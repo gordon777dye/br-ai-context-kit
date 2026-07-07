@@ -1,0 +1,18 @@
+# .gitignore — br-ai-context-kit (skeleton)
+#
+# The entries below are the per-app / internal files removed from the skeleton. Onboarding regenerates
+# them into this tree, so keep them ignored — nothing here should ever reach the public repo.
+
+# --- per-app onboarding output: generated & confidential, never commit ---
+/app/architecture.md
+/app/data-model.md
+/app/data-model.json
+/app/conventions.md
+/app/exemplars/
+
+# --- forward-looking hygiene for clones that onboard/compile a real app ---
+*.br
+*.bro
+*.wb
+*.wbo
+node_modules/
