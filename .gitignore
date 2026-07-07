@@ -3,6 +3,12 @@
 # The entries below are the per-app / internal files removed from the skeleton. Onboarding regenerates
 # them into this tree, so keep them ignored — nothing here should ever reach the public repo.
 
+# --- internal planning (not part of the published kit) ---
+/DEV_PLAN.md
+
+# --- LSP internal build artifacts (whole folder excluded) ---
+/lsp/
+
 # --- per-app onboarding output: generated & confidential, never commit ---
 /app/architecture.md
 /app/data-model.md
@@ -11,6 +17,7 @@
 /app/exemplars/
 
 # --- forward-looking hygiene for clones that onboard/compile a real app ---
+# (not part of the diff; safe to trim. compiled BR objects + node deps)
 *.br
 *.bro
 *.wb
