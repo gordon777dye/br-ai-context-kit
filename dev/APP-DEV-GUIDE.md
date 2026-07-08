@@ -21,9 +21,9 @@ authoritative backstop), pulling in the catalogs and your app's data-model as ne
 | Task | Start with | Then pull in |
 |---|---|---|
 | **Interpret / debug** — read existing BR | `topics.json` → `statement-semantics.md` | [`system-functions-catalog.md`](system-functions-catalog.md), [`error-reference.md`](error-reference.md), the app data-model (§4) |
-| **Coding** — write correct, idiomatic BR | `topics.json` → `statement-semantics.md` | the two catalogs + data-model, closed by the **`br-check`** write→check→fix loop |
+| **Coding** — write correct, idiomatic BR | `topics.json` → `statement-semantics.md` | the two catalogs + data-model, closed by a **`LOAD … source`** syntax check in BR (write→check→fix; §6) |
 | **App design** — architecture, data model, modules | [`../app/architecture.md`](../app/architecture.md) + generated **data-model** (§4) + [`../app/conventions.md`](../app/conventions.md) | br_tree concept leaves — [`file-model`](../br_tree/30-io-file/file-model/spec.md), [`library-facility`](../br_tree/50-libraries/library-facility/spec.md), [`screenio`](../br_tree/50-libraries/screenio/spec.md) |
-| **Testing** — validate behaviour | the toolchain + limitation in §6 | `br-check` (syntax); `br-query` for fixtures — note execution isn't headless here |
+| **Testing** — validate behaviour | headless BR (§6) | syntax-check via `LOAD "<prog>.brs" source`; run programs and procs headlessly through the BR invocation |
 
 *Why `topics.json` and not a flat keyword list: BR's lexicon is **positional** — only system
 functions are reserved against variable names, so telling a keyword from a variable needs the
@@ -126,8 +126,8 @@ node tools/extract-schema.js <path-to-app/filelay>
 This produces `data-model.md` + `data-model.json` for *that* app: per file, the data path,
 record length, each key index **with its composing fields** (the order you concatenate to
 build a `KEY=` lookup), and every field's FORM type/position. No app's data model is bundled
-here — generate the one you need. (If there's no `filelay/`, `br-describe`/`br-query` can read
-the schema straight from a binary data file.)
+here — generate the one you need. (No `filelay/`? Convert your data dictionary to the filelay format —
+see [`../app/INSTRUCTIONS.md`](../app/INSTRUCTIONS.md) Appendix A — then run the tool.)
 
 ### Read records (raw BR keyed I/O)
 
@@ -150,10 +150,10 @@ reference under [`../br_tree/50-libraries/fileio/`](../br_tree/50-libraries/file
 
 ## 5. Screens, printing, EDI (pointers)
 
-- **Screens**: ScreenIO drives interactive forms; persisted definitions live in
-  `screenio.dat`/`screenfld.dat` (round-trip to text with the `br-screenio` tool). A screen's event
-  `DEF FN…` code is compiled **into** the screen, so after editing an event function you **recompile
-  the screen** (not the event source alone) and never edit the compiled screen files directly.
+- **Screens**: ScreenIO drives interactive forms; persisted definitions live in the binary
+  `screenio.dat`/`screenfld.dat`, edited within BR/ScreenIO itself — never hand-edit those files. A
+  screen's event `DEF FN…` code is compiled **into** the screen, so after editing an event function you
+  **recompile the screen** (not the event source alone).
   Reference: [`../br_tree/50-libraries/screenio/`](../br_tree/50-libraries/screenio/).
 - **Printing**: `PRINT #n, USING form:` to an opened print file; PCL/PDF detail in
   [`../br_tree/40-io-printing/`](../br_tree/40-io-printing/).
@@ -163,22 +163,31 @@ reference under [`../br_tree/50-libraries/fileio/`](../br_tree/50-libraries/file
 
 ---
 
-## 6. Toolchain (and one limitation)
+## 6. Running BR (headless, via procedures)
 
-| Task | Tool |
+The kit ships two build-time helpers — [`tools/extract-schema.js`](tools/extract-schema.js) (schema →
+`data-model.md`, §4) and [`tools/gen_topics.py`](tools/gen_topics.py) (rebuild `topics.json` after
+editing `statement-semantics.md`). **Everything else is done by BR itself, driven headlessly:** write a
+`.prc` procedure containing the commands you want and run it through the BR invocation your app records
+in [`../app/toolset.md`](../app/toolset.md).
+
+Use a BR config with **`gui off`** and **no auto-launch of the app menu**, so BR drops to READY and runs
+the proc unattended (`toolset.md` covers creating such an "AI access" config when the normal
+`brconfig.sys` auto-starts the menu). Unlike the GUI `brnative.exe` path (which blocks on a splash
+screen without `LexiTip`), a `gui off` runtime runs procs to completion.
+
+| Task | How (BR, headless) |
 |---|---|
-| Syntax-check a `.brs` | `br-check` (**works headless**) |
-| List symbols / find unused DIMs | `br-symbols` / `br-unused` |
-| Inspect a data file's schema | `br-describe` / `br-query` (or generate `data-model.md`, §4) |
-| Query/maintain data files | `br-query` |
-| Round-trip screens to text | `br-screenio` |
-| Compile / run a program | `br-compile` / `br-run` |
+| **Syntax-check** a program | `LOAD "<prog>.brs" source` — parses line-by-line, halts on the first error with `ERR`/`LINE` set. The **`source`** keyword is required (`LOAD` defaults to object). |
+| **Run** a program | `RUN "<prog>"` (or `EXECUTE "<prog>"` from code); end the proc with `EXECUTE "system"` so BR exits instead of waiting at READY. |
+| **Read / maintain data** | Write a short BR program/proc that `OPEN`s the file (layout from `data-model.md`) and `READ`/`REWRITE`/`WRITE`s it — the kit has no external query tool. |
+| **Decompile** `.br` → `.brs` | a proc of `LOAD "<prog>.br"` / `LIST >"<prog>.br.brs"` pairs, ending `EXECUTE "system"` (see [`../app/INSTRUCTIONS.md`](../app/INSTRUCTIONS.md) STEP 3). |
 
-⚠️ **Limitation in this environment:** `br-compile`/`br-run` drive the **GUI** `brnative.exe`,
-which blocks on its splash screen without `LexiTip.exe`, so programs can't be executed
-headlessly here. BR code produced with this kit is therefore **syntax-validated with `br-check`,
-not executed.** Treat it as correct-by-construction; run it in a real BR
-environment (MyEditBR, or a Lexi install with `LexiTip.exe`) to confirm behavior.
+A proc is just BR commands, one per line, ending in `EXECUTE "system"`; run it with
+`"$BR_EXE" 'PROC <path>' -"$BR_CONFIG"` (exact executable and config in `toolset.md`). A command that
+errors leaves BR waiting at READY, so keep procs self-contained. File references resolve through the
+config's `DRIVE` map — use the **drive-relative** form (`<d>:dir\prog`, *no* leading backslash after the
+colon), per [`../br_tree/00-configuration/config-directives/spec.md`](../br_tree/00-configuration/config-directives/spec.md#paths).
 
 ---
 
@@ -192,4 +201,4 @@ environment (MyEditBR, or a Lexi install with `LexiTip.exe`) to confirm behavior
    (its `DEF LIBRARY`/`DEF FN` source).
 4. Follow the codebase's naming and module conventions.
 5. Handle every I/O error clause (`EOF`/`NOKEY`/`IOERR`/`LOCKED`).
-6. `br-check` it before considering it done.
+6. Syntax-check it in BR — `LOAD "<prog>.brs" source` (§6) — before considering it done.

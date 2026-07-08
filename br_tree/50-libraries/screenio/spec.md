@@ -5,7 +5,7 @@ source: screenio.brs (shipping source) + filelay/screenio,screenfld (schema) + b
 category: 50-libraries
 subcategory: 50-libraries/screenio
 kind: spec
-status: 2b           # spec + source-derived deep-reference pages (Function Reference, Data Model); authoritative over the fabricated docs/br-screenio-library guide; no conflicts
+status: 2b           # spec + source-derived deep-reference pages (Function Reference, Data Model); authoritative over the earlier fabricated ScreenIO library guide; no conflicts
 related: [library-facility, fnsnap]
 ---
 

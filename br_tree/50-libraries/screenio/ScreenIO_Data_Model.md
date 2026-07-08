@@ -18,8 +18,9 @@ and [file I/O](../../30-io-file/statements/spec.md) for you. Knowing this schema
 [event-callback contract](ScreenIO_Function_Reference.md#events) legible — events and validations are just
 string fields here that the engine `EXECUTE`s.
 
-These two files round-trip to editable text via the **`br-screenio`** skill (`export`/`validate`/`import`),
-so screens can be diffed and edited as text.
+Because these are ordinary **keyed BR data files** (schema below), a BR program can read or rewrite them
+directly using the documented layout, and BR's own ScreenIO designer maintains them interactively — so
+screens can be inspected and edited without leaving BR. Do not hand-edit the binaries outside BR.
 
 <a id="screen"></a>
 ## Screen header — `screenio.dat` (prefix `SI_`, key `SCREENCODE`)
@@ -105,4 +106,3 @@ One record per control on a screen.
 - [ScreenIO_Function_Reference.md](ScreenIO_Function_Reference.md) — the 16 exports and the event contract these fields feed
 - [spec.md](spec.md) — concepts and screen-function types
 - [20-io-screen/controls](../../20-io-screen/controls/spec.md) — the underlying BR controls ScreenIO renders (grid/list, picture, combo…)
-- `br-screenio` skill — export/validate/import `screenio.dat`/`screenfld.dat` as editable text
