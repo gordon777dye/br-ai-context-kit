@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment
 recovered-fold: AutoIt, BRListenerInstaller.exe, BRSerial.dat (3 redirect-collision pages folded from re-fetched source — AutoIt automation note + EditNN/R99C999, installer service-register, brserial.dat license/UserID$/version-rename; verbatim retained on the BR wiki)
 related: [config-directives, platform]
+keywords: [ODBC, PDF, Lexi, DLL, PEM, AutoIt]
 ---
 
 # Installation & tooling

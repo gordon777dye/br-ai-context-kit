@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (STOP/END/PAUSE termination); no conflicts
 recovered-fold: GOSUB, ON_GOSUB, RANDOMIZE (3 redirect-collision pages folded from re-fetched source — added RANDOMIZE, GOSUB error-1011 immediate restriction, ON-GOSUB NONE-is-a-GOSUB-branch; verbatim retained on the BR wiki)
 related: [conditionals, syntax, functions-udf]
+keywords: [FOR, NEXT, DO, LOOP, WHILE, UNTIL, GOTO, GOSUB, RETURN, ON GOTO, ON GOSUB, EXIT, RANDOMIZE, STOP, END, PAUSE]
 ---
 
 # Loops & branching

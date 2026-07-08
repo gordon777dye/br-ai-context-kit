@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment; PARITY removed (not an OPEN param on 4.0+)
 recovered-fold: OPEN_communications (folded+pruned — FORMAT=ASYNC/OUTIN-init/WAIT→4271/EOL=NONE; PARITY intentionally omitted; verbatim retained on the BR wiki)
 related: [statements, file-model]
+keywords: [BAUD, DATABITS, STOPBITS, COM, OPEN, serial]
 ---
 
 # Serial communications channels

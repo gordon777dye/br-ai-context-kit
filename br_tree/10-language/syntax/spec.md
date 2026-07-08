@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (line continuation); no conflicts
 recovered-fold: Keyword_Abbreviation (rules folded; full-table page RETAINED), DIAGRAM_CONVENTIONS (folded+pruned). 2 redirect-collision pages re-fetched; verbatim retained on the BR wiki
 related: [conditionals, other-flow, functions-udf]
+keywords: [REM, comment, line-number, label, continuation, "!:", abbreviation]
 ---
 
 # Lexical structure & program syntax

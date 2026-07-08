@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (linked files); no conflicts
 recovered-fold: Display_Files, File_Handle, File_Ref, Multi-User_Programming, NEW, NOSHR, OUTIN, OUTPUT, REC, RECL, RELATIVE, RESERVE (12 redirect-collision pages folded from re-fetched source; verbatim retained on the BR wiki)
 related: [statements, keys-indexes, form-spec]
+keywords: [OPEN, INTERNAL, EXTERNAL, KEYED, RELATIVE, DISPLAY, SHR, RESERVE, LINKED, WSID, locking]
 ---
 
 # File model (types, access, sharing)

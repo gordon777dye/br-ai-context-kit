@@ -7,6 +7,7 @@ subcategory: 40-io-printing/sort
 kind: spec
 status: 2b           # reference base verified comprehensive; backing stubs pruned (NoSort → controls); no conflicts
 related: [statements, keys-indexes]
+keywords: [SORT]
 ---
 
 # SORT facility

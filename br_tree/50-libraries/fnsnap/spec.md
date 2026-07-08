@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference catalog + br_tree per-area function index
 recovered-fold: FnSnap TOC page folded (dll location/pdf/provenance) + pruned; the 8 FnSnap__* API pages remain retained. Redirect-collision page re-fetched; verbatim retained on the BR wiki
 related: [library-facility, screenio]
+keywords: [FnSnap, LIBRARY]
 ---
 
 # FnSnap function packs

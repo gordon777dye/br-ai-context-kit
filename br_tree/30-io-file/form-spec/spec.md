@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (repetition/groups, SKIP, variant codes); no conflicts
 recovered-fold: BH_4, CC, CU, DR, GU, GZ, NZ (7 redirect-collision pages folded from re-fetched source — CU/CL/GU FORM error 1006, CC centering, NZ/GZ blank-on-zero, BH 4 range+sentinel; verbatim retained on the BR wiki)
 related: [statements, file-model, keys-indexes]
+keywords: [FORM, USING, PIC, POS, SKIP]
 canonical: form-spec   # canonical home for the FORM spec (printing/screen guides link here)
 ---
 

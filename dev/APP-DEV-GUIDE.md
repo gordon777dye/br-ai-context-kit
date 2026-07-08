@@ -7,6 +7,8 @@ context. Each section says **where the authoritative detail lives** so this stay
 a duplicate. It is application-agnostic: point the tooling at whatever BR app you're working
 on.
 
+Please document any errors in dev\ERRORS.md. This includes any inaccuracies *or ambiguities* found (within the context folder) while using this kit. Let the user know when you post something to this file so they can forward the report to ADS. 
+
 ---
 
 ## Start here — by task type
@@ -17,6 +19,14 @@ entry point for reading or writing BR code:** it routes a keyword to its anchore
 not the whole file) and carries the `lexicon` — the classified inventory of which spellings are
 reserved. The path is **`topics.json` → `statement-semantics.md` → [`../br_tree/`](../br_tree/)** (the
 authoritative backstop), pulling in the catalogs and your app's data-model as needed.
+
+The language axis has **two parallel keyword entry points** — use whichever fits the token:
+- **[`topics.json`](topics.json)** for statements/clauses — fast, line-ranged semantics + the `lexicon`.
+  This is the default for reading or writing statement code.
+- **[`brtree-index.json`](brtree-index.json)** for *any* BR keyword — config directives, screen
+  controls, printing, functions, commands — or to jump straight to the authoritative spec. Its
+  `keyword_index` maps a token to its br_tree spec path(s) + anchors: **`brtree-index.json` →
+  `../br_tree/<spec>/spec.md#<anchor>`**. It complements `topics.json`; it does not replace it.
 
 | Task | Start with | Then pull in |
 |---|---|---|
@@ -73,6 +83,7 @@ BR apps converge on a few conventions worth recognizing:
 |---|---|
 | A statement's behavior / semantics / side effects / error clauses | [`topics.json`](topics.json) routes to the right [`statement-semantics.md`](statement-semantics.md) section (anchor + line range); each topic links to br_tree for depth |
 | Full syntax, edge cases, version notes, related concepts | the [`../br_tree/`](../br_tree/) language reference tree (authoritative; the semantics file's See-also links land here) |
+| Which br_tree spec documents keyword `X` — across *all* topics (config, screen, printing, functions, commands), not just statements | [`brtree-index.json`](brtree-index.json) `keyword_index` maps a BR keyword to its spec path(s); each spec record carries its anchors + a one-line summary. Complements `topics.json` (which is statement-centric) |
 | Is `X` a keyword or a variable? Which words are reserved | [`topics.json`](topics.json) `lexicon` — the classified inventory; only system functions are reserved, every other keyword is positional (a variable may reuse its spelling) |
 | Built-in (system) functions (`STR$`, `CNVRT$`, `SRCH`, …) | [`system-functions-catalog.md`](system-functions-catalog.md) — the full `table6k∪table7k` roster with signatures |
 | App library / UDF signatures | index the **target app's own** `DEF LIBRARY`/`DEF FN` source — not the corpus (its UDFs are confidential) |
@@ -95,6 +106,10 @@ the br_tree reference; the critical ones:
 - **Every line is numbered**; labels go right after the number (`00050 LOOP1: …`).
 - **`=` is context-sensitive.** Inside `IF`/`WHILE`/`UNTIL` it means *compare*; elsewhere it
   *assigns*. Use **`:=`** to force assignment inside a condition (must be parenthesized).
+- **Operators aren't C/Python.** `&` is **string concatenation**, not bitwise-AND. `^` and `**` are
+  **both exponentiation**, not XOR. BR has **no source-level bitwise operators** at all. Modulo is
+  **`MOD`**, not `%`. (Full 12-level precedence in
+  [expressions](../br_tree/10-language/data-manipulation/expressions/spec.md).)
 - **String variables end in `$`**; size is declared `DIM NAME$*30`. Arrays are 1-based.
 - **Keywords abbreviate on entry** (shortest-unique-prefix; functions and clause words need full
   spelling), but BR **expands them when a program is LISTed** — so `.brs` source always shows full
@@ -104,7 +119,9 @@ the br_tree reference; the critical ones:
 - **`[WSID]`-style substitutions** appear in file names for per-workstation temp files
   (`"SORTCTL.Z[WSID]"`).
 - **`DEF`/`FNEND` functions** can have a typed/sized return (`DEF FNX$*255(...)`), optional
-  parameters after `;`, and by-reference parameters marked `&`. Two traps: `FN<name>` in a mid-body
+  parameters after `;` (which double as the **local-variable idiom** — trailing params the caller
+  never passes are fresh 0/null scratch locals each call), and by-reference parameters marked `&`.
+  Two traps: `FN<name>` in a mid-body
   expression is a *recursive call*, not the value-so-far — build an incremental result in a scratch
   variable, never by reading `FN<name>` back (you may assign it freely, last write wins); and a
   function has **one exit** — no early return, `GOTO` a label before `FNEND`.
@@ -171,12 +188,14 @@ reference under [`../br_tree/50-libraries/fileio/`](../br_tree/50-libraries/file
 
 ## 6. Running BR (headless, via procedures)
 
-The kit ships three build-time helpers — [`tools/extract-schema.js`](tools/extract-schema.js) (schema →
+The kit ships four build-time helpers — [`tools/extract-schema.js`](tools/extract-schema.js) (schema →
 `data-model.md`, §4), [`tools/gen_topics.py`](tools/gen_topics.py) (rebuild `topics.json` after
-editing `statement-semantics.md`), and [`tools/gen_datamodel_index.py`](tools/gen_datamodel_index.py)
-(rebuild `data-model-index.json`). Both generators take **`--verify`** — a non-writing drift check
-(source hash + range validation + regenerate-and-compare, exit 1 on drift) for catching a stale index
-after the source was edited but not regenerated. **Everything else is done by BR itself, driven headlessly:** write a
+editing `statement-semantics.md`), [`tools/gen_datamodel_index.py`](tools/gen_datamodel_index.py)
+(rebuild `data-model-index.json`), and [`tools/gen_brtree_index.py`](tools/gen_brtree_index.py)
+(rebuild `brtree-index.json` from br_tree spec frontmatter). The three Python generators take
+**`--verify`** — a non-writing drift check (source hash + range/structure validation +
+regenerate-and-compare, exit 1 on drift) for catching a stale index after the source was edited but
+not regenerated. **Everything else is done by BR itself, driven headlessly:** write a
 `.prc` procedure containing the commands you want and run it through the BR invocation your app records
 in [`../app/toolset.md`](../app/toolset.md).
 

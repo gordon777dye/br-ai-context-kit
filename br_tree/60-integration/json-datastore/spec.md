@@ -7,6 +7,7 @@ subcategory: 60-integration/json-datastore
 kind: spec
 status: 2b           # synthesized from the reference; new leaf, no backing pages to fold (nothing pending)
 related: [web, system-functions]
+keywords: [JSON, datastore, object-store]
 ---
 
 # JSON & data store

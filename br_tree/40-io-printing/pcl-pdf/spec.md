@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment
 recovered-fold: Native_Windows_Printing + NWP.DOC retained (deep NWP reference); PDFLib2.dll folded+pruned. Folded OPTION 31, DIRECT:/, justification/CHR$(6), \Estop_cursor, duplex, \Epage_number, paper tray/media, pdflib2.dll@4.20H. 3 redirect-collision pages re-fetched; verbatim retained on the BR wiki
 related: [statements]
+keywords: [PCL, PDF, NWP, barcode, FONT, SETFONT]
 ---
 
 # PCL / Native Windows Printing escape codes

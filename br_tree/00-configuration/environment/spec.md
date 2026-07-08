@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment
 recovered-fold: Environmental_Variable (redirect-collision page re-fetched; content already fully covered by this spec's SETENV/ENV$/%NAME% sections — pruned; verbatim retained on the BR wiki)
 related: [config-directives, client-server]
+keywords: [ENV, SETENV, DATADIR, BR_DATA, LOGIN_NAME, WORKPATH]
 ---
 
 # Environment variables & paths

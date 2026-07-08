@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # synthesized from the reference; new leaf
 recovered-fold: ATTN_Mode, CONV, EOF, NOREC, Operating_Mode, Operating_System_Error, PAUSE_mode, RETRY (8 redirect-collision pages folded from re-fetched source — full operating-mode table, OS-error 4300/4320+SysErr, ON-eligibility, RETRY caveats; verbatim retained on the BR wiki)
 related: [other-flow, conditionals]
+keywords: [ON ERROR, ERROR, IOERR, RETRY, CONTINUE, EXIT, ERR, LINE, SOFLOW, ZDIV]
 ---
 
 # Error handling

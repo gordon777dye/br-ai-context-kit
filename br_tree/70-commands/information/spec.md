@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree fold (BREAK detail, DISPLAY -p/MAT, STATUS/VERIFY, DEBUG_STR, LIST search); PROCIN/PROGRAM$ home resolved; no conflicts
 recovered-fold: NOSTEP (redirect-collision page re-fetched; NOSTEP/NOTRACE already covered by the GO bnf in program-management — pruned; verbatim retained on the BR wiki)
 related: [program-management, editing]
+keywords: [STATUS, LIST, TRACE, DISPLAY, LOGGING]
 ---
 
 # Information & debugging commands

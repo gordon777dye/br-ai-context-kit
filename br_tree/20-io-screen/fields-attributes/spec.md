@@ -7,6 +7,7 @@ subcategory: 20-io-screen/fields-attributes
 kind: spec
 status: 2b           # reference base + br_tree enrichment; L/^ resolved (br_tree wins): L=scroll-out, ^ dropped
 related: [input-output, controls, windows-cursor]
+keywords: [FMT, PIC, attribute, FILTER, color, DATE]
 ---
 
 # Field formats & attributes

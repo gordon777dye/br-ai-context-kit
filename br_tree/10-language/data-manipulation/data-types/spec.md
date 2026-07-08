@@ -7,6 +7,7 @@ subcategory: 10-language/data-manipulation/data-types
 kind: spec
 status: 2b           # reference base + br_tree enrichment (hex / null); no conflicts
 related: [declaration, assignment, expressions]
+keywords: [numeric, string, hexadecimal, null, inf]
 ---
 
 # Data types

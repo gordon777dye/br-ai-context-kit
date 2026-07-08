@@ -6,8 +6,9 @@ category: 40-io-printing
 subcategory: 40-io-printing/statements
 kind: spec
 status: 2b           # reference base + br_tree enrichment (PAGEOFLOW); misfiled command/config pages relocated; no conflicts
-recovered-fold: PRINT_USING, PRN, REMOTE_PRINTING (3 redirect-collision pages folded from re-fetched source — RUN >/>>/>CON: redirect, string-FORM recompile, PRN:/10 pass-through, DIRECT:/ vs SPOOLCMD, PRINTER_LIST(), CS OPTION 30/@ routing; verbatim retained on the BR wiki)
+recovered-fold: 'PRINT_USING, PRN, REMOTE_PRINTING (3 redirect-collision pages folded from re-fetched source — RUN >/>>/>CON: redirect, string-FORM recompile, PRN:/10 pass-through, DIRECT:/ vs SPOOLCMD, PRINTER_LIST(), CS OPTION 30/@ routing; verbatim retained on the BR wiki)'
 related: [pcl-pdf, sort]
+keywords: [PRINT, OPEN, PAGEOFLOW, NEWPAGE, HEADING, USING, PIC, COPIES]
 ---
 
 # Printing statements

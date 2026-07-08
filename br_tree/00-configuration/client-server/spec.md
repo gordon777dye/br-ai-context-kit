@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree fold (reconnect/keepalive, service install, troubleshooting); HTTP=CLIENT relocated to 60-integration/web; no conflicts
 recovered-fold: BRListener.Conf, BRListener.exe, BRListener.Log, Client_Server, MultiSession (5 redirect-collision pages folded from re-fetched source — Security section, TLS, 64/32-bit install + /ALTERNATE, SHELL LIMIT/DEFAULT + flags, CLIENT_CURRENT_DIR modes, conf-read-fresh; verbatim retained on the BR wiki)
 related: [config-directives, platform, environment]
+keywords: [CLIENT_SERVER, BRSERVER, SERVER, CONFIG]
 ---
 
 # Client-server

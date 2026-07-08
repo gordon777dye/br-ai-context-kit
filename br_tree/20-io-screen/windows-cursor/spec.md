@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (CMDKEY/FKEY/CURFLD, cursor shape, GUIMODE, borders); no conflicts
 recovered-fold: CURFLD, CURWINDOW, EROW, FNKEY, GUI_Console, GUI_Mode, Parent=None folded+pruned; FKEY retained (scancode tables). 8 redirect-collision pages re-fetched; verbatim retained on the BR wiki
 related: [input-output, fields-attributes, controls]
+keywords: [OPEN WINDOW, WINDOW, BORDER, NEWPAGE, CAPTION, cursor, PARENT]
 canonical: window-open   # canonical home for the window OPEN spec (printing guide links here)
 ---
 

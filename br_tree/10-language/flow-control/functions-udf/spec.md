@@ -7,6 +7,7 @@ subcategory: 10-language/flow-control/functions-udf
 kind: spec
 status: 2b           # reference base + br_tree enrichment (single-line DEF, string-fn length, recursion, function-authoring gotchas: return-name-is-call, single exit, no-paren calls, no array dims in params); no conflicts
 related: [other-flow, syntax, system-functions]
+keywords: [DEF, FNEND, FN, LIBRARY]
 ---
 
 # User-defined functions (DEF / FN)

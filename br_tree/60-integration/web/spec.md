@@ -7,6 +7,7 @@ subcategory: 60-integration/web
 kind: spec
 status: 2b           # reference base + br_tree enrichment (BR-as-webserver model); PHP-bridge model removed 2026-07-03; no source conflicts
 related: [json-datastore, screenio]
+keywords: [WEB_SERVER12, WebForm, HTTP, web-server, BR_FUNC]
 ---
 
 # Web integration

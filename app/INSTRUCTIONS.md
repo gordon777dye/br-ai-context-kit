@@ -6,7 +6,7 @@ Follow it once per application. Let your favorite AI model do the work (except f
 
 Once onboarding is complete, the reader may be a human or an LLM.
 
-Please document any errors in dev\ERRORS.md.
+Please document any errors in dev\ERRORS.md. This includes any inaccuracies *or ambiguities* found during the onboarding process.
 
 ---
 
@@ -21,8 +21,13 @@ Please document any errors in dev\ERRORS.md.
 | **App layer** | **`app\`** | **This** application's data model, style, and tools | ✅ This is what you build |
 
 Onboarding adds an **app axis** beside the existing **language axis**; keep them distinct:
-- **Language axis**: `topics.json` (BR keyword) → `statement-semantics.md` → `br_tree\`
-  — a *lexical* router, reached from a token you're about to read or write.
+- **Language axis** — two parallel keyword entry points into the same reference, reached from a token
+  you're about to read or write:
+  - `topics.json` (statement/clause keyword) → `statement-semantics.md` → `br_tree\` — a *lexical*
+    router with line ranges + the reserved-word `lexicon`.
+  - `brtree-index.json` (any BR keyword — config, screen, printing, functions, commands) →
+    `br_tree\<spec>#<anchor>` — a concept→spec router over *all* leaves; use it for non-statement
+    tokens or to reach the authoritative spec directly. Complements `topics.json`, doesn't replace it.
 - **App axis** (new): `dev\APP-DEV-GUIDE.md` → always-load `conventions.md` + `toolset.md`; on-demand
   `data-model.md` (by file), `exemplars\` (by archetype), `architecture.md`.
 

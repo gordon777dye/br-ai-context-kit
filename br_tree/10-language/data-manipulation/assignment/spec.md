@@ -7,6 +7,7 @@ subcategory: 10-language/data-manipulation/assignment
 kind: spec
 status: 2b           # reference base + br_tree enrichment (multiple assignment, += compound ops, append/prepend idioms); no conflicts
 related: [expressions, declaration, data-types, system-functions]
+keywords: [LET, MAT, DATA, READ, RESTORE, ":="]
 ---
 
 # Assignment & data movement

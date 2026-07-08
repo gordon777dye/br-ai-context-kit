@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment
 recovered-fold: BTREE, Key_Spec, KFNAME, KLN, KREC (5 redirect-collision pages folded from re-fetched source — Btree2 no-mix rule, KLN/KPS split-key segment param, KREC=index-record vs REC=master + display/linked behavior; verbatim retained on the BR wiki)
 related: [statements, file-model, form-spec]
+keywords: [INDEX, KEY, SEARCH, KEYED, REORG, VERIFY]
 ---
 
 # Keyed access & the index facility

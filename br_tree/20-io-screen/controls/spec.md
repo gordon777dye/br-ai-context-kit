@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment
 recovered-fold: 2D_Controls, CELL_RANGE, COLCNT, Combo_Boxes, Display_Buttons, RANGE folded+pruned; Grid_and_List retained (deep grid/list reference). 7 redirect-collision pages re-fetched; verbatim retained on the BR wiki
 related: [input-output, fields-attributes, windows-cursor]
+keywords: [GRID, LIST, TEXT, COMBO, RADIO, CHECK, MENU, FIELDS, BUTTON]
 ---
 
 # GUI controls

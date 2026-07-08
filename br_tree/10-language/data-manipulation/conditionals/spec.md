@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base; br_tree pages (IF/ELSE/END_IF) verified — all corroborate; no conflicts
 recovered-fold: Conditional_Expression (folded+pruned — implied <>0, SKIP, operator list; verbatim retained on the BR wiki)
 related: [expressions, other-flow]
+keywords: [IF, THEN, ELSE]
 ---
 
 # Conditionals (IF)

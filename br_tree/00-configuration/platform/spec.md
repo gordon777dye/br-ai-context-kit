@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment
 recovered-fold: Getting_Started (folded+pruned — WBSERVER.DAT/error 4175, spool RAW gotcha, SYSTEM exit/Ctrl-A; verbatim retained on the BR wiki)
 related: [config-directives, client-server, installation-tooling]
+keywords: [platform, executable, WSID, startup, brnative]
 ---
 
 # Platforms & executables

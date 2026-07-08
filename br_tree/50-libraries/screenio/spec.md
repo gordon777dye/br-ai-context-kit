@@ -7,6 +7,7 @@ subcategory: 50-libraries/screenio
 kind: spec
 status: 2b           # spec + source-derived deep-reference pages (Function Reference, Data Model); authoritative over the earlier fabricated ScreenIO library guide; no conflicts
 related: [library-facility, fnsnap]
+keywords: [ScreenIO, LIBRARY, fnfm, fnfm$]
 ---
 
 # ScreenIO library

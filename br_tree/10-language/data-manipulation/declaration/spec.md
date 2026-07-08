@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (OPTION BASE/statement, DIMONLY); no conflicts
 recovered-fold: Array_Name, Numeric_Variable (2 redirect-collision pages folded from re-fetched source — name must start with a letter (corrected from "letter or _"), FN-prefix reserved, scalar/array/string co-existence; verbatim retained on the BR wiki)
 related: [data-types, assignment, expressions]
+keywords: [DIM, MAT, OPTION]
 ---
 
 # Declaration (variables & arrays)

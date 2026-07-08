@@ -7,6 +7,7 @@ subcategory: 50-libraries/fileio
 kind: spec
 status: 2b           # source-derived reference + online-doc manual captured; ScreenIO/AuditBR build on it; no conflicts
 related: [library-facility, screenio]
+keywords: [FileIO, fnOpen, fnRead, LIBRARY]
 ---
 
 # FileIO library

@@ -8,6 +8,7 @@ kind: spec
 status: 2b           # reference base verified comprehensive; misfiled command pages relocated; added 2026-07-03: CLOSE trailing-colon terminates the statement (second colon needed before a following statement); no conflicts
 recovered-fold: LINPUT, OPEN_DISPLAY, OPEN_external, READ(disambig), REREAD, RESTORE(disambig), RESTORE_file (7 redirect-collision pages folded from re-fetched source — external short-record 4271, DELETE-invalid-on-external, TRANSLATE/0608/4146, RESTORE modes+linked anchors, LINPUT/WAIT/TIMEOUT, REREAD dup-key idiom; verbatim retained on the BR wiki)
 related: [file-model, form-spec, keys-indexes, serial-comm]
+keywords: [OPEN, CLOSE, READ, WRITE, REWRITE, DELETE, RESTORE, REREAD, REC, KEY]
 ---
 
 # File I/O statements

@@ -1,12 +1,13 @@
 ---
 title: Database operations (SQL / ODBC)
 file: spec.md
-source: CONFIG DATABASE (00-configuration/config-directives) + SQL/ODBC error codes (90-reference/error-codes 3002–3015, 4002–4015, 0366, 4270) + wiki DATABASE page + 4.3/4.30 release notes (90-reference/limits-constants: OPEN…SQL inline/file forms, ENVDB.BRS STATUS.DATABASE interrogation). Worked examples derived from the BR "brg_demo" SQL example set (db_connect / mysql_read / mysql_write / sqlite_read / sqlite_write.wbs, dsn.fil — working material, since pruned)
+source: 'CONFIG DATABASE (00-configuration/config-directives) + SQL/ODBC error codes (90-reference/error-codes 3002–3015, 4002–4015, 0366, 4270) + wiki DATABASE page + 4.3/4.30 release notes (90-reference/limits-constants: OPEN…SQL inline/file forms, ENVDB.BRS STATUS.DATABASE interrogation). Worked examples derived from the BR "brg_demo" SQL example set (db_connect / mysql_read / mysql_write / sqlite_read / sqlite_write.wbs, dsn.fil — working material, since pruned)'
 category: 30-io-file
 subcategory: 30-io-file/database
 kind: spec
 status: 2b           # verified against config-directives (CONFIG DATABASE), error-codes 3002–4270, wiki DATABASE page, and 4.3/4.30 release notes (OPEN…SQL inline/file forms, ENVDB.BRS STATUS.DATABASE demo); no conflicts
 related: [config-directives, statements, form-spec, json-datastore]
+keywords: [CONFIG DATABASE, OPEN, SQL, DSN, ODBC, CONNECTSTRING, ODBC-MANAGER, PASSWORDD, STATUS.DATABASE]
 ---
 
 # Database operations (SQL / ODBC)

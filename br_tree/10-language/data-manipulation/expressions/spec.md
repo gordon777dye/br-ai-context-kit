@@ -7,6 +7,7 @@ subcategory: 10-language/data-manipulation/expressions
 kind: spec
 status: 2b           # reference base; br_tree pages verified (all corroborate); corrected 2026-07-03: MOD is a function, not an infix operator (removed from precedence table); no conflicts
 related: [assignment, conditionals, data-types, declaration]
+keywords: [AND, OR, NOT, precedence, ":=", operators]
 ---
 
 # Expressions
