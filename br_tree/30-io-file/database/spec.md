@@ -1,7 +1,7 @@
 ---
 title: Database operations (SQL / ODBC)
 file: spec.md
-source: BR SQL example set (context/work/sql — db_connect.wbs, mysql_read.wbs, mysql_write.wbs, sqlite_read.wbs, sqlite_write.wbs, dsn.fil) + CONFIG DATABASE (00-configuration/config-directives) + SQL/ODBC error codes (90-reference/error-codes 3002–3015, 4002–4012, 0366) + wiki DATABASE page
+source: BR SQL example set (context/work/sql — db_connect.wbs, mysql_read.wbs, mysql_write.wbs, sqlite_read.wbs, sqlite_write.wbs, dsn.fil) + CONFIG DATABASE (00-configuration/config-directives) + SQL/ODBC error codes (90-reference/error-codes 3002–3015, 4002–4015, 0366, 4270) + wiki DATABASE page + 4.3/4.30 release notes (90-reference/limits-constants: OPEN…SQL inline/file forms, ENVDB.BRS STATUS.DATABASE interrogation)
 category: 30-io-file
 subcategory: 30-io-file/database
 kind: spec
@@ -81,7 +81,7 @@ Sample connection strings by target:
 | MySQL | `DSN=BRG_DEMO;SERVER=127.0.0.1;UID=dbadmin;PWD=…;DATABASE=brg_demo;PORT=3306` |
 | SQLite | `DSN=SQLite3 Datasource;Database=C:\demo\brg_demo.sqlite;SyncPragma=NORMAL;Timeout=100000;…` |
 | SQL Server (SQL login) | `DRIVER=SQL Server;SERVER=server;Initial Catalog=database;UID=username;PWD=password` |
-| SQL Server (Windows auth) | `DRIVER=SQL Server;Initial Catalog=database;SERVER=server` with `User=LOGIN_NAME Password=BR_PASSWORD` |
+| SQL Server (Windows auth) | `DRIVER=SQL Server;Initial Catalog=database;SERVER=server` with trailing `, USER=LOGIN_NAME, PASSWORD=BR_PASSWORD` |
 | MS Access | `Driver={Microsoft Access Driver (*.mdb)};DBQ=C:\path\Contact.mdb` |
 
 <a id="discover-connstring"></a>
@@ -90,20 +90,24 @@ Sample connection strings by target:
 After a connection is configured, its effective connection string is readable through `Env$`:
 
 ```business-rules
-PRINT Env$("STATUS.DATABASE.[BRG_DEMO].CONNECTSTRING")
+PRINT Env$("STATUS.DATABASE.BRG_DEMO.CONNECTSTRING")
 ```
 
 This is how the **ODBC-MANAGER → capture → reuse** pattern works: let the user pick the source once,
 read back the resolved string, and save it so later runs can connect **DSN-less** without prompting.
+
+Connection names in `STATUS.DATABASE` paths are **uppercased** by BR — a connection configured as
+`DemoConn` is addressed as `DEMOCONN` in `Env$` lookups. Substitute the bare name directly; there are
+**no brackets** in the path string.
 
 ```business-rules
 00010 PRINT Newpage
 00011 IF Env$("br_model")="CLIENT_SERVER" THEN PRINT "Cannot use ODBC-MANAGER in Client/Server mode"
 00020 EXECUTE "Config Database Test_DB ODBC-MANAGER" ERROR CONNECT_ERROR
 00030 PRINT "Connection String is:" !:
-      PRINT Env$("STATUS.DATABASE.[TEST_DB].CONNECTSTRING")
+      PRINT Env$("STATUS.DATABASE.TEST_DB.CONNECTSTRING")
 00040 OPEN #1: "NAME=dsn.fil,replace,recl=4096", display, output
-00050 PRINT #1: Env$("STATUS.DATABASE.[TEST_DB].CONNECTSTRING")   ! save for reuse
+00050 PRINT #1: Env$("STATUS.DATABASE.TEST_DB.CONNECTSTRING")   ! save for reuse
 00060 CLOSE #1:
 00099 STOP
 00100 CONNECT_ERROR: !
@@ -136,6 +140,19 @@ OPEN #<channel>: "DATABASE=<db-ref>", SQL <string-expression>, OUTIN
 
 The statement text is **bound at OPEN time**. To run a different statement, build a new string and
 `OPEN` a fresh channel (the examples re-`OPEN` per operation).
+
+<a id="open-sql-file"></a>
+### Opening SQL from an external file
+
+Instead of passing SQL text in a string variable, you can point `OPEN` at a file containing SQL text:
+
+```business-rules
+OPEN #H: "DATABASE=MyConn,NAME=Setup_Tables.sql/MyFolder", SQL, OUTIN
+```
+
+This is useful for long setup scripts (create/alter statements) and keeps large SQL blocks out of
+program source. The BR 4.3 release notes document both `OPEN … SQL` forms — SQL text inline
+(`SQL "<statement>"`) or from a file (`NAME=<file>` with a bare `SQL`).
 
 ---
 
@@ -190,6 +207,8 @@ width. Loop until `EOF`:
 - Use the FORM to control numeric vs. character interpretation (`N`, `PD`, `C`, dates, …) exactly as
   for a native BR record — see [form-spec](../form-spec/spec.md).
 - `EOF` fires when the result set is exhausted.
+- For wide `SELECT` lists, arrays and composite FORMs are usually easier to maintain than long
+  variable lists.
 
 ---
 
@@ -202,6 +221,18 @@ CLOSE #DB_HANDLE:
 
 Releases the channel and the associated statement/result set. Always close, especially in loops that
 re-open per operation, to avoid leaking ODBC handles.
+
+<a id="clear-connections"></a>
+### Clearing configured connections
+
+You can remove one configured database reference or clear all references:
+
+```business-rules
+EXECUTE "CONFIG DATABASE CLEAR MyConn"
+EXECUTE "CONFIG DATABASE CLEAR ALL"
+```
+
+Clearing can help long-running routines reset stale or no-longer-needed connection references.
 
 ---
 
@@ -224,19 +255,20 @@ re-open per operation, to avoid leaking ODBC handles.
 ```
 
 <a id="ex-sqlite-write"></a>
-### SQLite — insert a row
+### SQLite — parameterized insert
 
 ```business-rules
-48001 DIM C_SQL$*4096
-48002 LET C_SQL$="INSERT INTO tbl_names (firstname,lastname) VALUES (""EVETS"", ""REGOK"");"
+48001 DIM C_SQL$*4096, FIRST$*50, LAST$*50
+48002 LET FIRST$="EVETS" : LET LAST$="REGOK"
+48003 LET C_SQL$="INSERT INTO tbl_names (firstname,lastname) VALUES (?, ?)"
 49001 EXECUTE 'CONFIG database brg_demo CONNECTSTRING="DSN=SQLite3 Datasource;Database=C:\demo\2018\brg_demo.sqlite;SyncPragma=NORMAL;Timeout=100000;NoCreat=0;PWD="'
 49002 OPEN #(DB_HANDLE:=21): "DATABASE=brg_demo", SQL C_SQL$, OUTIN
-49003 WRITE #DB_HANDLE:                                    ! perform the INSERT
+49003 WRITE #DB_HANDLE: FIRST$, LAST$                      ! bind parameters and INSERT
 49008 DONE: CLOSE #DB_HANDLE:
 ```
 
-> Note the doubled quotes: inside a BR `"…"` string, `""` is a literal `"`, so the SQL text receives
-> `'EVETS'`-style quoted values as `"EVETS"`.
+If you do inline literal string values in SQL text, remember that inside a BR `"…"` string,
+`""` is a literal `"`.
 
 <a id="ex-mysql"></a>
 ### MySQL — same pattern, different connection string
@@ -255,6 +287,28 @@ re-open per operation, to avoid leaking ODBC handles.
 
 Only the `CONNECTSTRING` changes between SQLite and MySQL — the `OPEN`/`WRITE`/`READ`/`CLOSE`
 mechanics are identical across ODBC back ends. That portability is the whole point of the ODBC layer.
+
+<a id="ex-sqlserver-winauth-error"></a>
+### SQL Server (Windows authentication) — select with explicit error labels
+
+```business-rules
+00010 DIM C_SQL$*4096, FIRST$*50, LAST$*50, EMAIL$*100
+00020 EXECUTE 'CONFIG DATABASE DemoConn CONNECTSTRING="DRIVER=SQL Server;Initial Catalog=mydb;SERVER=myserver", USER=LOGIN_NAME, PASSWORD=BR_PASSWORD' ERROR CONNECT_ERR
+00030 LET C_SQL$="SELECT FirstName, LastName, Email FROM dbo.Customers ORDER BY LastName"
+00040 OPEN #(H:=21): "DATABASE=DemoConn", SQL C_SQL$, OUTIN ERROR OPEN_ERR
+00050 WRITE #H: ERROR EXEC_ERR
+00060 RD: READ #H, USING 'FORM POS 1,C 50,C 50,C 100': FIRST$, LAST$, EMAIL$ EOF DONE ERROR READ_ERR
+00070     PRINT TRIM$(LAST$); ", "; TRIM$(FIRST$); "  <"; TRIM$(EMAIL$); ">"
+00080     GOTO RD
+00090 DONE: CLOSE #H:
+00100 STOP
+00110 CONNECT_ERR:
+00120 OPEN_ERR:
+00130 EXEC_ERR:
+00140 READ_ERR:
+00150     PRINT "Error:"; ERR; " Line:"; LINE; " Syserr:"; SYSERR$
+00160     STOP
+```
 
 ---
 
@@ -286,10 +340,51 @@ second processing context; the two lists run parallel through 3012/4012, then di
 Also relevant: **0366** (`brvbCommandMissing`) — no SQL command was supplied with the submit/fetch
 statement (i.e., the channel had no bound SQL to run).
 
+Also common: **4270** — `EOF` on `READ` when no `EOF` clause was provided. This is normal end-of-
+result-set behavior, not a driver failure.
+
 Common first checks when a connect or query fails: the ODBC DSN/driver name, server reachability and
 port, credentials, and (for `ODBC-MANAGER`) that you are **not** in Client/Server mode. Turning up
 ODBC logging helps — `LOGGING 6, C:\ODBC-LOG.TXT` records the **actual SQL** sent to the driver (see
 [ODBC](../../00-configuration/installation-tooling/ODBC.md)).
+
+<a id="status-database"></a>
+## `STATUS.DATABASE` introspection
+
+BR extends [`Env$("STATUS…")`](../../10-language/data-manipulation/system-functions/spec.md#system-info)
+to walk a configured connection's schema — connections, tables, columns, and their types. A scalar
+lookup returns a string; a lookup ending in **`.LIST`** paired with a `MAT` array **redimensions and
+loads** that array (the `LET Env$(…, MAT arr$)` form).
+
+> **Notation.** `<db-ref>`, `<table>`, `<column>` below are **placeholders** — substitute the actual
+> name (BR uppercases connection names), with **no brackets** in the real string. Each name is exactly
+> what the corresponding `.LIST` call returned.
+
+```business-rules
+LET   Env$("STATUS.DATABASE.LIST", MAT DBS$)                                  ! all connected databases
+PRINT Env$("STATUS.DATABASE.<db-ref>.DSN")                                      ! the DSN
+PRINT Env$("STATUS.DATABASE.<db-ref>.CONNECTSTRING")                            ! resolved connect string
+LET   Env$("STATUS.DATABASE.<db-ref>.TABLES.LIST", MAT TABLES$)                 ! table names
+PRINT Env$("STATUS.DATABASE.<db-ref>.TABLES.<table>.TYPE")                      ! e.g. TABLE / VIEW
+PRINT Env$("STATUS.DATABASE.<db-ref>.TABLES.<table>.REMARKS")
+LET   Env$("STATUS.DATABASE.<db-ref>.TABLES.<table>.COLUMNS.LIST", MAT COLS$)   ! column names
+PRINT Env$("STATUS.DATABASE.<db-ref>.TABLES.<table>.COLUMNS.<column>.TYPE")
+PRINT Env$("STATUS.DATABASE.<db-ref>.TABLES.<table>.COLUMNS.<column>.LENGTH")
+PRINT Env$("STATUS.DATABASE.<db-ref>.TABLES.<table>.COLUMNS.<column>.DECIMALS")
+```
+
+Because the path is an ordinary string, real code builds it by **concatenation** — dropping in the name
+a `.LIST` returned rather than a literal placeholder:
+
+```business-rules
+LET ST$ = "STATUS.DATABASE." & CONN$                          ! CONN$ from STATUS.DATABASE.LIST
+LET Env$(ST$ & ".TABLES.LIST", MAT TABLES$)
+LET Env$(ST$ & ".TABLES." & TABLE$ & ".COLUMNS.LIST", MAT COLS$)
+```
+
+This metadata drives diagnostics and **dynamic FORM-building** that adapts to discovered column types,
+lengths, and decimals. A complete schema-walking program is the `ENVDB.BRS` demo in the
+[4.30 release notes](../../90-reference/limits-constants/4.30.md).
 
 ---
 
@@ -304,6 +399,25 @@ ODBC logging helps — `LOGGING 6, C:\ODBC-LOG.TXT` records the **actual SQL** s
   string — it avoids SQL-injection-style breakage and quoting bugs.
 - Treat a saved connection string (e.g. the `dsn.fil` capture pattern) like any other secret.
 
+<a id="troubleshooting"></a>
+## Troubleshooting checklist
+
+When a connection fails:
+
+- Confirm the ODBC driver is installed on the machine where BR is running.
+- Confirm the driver name in the connection string exactly matches the installed driver.
+- Confirm server/host, database name, credentials, and firewall/network reachability.
+- Confirm `ODBC-MANAGER` is not used in Client/Server mode.
+- Print `Syserr$` for the driver-specific failure text.
+
+When a query fails:
+
+- Print/log the SQL text (keep the last statement in a variable so it can be logged on failure).
+- Confirm parameter-marker count matches `WRITE` data-element count.
+- Confirm selected columns match the `READ ... USING` FORM layout.
+- Increase character field widths if truncation/mismatch is suspected.
+- Use `STATUS.DATABASE` metadata to verify table/column types and lengths.
+
 ---
 
 <a id="see-also"></a>
@@ -315,7 +429,13 @@ ODBC logging helps — `LOGGING 6, C:\ODBC-LOG.TXT` records the **actual SQL** s
   BR data files to external tools via the BR ODBC driver; ODBC logging
 - [statements](../statements/spec.md) — `OPEN`/`WRITE`/`READ`/`CLOSE` general semantics
 - [form-spec](../form-spec/spec.md) — `FORM` field types used to map result columns
+- [ENV$](../../10-language/data-manipulation/system-functions/spec.md#system-info) — the `STATUS`
+  interrogation function used for `STATUS.DATABASE` introspection
 - [json-datastore](../../60-integration/json-datastore/spec.md) — BR's other structured-data integration facility
+- 4.3 / 4.30 release notes ([limits-constants](../../90-reference/limits-constants/4.30.md)) — the
+  `OPEN … SQL` inline/file forms and the `ENVDB.BRS` `STATUS.DATABASE` schema-walk demo
+- `CONFIG DATABASE CLEAR` examples: [config-directives](../../00-configuration/config-directives/spec.md)
 - SQL/ODBC error codes: [3002](../../90-reference/error-codes/3002.md)–[3015](../../90-reference/error-codes/3015.md),
   [4002](../../90-reference/error-codes/4002.md)–[4015](../../90-reference/error-codes/4015.md),
-  [0366](../../90-reference/error-codes/0366.md)
+  [0366](../../90-reference/error-codes/0366.md),
+  [4270](../../90-reference/error-codes/4270.md)

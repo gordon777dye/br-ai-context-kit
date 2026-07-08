@@ -1095,15 +1095,17 @@ INDEX CUSTOMER.DAT CUSTZIP.KEY 1/50 20/5 REPLACE
 
 **Semantics:**
 - **Connection vs. channel** — configure once with `CONFIG DATABASE`, then reference by `<db-ref>` in the OPEN name-string. Requires BR **4.3+**.
-- **SQL bound at OPEN** — to run a different statement, build a new string and `OPEN` a fresh channel.
+- **SQL bound at OPEN** — to run a different statement, build a new string and `OPEN` a fresh channel. SQL text may instead come from a file: `OPEN #h: "DATABASE=<db-ref>,NAME=<file>", SQL, OUTIN`.
 - **`WRITE` submits, `READ` fetches** — a `WRITE` must precede the first `READ` on a `SELECT`. A `WRITE` **with** a data list binds parameters in order (count must match — else error 3007/4007).
 - **Columns map by FORM** — the SELECT list maps left-to-right onto the FORM fields (`C`/`N`/`PD`/dates), exactly like a native record.
-- **Connection-string discovery** — `Env$("STATUS.DATABASE.[<db-ref>].CONNECTSTRING")` returns the resolved string (used to capture an `ODBC-MANAGER` pick for later DSN-less reuse).
+- **Connection & schema discovery** — `Env$("STATUS.DATABASE.<db-ref>.CONNECTSTRING")` returns the resolved string (no brackets in the path); `STATUS.DATABASE.LIST`, `.<db-ref>.TABLES.LIST`, and `.TABLES.<table>.COLUMNS.LIST`/`.<column>.TYPE` enumerate the live schema. The `.LIST` forms load a `MAT` array via `LET Env$(…, MAT arr$)`.
+- **Releasing connections** — `EXECUTE "CONFIG DATABASE CLEAR <db-ref>"` drops one configured connection; `CLEAR ALL` drops them all.
 - **Client/Server** — `ODBC-MANAGER` cannot be used in Client/Server mode (it depends on the user's local ODBC settings).
 
 **Common errors:**
 - **3002–3015 / 4002–4015** — the SQL/ODBC error ranges (prepare/execute/fetch/bind failures; 3007/4007 = parameter-count mismatch; 4015 = database not opened)
 - **0366** — no SQL command supplied with the submit/fetch statement
+- **4270** — `EOF` on `READ` with no `EOF` clause given (normal end of result set, not a failure)
 
 **Gotchas:**
 1. **Size the SQL buffer** — `DIM C_SQL$*4096`; SQL text is long
