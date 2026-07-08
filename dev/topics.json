@@ -2,6 +2,7 @@
   "$comment": "Topic index + lexicon over statement-semantics.md and tools/lexicon.json. Router for the interpret/code bundles (see APP-DEV-GUIDE.md). 'lines' are 1-based inclusive ranges for cheap section loading; regenerate with tools/gen_topics.py.",
   "generated": "2026-07-08",
   "source": "statement-semantics.md",
+  "source_sha256": "7ece0aad62b5a2e182390f833add559dfe55e6eabc53126b39f38361000cdef0",
   "count": 48,
   "lexicon": {
     "note": "BR's lexicon is positional. Only system-function names (table6k u table7k) are reserved against variable names, and a variable never starts 'FN'. Statement, clause, and command keywords are keywords only by position: a variable or label may reuse their spelling. Resolve keyword-vs-variable-vs-label by position + symbol table, not by the lexeme.",

@@ -85,13 +85,17 @@ composition. This step is deterministic.
 
 ```
 node dev\tools\extract-schema.js <app>\filelay context\app
+python dev\tools\gen_datamodel_index.py
 ```
 
-- **Produces:** `app\data-model.json` (structured) + `app\data-model.md` (readable) — per file: data
-  path, record length, key indexes **with their composing fields in order**, and every field's FORM
-  type/position.
-- **Verify:** the tool prints `layouts: N, total fields: M` and flags any file it could not parse.
-- **Re-run** whenever `filelay\` changes — it is generated, never hand-edited.
+- **Produces:** `app\data-model.md` (readable) — per file: data path, record length, key indexes
+  **with their composing fields in order**, and every field's FORM type/position. Each file section
+  carries an `<a id="…">` anchor.
+- **Index:** `gen_datamodel_index.py` then builds `app\data-model-index.json` — a per-file map to
+  1-based inclusive line ranges (like `dev\topics.json` for statement-semantics). Load one file's
+  slice instead of the whole (large) `data-model.md`.
+- **Verify:** the extractor prints `layouts: N, total fields: M`; the indexer prints `files: N …`.
+- **Re-run both** whenever `filelay\` changes — they are generated, never hand-edited.
 
 ### STEP 2 — Toolset entries (fill in the blanks)
 **Modify `app\toolset.md`** and fill in these **required** values first — they are everything the model

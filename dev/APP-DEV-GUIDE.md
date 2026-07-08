@@ -121,13 +121,19 @@ dictionary. Turn it into a structured model with the bundled tool:
 
 ```
 node tools/extract-schema.js <path-to-app/filelay>
+python tools/gen_datamodel_index.py
 ```
 
-This produces `data-model.md` + `data-model.json` for *that* app: per file, the data path,
+This produces `data-model.md` for *that* app: per file, the data path,
 record length, each key index **with its composing fields** (the order you concatenate to
 build a `KEY=` lookup), and every field's FORM type/position. No app's data model is bundled
 here — generate the one you need. (No `filelay/`? Convert your data dictionary to the filelay format —
 see [`../app/INSTRUCTIONS.md`](../app/INSTRUCTIONS.md) Appendix A — then run the tool.)
+
+`data-model.md` is large. `gen_datamodel_index.py` builds `data-model-index.json` beside it — a
+per-file map to 1-based inclusive line ranges (the same sharding `topics.json` gives
+`statement-semantics.md`). **Don't load the whole data model:** look the file up in the index and
+read only its line slice. Re-run the indexer whenever the model is regenerated.
 
 ### Read records (raw BR keyed I/O)
 
@@ -165,9 +171,12 @@ reference under [`../br_tree/50-libraries/fileio/`](../br_tree/50-libraries/file
 
 ## 6. Running BR (headless, via procedures)
 
-The kit ships two build-time helpers — [`tools/extract-schema.js`](tools/extract-schema.js) (schema →
-`data-model.md`, §4) and [`tools/gen_topics.py`](tools/gen_topics.py) (rebuild `topics.json` after
-editing `statement-semantics.md`). **Everything else is done by BR itself, driven headlessly:** write a
+The kit ships three build-time helpers — [`tools/extract-schema.js`](tools/extract-schema.js) (schema →
+`data-model.md`, §4), [`tools/gen_topics.py`](tools/gen_topics.py) (rebuild `topics.json` after
+editing `statement-semantics.md`), and [`tools/gen_datamodel_index.py`](tools/gen_datamodel_index.py)
+(rebuild `data-model-index.json`). Both generators take **`--verify`** — a non-writing drift check
+(source hash + range validation + regenerate-and-compare, exit 1 on drift) for catching a stale index
+after the source was edited but not regenerated. **Everything else is done by BR itself, driven headlessly:** write a
 `.prc` procedure containing the commands you want and run it through the BR invocation your app records
 in [`../app/toolset.md`](../app/toolset.md).
 

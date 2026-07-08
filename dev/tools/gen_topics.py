@@ -13,8 +13,10 @@ Router / lexical index for the interpret + code task bundles (see ../APP-DEV-GUI
 
 Fully self-contained within context/dev/ — no ../lsp/ dependency.
 Run from anywhere:  python tools/gen_topics.py
+  --verify : don't write; check topics.json is in sync with statement-semantics.md
+             (source hash, range validity, and a full regenerate-and-compare). Exit 1 on drift.
 """
-import io, os, re, json, datetime
+import io, os, re, sys, json, hashlib, datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEV = os.path.dirname(HERE)                      # context/dev
@@ -58,7 +60,9 @@ META = {
 
 # ---- topic index ---------------------------------------------------------
 with io.open(sem_path, "r", encoding="utf-8", newline="") as f:
-    lines = f.read().split("\n")
+    raw = f.read()
+lines = raw.split("\n")
+src_hash = hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 anchor_re = re.compile(r'^<a id="([^"]+)"></a>\s*$')
 brtree_re = re.compile(r'\.\./br_tree/[^\s\)]+?spec\.md(?:#[\w-]+)?')
@@ -129,11 +133,50 @@ doc = {
                 "inclusive ranges for cheap section loading; regenerate with tools/gen_topics.py.",
     "generated": datetime.date.today().isoformat(),
     "source": "statement-semantics.md",
+    "source_sha256": src_hash,
     "count": len(topics),
     "lexicon": lexicon,
     "keyword_index": dict(sorted(kw_index.items())),
     "topics": topics,
 }
+
+def _drop_generated(d):
+    return {k: v for k, v in d.items() if k != "generated"}
+
+if "--verify" in sys.argv:
+    name = os.path.basename(out_path)
+    if not os.path.exists(out_path):
+        print("VERIFY FAIL: %s missing — run tools/gen_topics.py" % name); sys.exit(1)
+    with io.open(out_path, "r", encoding="utf-8") as f:
+        existing = json.load(f)
+    problems = []
+    if existing.get("source_sha256") != src_hash:
+        problems.append("source_sha256 mismatch: statement-semantics.md changed since last generate")
+    prev_end = 0
+    for t in existing.get("topics", []):
+        rng = t.get("semantics", {}).get("lines")
+        aid = t.get("id")
+        if not (isinstance(rng, list) and len(rng) == 2 and all(isinstance(n, int) for n in rng)):
+            problems.append("topic %s: malformed line range %r" % (aid, rng)); continue
+        lo, hi = rng
+        if lo < 1 or hi < lo:
+            problems.append("topic %s: invalid range [%d,%d]" % (aid, lo, hi))
+        if hi > total:
+            problems.append("topic %s: range [%d,%d] exceeds file length %d" % (aid, lo, hi, total))
+        if lo <= prev_end:
+            problems.append("topic %s: range starts at %d, overlaps previous topic (ended %d)" % (aid, lo, prev_end))
+        prev_end = hi
+    if _drop_generated(existing) != _drop_generated(doc):
+        problems.append("content drift: regenerated index differs from on-disk "
+                        "(line ranges / keywords / br_tree links / lexicon) - run tools/gen_topics.py")
+    if problems:
+        print("VERIFY FAIL (%d issue%s):" % (len(problems), "" if len(problems) == 1 else "s"))
+        for p in problems:
+            print("  - " + p)
+        sys.exit(1)
+    print("VERIFY OK: %s in sync - %d topics, source hash %s..."
+          % (name, len(doc["topics"]), src_hash[:12]))
+    sys.exit(0)
 
 with io.open(out_path, "w", encoding="utf-8", newline="\n") as f:
     json.dump(doc, f, ensure_ascii=False, indent=2)

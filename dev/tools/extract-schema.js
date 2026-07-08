@@ -3,7 +3,8 @@
  * Generic: point it at any app's filelay directory.
  *   Usage: node extract-schema.js <filelayDir> [outDir]
  *   filelayDir defaults to $BR_FILELAY_DIR; outDir defaults to this tool's parent (context/dev).
- * Output: data-model.json (structured) + data-model.md (readable).
+ * Output: data-model.md (readable). (No JSON is emitted — nothing consumes it;
+ *   the .md is the retrieval artifact. Re-add a writeFileSync if a tool ever needs structured schema.)
  * filelay format:
  *   <dir\datafile>,<PREFIX_>,<n>
  *   <dir\datafile.keyN>,<FIELD/FIELD/...>      (one per index)
@@ -88,10 +89,6 @@ function parseLayout(name) {
 
 const layouts = files.map(parseLayout).sort((a, b) => a.name.localeCompare(b.name));
 
-fs.writeFileSync(path.join(OUTDIR, 'data-model.json'),
-  JSON.stringify({ generated: new Date().toISOString().slice(0, 10), source: LAYDIR,
-    fileCount: layouts.length, layouts }, null, 1));
-
 // readable markdown
 const L = [];
 L.push('# BR application data model (file schemas)');
@@ -99,10 +96,15 @@ L.push('');
 L.push(`Data dictionary for **${layouts.length}** BR data files, parsed from \`${LAYDIR}\`. Dual purpose:`);
 L.push('an LLM uses this to know what files/fields exist and how they are keyed when writing BR');
 L.push('code; an LSP uses field names + FORM types to validate/complete `OPEN`/`READ…USING` and');
-L.push('to build correct key expressions. Machine-readable companion: `data-model.json`.');
+L.push('to build correct key expressions.');
 L.push('');
 L.push('Per file: the data path, record length, key indexes (with their composing fields — the');
 L.push('order you concatenate values to build a `KEY=` lookup), and every field with its FORM type.');
+L.push('');
+L.push('> Each file section carries an `<a id="…">` anchor (its file name). For cheap per-file');
+L.push('> retrieval, `data-model-index.json` maps every file to its 1-based inclusive line range —');
+L.push('> load just that slice instead of the whole document. Regenerate the index with');
+L.push('> `tools/gen_datamodel_index.py` after (re)generating or hand-editing this file.');
 L.push('');
 L.push('| File | Recl | Fields | Keys |');
 L.push('|---|---|---|---|');
@@ -111,6 +113,7 @@ for (const r of layouts) {
 }
 L.push('');
 for (const r of layouts) {
+  L.push(`<a id="${r.name}"></a>`);
   L.push(`## ${r.name}`);
   L.push('');
   L.push(`- **Data file:** \`${r.dataFile || '?'}\`${r.prefix ? ` (field prefix \`${r.prefix}\`)` : ''} · **recl** ${r.recl ?? '?'}`);
