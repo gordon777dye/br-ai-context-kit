@@ -99,32 +99,11 @@ BR apps converge on a few conventions worth recognizing:
 
 ## 3. Language essentials you must get right
 
-These bite newcomers (and LLMs trained on other BASICs). Per-statement detail in
-[`statement-semantics.md`](statement-semantics.md) indexed by [`topics.json`](topics.json), full detail in 
-the br_tree reference; the critical ones:
-
-- **Every line is numbered**; labels go right after the number (`00050 LOOP1: …`).
-- **`=` is context-sensitive.** Inside `IF`/`WHILE`/`UNTIL` it means *compare*; elsewhere it
-  *assigns*. Use **`:=`** to force assignment inside a condition (must be parenthesized).
-- **Operators aren't C/Python.** `&` is **string concatenation**, not bitwise-AND. `^` and `**` are
-  **both exponentiation**, not XOR. BR has **no source-level bitwise operators** at all. Modulo is
-  **`MOD`**, not `%`. (Full 12-level precedence in
-  [expressions](../br_tree/10-language/data-manipulation/expressions/spec.md).)
-- **String variables end in `$`**; size is declared `DIM NAME$*30`. Arrays are 1-based.
-- **Keywords abbreviate on entry** (shortest-unique-prefix; functions and clause words need full
-  spelling), but BR **expands them when a program is LISTed** — so `.brs` source always shows full
-  keywords. You never read or write abbreviations in source files.
-- **I/O carries trailing error clauses**, not exceptions: `READ #1,…: A$ NOKEY L900 EOF L990`.
-  Handle `EOF`, `NOKEY`, `IOERR`, `CONV`, `LOCKED` explicitly.
-- **`[WSID]`-style substitutions** appear in file names for per-workstation temp files
-  (`"SORTCTL.Z[WSID]"`).
-- **`DEF`/`FNEND` functions** can have a typed/sized return (`DEF FNX$*255(...)`), optional
-  parameters after `;` (which double as the **local-variable idiom** — trailing params the caller
-  never passes are fresh 0/null scratch locals each call), and by-reference parameters marked `&`.
-  Two traps: `FN<name>` in a mid-body
-  expression is a *recursive call*, not the value-so-far — build an incremental result in a scratch
-  variable, never by reading `FN<name>` back (you may assign it freely, last write wins); and a
-  function has **one exit** — no early return, `GOTO` a label before `FNEND`.
+Moved to [`essentials.md`](essentials.md) — the language rules that bite newcomers (and LLMs
+trained on other BASICs), **plus a growing set of runtime gotchas confirmed empirically** while
+actually RUNning BR programs - built-ins that didn't behave as expected, and more. Read it before writing or debugging any BR code; per-statement detail
+stays in [`statement-semantics.md`](statement-semantics.md) indexed by [`topics.json`](topics.json),
+full detail in the br_tree reference.
 
 ---
 

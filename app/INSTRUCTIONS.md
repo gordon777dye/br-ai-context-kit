@@ -103,21 +103,33 @@ python dev\tools\gen_datamodel_index.py
 - **Re-run both** whenever `filelay\` changes — they are generated, never hand-edited.
 
 ### STEP 2 — Toolset entries (fill in the blanks)
-**Modify `app\toolset.md`** and fill in these **required** values first — they are everything the model
-(and the STEP 3 / feedback-loop tooling) needs to run and check code. Keep it minimal; the rest of the
-runbook (dev commands, utilities, deploy notes — template: the `## Development Commands` block in the
-repo's root AI memoery file can grow later.
+First create 2 br_test.sys configuration files by copying your app's configuration file and making 
+the following changes:
 
-Modify toolset.md to have the correct paths: 
-```
-BR executable  ($BR_EXE)    : <path/name>            # e.g. C:\BRnative\brnative.exe — machine-specific
-brconfig.sys   ($BR_CONFIG) : <path>                 # usually the app root — ships with the app
-BR version                  : <e.g. native 4.3x>     # directives/behavior differ across versions
+br_test.sys:
+- Remove any EXECUTE statement
+- Include a LOGIING statement with the ", UNATTENDED" keyword
+
+The UNATTEND keyword lets AI run BR in a headless (with no user input) mode. 
+
+br_test2.sys:
+- Same as br_test.sys without the UNATTENDED keyword on the logging statement
+
+Next **Modify `app\toolset.md`** and fill in these **required** values — they are everything the model
+(and the STEP 3 / feedback-loop tooling) needs to run and check code. 
+
+Modify toolset.md to have the correct paths:
+
+```powershell
+$env:BR_EXE = "C:\ADS\sys\br.d\br432g-32.exe"        # your normal app BR executable
+$env:BR_CONFIG = "C:\ads\sys\br.d\brconfig.sys"      #  ships with the app
+$env:BR_TEST = "C:\ads\sys\br.d\br_test.sys"         # the config file for AI internal use
+$env:BR_TEST2 = "C:\ads\sys\br.d\br_test2.sys"       # the config file for testing user interfaces
 ```
 
 - **Executable path is machine-specific** → kept in `$BR_EXE`; provide an absolute path to your BR executable.
 - **`brconfig.sys` is app-owned** → a fixed path (override via `$BR_CONFIG` only if a box needs to).
-- **Canonical invocation** — an optional quoted BR statement first, then the config as `-<file>`
+- **Parameters** — an optional quoted BR statement first, then the config as `-<config-filename>`
   (a dash **attached** to the path): `"$BR_EXE" ["<statement>"] -"$BR_CONFIG"`. Syntax:
   [br_tree — Startup command line](../br_tree/00-configuration/platform/spec.md).
 Full worked example: [`toolset.md`](toolset.md).

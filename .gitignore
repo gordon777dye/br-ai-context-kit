@@ -24,3 +24,5 @@
 *.wb
 *.wbo
 node_modules/
+/dev/gen_topics.br*
+

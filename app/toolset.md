@@ -10,21 +10,24 @@
 
 AI models need to know how to invoke Business Rules for compilation and testing. Here is where you tell it how it can do that from a terminal command line (e.g. cmd.exe or PowerShell). 
 
-**If your standard brconfig.sys includes an EXECUTE statement (recommended) then you will need to create another config file for simple AI access.** Note- you can use a standard set of configuration statements in a config file that you INCLUDE into each config variant.
+**You will need to create 2 other config files for simple AI access.** Note- you can use a standard set of configuration statements in a config file that you INCLUDE into each config variant.
 
 | Fact | Value | Nature |
 |---|---|---|
 | **BR executable** | `$BR_EXE` — default `C:\BRnative\brnative.exe` | Server-specific - your existing BR pathname
-| **`brconfig.sys`** | `$BR_CONFIG` — default `C:\ads\qsmrp\brconfig.sys` | App startup |
-| **`brconfig.sys`** | `$BR_CONFIG` — default `C:\ads\qsmrp\br_test.sys` | AI utility |
-| **BR version/flavor** | BR **native** 4.3x (Windows) | Config directives & behavior differ across versions |
+| **`brconfig.sys`** | `$BR_CONFIG` — default `C:\ads\qsmrp\brconfig.sys` | Existing app startup |
+| **`brconfig.sys`** | `$BR_TEST` — default `C:\ads\qsmrp\br_test.sys` | AI utility |
+| **`brconfig.sys`** | `$BR_TEST2` — default `C:\ads\qsmrp\br_test2.sys` | AI User Interface |
 
-Set the machine-specific path once per box (PowerShell):
+
+  **SET THE MACHINE SPECIFIC PATHS HERE:**
+  (See INSTRUCTIONS step 2)
 
 ```powershell
 $env:BR_EXE = "C:\ADS\sys\br.d\br432g-32.exe"
 $env:BR_CONFIG = "C:\ads\sys\br.d\brconfig.sys"
 $env:BR_TEST = "C:\ads\sys\br.d\br_test.sys"
+$env:BR_TEST2 = "C:\ads\sys\br.d\br_test2.sys"
 ```
 
 ## AI Canonical invocations
@@ -32,8 +35,9 @@ $env:BR_TEST = "C:\ads\sys\br.d\br_test.sys"
 Copy these verbatim (the STEP 1 compile check uses the same form).
 
 ```
-"$BR_EXE" -"$BR_CONFIG"                          # start BR into the app (interactive)
-"$BR_EXE" "RUN cnp\menu" -"$BR_TEST"           # run a statement/command at startup
+"$BR_EXE" -"$BR_CONFIG"                        # start BR into the app (interactive)
+"$BR_EXE" "RUN glp\trial_bal" -"$BR_TEST"      # run a program
+"$BR_EXE" "RUN cnp\menu" -"$BR_TEST2"          # run a statement/command at startup
 ```
 
 - **`-<config-file>`** names an alternate config file — a dash **immediately followed** by the

@@ -3543,6 +3543,7 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 - **Return value** — If never assigned, the function returns 0 (numeric) or empty (string)
 - **File I/O** — Only multi-line functions can perform file I/O; single-line functions cannot
 - **Library functions** — DEF LIBRARY marks a function as callable from other programs; it must be linked with a `LIBRARY` statement; the rules for library linkage are sophisticated with respect to performance, and need to be carefully considered
+- **Skipped in normal flow** — a `DEF…FNEND` block is not executed by falling into it; the runtime skips over the definition during ordinary top-to-bottom/`GOTO` flow the same way it skips a `FORM` line. No `STOP`/`GOTO` guard before a function definition is needed to keep execution from entering it with unset parameters — a function only runs when called
 
 **Writing functions — gotchas:**
 - **Return name is write-only** — inside the body, `FN<name>` in an expression is a recursive **call**, not the value-so-far; assign it freely (last write wins), but build an incremental result in a scratch variable, never by reading `FN<name>` back
