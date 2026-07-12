@@ -1,8 +1,8 @@
 {
   "$comment": "Topic index + lexicon over statement-semantics.md and tools/lexicon.json. Router for the interpret/code bundles (see APP-DEV-GUIDE.md). 'lines' are 1-based inclusive ranges for cheap section loading; regenerate with tools/gen_topics.py.",
-  "generated": "2026-07-08",
+  "generated": "2026-07-09",
   "source": "statement-semantics.md",
-  "source_sha256": "7ece0aad62b5a2e182390f833add559dfe55e6eabc53126b39f38361000cdef0",
+  "source_sha256": "b614a74e0f558e87a32fef4eefe20d976cfa21c21dffe29c4c1c38d3e36585f8",
   "count": 48,
   "lexicon": {
     "note": "BR's lexicon is positional. Only system-function names (table6k u table7k) are reserved against variable names, and a variable never starts 'FN'. Statement, clause, and command keywords are keywords only by position: a variable or label may reuse their spelling. Resolve keyword-vs-variable-vs-label by position + symbol table, not by the lexeme.",
@@ -1298,7 +1298,7 @@
         "anchor": "def-fn",
         "lines": [
           3500,
-          3646
+          3647
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/functions-udf/spec.md"
@@ -1315,8 +1315,8 @@
         "file": "statement-semantics.md",
         "anchor": "library-functions",
         "lines": [
-          3648,
-          3713
+          3649,
+          3714
         ]
       },
       "br_tree": "../br_tree/50-libraries/library-facility/spec.md"
@@ -1330,8 +1330,8 @@
         "file": "statement-semantics.md",
         "anchor": "cross-reference-map",
         "lines": [
-          3715,
-          3767
+          3716,
+          3768
         ]
       },
       "br_tree": null
@@ -1345,8 +1345,8 @@
         "file": "statement-semantics.md",
         "anchor": "error-code-quick-reference",
         "lines": [
-          3769,
-          3790
+          3770,
+          3791
         ]
       },
       "br_tree": null
@@ -1360,8 +1360,8 @@
         "file": "statement-semantics.md",
         "anchor": "quick-start-examples",
         "lines": [
-          3792,
-          3854
+          3793,
+          3855
         ]
       },
       "br_tree": null

@@ -24,9 +24,9 @@ AI models need to know how to invoke Business Rules for compilation and testing.
   (See INSTRUCTIONS step 2)
 
 ```powershell
-$env:BR_EXE = "C:\ADS\sys\br.d\br432g-32.exe"
-$env:BR_CONFIG = "C:\ads\sys\br.d\brconfig.sys"
-$env:BR_TEST = "C:\ads\sys\br.d\br_test.sys"
+$env:BR_EXE = "C:\ADS\qsmrp\context\app\bin\br432k-64.exe"
+$env:BR_CONFIG = "C:\ads\qsmrp\context\app\bin\brconfig.sys"
+$env:BR_TEST = "C:\ads\qsmrp\context\app\bin\br_test.sys"
 $env:BR_TEST2 = "C:\ads\sys\br.d\br_test2.sys"
 ```
 

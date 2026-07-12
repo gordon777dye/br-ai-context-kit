@@ -12,6 +12,10 @@ codebase you're on. There are three published parts:
   for depth.
 - **[`app\`](app\)** — where your toolset information and application programming style will reside.
 
+## Rules
+
+- Do not invent, guess, or infer commands, file paths, syntax, or facts. If you don't know something: (a) search the context first, (b) flag it as unknown, (c) ask the user. **Never guess** or fill gaps with plausible-sounding guesses.
+
 ## Installation
 
 **Copy this `context` folder with it's sub-folders into the main folder of your application**. Then proceed to configure it for your app and toolset as 

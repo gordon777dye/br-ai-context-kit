@@ -59,7 +59,7 @@ anywhere an expression is allowed.
 | `RPT$(s$,n)` | `s$` repeated `n` times |
 | `LEN(s$)` | actual current length |
 | `POS(s1$,[^]s2$[,[-]start])` | position of `s2$` in `s1$` (0 if none); `^`=case-insensitive (`CONFIG SEARCH_CHAR`); `-start`=search backward |
-| `SREP$(src$,find$,repl$)` | string replace (where available) |
+| `SREP$(src$[,start],find$,repl$)` | string replace (each occurrence) |
 | `XLATE$(s$,table$[,start])` | translate `s$` through a 256-byte `table$`: each input char of ASCII value `n` is replaced by the `(n+1)`-th char of `table$`; chars past the table's length pass through unchanged. Optional `start` position. A `table$` beginning `STR2UTF`/`UTF2STR` does UTF-8 conversion |
 | `LOGIN_NAME$` | current user's login name (3.83h+) |
 

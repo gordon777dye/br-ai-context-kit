@@ -245,8 +245,9 @@ OPEN `#`<channel> `:` <file-open-string> `,` `EXTERNAL` `,`
 ! External file input with 4271 error handling (short record at EOF)
 00050 OPEN #3: "NAME=DATA.BIN,RECL=256", EXTERNAL, INPUT, SEQUENTIAL
 00060 DIM RAW$*256
-00070 READ #3: RAW$ IOERR 100 EOF 200
+00070 READ #3, USING 90: RAW$ IOERR 100 EOF 200
 00080 GOTO 70
+00090 FORM C 256
 00100 ! Handle 4271 (short record) or other I/O error
 00110 IF ERR=4271 THEN GOSUB 300 ELSE GOTO 200
 00200 CLOSE #3: : STOP                     ! two colons: terminate CLOSE, then separate STOP

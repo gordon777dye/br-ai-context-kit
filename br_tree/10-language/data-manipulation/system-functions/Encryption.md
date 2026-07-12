@@ -23,8 +23,8 @@ related: [ENCRYPT, DECRYPT, internal functions, ENCRYPT$, DECRYPT$]
 ==Symmetric Key Ciphers==
 There are two encryption functions in the BR language, `ENCRYPT$` and `DECRYPT$`.
 
- ENCRYPT$(Data$ [,Key$ [,Encryption-type$ [,Initialization-vector$]]])
- DECRYPT$(Data$ [,Key$ [,Encryption-type$ [,Initialization-vector$]]])
+- ENCRYPT$(Data$ [,Key$ [,Encryption-type$ [,Initialization-vector$]]])
+- DECRYPT$(Data$ [,Key$ [,Encryption-type$ [,Initialization-vector$]]])
 
 Data$ - The data to be encrypted
 

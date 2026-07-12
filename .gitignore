@@ -11,18 +11,20 @@
 
 # --- per-app onboarding output: generated & confidential, never commit ---
 /app/architecture.md
-/app/data-model.md
-/app/data-model.json
-/app/data-model-index.json
+/app/data-model*
 /app/conventions.md
 /app/exemplars/
+/app/bin/
+.claude/
 
 # --- forward-looking hygiene for clones that onboard/compile a real app ---
 # (not part of the diff; safe to trim. compiled BR objects + node deps)
 *.br
+*.brs
 *.bro
 *.wb
 *.wbo
 node_modules/
-/dev/gen_topics.br*
 
+dev/tools/BR_PORT_QUICKSTART.md
+dev/tools/PORT_ANALYSIS.md

@@ -48,7 +48,7 @@ Relative forms work: `\` → root, `..` → parent, `..\..` → grandparent. `-N
 <a id="dir"></a>**DIR** lists files (wildcards `*`/`?`), with file size, date and time. Options:
 `-A` archive-bit files only (DOS; ignored on Linux), `-O` sort alphabetically, `-P` pause per
 screen, `-W` wide four-column (sorted, long names; like `-C` but across not down), `-U` unadorned
-(no extended names), `-C` columnar sorted with a trailing `/` on directories and `*` on
+(no extended names), `-C` columnar sorted with a trailing `\` on directories and `*` on
 executables, `-L` long names + permissions (Linux), `-B` bare long name. `>file` redirects (`>>`
 appends), `PRINT` to the printer (mutually exclusive with `>`).
 
