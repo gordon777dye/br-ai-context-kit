@@ -106,6 +106,15 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
   **If a program needs string buffers in the tens/hundreds of KB, check the target config for
   `OPTION 60` first** — remove it, or keep every `DIM`'d string under 32767 bytes if it must stay.
 
+- **`MAT arr(n)` resizing a shared/reusable scratch array is sticky.** A generic subroutine 
+  (e.g. a sort/dedupe helper) that does `MAT WORK$(n)` to resize a shared array before
+  processing **reshapes it for every subsequent caller**. This also applies to arrays 
+  passed as parameters. If a later call reuses that same array for a *larger* batch without 
+  re-growing it first, writing past the now-too-small bound 
+  silently manifests as the same input-wait symptom (`ERR 122`, "illegal array element" —
+  [`../br_tree/90-reference/error-codes/0122.md`](../br_tree/90-reference/error-codes/0122.md)).
+  **`MAT arr(neededsize)` immediately before every write into a shared scratch array**.
+
 ---
 
 ## 3. Control-flow footguns
@@ -113,15 +122,8 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
 - **Never name a label a numeric value (e.g `06340 4520:`); while BR allows this, it converts 
   it to a LET statement (e.g. `LET 4520: !`); use a descriptive text label (`DONE:`, `SKIPBT:`) 
   for every `GOTO` target**. 
-
-- **`MAT arr(n)` resizing a shared/reusable scratch array is sticky.** A generic subroutine 
-  (e.g. a sort/dedupe helper) that does `MAT WORK$(n)` to resize a shared array before
-  processing **permanently reshapes it** for every subsequent caller. This also applies to arrays 
-  passed as parameters. If a later call reuses that same array for a *larger* batch without 
-  re-growing it first, writing past the now-too-small bound 
-  silently manifests as the same input-wait symptom (`ERR 122`, "illegal array element" —
-  [`../br_tree/90-reference/error-codes/0122.md`](../br_tree/90-reference/error-codes/0122.md)).
-  **`MAT arr(neededsize)` immediately before every write into a shared scratch array**.
+- **No CONTINUE statement** Only GOTO. However EXIT DO is supported.
+- ****No recursive globbing** or directory walking.
 
 ---
 
@@ -211,6 +213,12 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
 
 ## 5. Output/I/O gotchas
 
+- **`DRIVE` statements establish virtual drives** BR programs operate on virtual drives. When BR 
+  OPENs a file, the drive letter in the  file path (default is "current" drive) must be mapped with a 
+  configuration DRIVE statement. This letter can be entirely different from the OS drive letter and 
+  folder location. This makes applications portable without code changes but coders need to 
+  be aware of it when creating an `OPEN` statement.
+
 - **A `DISPLAY OUTPUT` file with no `RECL=` wraps output at a 132 byte default width** — inserting a
   mid-line CRLF that silently splits one `PRINT`'d line into two physical lines on disk. This
   produced no error at all; it just corrupted a generated JSON file (a long string value cut across
@@ -234,11 +242,6 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
   it also survives a naive "no dot = directory" filter and gets mistaken for a real subdirectory
   name). Confirmed on every `DIR -B` redirect regardless of target directory.
 
-- **RETRACTED — "EXECUTE DIR + immediate OPEN race" was a misdiagnosis, not a real BR bug.** 
-  **Lesson: a single debugging session's "I added X and the symptom went away" is not proof X was
-  the cause** — retest with X removed against the same real conditions before writing a mechanism
-  down as confirmed, especially when the "why" (root cause) was already flagged unconfirmed the
-  first time.
 
 - **`CNT` is a reserved BR system pseudo-variable** ("I/O items successfully processed" — see
   [flow-control/error-handling](../br_tree/10-language/flow-control/error-handling/spec.md), which

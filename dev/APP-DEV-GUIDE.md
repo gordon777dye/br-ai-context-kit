@@ -7,11 +7,11 @@ context. Each section says **where the authoritative detail lives** so this stay
 a duplicate. It is application-agnostic: point the tooling at whatever BR app you're working
 on.
 
-Please document any errors in dev\ERRORS.md. This includes any inaccuracies *or ambiguities* found (within the context folder) while using this kit. Let the user know when you post something to this file so they can forward the report to ADS. 
+Please document any errors in dev\ERRORS.md. This includes any inaccuracies *or ambiguities* found (within the context folder) while using this kit. Let the user know when you post something to ERRORS.md so users can forward the report to ADS. 
 
 ---
 
-## Start here — by task type
+## Models Start here — by task type
 
 **Don't load the whole kit**; for one program it's mostly ballast. **[`topics.json`](topics.json) is the
 entry point for reading or writing BR code:** it routes a keyword to its anchored
@@ -20,7 +20,14 @@ not the whole file) and carries the `lexicon` — the classified inventory of wh
 reserved. The path is **`topics.json` → `statement-semantics.md` → [`../br_tree/`](../br_tree/)** (the
 authoritative backstop), pulling in the catalogs and your app's data-model as needed.
 
-The language axis has **two parallel keyword entry points** — use whichever fits the token:
+For access to the Business Rules compiler:
+1. Read app/toolset.md to extract the environment variable definitions
+2. Extract the PowerShell snippet that sets $env:BR_EXE, $env:BR_TEST, etc.
+3. Execute those environment variable assignments before attempting any BR invocation
+4. Use those variables in subsequent commands (e.g. $VAR_NAME in Bash)
+5. See section 6 below for advice on how to run BR and identify program errors.
+
+The language axis has **two parallel keyword indexes** — use whichever fits the token:
 - **[`topics.json`](topics.json)** for statements/clauses — fast, line-ranged semantics + the `lexicon`.
   This is the default for reading or writing statement code.
 - **[`brtree-index.json`](brtree-index.json)** for *any* BR keyword — config directives, screen
@@ -167,6 +174,7 @@ reference under [`../br_tree/50-libraries/fileio/`](../br_tree/50-libraries/file
 
 ## 6. Running BR (headless, via procedures)
 
+### Non-BR Kit Helpers
 The kit ships four build-time helpers — [`tools/extract-schema.js`](tools/extract-schema.js) (schema →
 `data-model.md`, §4), [`tools/gen_topics.py`](tools/gen_topics.py) (rebuild `topics.json` after
 editing `statement-semantics.md`), [`tools/gen_datamodel_index.py`](tools/gen_datamodel_index.py)
@@ -174,19 +182,32 @@ editing `statement-semantics.md`), [`tools/gen_datamodel_index.py`](tools/gen_da
 (rebuild `brtree-index.json` from br_tree spec frontmatter). The three Python generators take
 **`--verify`** — a non-writing drift check (source hash + range/structure validation +
 regenerate-and-compare, exit 1 on drift) for catching a stale index after the source was edited but
-not regenerated. **Everything else is done by BR itself, driven headlessly:** write a
-`.prc` procedure containing the commands you want and run it through the BR invocation your app records
-in [`../app/toolset.md`](../app/toolset.md).
+not regenerated. **Everything else is done by BR itself, driven headlessly**
 
-Use a BR config with **`gui off`** and **no auto-launch of the app menu**, so BR drops to READY and runs
-the proc unattended (`toolset.md` covers creating such an "AI access" config when the normal
-`brconfig.sys` auto-starts the menu). Unlike the GUI `brnative.exe` path (which blocks on a splash
-screen without `LexiTip`), a `gui off` runtime runs procs to completion.
+### How to Execute BR
+
+Before running BR check the BR configuration file (specified in toolset.md) to see where the `LOGGING` 
+output file is located. This will need to be interrogated after your batch run to see how the program 
+ended. The log level should be set to 8 or greater.
+
+When interrogating the configurstion file take note of the first `DRIVE` statement **to see what folder 
+BR starts in**. You may need to have the proc or program CD to the folder of your choice at the 
+beginning of each test.
+
+You can write a `.prc` procedure containing the commands you want and run it through the BR invocation 
+described in [`../app/toolset.md`](../app/toolset.md).
+
+Use a BR config with **no auto-launch of the app menu** (BR_TEST.sys), so BR runs your initial
+command (e.g. `PROC <procname>`) unattended; `toolset.md` covers creating such an "AI access" 
+config from the normal app `brconfig.sys`.  When BR runs unattended, it exits as soon as it stops. 
+Then check the log file to what caused BR to stop. This may take a little investigation to 
+understand how to efficiently interrogate the log file. Tip- grep based on date and time after you see
+how it is formatted. Therror 
 
 | Task | How (BR, headless) |
 |---|---|
 | **Syntax-check** a program | `LOAD "<prog>.brs" source` — parses line-by-line, halts on the first error with `ERR`/`LINE` set. The **`source`** keyword is required (`LOAD` defaults to object). |
-| **Run** a program | `RUN "<prog>"` (or `EXECUTE "<prog>"` from code); end the proc with `EXECUTE "system"` so BR exits instead of waiting at READY. |
+| **Run** a program | `RUN "<prog>"` If running attended, end the proc with `EXECUTE "system"` so BR exits instead of waiting at READY. |
 | **Read / maintain data** | Write a short BR program/proc that `OPEN`s the file (layout from `data-model.md`) and `READ`/`REWRITE`/`WRITE`s it — the kit has no external query tool. |
 | **Decompile** `.br` → `.brs` | a proc of `LOAD "<prog>.br"` / `LIST >"<prog>.br.brs"` pairs, ending `EXECUTE "system"` (see [`../app/INSTRUCTIONS.md`](../app/INSTRUCTIONS.md) STEP 3). |
 

@@ -1,8 +1,8 @@
 {
   "$comment": "Topic index + lexicon over statement-semantics.md and tools/lexicon.json. Router for the interpret/code bundles (see APP-DEV-GUIDE.md). 'lines' are 1-based inclusive ranges for cheap section loading; regenerate with tools/gen_topics.py.",
-  "generated": "2026-07-09",
+  "generated": "2026-07-13",
   "source": "statement-semantics.md",
-  "source_sha256": "b614a74e0f558e87a32fef4eefe20d976cfa21c21dffe29c4c1c38d3e36585f8",
+  "source_sha256": "f2f850e1deaa716a7b43e3b320a6bc12c3bad4e2b4aa6c01d5282c0b88accc63",
   "count": 48,
   "lexicon": {
     "note": "BR's lexicon is positional. Only system-function names (table6k u table7k) are reserved against variable names, and a variable never starts 'FN'. Statement, clause, and command keywords are keywords only by position: a variable or label may reuse their spelling. Resolve keyword-vs-variable-vs-label by position + symbol table, not by the lexeme.",
@@ -543,7 +543,7 @@
         "anchor": "open-file",
         "lines": [
           118,
-          272
+          273
         ]
       },
       "br_tree": "../br_tree/30-io-file/statements/spec.md"
@@ -559,8 +559,8 @@
         "file": "statement-semantics.md",
         "anchor": "read",
         "lines": [
-          274,
-          391
+          275,
+          392
         ]
       },
       "br_tree": "../br_tree/30-io-file/statements/spec.md"
@@ -576,8 +576,8 @@
         "file": "statement-semantics.md",
         "anchor": "reread",
         "lines": [
-          393,
-          460
+          394,
+          461
         ]
       },
       "br_tree": "../br_tree/30-io-file/statements/spec.md"
@@ -593,8 +593,8 @@
         "file": "statement-semantics.md",
         "anchor": "write",
         "lines": [
-          462,
-          542
+          463,
+          543
         ]
       },
       "br_tree": "../br_tree/30-io-file/statements/spec.md"
@@ -610,8 +610,8 @@
         "file": "statement-semantics.md",
         "anchor": "rewrite",
         "lines": [
-          544,
-          615
+          545,
+          616
         ]
       },
       "br_tree": "../br_tree/30-io-file/statements/spec.md"
@@ -627,8 +627,8 @@
         "file": "statement-semantics.md",
         "anchor": "delete",
         "lines": [
-          617,
-          699
+          618,
+          700
         ]
       },
       "br_tree": "../br_tree/30-io-file/statements/spec.md"
@@ -644,8 +644,8 @@
         "file": "statement-semantics.md",
         "anchor": "restore",
         "lines": [
-          701,
-          795
+          702,
+          796
         ]
       },
       "br_tree": "../br_tree/30-io-file/statements/spec.md"
@@ -661,8 +661,8 @@
         "file": "statement-semantics.md",
         "anchor": "close",
         "lines": [
-          797,
-          872
+          798,
+          873
         ]
       },
       "br_tree": "../br_tree/30-io-file/statements/spec.md"
@@ -678,8 +678,8 @@
         "file": "statement-semantics.md",
         "anchor": "form",
         "lines": [
-          874,
-          950
+          875,
+          951
         ]
       },
       "br_tree": "../br_tree/30-io-file/form-spec/spec.md"
@@ -695,8 +695,8 @@
         "file": "statement-semantics.md",
         "anchor": "sort",
         "lines": [
-          952,
-          1016
+          953,
+          1017
         ]
       },
       "br_tree": "../br_tree/40-io-printing/sort/spec.md"
@@ -712,8 +712,8 @@
         "file": "statement-semantics.md",
         "anchor": "index",
         "lines": [
-          1018,
-          1075
+          1019,
+          1076
         ]
       },
       "br_tree": "../br_tree/30-io-file/keys-indexes/spec.md"
@@ -731,8 +731,8 @@
         "file": "statement-semantics.md",
         "anchor": "database",
         "lines": [
-          1077,
-          1139
+          1078,
+          1140
         ]
       },
       "br_tree": "../br_tree/30-io-file/database/spec.md"
@@ -748,8 +748,8 @@
         "file": "statement-semantics.md",
         "anchor": "print",
         "lines": [
-          1141,
-          1260
+          1142,
+          1261
         ]
       },
       "br_tree": "../br_tree/40-io-printing/statements/spec.md"
@@ -766,8 +766,8 @@
         "file": "statement-semantics.md",
         "anchor": "input",
         "lines": [
-          1262,
-          1342
+          1263,
+          1343
         ]
       },
       "br_tree": "../br_tree/20-io-screen/input-output/spec.md"
@@ -784,8 +784,8 @@
         "file": "statement-semantics.md",
         "anchor": "open-serial",
         "lines": [
-          1344,
-          1413
+          1345,
+          1414
         ]
       },
       "br_tree": "../br_tree/30-io-file/serial-comm/spec.md"
@@ -802,8 +802,8 @@
         "file": "statement-semantics.md",
         "anchor": "display-menu",
         "lines": [
-          1415,
-          1463
+          1416,
+          1464
         ]
       },
       "br_tree": "../br_tree/20-io-screen/controls/spec.md#menus"
@@ -819,8 +819,8 @@
         "file": "statement-semantics.md",
         "anchor": "open-window",
         "lines": [
-          1465,
-          1544
+          1466,
+          1545
         ]
       },
       "br_tree": "../br_tree/20-io-screen/windows-cursor/spec.md#open-window"
@@ -836,8 +836,8 @@
         "file": "statement-semantics.md",
         "anchor": "print-fields",
         "lines": [
-          1546,
-          1646
+          1547,
+          1647
         ]
       },
       "br_tree": "../br_tree/20-io-screen/input-output/spec.md"
@@ -853,8 +853,8 @@
         "file": "statement-semantics.md",
         "anchor": "input-fields",
         "lines": [
-          1648,
-          1788
+          1649,
+          1789
         ]
       },
       "br_tree": "../br_tree/20-io-screen/input-output/spec.md"
@@ -871,8 +871,8 @@
         "file": "statement-semantics.md",
         "anchor": "rinput-fields",
         "lines": [
-          1790,
-          1871
+          1791,
+          1872
         ]
       },
       "br_tree": "../br_tree/20-io-screen/windows-cursor/spec.md"
@@ -889,8 +889,8 @@
         "file": "statement-semantics.md",
         "anchor": "input-select",
         "lines": [
-          1873,
-          1937
+          1874,
+          1938
         ]
       },
       "br_tree": "../br_tree/20-io-screen/windows-cursor/spec.md"
@@ -908,8 +908,8 @@
         "file": "statement-semantics.md",
         "anchor": "grid-list-text",
         "lines": [
-          1939,
-          1997
+          1940,
+          1998
         ]
       },
       "br_tree": "../br_tree/20-io-screen/controls/spec.md#grid-list"
@@ -927,8 +927,8 @@
         "file": "statement-semantics.md",
         "anchor": "screen-controls",
         "lines": [
-          1999,
-          2069
+          2000,
+          2070
         ]
       },
       "br_tree": "../br_tree/20-io-screen/controls/spec.md"
@@ -944,8 +944,8 @@
         "file": "statement-semantics.md",
         "anchor": "option",
         "lines": [
-          2071,
-          2115
+          2072,
+          2116
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/declaration/spec.md#option"
@@ -961,8 +961,8 @@
         "file": "statement-semantics.md",
         "anchor": "dim",
         "lines": [
-          2117,
-          2227
+          2118,
+          2228
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/declaration/spec.md"
@@ -978,8 +978,8 @@
         "file": "statement-semantics.md",
         "anchor": "let",
         "lines": [
-          2229,
-          2285
+          2230,
+          2286
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/assignment/spec.md#let"
@@ -995,8 +995,8 @@
         "file": "statement-semantics.md",
         "anchor": "forced-assignment",
         "lines": [
-          2287,
-          2336
+          2288,
+          2337
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/assignment/spec.md#forced-assignment"
@@ -1012,8 +1012,8 @@
         "file": "statement-semantics.md",
         "anchor": "mat",
         "lines": [
-          2338,
-          2396
+          2339,
+          2397
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/assignment/spec.md#mat"
@@ -1027,8 +1027,8 @@
         "file": "statement-semantics.md",
         "anchor": "substring-assignment",
         "lines": [
-          2398,
-          2448
+          2399,
+          2449
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/assignment/spec.md#substring"
@@ -1046,8 +1046,8 @@
         "file": "statement-semantics.md",
         "anchor": "data-read-restore",
         "lines": [
-          2450,
-          2509
+          2451,
+          2510
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/assignment/spec.md#data-table"
@@ -1066,8 +1066,8 @@
         "file": "statement-semantics.md",
         "anchor": "if-then-else",
         "lines": [
-          2511,
-          2593
+          2512,
+          2594
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/conditionals/spec.md"
@@ -1083,8 +1083,8 @@
         "file": "statement-semantics.md",
         "anchor": "goto",
         "lines": [
-          2595,
-          2645
+          2596,
+          2646
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1101,8 +1101,8 @@
         "file": "statement-semantics.md",
         "anchor": "on-goto-gosub",
         "lines": [
-          2647,
-          2701
+          2648,
+          2702
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1118,8 +1118,8 @@
         "file": "statement-semantics.md",
         "anchor": "randomize",
         "lines": [
-          2703,
-          2737
+          2704,
+          2738
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1138,8 +1138,8 @@
         "file": "statement-semantics.md",
         "anchor": "stop-end-pause-chain",
         "lines": [
-          2739,
-          2802
+          2740,
+          2803
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1156,8 +1156,8 @@
         "file": "statement-semantics.md",
         "anchor": "for-next",
         "lines": [
-          2804,
-          2891
+          2805,
+          2892
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1175,8 +1175,8 @@
         "file": "statement-semantics.md",
         "anchor": "do-loop",
         "lines": [
-          2893,
-          3007
+          2894,
+          3008
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1193,8 +1193,8 @@
         "file": "statement-semantics.md",
         "anchor": "gosub-return",
         "lines": [
-          3009,
-          3098
+          3010,
+          3099
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1210,8 +1210,8 @@
         "file": "statement-semantics.md",
         "anchor": "exit",
         "lines": [
-          3100,
-          3168
+          3101,
+          3169
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1227,8 +1227,8 @@
         "file": "statement-semantics.md",
         "anchor": "execute",
         "lines": [
-          3170,
-          3238
+          3171,
+          3239
         ]
       },
       "br_tree": "../br_tree/70-commands/program-management/spec.md#system"
@@ -1244,8 +1244,8 @@
         "file": "statement-semantics.md",
         "anchor": "on-condition",
         "lines": [
-          3240,
-          3310
+          3241,
+          3311
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/error-handling/spec.md"
@@ -1261,8 +1261,8 @@
         "file": "statement-semantics.md",
         "anchor": "on-error",
         "lines": [
-          3312,
-          3386
+          3313,
+          3387
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/error-handling/spec.md"
@@ -1279,8 +1279,8 @@
         "file": "statement-semantics.md",
         "anchor": "retry-continue",
         "lines": [
-          3388,
-          3498
+          3389,
+          3499
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/error-handling/spec.md"
@@ -1297,8 +1297,8 @@
         "file": "statement-semantics.md",
         "anchor": "def-fn",
         "lines": [
-          3500,
-          3647
+          3501,
+          3648
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/functions-udf/spec.md"
@@ -1315,8 +1315,8 @@
         "file": "statement-semantics.md",
         "anchor": "library-functions",
         "lines": [
-          3649,
-          3714
+          3650,
+          3715
         ]
       },
       "br_tree": "../br_tree/50-libraries/library-facility/spec.md"
@@ -1330,8 +1330,8 @@
         "file": "statement-semantics.md",
         "anchor": "cross-reference-map",
         "lines": [
-          3716,
-          3768
+          3717,
+          3769
         ]
       },
       "br_tree": null
@@ -1345,8 +1345,8 @@
         "file": "statement-semantics.md",
         "anchor": "error-code-quick-reference",
         "lines": [
-          3770,
-          3791
+          3771,
+          3792
         ]
       },
       "br_tree": null
@@ -1360,8 +1360,8 @@
         "file": "statement-semantics.md",
         "anchor": "quick-start-examples",
         "lines": [
-          3793,
-          3855
+          3794,
+          3856
         ]
       },
       "br_tree": null

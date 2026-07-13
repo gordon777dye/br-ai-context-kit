@@ -35,7 +35,11 @@ Encryption-type$ - The type of encryption to be done.  If not specified, a commo
 Initialization-vector$ - This is an arcane part of encryption standards. It exists to prevent attackers from being able to tell whether the unencrypted data has changed. This is described in more detail below, but is general only needed when interfacing with other non-BR programs.
 
 == Interfacing With Other Programs (encryption type and initialization vector)==
-There are a number of different types of encryption that BR supports through OpenSSL:  AES, BLOWFISH, DES, triple DES, RC4 and RC2.  Most symmetric key ciphers are block ciphers meaning that they encrypt one block at a time. This means if you have a bit message, it is broken up into multiple blocks and each block is encrypted. The block size can be set as (128, 192, 256) bits. Some encryption types don't support all of these values so STATUS ENCRYPTION should be checked to see what encryption types are available in BR. Besides block size, there are also various schemes for blocking data. One might expect that using 256 bit blocking would simply take every 32 bytes and call it a block.  This is not done though because there is a possibility that this would cause patterns in the encrypted data. To prevent this, there are various schemes known as codebooks which change the way data is blocked. Wikipedia explains this in more detail. If the encryption type is not specified AES:256:CBC:128 will be used. To be compatible with other programs the entire encryption type must be specified (cipher: key length: codebook: initialization vector length).
+There are a number of different types of encryption that BR supports through OpenSSL:  AES, BLOWFISH, DES, triple DES, RC4 and RC2.  Most symmetric key ciphers are block ciphers meaning that they encrypt one block at a time. This means if you have a bit message, it is broken up into multiple blocks and each block is encrypted. The block size can be set as (128, 192, 256) bits. Some encryption types don't support all of these values so STATUS ENCRYPTION should be checked to see what encryption types are available in BR. Besides block size, there are also various schemes for blocking data. One might expect that using 256 bit blocking would simply take every 32 bytes and call it a block.  This is not done though because there is a possibility that this would cause patterns in the encrypted data. To prevent this, there are various schemes known as codebooks which change the way data is blocked. Wikipedia explains this in more detail. 
+
+If the encryption type is not specified, AES:256:CBC:128 will be used. To be compatible with other programs, the entire encryption type must be specified in the format: `cipher:key-length:codebook:iv-length` (example: `AES:256:CBC:128`).
+
+**Important:** IV length requirements vary by algorithm and mode. ECB modes do not use an IV (specify 0); CBC/CFB/OFB modes typically require 8 or 16 bytes depending on the cipher's block size. Stream ciphers like RC4 do not use an IV. Use **STATUS ENCRYPTION** to verify which encryption type combinations are valid for your build.
 
 Initialization-vector – this is used to cause the same data encrypted with the same key to have a different encrypted result. This is significant because otherwise an attacker looking at data seeing the same encrypted result twice would know that the key and the unencrypted data have not changed. Regardless of whether or not you are concerned about this potential security issue, the standard encryption methods require this value so interfacing with other programs may require you to use it. It is a common practice to use a random number for this value and store the value at the beginning of (ahead of) the encrypted result. This is what BR does if this parameter is omitted.
 
@@ -49,12 +53,140 @@ the result would be simply “encrypted result”.
 
 DECRYPT$ has the same arguments as ENCRYPT$ with the exception of the first parameter which is the encrypted data. DECRYPT$ expects to be used with the same key$, encryption-type$, and initialization-vector$ as was used to encrypt the data.  As with ENCRYPT$, if key$ is not specified, the value from the OPTION statement will be used. If encryption-type$ is not specified, “AES:256:CBC:128” will be used. If the initialization vector is not specified, it will be assumed that the encrypted data starts with an initialization vector.
 
+==Result Formats and Lengths==
+
+===ENCRYPT$ Result Structure===
+
+The output of ENCRYPT$ varies depending on whether an initialization vector (IV) is auto-generated or explicitly provided:
+
+**Case 1: IV Auto-Generated (IV$ parameter omitted or empty)**
+
+When you do not specify an IV parameter, BR generates a random IV and **prepends it** to the encrypted data:
+
+ Result = [Random IV] + [Encrypted Data]
+
+The IV length is determined by the encryption type specification (the last number in cipher:key-length:mode:iv-length).
+
+**Example:**
+<pre>
+encrypted$ = ENCRYPT$(“Hello World”, “mykey”, “AES:256:CBC:128”)
+! Result structure: 16 bytes of random IV + encrypted “Hello World” data
+! Total length ≈ 16 bytes (IV) + 16 bytes (padded/encrypted block) = ~32 bytes
+</pre>
+
+**Case 2: IV Explicitly Specified**
+
+When an IV is explicitly provided, only the encrypted data is returned (no IV prepending):
+
+ Result = [Encrypted Data]
+
+**Example:**
+<pre>
+my_iv$ = “1234567890123456”  ! 16 bytes for AES
+encrypted$ = ENCRYPT$(“Hello World”, “mykey”, “AES:256:CBC:128”, my_iv$)
+! Result: just encrypted “Hello World”, no IV prepended
+! Total length ≈ 16 bytes (single AES block)
+</pre>
+
+===ENCRYPT$ Result Length Calculation===
+
+For **symmetric ciphers**, output length depends on plaintext size due to block padding:
+
+* **Block ciphers (DES, AES, etc.):** Output = ceiling(plaintext_length / block_size) × block_size
+  - DES, DES-EDE, DES-EDE3, BF, CAST5, IDEA: 8-byte blocks
+  - AES, CAMELLIA, SEED: 16-byte (128-bit) blocks
+  - If IV is auto-generated, add IV length to total (e.g., AES with auto-IV: 16 + encrypted_data)
+
+* **Stream ciphers (RC4):** Output = plaintext_length (no padding)
+
+**Examples:**
+<pre>
+! DES with 8-byte block: “test” (4 bytes) → 8 bytes encrypted
+encrypted$ = ENCRYPT$(“test”, “key”, “DES:64:CBC:64”)
+LEN(encrypted$) = 8 (with auto-IV) or 16 total (8 IV + 8 encrypted)
+
+! AES with 16-byte block: “Hello” (5 bytes) → 16 bytes encrypted  
+encrypted$ = ENCRYPT$(“Hello”, “key”, “AES:256:CBC:128”)
+LEN(encrypted$) = 16 (with explicit IV) or 32 total (16 IV + 16 encrypted)
+
+! RC4 stream cipher: “Hello” (5 bytes) → 5 bytes encrypted (no padding)
+encrypted$ = ENCRYPT$(“Hello”, “key”, “RC4:128:STREAM:0”)
+LEN(encrypted$) = 5
+</pre>
+
+===DECRYPT$ Result Structure===
+
+DECRYPT$ reverses the process:
+* If IV was **auto-generated**, DECRYPT$ expects the encrypted data to **start with the IV** and extracts it automatically
+* If IV was **explicitly provided**, DECRYPT$ uses the provided IV to decrypt
+
+**Important:** Use identical parameters for decryption as were used for encryption, except for the encrypted data itself.
+
+**Example:**
+<pre>
+! Encryption with auto-IV
+plaintext$ = “Secret Message”
+encrypted$ = ENCRYPT$(plaintext$, “key1”, “AES:256:CBC:128”)
+! encrypted$ contains: [16-byte random IV] + [encrypted message]
+
+! Decryption without specifying IV (auto-extracted from encrypted$)
+recovered$ = DECRYPT$(encrypted$, “key1”, “AES:256:CBC:128”)
+! Result: “Secret Message” (length = 14, spaces and padding removed)
+
+! Alternative: manually extract and provide IV
+iv_extracted$ = encrypted$(1:16)
+encrypted_only$ = encrypted$(17:LEN(encrypted$))
+recovered$ = DECRYPT$(encrypted_only$, “key1”, “AES:256:CBC:128”, iv_extracted$)
+! Result: same as above
+</pre>
+
+===Hash Result Lengths===
+
+Hash/digest algorithms produce **fixed-length output regardless of input size:**
+
+| Algorithm | Output Length (bytes) | Output Format |
+|-----------|----------------------|---------------|
+| MD5 | 16 | 32 hex characters (if displayed as hex) |
+| SHA (original) | 20 | 40 hex characters (if displayed as hex) |
+| SHA-1 | 20 | 40 hex characters (if displayed as hex) |
+| DSS | 20 | 40 hex characters (if displayed as hex) |
+| DSS-1 | 20 | 40 hex characters (if displayed as hex) |
+| MDC-2 | 16 | 32 hex characters (if displayed as hex) |
+| RIPEMD-160 | 20 | 40 hex characters (if displayed as hex) |
+
+**Note:** The output is **binary data**, not hex-encoded. To display or transmit as readable hex, use `UNHEX$()`.
+
+**Examples:**
+<pre>
+! Hash with auto-generated result
+hash_result$ = ENCRYPT$(“password123”, “”, “MD5”)
+LEN(hash_result$) = 16 bytes (binary)
+
+! Display as hex (readable)
+hex_hash$ = UNHEX$(hash_result$)
+! Now 32 characters representing the 16-byte MD5
+
+! Another example: SHA-1
+sha1_result$ = ENCRYPT$(“data”, “”, “SHA-1”)
+LEN(sha1_result$) = 20 bytes (binary)
+hex_sha1$ = UNHEX$(sha1_result$)
+! Now 40 hex characters
+</pre>
+
 ==Hashing Routines==
-Three common forms of hashing are allowed in BR. They are MD5, SHA, and SHA-1. These are also provided through the ENCRYPT$ function specifying a null key$ value:
+Multiple hashing algorithms are available in BR. These are provided through the ENCRYPT$ function by specifying a null key$ value:
 
- ENCRYPT$(data$, “”, “MD5”) ENCRYPT$(data$, “”, “SHA”) ENCRYPT$(data$, “”, “SHA-1”)
+ ENCRYPT$(data$, “”, “MD5”)
+ ENCRYPT$(data$, “”, “SHA”)
+ ENCRYPT$(data$, “”, “SHA-1”)
+ ENCRYPT$(data$, “”, “DSS”)
+ ENCRYPT$(data$, “”, “DSS-1”)
+ ENCRYPT$(data$, “”, “MDC-2”)
+ ENCRYPT$(data$, “”, “RIPEMD-160”)
 
-Hashing is also referred to as Message Digests or digests. This is what the MD in MD5 means. There is no way to restore data that has been hashed. Hashing is a one way function so DECRYPT$ will yield an error.
+Hashing is also referred to as Message Digests or digests. This is what the MD in MD5 means. There is no way to restore data that has been hashed. Hashing is a one-way function so DECRYPT$ will return error **BRENODECRYPTENCRYPT** if attempted on a hashed value.
+
+**Note:** SHA is available for backward compatibility but SHA-1 or stronger algorithms are recommended for new code.
 
 ==Asymmetric Encryption==
 Asymmetric key encryption is also known as public/private key encryption.
@@ -126,22 +258,25 @@ The following algorithms are supported for backward compatibility and remain ava
 
 ===Symmetric Key Ciphers===
 <pre>
-DES (all modes)
-DES-EDE / DES-EDE3 (Triple DES)
-RC4 (40, 128)
-RC2 (40, 64, 128)
-BF (Blowfish)
-CAST5
-AES:128 / 192 / 256 (ECB, CBC, CFB, OFB)
-IDEA
-CAMELLIA:128 / 192 / 256
-SEED
+DES (ECB, CBC, CFB1, CFB8, CFB64, OFB)
+DES-EDE / DES-EDE3 (Triple DES) (ECB, CBC, CFB1, CFB8, CFB64, OFB)
+RC4 (40, 128 in STREAM mode)
+RC2 (40, 64, 128 with ECB, CBC, CFB64, OFB modes)
+BF (Blowfish, 128-bit; ECB, CBC, CFB64, OFB)
+CAST5 (128-bit; ECB, CBC, CFB64, OFB)
+AES (128, 192, 256-bit; ECB, CBC, CFB1, CFB8, CFB128, OFB)
+IDEA (128-bit; ECB, CFB64, OFB, CBC) — not available on Mac OS X
+CAMELLIA (128, 192, 256-bit; ECB, CBC, CFB1, CFB8, CFB128, OFB) — not available on Mac OS X
+SEED (128-bit; ECB, CBC, CFB128, OFB) — not available on Mac OS X
 </pre>
 
 ===Message Digest Algorithms===
 <pre>
 MD5
+SHA   (original algorithm; use SHA-1 or SHA-256 for new code)
 SHA-1
+DSS   (Digital Signature Standard)
+DSS-1
 MDC-2
 RIPEMD-160
 </pre>
@@ -151,18 +286,7 @@ RIPEMD-160
 The following algorithms were available in earlier versions but are no longer exposed in current builds:
 
 <pre>
-SHA   (original / alias)
-DSS
-DSS-1
-</pre>
-
-These were removed due to obsolescence or lack of modern security relevance.
-
-==In Development (Newer Additions)==
-
-===Added in Version 4.31hdg===
-<pre>
-SHA-256
+(None currently — all previously deprecated algorithms have been restored or remain available)
 </pre>
 
 ==STATUS ENCRYPTION==
@@ -173,24 +297,145 @@ The command:
 STATUS ENCRYPTION
 </pre>
 
-displays the encryption and digest algorithms supported by the currently running BR executable. This is the authoritative source for determining which algorithms are available.
+displays the encryption and digest algorithms supported by the currently running BR executable. This is the **authoritative source** for determining which algorithms, modes, and key lengths are available. Algorithm availability may vary by platform (e.g., IDEA, CAMELLIA, and SEED are unavailable on Mac OS X).
 
 ==Notes==
 
-* Default encryption:
-  <code>AES:256:CBC:128</code>
+* Default encryption: `AES:256:CBC:128`
 * If no initialization vector is provided, BR prepends a random IV to the encrypted output.
-* DECRYPT$ must use the same parameters as ENCRYPT$.
+* DECRYPT$ must use the same parameters (key, encryption-type, IV) as were used for ENCRYPT$.
+* Attempting to use an unsupported encryption type or mode combination will return an error. Use STATUS ENCRYPTION to verify availability.
+* Error `BRENODECRYPTENCRYPT` is returned when attempting DECRYPT$ on a hashed value (one-way digests cannot be reversed).
+
+==Common Use Cases and Examples==
+
+===Example 1: Basic Encryption/Decryption with Auto-IV (Recommended)===
+
+<pre>
+! Simple, secure encryption using defaults
+plaintext$ = "Sensitive data"
+key$ = "MySecretKey"
+
+! Encrypt (IV auto-generated and prepended)
+encrypted$ = ENCRYPT$(plaintext$, key$)
+! Result: ~32 bytes (16-byte IV + 16-byte padded data for AES-256-CBC)
+
+! Decrypt (IV auto-extracted)
+recovered$ = DECRYPT$(encrypted$, key$)
+! Result: "Sensitive data" (padding removed, original plaintext recovered)
+</pre>
+
+===Example 2: Consistent Encryption (Same Output Each Time)===
+
+<pre>
+! When you need deterministic output (same plaintext = same ciphertext)
+plaintext$ = "Important"
+key$ = "MySecretKey"
+fixed_iv$ = "FixedIV1234567890"  ! 16 bytes for AES
+
+! Encrypt with explicit IV (output is consistent)
+encrypted$ = ENCRYPT$(plaintext$, key$, "AES:256:CBC:128", fixed_iv$)
+! Result: ~16 bytes (only encrypted data, no IV prepended)
+
+! Encrypt same data again with same key/IV
+encrypted2$ = ENCRYPT$(plaintext$, key$, "AES:256:CBC:128", fixed_iv$)
+! Result: identical to encrypted$ (useful for comparing stored values)
+
+! Decrypt using same IV
+recovered$ = DECRYPT$(encrypted$, key$, "AES:256:CBC:128", fixed_iv$)
+</pre>
+
+===Example 3: Password Hashing (MD5, SHA-1)===
+
+<pre>
+! One-way hashing for password validation
+password$ = "UserPassword123"
+
+! Create hash (16 bytes binary)
+password_hash$ = ENCRYPT$(password$, "", "MD5")
+! Store password_hash$ in database
+
+! Later, verify by re-hashing login attempt
+login_attempt$ = "UserPassword123"
+attempt_hash$ = ENCRYPT$(login_attempt$, "", "MD5")
+
+IF attempt_hash$ = password_hash$ THEN
+   PRINT "Password matches!"
+ELSE
+   PRINT "Incorrect password"
+END IF
+</pre>
+
+===Example 4: Working with Hash Output (Convert to Hex Display)===
+
+<pre>
+! SHA-1 hash and display as hex string
+data$ = "Message to hash"
+hash_binary$ = ENCRYPT$(data$, "", "SHA-1")  ! 20 bytes binary
+LEN(hash_binary$)  ! = 20
+
+! Convert to hex for display/logging
+hash_hex$ = UNHEX$(hash_binary$)
+PRINT "SHA-1 Hash: " & hash_hex$
+! Output: SHA-1 Hash: ABC123DEF456... (40 hex characters)
+</pre>
+
+===Example 5: Interoperability with External Systems===
+
+<pre>
+! Encrypt data to send to a non-BR system
+! System expects: AES-128 CBC mode with explicit 16-byte IV, no IV prepending
+
+plaintext$ = "System Integration"
+key$ = "16-byte-key12345"     ! Exactly 16 bytes for AES-128
+my_iv$ = "InitVect16bytes"    ! Exactly 16 bytes
+
+! Encrypt with explicit params (IV not prepended)
+encrypted$ = ENCRYPT$(plaintext$, key$, "AES:128:CBC:128", my_iv$)
+! Result: ~16 bytes (single AES block)
+
+! Send to external system as: [my_iv$] + [encrypted$]
+output$ = my_iv$ & encrypted$
+
+! To receive and decrypt from external system:
+received$ = ... ! Data from other system (IV + encrypted)
+received_iv$ = received$(1:16)
+received_encrypted$ = received$(17:LEN(received$))
+recovered$ = DECRYPT$(received_encrypted$, key$, "AES:128:CBC:128", received_iv$)
+</pre>
+
+===Example 6: Working with Large Data (Output Length)===
+
+<pre>
+! Encrypting data larger than one block
+large_data$ = "This is a longer message that spans multiple blocks"
+! Length = 51 bytes
+
+key$ = "MyKey"
+
+! AES has 16-byte blocks; 51 bytes → 64 bytes encrypted (4 blocks)
+encrypted$ = ENCRYPT$(large_data$, key$)
+! With auto-IV: LEN(encrypted$) = 16 (IV) + 64 (encrypted) = 80 bytes
+
+! DES has 8-byte blocks; 51 bytes → 56 bytes encrypted (7 blocks)
+encrypted_des$ = ENCRYPT$(large_data$, key$, "DES:64:CBC:64")
+! With auto-IV: LEN(encrypted_des$) = 8 (IV) + 56 (encrypted) = 64 bytes
+
+! Stream cipher (RC4) has no padding
+encrypted_rc4$ = ENCRYPT$(large_data$, key$, "RC4:128:STREAM:0")
+! With auto-IV: LEN(encrypted_rc4$) = 0 (RC4 has no IV) + 51 = 51 bytes
+</pre>
 
 ==Wishlist: Future Encryption Types==
 
 The following modern algorithms are supported by OpenSSL but not currently exposed in BR:
 
+* SHA-256 (message digest)
+* SHA-512 (message digest)
 * AES:128:GCM:96
 * AES:192:GCM:96
 * AES:256:GCM:96
 * HMAC-SHA-256
 * HMAC-SHA-512
-* SHA-512
 * ChaCha20-Poly1305
 * PBKDF2 (password hashing)
