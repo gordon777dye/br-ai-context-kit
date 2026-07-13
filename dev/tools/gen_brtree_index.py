@@ -34,7 +34,11 @@ def parse_list(v):
 
 
 def lead_paragraph(body):
-    """First real paragraph after the H1, collapsed to one line."""
+    """First real paragraph after the H1, collapsed to one line.
+
+    Kept whole: the summary is what a reader ranks specs on without opening them,
+    so truncating it defeats the index.
+    """
     lines = body.split("\n")
     # skip to after the first '# ' heading
     i = 0
@@ -50,8 +54,7 @@ def lead_paragraph(body):
     text = " ".join(para)
     text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)   # [label](url) -> label
     text = re.sub(r"[*`]", "", text)                        # drop **bold** / *em* / `code`
-    text = re.sub(r"\s+", " ", text)
-    return text[:240].rstrip()
+    return re.sub(r"\s+", " ", text).strip()
 
 
 def build():

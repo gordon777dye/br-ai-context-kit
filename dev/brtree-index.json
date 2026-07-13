@@ -800,7 +800,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "The start-up configuration file (BRConfig.sys) — holds environmental settings read by BR at launch (800 chars/line). Configuration, not coding. BR loads it at start-up, falling back to the legacyWBConfig.sys if BRConfig.sys is absent. Lines"
+      "summary": "The start-up configuration file (BRConfig.sys) — holds environmental settings read by BR at launch (800 chars/line). Configuration, not coding. BR loads it at start-up, falling back to the legacyWBConfig.sys if BRConfig.sys is absent. Lines containing errors are listed on screen at start-up and then ignored (their defaults apply) so a bad directive never halts start-up. Environment-variable handling is in environment; client-server settings in client-server. Almost every directive can also be applied at runtime via the CONFIG command (and conditioned per-user with a leading @\"login\"). A REM line (or ! after a space) is a comment."
     },
     {
       "path": "00-configuration/environment",
@@ -930,7 +930,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "Putting values into variables and arrays and changing them in place: LET, the forced-assignment operator :=, MAT array operations, substring mutation, and the internal data table (DATA/READ/RESTORE). Operators that form the right-hand-side"
+      "summary": "Putting values into variables and arrays and changing them in place: LET, the forced-assignment operator :=, MAT array operations, substring mutation, and the internal data table (DATA/READ/RESTORE). Operators that form the right-hand-side values are in expressions; declaring/sizing storage is in declaration."
     },
     {
       "path": "10-language/data-manipulation/conditionals",
@@ -987,7 +987,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "The literals and value kinds BR works with: numeric (integer / fixed-point / scientific) and string. Declaring a variable's storage (string max length, arrays) lives in declaration; the operators that combine these values live in expression"
+      "summary": "The literals and value kinds BR works with: numeric (integer / fixed-point / scientific) and string. Declaring a variable's storage (string max length, arrays) lives in declaration; the operators that combine these values live in expressions."
     },
     {
       "path": "10-language/data-manipulation/declaration",
@@ -1017,7 +1017,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "Declaring storage: variable kinds and naming, DIM for string length and arrays, and runtime redimensioning with MAT. Putting values into variables/arrays (LET, MAT copy/arithmetic, READ/DATA) lives in assignment; the value kinds themselves"
+      "summary": "Declaring storage: variable kinds and naming, DIM for string length and arrays, and runtime redimensioning with MAT. Putting values into variables/arrays (LET, MAT copy/arithmetic, READ/DATA) lives in assignment; the value kinds themselves are in data-types."
     },
     {
       "path": "10-language/data-manipulation/expressions",
@@ -1053,7 +1053,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "Operators, precedence, and the numeric / string / relational / logical expressions that BR evaluates. Substring mutation and the LET form of assignment live in assignment; the IF / WHILE / UNTIL constructs that consume relational expression"
+      "summary": "Operators, precedence, and the numeric / string / relational / logical expressions that BR evaluates. Substring mutation and the LET form of assignment live in assignment; the IF / WHILE / UNTIL constructs that consume relational expressions live in conditionals."
     },
     {
       "path": "10-language/data-manipulation/system-functions",
@@ -1169,7 +1169,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "Defining your own FN… functions with DEF … FNEND, their parameters (by value vs. by reference), local scope, and return value. The library facility that loads and links functions across programs (LIBRARY statement, loading strategies, searc"
+      "summary": "Defining your own FN… functions with DEF … FNEND, their parameters (by value vs. by reference), local scope, and return value. The library facility that loads and links functions across programs (LIBRARY statement, loading strategies, search order) is in 50-libraries/library-facility. Built-in intrinsic functions are in system-functions."
     },
     {
       "path": "10-language/flow-control/other-flow",
@@ -1294,7 +1294,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "Graphical controls built on FIELDS: combo boxes, radio buttons, check boxes, buttons, text boxes, date pickers, grids/lists, native menus, plus field help. They share the FIELDS statement and attribute machinery in input-output and fields-a"
+      "summary": "Graphical controls built on FIELDS: combo boxes, radio buttons, check boxes, buttons, text boxes, date pickers, grids/lists, native menus, plus field help. They share the FIELDS statement and attribute machinery in input-output and fields-attributes; selection/clicks return values via the FKEY system variable."
     },
     {
       "path": "20-io-screen/fields-attributes",
@@ -1329,7 +1329,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "The format and attributes parts of a FIELDS definition — what a field looks like and how it behaves. The statements that use them are in input-output. Reusable attribute/font names defined in BRConfig.sys live under 00-configuration/config-"
+      "summary": "The format and attributes parts of a FIELDS definition — what a field looks like and how it behaves. The statements that use them are in input-output. Reusable attribute/font names defined in BRConfig.sys live under 00-configuration/config-directives."
     },
     {
       "path": "20-io-screen/input-output",
@@ -1364,7 +1364,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "Full-screen data entry: positioning text and input at any row/column with PRINT FIELDS, INPUT FIELDS, and RINPUT FIELDS. Field formats and attributes are in fields-attributes; GUI controls (buttons, grids, …) in controls; windows in windows"
+      "summary": "Full-screen data entry: positioning text and input at any row/column with PRINT FIELDS, INPUT FIELDS, and RINPUT FIELDS. Field formats and attributes are in fields-attributes; GUI controls (buttons, grids, …) in controls; windows in windows-cursor."
     },
     {
       "path": "20-io-screen/windows-cursor",
@@ -1398,7 +1398,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "Opening bordered windows (mini-screens) as DISPLAY channels, drawing borders, and locating the cursor. FIELDS I/O inside a window uses PRINT #w, FIELDS … — see input-output. This is the canonical home for the window OPEN spec; the printing"
+      "summary": "Opening bordered windows (mini-screens) as DISPLAY channels, drawing borders, and locating the cursor. FIELDS I/O inside a window uses PRINT #w, FIELDS … — see input-output. This is the canonical home for the window OPEN spec; the printing guide links here rather than redefining it."
     },
     {
       "path": "30-io-file/database",
@@ -1446,7 +1446,7 @@
         "troubleshooting",
         "see-also"
       ],
-      "summary": "This explains how a Business Rules! program can act as a SQL client — connecting to an external relational database (SQLite, MySQL, SQL Server, MS Access, …) through ODBC, submitting SQL statements, and reading result rows. BR treats a live"
+      "summary": "This explains how a Business Rules! program can act as a SQL client — connecting to an external relational database (SQLite, MySQL, SQL Server, MS Access, …) through ODBC, submitting SQL statements, and reading result rows. BR treats a live SQL statement as an ordinary I/O channel: you OPEN it, WRITE to submit/execute, READ to fetch rows, and CLOSE when done."
     },
     {
       "path": "30-io-file/file-model",
@@ -1518,7 +1518,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "FORM describes the byte-level layout of a record (or a print line) — the field type codes that READ/WRITE/REWRITE and PRINT … USING decode/encode against. This is the canonical FORM reference; the file-I/O statements (statements) and the pr"
+      "summary": "FORM describes the byte-level layout of a record (or a print line) — the field type codes that READ/WRITE/REWRITE and PRINT … USING decode/encode against. This is the canonical FORM reference; the file-I/O statements (statements) and the printing guide link here rather than redefining it."
     },
     {
       "path": "30-io-file/keys-indexes",
@@ -1624,7 +1624,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "Opening internal files and reading/writing/updating records. Concepts (types, modes, access, locking) are in file-model; record layout in form-spec; keyed access (KEY=/SEARCH=) in keys-indexes. Display-file PRINT/INPUT/LINPUT and printer/se"
+      "summary": "Opening internal files and reading/writing/updating records. Concepts (types, modes, access, locking) are in file-model; record layout in form-spec; keyed access (KEY=/SEARCH=) in keys-indexes. Display-file PRINT/INPUT/LINPUT and printer/serial opens are cross-referenced below."
     },
     {
       "path": "40-io-printing/pcl-pdf",
@@ -1658,7 +1658,7 @@
         "pjl",
         "see-also"
       ],
-      "summary": "Rich printer formatting beyond plain PRINT USING: fonts, color, positioning, images, and boxes/shading — emitted as escape sequences (\\E…) or PRINTER.SYS substitution tags ([NAME]) inside PRINT #255: output. The plain print statements are i"
+      "summary": "Rich printer formatting beyond plain PRINT USING: fonts, color, positioning, images, and boxes/shading — emitted as escape sequences (\\E…) or PRINTER.SYS substitution tags ([NAME]) inside PRINT #255: output. The plain print statements are in statements; the tag definitions live in PRINTER.SYS under 00-configuration."
     },
     {
       "path": "40-io-printing/sort",
@@ -1721,7 +1721,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "PRINT (and PRINT USING) for screen/printer/display output, formatting with FORM/PIC, cursor positioning, page control, and opening printer files. On-screen PRINT FIELDS is in 20-io-screen/input-output; the record-layout FORM codes are canon"
+      "summary": "PRINT (and PRINT USING) for screen/printer/display output, formatting with FORM/PIC, cursor positioning, page control, and opening printer files. On-screen PRINT FIELDS is in 20-io-screen/input-output; the record-layout FORM codes are canonically in 30-io-file/form-spec; printer configuration (spooling, PRINTER.SYS) is in 00-configuration."
     },
     {
       "path": "50-libraries/fileio",
@@ -1745,7 +1745,7 @@
         "semantics",
         "see-also"
       ],
-      "summary": "FileIO (a Sage AX library) is the standard file-access abstraction in this codebase: you describe each data file once in an ASCII layout file, and FileIO OPENs it, builds the FORM, sizes your record arrays, and defines FILE_FIELD subscript"
+      "summary": "FileIO (a Sage AX library) is the standard file-access abstraction in this codebase: you describe each data file once in an ASCII layout file, and FileIO OPENs it, builds the FORM, sizes your record arrays, and defines FILE_FIELD subscript constants — so programs reference fields by name and never hard-code positions. Change a layout and FileIO migrates the data file on the fly; no program needs editing. ScreenIO builds on it."
     },
     {
       "path": "50-libraries/fnsnap",
@@ -1775,7 +1775,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "FnSnap is a shipped collection of ready-made FN… library functions (dialogs, screen helpers, printing/PCL, bar codes, dates, files, arrays, window maintenance). Link them with the library facility like any library function and call FNINIT o"
+      "summary": "FnSnap is a shipped collection of ready-made FN… library functions (dialogs, screen helpers, printing/PCL, bar codes, dates, files, arrays, window maintenance). Link them with the library facility like any library function and call FNINIT once at program start. This page is a navigational index; each function's full signature, parameters and notes live in the per-area FnSnap__ pages linked below."
     },
     {
       "path": "50-libraries/library-facility",
@@ -1832,7 +1832,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "A Rapid-Application-Development library (a Sage AX tool) for building event-driven, screen-based applications; it builds on the FileIO library for data access. A Screen Function (built in the ScreenIO designer) is called like any library fu"
+      "summary": "A Rapid-Application-Development library (a Sage AX tool) for building event-driven, screen-based applications; it builds on the FileIO library for data access. A Screen Function (built in the ScreenIO designer) is called like any library function; ScreenIO drives the underlying screen FIELDS and file I/O for you."
     },
     {
       "path": "60-integration/json-datastore",
@@ -1888,7 +1888,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "Running BR programs as the backend of a website: BR's own WEB_SERVER12.BR serves the pages, a page names a BR function via a ?BR_FUNC=… URL, and the WebForm library builds the HTML. A BR program can also reach out to web pages/services as a"
+      "summary": "Running BR programs as the backend of a website: BR's own WEB_SERVER12.BR serves the pages, a page names a BR function via a ?BR_FUNC=… URL, and the WebForm library builds the HTML. A BR program can also reach out to web pages/services as an HTTP client — see Outbound."
     },
     {
       "path": "70-commands/editing",
@@ -1956,7 +1956,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "OS-level file and directory operations, runnable interactively or from a procedure / EXECUTE. For opening files inside a program see 30-io-file/statements. Each command has a short abbreviation (in parentheses below). Options follow a leadi"
+      "summary": "OS-level file and directory operations, runnable interactively or from a procedure / EXECUTE. For opening files inside a program see 30-io-file/statements. Each command has a short abbreviation (in parentheses below). Options follow a leading dash and may be combined (-AW); a -<n> record length, when combined, must come last."
     },
     {
       "path": "70-commands/information",
@@ -2038,7 +2038,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "Loading, saving, running, and chaining programs, plus procedure files (command scripts). Commands run immediately (no line number) and — crucially — from program code via EXECUTE. Line-editing commands are in editing; file/dir commands in f"
+      "summary": "Loading, saving, running, and chaining programs, plus procedure files (command scripts). Commands run immediately (no line number) and — crucially — from program code via EXECUTE. Line-editing commands are in editing; file/dir commands in file-directory."
     }
   ]
 }

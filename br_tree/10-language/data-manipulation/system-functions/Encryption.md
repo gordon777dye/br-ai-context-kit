@@ -273,7 +273,7 @@ SEED (128-bit; ECB, CBC, CFB128, OFB) — not available on Mac OS X
 ===Message Digest Algorithms===
 <pre>
 MD5
-SHA   (original algorithm; use SHA-1 or SHA-256 for new code)
+SHA   (original algorithm; use SHA-1 for new code — SHA-256 is not exposed in BR, see Wishlist below)
 SHA-1
 DSS   (Digital Signature Standard)
 DSS-1

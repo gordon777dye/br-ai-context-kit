@@ -875,7 +875,7 @@
           1872
         ]
       },
-      "br_tree": "../br_tree/20-io-screen/windows-cursor/spec.md"
+      "br_tree": "../br_tree/20-io-screen/input-output/spec.md"
     },
     {
       "id": "input-select",
@@ -893,7 +893,7 @@
           1938
         ]
       },
-      "br_tree": "../br_tree/20-io-screen/windows-cursor/spec.md"
+      "br_tree": "../br_tree/20-io-screen/input-output/spec.md#select"
     },
     {
       "id": "grid-list-text",
@@ -1231,7 +1231,7 @@
           3239
         ]
       },
-      "br_tree": "../br_tree/70-commands/program-management/spec.md#system"
+      "br_tree": "../br_tree/70-commands/program-management/spec.md#execute"
     },
     {
       "id": "on-condition",

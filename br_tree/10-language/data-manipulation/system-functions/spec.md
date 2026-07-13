@@ -71,7 +71,8 @@ anywhere an expression is allowed.
 | `VAL(s$)` | string → number |
 | `CNVRT$(spec$,n)` | number → string per a FORM format code (`B BH BL D G GZ L N NZ PD PIC S ZD`); enhanced `STR$` (slower than a `FORM`) — see [form-spec](../../../30-io-file/form-spec/spec.md#syntax) |
 | `CFORM$(form$)` | pre-compile a FORM string into a fast format variable (see note) |
-| `HEX$(s$)` / `UNHEX$(s$)` | hex notation ↔ characters (e.g. printer escapes; printer translation starts `HEX$("2B00")`) |
+| `HEX$(s$)` | **hex text → binary.** `s$` must be hex digits in **pairs**: `HEX$("2B00")` → 2 bytes (printer escapes; a printer translation starts this way). `HEX$("ABC")` (odd length) is invalid, and passing data that is not hex-digit text can abort the BR process rather than raise a trappable error — validate before calling |
+| `UNHEX$(s$)` | **binary → hex text** — the inverse. Renders arbitrary bytes readable: a 20-byte `ENCRYPT$(…,"SHA-1")` digest becomes its familiar 40-character hex string |
 | `PIC$[(sym$)]` | current currency symbol; with a 1-char `sym$`, sets it (persists until changed / BR exit; per-workstation) |
 
 > **`CFORM$` caveat** — output is an unreadable, machine/release-dependent internal format: never

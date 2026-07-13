@@ -26,6 +26,11 @@
 *.wbo
 node_modules/
 
+# --- BR ports of the Python generators: kit-testing instruments, never published ---
+# The .brs ports themselves are covered by *.brs above. These are what a test RUN drops
+# into the tree: a sandbox index (never the canonical brtree-index.json) and DIR scratch.
 dev/tools/BR_PORT_QUICKSTART.md
 dev/tools/PORT_ANALYSIS.md
 dev/src/
+*.brtest.json
+dev/temp_specs.txt

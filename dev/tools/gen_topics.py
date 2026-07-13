@@ -58,6 +58,36 @@ META = {
     "library-functions": ["LIBRARY", "DEF LIBRARY"],
 }
 
+# Curated: ids that carry no routing keywords on purpose. Together with META this
+# partitions every anchor, so an unclassified one is an error rather than a silent
+# demotion to a keyword-less "reference" topic (see classification_problems).
+REFERENCE = {
+    "cross-reference-map",
+    "error-code-quick-reference",
+    "quick-start-examples",
+}
+
+
+def classification_problems(anchor_ids):
+    """Drift between the hand-maintained META/REFERENCE maps and the anchors on disk.
+
+    Nothing else catches this: an anchor missing from META still produces a topic (a
+    keyword-less "reference" one, invisible to routing), and regenerate-and-compare
+    cannot see the difference because it regenerates the same way.
+    """
+    problems = []
+    ids = set(anchor_ids)
+    for aid in sorted(META.keys() - ids):
+        problems.append("META id '%s' has no anchor in %s (renamed or removed?) - its "
+                        "routing keywords are dead" % (aid, os.path.basename(sem_path)))
+    for aid in sorted(REFERENCE - ids):
+        problems.append("REFERENCE id '%s' has no anchor in %s" % (aid, os.path.basename(sem_path)))
+    for aid in [a for a in anchor_ids if a not in META and a not in REFERENCE]:
+        problems.append("anchor '%s' is in neither META nor REFERENCE - it routes to nothing; "
+                        "add its keywords to META, or list it in REFERENCE if it is not a "
+                        "statement" % aid)
+    return problems
+
 # ---- topic index ---------------------------------------------------------
 with io.open(sem_path, "r", encoding="utf-8", newline="") as f:
     raw = f.read()
@@ -66,6 +96,24 @@ src_hash = hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 anchor_re = re.compile(r'^<a id="([^"]+)"></a>\s*$')
 brtree_re = re.compile(r'\.\./br_tree/[^\s\)]+?spec\.md(?:#[\w-]+)?')
+# A cross-reference list item:  - [label](../br_tree/<leaf>/spec.md#anchor)
+xref_re = re.compile(r'^\s*[-*]\s*\[[^\]]+\]\((\.\./br_tree/[^\s\)]+?spec\.md(?:#[\w-]+)?)\)')
+
+
+def brtree_link(body):
+    """The section's canonical br_tree home.
+
+    Taken from the trailing cross-reference list, whose first entry is the canonical
+    leaf. Prose above it may link br_tree in passing (a related spec, a neighbouring
+    subsection); those mentions must not win, or the topic routes to a spec that merely
+    got named first. Falls back to any link for sections that carry no list.
+    """
+    for ln in body.split("\n"):
+        m = xref_re.match(ln)
+        if m:
+            return m.group(1)
+    m = brtree_re.search(body)
+    return m.group(0) if m else None
 
 found = []
 for i, ln in enumerate(lines):
@@ -80,8 +128,7 @@ for k, (aid, aline, title) in enumerate(found):
     heading_line = aline + 1
     end_line = (found[k + 1][1] - 1) if k + 1 < len(found) else total
     body = "\n".join(lines[heading_line:end_line])
-    bt = brtree_re.search(body)
-    br_tree = bt.group(0) if bt else None
+    br_tree = brtree_link(body)
     if aid in META:
         topics.append({
             "id": aid, "kind": "statement", "title": title, "keywords": META[aid],
@@ -149,7 +196,7 @@ if "--verify" in sys.argv:
         print("VERIFY FAIL: %s missing — run tools/gen_topics.py" % name); sys.exit(1)
     with io.open(out_path, "r", encoding="utf-8") as f:
         existing = json.load(f)
-    problems = []
+    problems = classification_problems([aid for aid, _, _ in found])
     if existing.get("source_sha256") != src_hash:
         problems.append("source_sha256 mismatch: statement-semantics.md changed since last generate")
     prev_end = 0
@@ -187,5 +234,8 @@ print("topics: %d (stmt %d, ref %d) | routing-keywords %d | br_tree %d | missing
       % (len(topics), sum(1 for t in topics if t["kind"] == "statement"),
          sum(1 for t in topics if t["kind"] == "reference"), len(kw_index),
          sum(1 for t in topics if t["br_tree"]), missing_bt or "none"))
+
+for p in classification_problems([aid for aid, _, _ in found]):
+    print("WARNING: " + p)
 print("lexicon: reserved(fn) %d | statement %d | clause %d | command %d"
       % (len(reserved), len(statement_kw), len(clause_kw), len(command_kw)))

@@ -129,11 +129,22 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
 
 ## 4. Built-ins that didn't behave as documented (environment-specific — verify before trusting)
 
+- **`DEF` lets you declare a by-value string parameter larger than 32,767 — and then fails at the
+  call, not at the `DEF`.** The oversized declaration is accepted silently: `DEF FNX(B$*400000)`
+  compiles and loads without complaint. But pass a string longer than **32,767** bytes into it and you
+  get **error 4 — string overflow**
+  ([`0004`](../br_tree/90-reference/error-codes/0004.md)) at the point of call. **The declared `*n`
+  therefore lies**: 32,767 is the hard by-value ceiling no matter what size you specify in the `DEF`. 
+  The boundary itself is clean — a `*32767` parameter takes a full 32,767-byte string with no trouble.
+  **To pass more than 32,767 bytes, pass by reference** (`DEF FNX(&BIG$)`) — see §2, and remember a
+  by-reference parameter means the callee's writes mutate the caller's variable.
+
 - **`HEX$` values must be given in pairs; `HEX$("ABC")` is invalid; `HEX$("ABCD")` is valid. 
 
-- **`HEX$` and `UNHEX$` go the opposite direction from what the name suggests, and system-functions'
-  one-line table entry ("hex notation ↔ characters") doesn't disambiguate which name is which
-  direction.** Empirically confirmed: `UNHEX$(binary$)` is binary→hex-text (e.g. turns a 20-byte
+- **`HEX$` and `UNHEX$` go the opposite direction from what the name suggests.** (The
+  system-functions table used to gloss both as "hex notation ↔ characters", which disambiguated
+  neither; it now spells out each direction separately.) Empirically confirmed: `UNHEX$(binary$)`
+  is binary→hex-text (e.g. turns a 20-byte
   `ENCRYPT$(...,"SHA-1")` digest into its familiar 40-char hex string — verified against
   `hashlib.sha1(b"hello world").hexdigest()`, matched exactly case-insensitively). `HEX$(hextext$)`
   is the reverse, hex-text→binary (`HEX$("ABCD")` → 2 raw bytes `0xAB 0xCD`) — consistent with the
@@ -143,14 +154,16 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
   (confirmed reproducible on this build/config). Never call `HEX$` on data you haven't confirmed is
   hex-digit text; if in doubt which conversion you need, `UNHEX$` is binary→readable-hex.
 
-- **`ENCRYPT$` supports SHA-1, but not SHA-256.** Reconfirmed against this build: `STATUS ENCRYPTION`
-  lists message digest algorithms `MD5 SHA SHA-1 DSS DSS-1 MDC-2 RIPEMD-160` — no `SHA-256`, despite
-  [`Encryption.md`](../br_tree/10-language/data-manipulation/system-functions/Encryption.md) listing
-  `SHA-256` as "Added in Version 4.31hdg". `ENCRYPT$(s$,"","SHA-256")` fails with error **2022**
-  ("the given encryption method does not exist") on this build. Note also: `Encryption.md` lists
-  plain `SHA` as "Deprecated (Removed / No Longer Available)", yet this build's own `STATUS
-  ENCRYPTION` output includes `SHA` in its live digest-algorithm list — a documented-vs-actual
-  contradiction in that backing page, not just a version gap.
+- **`ENCRYPT$` has no SHA-256 — hash with SHA-1.** `ENCRYPT$(s$,"","SHA-256")` fails with error
+  **2022** ("the given encryption method does not exist"). This build's `STATUS ENCRYPTION` reports
+  message digests `MD5 SHA SHA-1 DSS DSS-1 MDC-2 RIPEMD-160`, which matches
+  [`Encryption.md`](../br_tree/10-language/data-manipulation/system-functions/Encryption.md) — it
+  lists SHA-256 under *Wishlist: Future Encryption Types* ("supported by OpenSSL but not currently
+  exposed in BR"). **`STATUS ENCRYPTION` is the authoritative list for the executable you are actually
+  running** — check it rather than assuming an algorithm exists. Hash via the 3-argument null-key form,
+  `ENCRYPT$(data$,"","SHA-1")`, which returns a **20-byte binary** digest — pass it through `UNHEX$`
+  to get the familiar 40-character hex string (see the `HEX$`/`UNHEX$` entry above; the digest is not
+  hex until you convert it).
 
 - **No documented trap clause for channel-less `READ`/`DATA` exhaustion.**
   [`statement-semantics.md`](statement-semantics.md) and `br_tree`'s DATA/READ/RESTORE coverage
@@ -258,22 +271,8 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
 
 ## 6. When something silently fails: how to actually debug it
 
-- Run headless with a `gui off` config and **`UNATTENDED`** logging (§6 of
-  [`APP-DEV-GUIDE.md`](APP-DEV-GUIDE.md#6-running-br-headless-via-procedures)). This turns an
-  otherwise-indefinite hang into a fast, logged abort with the offending program and line number —
-  the difference between one diagnostic pass and manually killing a stuck process every time.
-- Don't assume the reported line number is the *root cause* line — it's where the symptom
-  surfaced. Trace backward from there; the actual defect (an un-sized variable, a bad `GOTO`
-  target) is often several statements upstream.
-- **Plain `PRINT` (no channel) is invisible when driven headlessly through `brnative.exe`** — it
-  outputs to the command console, which nothing captures in an unattended/scripted run; an `ON ERROR` handler's `PRINT "Error";ERR` produced no
-  visible output at all, making a real failure look like silent success. **Route any diagnostic
-  output a headless run needs to see through a file** (`OPEN #n: "NAME=...,REPLACE,EOL=LF",
-  DISPLAY, OUTPUT` then `PRINT #n:`), not bare `PRINT`.
-- When a documented, spec-correct construct still fails, **isolate it** with a minimal `mini*.brs`
-  probe — a handful of lines, one `OPEN`/`PRINT`/`CLOSE` to a debug file — before assuming your own
-  program logic is the bug. Several of the gotchas above cost real time specifically because the
-  failing construct *looked* like it must be a logic error in the larger program, when it was
-  actually a runtime limitation unrelated to the surrounding code. If you find that the runtime 
-  execution conflicts with the br_tree or semantics specifcations preserve and reference the 
-  mini program that demonstrates the failure. 
+Moved to [`APP-DEV-GUIDE.md`](APP-DEV-GUIDE.md#when-something-silently-fails-how-to-actually-debug-it)
+(§6, *Running BR*) — the debugging loop is about *running* BR, so it lives beside the headless
+invocation, `UNATTENDED` logging, and the operational hazards it depends on. Read it before chasing
+any gotcha in this file: several of them cost real time only because the failing construct looked
+like a logic error when it was a runtime limitation.

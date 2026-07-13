@@ -217,6 +217,61 @@ errors leaves BR waiting at READY, so keep procs self-contained. File references
 config's `DRIVE` map — use the **drive-relative** form (`<d>:dir\prog`, *no* leading backslash after the
 colon), per [`../br_tree/00-configuration/config-directives/spec.md`](../br_tree/00-configuration/config-directives/spec.md#paths).
 
+### Operational hazards of a headless run
+
+These bite the *runner*, not the program, and each one masquerades as something else:
+
+- **Every BR start pays a splash delay (~20s observed) before it does anything.** Budget a generous
+  timeout — **≥90s** — or a perfectly healthy run looks like a hang and gets killed just before it
+  starts working.
+- **A headless BR GUI run can steal OS keyboard focus from a live, interactive BR session.** A
+  keystroke typed into the real session has been observed landing in the headless one (and the reverse
+  is presumably possible). **Don't launch headless runs casually while someone has an interactive BR
+  session open — ask first.**
+- **Force-killing a hung BR process does not cleanly release its workstation (`WSID`) session slot.**
+  After a `taskkill -F`, a *later* run can fail during WSID assignment (observed: exit code 99) —
+  which reads exactly like a bug in the program you just changed, and isn't. **If a headless run
+  mysteriously dies at the assign-WSID stage, suspect a leaked slot from an earlier force-kill before
+  you suspect your code.** Letting every run reach its own `EXECUTE "system"` exit avoids this;
+  `UNATTENDED` logging (below) is what makes that achievable, since it turns hangs into fast aborts.
+- **`LIST` regenerates source through the config's `style` directive, so a decompile *restyles* it.**
+  Keywords, label case, indentation and comment alignment are normalized to the config (e.g.
+  `style indent 3 45 keywords lower labels mixed expressions upper`). A program whose stored source
+  used a different style therefore shows a **huge textual diff that is almost entirely cosmetic, not a
+  code change** — don't read it as one, and don't hand-"fix" it back.
+
+### When something silently fails: how to actually debug it
+
+- Run headless with a `gui off` config and **`UNATTENDED`** logging (above). This turns an
+  otherwise-indefinite hang into a fast, logged abort with the offending program and line number —
+  the difference between one diagnostic pass and manually killing a stuck process every time.
+- Don't assume the reported line number is the *root cause* line — it's where the symptom
+  surfaced. Trace backward from there; the actual defect (an un-sized variable, a bad `GOTO`
+  target) is often several statements upstream.
+- **Plain `PRINT` (no channel) is invisible when driven headlessly through `brnative.exe`** — it
+  outputs to the command console, which nothing captures in an unattended/scripted run; an `ON ERROR` handler's `PRINT "Error";ERR` produced no
+  visible output at all, making a real failure look like silent success. **Route any diagnostic
+  output a headless run needs to see through a file** (`OPEN #n: "NAME=...,REPLACE,EOL=LF",
+  DISPLAY, OUTPUT` then `PRINT #n:`), not bare `PRINT`.
+- When a documented, spec-correct construct still fails, **isolate it** with a minimal `mini*.brs`
+  probe — a handful of lines, one `OPEN`/`PRINT`/`CLOSE` to a debug file — before assuming your own
+  program logic is the bug. Several of the gotchas in [`essentials.md`](essentials.md) cost real time
+  specifically because the failing construct *looked* like it must be a logic error in the larger
+  program, when it was actually a runtime limitation unrelated to the surrounding code. If you find
+  that the runtime execution conflicts with the br_tree or semantics specifcations preserve and
+  reference the mini program that demonstrates the failure.
+- **A symptom disappearing is not proof you found the cause.** "I added a statement and it started
+  working" is a correlation: **re-test with your fix removed**, against the same real conditions that
+  produced the symptom, before recording a mechanism as confirmed. An `EXECUTE`-then-`OPEN` "race" was
+  once recorded here on exactly that reasoning and turned out to be wrong — the supposedly load-bearing
+  statement removed cleanly, with byte-identical output.
+- **Writing a large BR program? Generate it, don't hand-type it.** Past ~100–150 lines, write a small
+  script that emits the `.brs` — appending unnumbered logical lines to a list and auto-numbering them
+  in one final pass — rather than typing line numbers by hand. Renumbering to insert a line becomes
+  reordering, not bookkeeping, and repetitive or derived content (`DATA` blocks, static JSON skeletons)
+  can be emitted **from the actual source data** instead of hand-transcribed, which at that scale is a
+  real source of silent bugs.
+
 ---
 
 ## 7. Checklist for writing a new BR program
