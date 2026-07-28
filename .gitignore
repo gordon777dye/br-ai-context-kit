@@ -34,3 +34,4 @@ dev/tools/PORT_ANALYSIS.md
 dev/src/
 *.brtest.json
 dev/temp_specs.txt
+dev/tools/wsids

@@ -46,7 +46,7 @@ brevity as it ascends. (Language facts still ascend into `topics.json`; app fact
 ```
 context\app\
   INSTRUCTIONS.md       # this sheet (stays)
-  data-model.md/.json   # STEP 1 — generated from the app's filelay\
+  data-model.md/.json   # STEP 1 — generated from the app's filelay\ folder
   toolset.md            # STEP 2 — BR launch env, canonical invocations, run/build commands
   exemplars\            # STEP 4 — ~10–20 blessed real programs, annotated
   conventions.md        # STEP 5 — house style, derived from the app's own source
