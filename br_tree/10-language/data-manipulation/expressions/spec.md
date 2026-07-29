@@ -28,6 +28,13 @@ relational expressions live in [conditionals](../conditionals/spec.md).
 <relational-expression> ::= <expression> <relational-operator> <expression>
 ```
 
+**`name(...)` is ambiguous on its face** — a function call, an array subscript, or a substring —
+and BR resolves it by **arity**, not by consulting a symbol table: whether the mandatory operands
+that name requires are present decides what it is. `X(3)` subscripts because `X` requires no
+arguments; `SIN(3)` calls because `SIN` requires one. A `DIM` does **not** shadow an intrinsic.
+Full rule and worked counterexamples:
+[syntax — name resolution](../../syntax/spec.md#name-resolution).
+
 <a id="semantics"></a>
 ## Semantics
 
@@ -154,4 +161,7 @@ String comparison (ASCII, case-sensitive):
 - [assignment](../assignment/spec.md) — `LET`, the assignment form of `:=`, substring mutation
 - [conditionals](../conditionals/spec.md) — `IF`/`WHILE`/`UNTIL` that consume these expressions
 - [data-types](../data-types/spec.md) — the numeric and string operands
+- [syntax — name resolution](../../syntax/spec.md#name-resolution) — how `name(...)` is decided
+  between a call, a subscript and a substring
+- [system-functions](../system-functions/spec.md) — the intrinsics whose arity drives that decision
 - (Backing keyword pages verified against this spec and pruned.)

@@ -1167,9 +1167,16 @@ OPEN `#`<channel> `:` `"` `NAME=`<printer-spec> [`,` `RECL=`<n>] [`,` `EOL=`<eol
 - **`#255`** — Printer (implicit open on first use); output goes to the default printer or spooler
 - **`#<n>` (1–199 | 300-999)** — Normal use channel number (via `OPEN … DISPLAY`)
 
-**Value Options:**
+**Value Options** — these are **print-list items only, not expressions.** They yield no value, so
+they cannot be assigned, passed, or compared: neither `LET X$ = BELL` nor `LET X = BELL` compiles.
+`BELL` and `NEWPAGE` are nonetheless **reserved** words (both are declared in BR's `table7k`), so
+no variable may take those spellings; `TAB` is in neither runtime table and is not reserved.
+
+**Any `PRINT` statement may carry them, on any channel** — screen, a window, a report/printer file,
+any opened display channel. The channel does not restrict *which* options are available; it only
+determines what the option does.
 - **`BELL`** — Sounds the bell/beep
-- **`NEWPAGE`** — Clears the screen (if `#0`), or form-feeds the printer (if `#255`/display file); should be the first statement of a screen section
+- **`NEWPAGE`** — Starts a new page on whatever the channel is: clears a screen or window, form-feeds a printer or display file, and zeroes that channel's line counter (`LINES`). Use it as the first output of a screen section or report page. Also usable as a print *target*
 - **`TAB(<col>)`** — Moves the cursor to column <col> (1-based); wraps to next line if already past col
 
 **Value Separators:**
@@ -2141,7 +2148,7 @@ RINPUT [`#`<window>`,`] `FIELDS` <field-specs> [`,` `ATTR` <attrs>] [`,` `HELP` 
 **Semantics:**
 - **DIM is Non-executable** — DIM is processed before the run; it can appear anywhere (beginning, middle, or end)
 - **Implicit declaration** — Variables used without DIM are implicitly declared on first use
-- **Identifier naming** — Names **begin with a letter**, 1–30 chars (letters, digits, `_`); not a reserved word, and never an `FN…` name (reserved for user-defined functions)
+- **Identifier naming** — **`_` counts as a letter** for naming: names are 1–30 chars of letters, digits and `_`, and may **begin** with `_` (`_a = 1` is valid; a name of nothing but underscores, `_`, is valid too). The same rule covers **line labels**. Not a reserved word, and never an `FN…` name (reserved for user-defined functions). *The wiki says names must begin with a letter — it is wrong; the runtime accepts these.*
 - **Case-insensitive** — `NAME$` and `name$` are the same variable
 - **Type/shape coexistence** — One identifier can name **four distinct variables** at once — numeric scalar, numeric array, string scalar, string array: `A`, `MAT A`, `A$`, `MAT A$`
 - **Auto-dimension** — Arrays of ≤10 elements are auto-dimensioned to 10 without explicit DIM

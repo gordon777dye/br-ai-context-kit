@@ -19,6 +19,15 @@ across programs (`LIBRARY` statement, loading strategies, search order) is in
 intrinsic functions are in
 [system-functions](../../data-manipulation/system-functions/spec.md).
 
+**These are two separate systems and their rules do not carry over.** What is written here about
+signatures — typed and sized returns, `;`-optional parameters, `&` by reference, one exit — applies
+to `FN…` functions only, and the intrinsics' rules (which names are reserved, the optional `MAT`
+qualifier, atoms and assignables) apply only to them. Nor do `FN…` names take part in
+[arity-driven name resolution](../../syntax/spec.md#name-resolution): a variable never starts
+`FN`, so the prefix alone settles what such a token is. The one rule shared by both: a
+**parameterless** function of either kind is called with no parentheses — `FNGET$`, never
+`FNGET$()`.
+
 <a id="syntax"></a>
 ## Syntax
 

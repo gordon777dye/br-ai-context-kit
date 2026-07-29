@@ -34,7 +34,17 @@ anywhere an expression is allowed.
 
 - String functions return strings (suffix `$`); numeric functions return numbers.
 - The **array-processing** functions (`AIDX`/`DIDX`, `UDIM`, `SUM`, `SRCH`, `STR2MAT`/`MAT2STR`)
-  operate on `MAT` arguments and pair with [assignment](../assignment/spec.md#mat).
+  take array arguments and pair with [assignment](../assignment/spec.md#mat).
+- <a id="mat-qualifier"></a>**The `MAT` qualifier is optional.** Wherever an argument must be an
+  array, BR accepts either `MAT name` or a bare `name`, and reads the bare name as an array name.
+  Both `UDIM(MAT Y)` and `UDIM(Y)` compile. Signatures in this spec and in
+  [`dev/system-functions-catalog.md`](../../../../dev/system-functions-catalog.md) may show either
+  spelling; neither is the required one.
+- **The sole exception is `AIDX`/`DIDX`, which reject it** — `MAT X = AIDX(Y)` compiles,
+  `MAT X = AIDX(MAT Y)` does not. They are also functions **only as an operand of 
+  a `MAT` primary**, the right-hand side of a `MAT` assignment, and are not callable 
+  in an ordinary expression; see
+  [assignment](../assignment/spec.md#syntax) for the `<mat-rhs>` production they belong to.
 - `LEN(s$)` returns the **actual** current length, not the `DIM` maximum.
 - **Inverse pairs**: `CHR$`↔`ORD`, `HEX$`↔`UNHEX$`, `STR$`↔`VAL`, `ENCRYPT$`↔`DECRYPT$`.
 - Several entries here query **file/window** or **screen/keyboard** state; they live in this index

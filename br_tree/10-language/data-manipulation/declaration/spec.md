@@ -6,7 +6,7 @@ category: 10-language
 subcategory: 10-language/data-manipulation/declaration
 kind: spec
 status: 2b           # reference base + br_tree enrichment (OPTION BASE/statement, DIMONLY); no conflicts
-recovered-fold: Array_Name, Numeric_Variable (2 redirect-collision pages folded from re-fetched source — name must start with a letter (corrected from "letter or _"), FN-prefix reserved, scalar/array/string co-existence; verbatim retained on the BR wiki)
+recovered-fold: Array_Name, Numeric_Variable (2 redirect-collision pages folded from re-fetched source — FN-prefix reserved, scalar/array/string co-existence; verbatim retained on the BR wiki). NOTE 2026-07-29 - that fold also changed the first-character rule to "letter" only, following the wiki; reverted to "letter or _" after testing the runtime, which accepts `_a = 1`. The wiki is wrong on this point.
 related: [data-types, assignment, expressions]
 keywords: [DIM, MAT, OPTION]
 ---
@@ -43,10 +43,10 @@ DIM <variable-list>
 - **Numeric** (`X`, `TOTAL_COST`) default to `0`; **string** (ends in `$`, e.g. `NAME$`) default
   to the empty string and cannot do arithmetic.
 - **Case-insensitive** (`NAME$` = `name$`) and **implicitly declared** on first use.
-- **Naming**: **begin with a letter** (1–30 chars of letters, digits and `_`); not a reserved word,
-  and **never an `FN…` name** (those are reserved for user-defined functions). The *same* identifier
-  can coexist as a numeric scalar, numeric array, string scalar **and** string array — `A`, `MAT A`,
-  `A$`, `MAT A$` are four distinct variables.
+- **Naming**: **begin with a letter or `_`** (1–30 chars of letters, digits and `_`); not a reserved
+  word, and **never an `FN…` name** (those are reserved for user-defined functions). The *same*
+  identifier can coexist as a numeric scalar, numeric array, string scalar **and** string array —
+  `A`, `MAT A`, `A$`, `MAT A$` are four distinct variables.
 - Values **persist** until reassigned, or cleared by `CLEAR`, `RUN`, `LOAD`, `CHAIN`, or exit.
 
 <a id="dim"></a>

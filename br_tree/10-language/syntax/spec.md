@@ -5,17 +5,18 @@ source: §Lexical Structure, §Language Overview
 category: 10-language
 subcategory: 10-language/syntax
 kind: spec
-status: 2b           # reference base + br_tree enrichment (line continuation); no conflicts
+status: 2b           # reference base + br_tree enrichment (line continuation, name resolution); no conflicts
 recovered-fold: Keyword_Abbreviation (rules folded; full-table page RETAINED), DIAGRAM_CONVENTIONS (folded+pruned). 2 redirect-collision pages re-fetched; verbatim retained on the BR wiki
-related: [conditionals, other-flow, functions-udf]
-keywords: [REM, comment, line-number, label, continuation, "!:", abbreviation]
+related: [conditionals, other-flow, functions-udf, system-functions, expressions]
+keywords: [REM, comment, line-number, label, continuation, "!:", abbreviation, identifier, name-resolution]
 ---
 
 # Lexical structure & program syntax
 
 How BR source is written: line numbers, comments, identifiers, line labels, and multiple
-statements per line. The control statements that *use* line refs are in
-[other-flow](../flow-control/other-flow/spec.md) and
+statements per line — and [how BR decides what a bare token *is*](#name-resolution), which is by
+arity rather than by symbol table and catches most newcomers out. The control statements that
+*use* line refs are in [other-flow](../flow-control/other-flow/spec.md) and
 [conditionals](../data-manipulation/conditionals/spec.md).
 
 <a id="syntax"></a>
@@ -64,7 +65,57 @@ Both are non-executable and preserve case. They differ in **scope**:
 <a id="identifiers"></a>
 ### Identifiers
 1–30 characters; must start with a letter or `_`; may contain letters, digits, `_`;
-case-insensitive; cannot be a system function name. (String variables add a trailing `$`.)
+case-insensitive. (String variables add a trailing `$`.) A name held in the runtime function
+tables (`table6k` ∪ `table7k`) cannot be a variable; a few intrinsics resolved *outside* those
+tables can be — see [name resolution](#name-resolution) for what that costs you.
+
+<a id="name-resolution"></a>
+### Name resolution — how BR decides what a token is
+BR does **not** decide by looking the name up in a symbol table. It decides by 
+**arity**: on meeting a token that matches a keyword or intrinsic, it checks whether 
+the **mandatory operands that name requires are actually present**. If they are, the 
+token is accepted as that keyword or function. If they are not, BR moves on, and 
+the token eventually resolves as a variable.
+
+This is the general rule behind BR's positional lexicon — the same mechanism that lets a label or
+variable reuse a statement-keyword spelling. Its sharpest consequence involves the intrinsics that
+live outside `table6k`/`table7k` (`ABS`, `INT`, `SGN`, `AIDX`, `DIDX`, `NEXT`), which are
+therefore not reserved:
+
+```business-rules
+00010 DIM AIDX, NEXT, ABS, SGN   ! legal — no arguments supplied, so these are names
+00020 LET ABS = 7
+00030 PRINT ABS                  ! 7        — the variable
+00040 PRINT ABS(3)               ! 3        — the intrinsic, in the same program
+```
+
+```business-rules
+00010 DIM ABS(3)                 ! rejected — ABS(3) supplies ABS's required argument,
+                                 ! so it reads as a call; no subscript reading remains
+```
+
+So a scalar variable and an intrinsic of the same name coexist, told apart **only** by whether an
+argument is present — and such a variable can never be subscripted, because the subscripted form
+is always the function.
+
+Two corollaries worth stating plainly:
+
+- **A `DIM` does not shadow an intrinsic.** Declaring `ABS` does not make `ABS(3)` a subscript.
+- **Being declared is not what distinguishes `X(3)` from `SIN(3)`.** Arity is. `X` requires no
+  arguments and so yields a name that `(3)` then subscripts; `SIN` requires one, so `SIN(3)`
+  is a call. Reasoning from "is it DIM'd?" gives the wrong answer for any declared intrinsic.
+
+Writing a variable with one of these six names is legal and inadvisable; a language server may
+reasonably warn about it.
+
+**Scope: this is about keywords and *system* functions.** User-defined and library functions are
+not part of this contest — every one is named `FN…`, and a variable never starts `FN`, so the
+name alone settles what a `FN…` token is and no arity lookahead is needed to disambiguate it.
+Their signatures follow their own rules (typed and sized returns, `;`-optional parameters, `&`
+by-reference parameters, one exit), which belong to
+[functions-udf](../flow-control/functions-udf/spec.md) and do not carry over from anything above.
+The one rule the two do share: a **parameterless** function of either kind is called with no
+parentheses — `FNGET$`, never `FNGET$()`.
 
 <a id="line-labels"></a>
 ### Line labels
@@ -161,6 +212,9 @@ in angle brackets is a default keyed to the Defaults list; **insertable** sub-di
 - [other-flow](../flow-control/other-flow/spec.md) — `GOTO`/`GOSUB`/`ON GOTO` that consume `<line-ref>`
 - [conditionals](../data-manipulation/conditionals/spec.md) — `IF` line/label targets
 - [functions-udf](../flow-control/functions-udf/spec.md) — `DEF`/`FN` definitions
+- [system-functions](../data-manipulation/system-functions/spec.md) — the intrinsics whose arity
+  drives [name resolution](#name-resolution); which names are reserved
+- [expressions](../data-manipulation/expressions/spec.md) — where call-vs-subscript is parsed
 - Backing keyword page retained (deep reference — full command/statement abbreviation appendix):
   [Keyword_Abbreviation](Keyword_Abbreviation.md)
 - (Other backing pages folded into this spec and pruned. The 2b

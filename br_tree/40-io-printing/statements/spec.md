@@ -8,7 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (PAGEOFLOW); misfiled command/config pages relocated; no conflicts
 recovered-fold: 'PRINT_USING, PRN, REMOTE_PRINTING (3 redirect-collision pages folded from re-fetched source — RUN >/>>/>CON: redirect, string-FORM recompile, PRN:/10 pass-through, DIRECT:/ vs SPOOLCMD, PRINTER_LIST(), CS OPTION 30/@ routing; verbatim retained on the BR wiki)'
 related: [pcl-pdf, sort]
-keywords: [PRINT, OPEN, PAGEOFLOW, NEWPAGE, HEADING, USING, PIC, COPIES]
+keywords: [PRINT, OPEN, PAGEOFLOW, NEWPAGE, BELL, TAB, HEADING, USING, PIC, COPIES]
 ---
 
 # Printing statements
@@ -42,12 +42,23 @@ OPEN '#255' ':' '"' NAME=<printer-spec> [',' RECL=<n>] [',' EOL=<eol>] [',' COPI
 <a id="semantics"></a>
 ## Semantics
 
-<a id="destinations"></a>**Destinations**: `#0` screen (default), `#255` printer (implicit open
-on first use), or any opened display channel.
+<a id="destinations"></a>**Destinations**: `#0` screen (default), a window channel, `#255` printer
+(implicit open on first use), or any opened display channel.
 
-<a id="options"></a>**Options** (each followed by `;`): `BELL` sounds the bell, `NEWPAGE` clears
-the screen / form-feeds the printer (use as the first statement), `TAB(col)` moves to a column
-(wraps to next line if already past it).
+<a id="options"></a>**Options** (each followed by `;`): `BELL` sounds the bell, `NEWPAGE` starts a
+new page on whatever the channel is — clearing a screen or window, form-feeding a printer or
+display file, and zeroing that channel's line counter (use as the first output of a screen section
+or report page) — and `TAB(col)` moves to a column (wraps to next line if already past it).
+
+**Any `PRINT` may carry these, on any channel.** The channel does not restrict which options are
+available; it only determines what each one does.
+
+These are **print-list items, not expressions** — they yield no value and cannot appear outside a
+`PRINT` list: neither `LET X$ = BELL` nor `LET X = BELL` compiles. `BELL` and `NEWPAGE` are
+nonetheless **reserved** names (both declared in
+[`table7k`](../../10-language/syntax/table7k.txt)), so no variable may take those spellings;
+`TAB` is declared in neither runtime table and is not reserved. See
+[10-language/syntax](../../10-language/syntax/spec.md#identifiers).
 
 <a id="separators"></a>**Separators**: `,` tabs to the next **print zone** (screen 1/24/48;
 printer 1/24/48/72/96, 24 wide); `;` concatenates with no spacing. Numbers print with automatic

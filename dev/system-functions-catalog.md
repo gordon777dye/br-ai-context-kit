@@ -30,9 +30,14 @@ NAME(arg1, arg2, [opt], rep…)
   **comma-separated** (including the first two when there are two or more); a single argument takes no
   separator at all.
 - **Return type** is the Returns column — `str` / `num` / `mat num` / `mat str`. A name ending `$`
-  always returns `str`, otherwise `num` (BR's hard rule — fixes every return type here, even `✗` entries).
+  always returns `str`, otherwise `num` (BR's hard rule — fixes every return type here, even `✗`
+  entries). **The rule has no exceptions.** `BELL` and `NEWPAGE` look like counterexamples and are
+  not: they yield no expression value at all — neither `LET X$ = BELL` nor `LET X = BELL` compiles
+  — so the rule never applies to them. They are print-list items; see usage note 5.
 - `[x]` optional · `x…` one-or-more (variadic) · `(out)` a `MAT` the function **fills** (must be a
-  declared array lvalue).
+  declared array lvalue) · **`MAT name`** an array argument, where the `MAT` keyword is **optional**
+  (see note 3) · **`array-name`** an array argument where `MAT` is **not allowed** (only
+  `AIDX`/`DIDX`).
 - **atom** = usable with **no parentheses** (a bare value); see the table below.
 - **assignable** = a pseudo-variable that also accepts assignment, e.g. `LET FKEY(x)`.
 
@@ -40,16 +45,69 @@ NAME(arg1, arg2, [opt], rep…)
 
 1. **Functions are never abbreviated.** Unlike statement keywords, `table6k`/`table7k` require the
    **full** spelling — always written out in full.
-2. **No-paren atoms** (below) are bare **values**, not `name(` calls. And a name in *this* catalog is
-   a built-in function, whereas a `DIM`'d name with a parenthesis is an array subscript — that is how
-   you tell apart e.g. `X(3)` (an array element) from `SIN(3)` (a function call). A **parameterless**
-   function (built-in *or* user `FN…`) is called with **no** parentheses — `FNGET$`, never `FNGET$()`.
-3. **`MAT`-argument functions** take the literal `MAT name` form (array-processing group, `FILE`
-   rect, `STR2MAT`/`MAT2STR`, `PRINTER_LIST`, `UDIM`/`SUM`/`SRCH`/`AIDX`/`DIDX`).
+2. **No-paren atoms** (below) are bare **values**, not `name(` calls. A **parameterless** function
+   (built-in *or* user `FN…`) is called with **no** parentheses — `FNGET$`, never `FNGET$()`.
+   What tells `X(3)` (an array element) apart from `SIN(3)` (a function call) is **arity, not
+   declaration**: `X` requires no arguments, so it resolves to a name that `(3)` subscripts;
+   `SIN` requires one, so `SIN(3)` is a call. Do **not** reason from "is it `DIM`'d?" — declaring
+   a name does not shadow an intrinsic. Full rule and worked counterexamples:
+   [10-language/syntax — name resolution](../br_tree/10-language/syntax/spec.md#name-resolution).
+3. **The `MAT` qualifier is optional.** Wherever an argument must be an array, BR accepts either
+   `MAT name` or a bare `name`, reading the bare name as an array name — `UDIM(MAT Y)` and
+   `UDIM(Y)` both compile. Signatures below are written `MAT name` for clarity about what the
+   argument *is*, not because the keyword is required.
+   **`AIDX`/`DIDX` are the sole exception: they reject it** — `MAT X = AIDX(Y)` compiles,
+   `MAT X = AIDX(MAT Y)` does not. Their argument is shown as `array-name`. See note 6.
 4. **Assignable pseudo-variables** appear on the LHS: `CMDKEY`, `FKEY`, `CURFLD`, `CURTAB`,
    `CURWINDOW`, `PIC$`. `LET name(args)` is valid for these.
-5. **Print-list-only:** `TAB(x)` is valid only inside a `PRINT` list; `NEWPAGE`/`BELL` are character
-   *values* (`NEWPAGE` also works as a print target).
+5. **`BELL`, `NEWPAGE` and `TAB(x)` are print-list items, not value-returning functions.** All
+   three are `<print-options>` — valid **only inside a `PRINT` list** and yielding no expression
+   value: neither `LET X$ = BELL` nor `LET X = BELL` compiles. They are documented with the print
+   statements ([40-io-printing/statements](../br_tree/40-io-printing/statements/spec.md#options)).
+
+   They differ in one respect only, and it is a naming matter, not a usage one: **`BELL` and
+   `NEWPAGE` are reserved** (declared in `table7k`), so no variable may take those spellings, while
+   **`TAB` is in neither runtime table** and is therefore not reserved. `BELL`/`NEWPAGE` are listed
+   below because they are reserved names a reader will look up; `TAB` is deliberately absent.
+   (`NEWPAGE` also works as a print *target*.)
+6. **`AIDX`/`DIDX` are functions only as a `MAT` primary** — the right-hand side of a `MAT`
+   assignment, `MAT ORDER = AIDX(CUST$)`. They are not system functions anywhere else, so they are
+   not callable in an ordinary expression. Their home production is `<mat-rhs>` in
+   [assignment](../br_tree/10-language/data-manipulation/assignment/spec.md#syntax).
+
+## Functions BR does **not** have (read this first)
+
+This catalog is the complete roster, so **any name not in it does not exist** — but a positive list
+is easy to read past. The names below are the ones most often reached for by habit, from other
+BASICs or from C/Python/JS. None of them is a BR function; each row gives what BR uses instead.
+Every entry was checked against the roster.
+
+| Not in BR | Use instead |
+|---|---|
+| `MID$`, `SUBSTR` | **substring notation** `s$(m:n)` — 1-based, inclusive |
+| `LEFT$` | `s$(1:n)` |
+| `RIGHT$` | `s$(m:inf)` — `inf` means "end of string" |
+| `INDEX`, `INSTR` | `POS(s1$, s2$[, start])` |
+| `ASC` | `ORD(s$)` |
+| `UCASE$`, `UPPER$` / `LCASE$`, `LOWER$` | `UPRC$(s$)` / `LWRC$(s$)` |
+| `LTRIM$` / `RTRIM$` | `LTRM$(s$[,c$])` / `RTRM$(s$[,c$])` |
+| `SPACE$`, `STRING$` | `RPT$(s$, n)` |
+| `REPLACE$` | `SREP$(src$, find$, repl$)` |
+| `FORMAT$` | `CNVRT$(spec$, n)` |
+| `STR` | `STR$(n)` |
+| `SPLIT` / `JOIN` | `STR2MAT` / `MAT2STR` |
+| `SQRT` | `SQR(n)` |
+| `ATAN` | `ATN(n)` |
+| `LOG10` | `LOG(n)` is the **natural** log; scale it yourself |
+| `CINT` / `FIX` | `INT(n)` / `IP(n)` |
+| `POWER` | the `^` or `**` operator |
+| `RANDOM` | `RND` |
+| `UBOUND`, `ARRAYLEN`, `COUNT` | `UDIM(MAT arr[, dim])` |
+| `LBOUND` | nothing needed — BR arrays are **1-based** |
+
+Two traps this list does not cover, because they are operators rather than functions: `MOD` is a
+**function only** (`MOD(a, b)`, never `a MOD b`), and `&` is **string concatenation**, not
+bitwise-AND. See [essentials](essentials.md#1-core-language-rules).
 
 ## No-paren atoms (lex as a value, not `name(`)
 
@@ -82,7 +140,7 @@ Never take arguments:
 | `WBVERSION$` / `WBPLATFORM$` | str | running BR version / platform |
 | `SYSERR` / `SYSERR$` | num / str | OS error number / description |
 
-Optionally bare (also have a parenthesized form): `DATE$`, `PIC$`, `KSTAT$`, `NXTFLD`, `CMDKEY`,
+Optionally bare (also have a parenthesized form): `DATE$`, `KSTAT$`, `NXTFLD`, `CMDKEY`,
 `FKEY`, `CURFLD`, `CURTAB`, `RND` (bare = next value; `LET RND(seed)` seeds).
 
 ## String & character
@@ -151,7 +209,7 @@ Optionally bare (also have a parenthesized form): `DATE$`, `PIC$`, `KSTAT$`, `NX
 | `UDIM(MAT arr, [dim])` | num | current size of an array (or of dimension `dim`) |
 | `SUM(MAT arr)` | num | sum of all elements |
 | `SRCH(MAT arr, arg, [start])` | num | row of a match (0/-1 if none; `^`-prefix = case-insensitive) |
-| `AIDX(MAT arr)` / `DIDX(MAT arr)` | mat num | ascending / descending **index** array (source unchanged; used in a `MAT =` assign) |
+| `AIDX(array-name)` / `DIDX(array-name)` | mat num | ascending / descending **index** array (source unchanged). Only as a `MAT =` right-hand side, and the argument takes **no `MAT` keyword**: `MAT X = AIDX(Y)` compiles, `MAT X = AIDX(MAT Y)` does not |
 | `STR2MAT(s$, MAT a$ (out), [[MAT]sep$], [flags$])` | num | split string → array (dynamically redims `a$`); returns the count. `sep$` is a user delimiter (default = any `\n`/`\r` run; `""` = per-char); `flags$` = quote type `Q`/`'`/`"` + `:TRIM`/`:LTRM`/`:RTRM` |
 | `MAT2STR(MAT a$, s$ (out), [[MAT]sep$], [flags$])` | num | join array → string; returns the count. `sep$` default = `CRLF`/`CR`, placed after every element incl. the last; `""` concatenates |
 
@@ -213,9 +271,8 @@ Optionally bare (also have a parenthesized form): `DATE$`, `PIC$`, `KSTAT$`, `NX
 | `SESSION$` | str | this session's ID — `WSID` + a 1-digit session number `1`–`9` (e.g. `011`) — atom |
 | `VARIABLE$` | str | name of the variable that failed in the **last I/O statement** (not for field-spec errors 850–890 or calculated expressions) — atom |
 | `WBVERSION$` / `WBPLATFORM$` | str | running BR version / platform string (`WBPLATFORM$` = `WINDOWS` on unix CS under `CONFIG SHELL DEFAULT CLIENT`) — atoms |
-| `NEWPAGE` | str | a char that form-feeds the printer / clears the screen and zeroes the line counter (atom) |
-| `BELL` | str | a char that sounds the tone (atom) |
-| `TAB(x)` | — | tab to column `x` — **valid only inside a `PRINT` list** |
+| `NEWPAGE` | — | starts a new page on **any** channel — clears a screen or window, form-feeds a printer or display file, zeroes that channel's line counter. **`PRINT` list only** — no expression value (see note 5); also usable as a print *target* |
+| `BELL` | — | sounds the tone. **`PRINT` list only** — no expression value (see note 5) |
 
 ### Integration / native (name-level — verify against the cited leaf)
 

@@ -44,7 +44,10 @@ The language axis has **two parallel keyword indexes** — use whichever fits th
 
 *Why `topics.json` and not a flat keyword list: BR's lexicon is **positional** — only system
 functions are reserved against variable names, so telling a keyword from a variable needs the
-`lexicon` block, not a keyword table.*
+`lexicon` block, not a keyword table. And the decision itself is made by **arity**, not by a
+symbol table: see
+[name resolution](../br_tree/10-language/syntax/spec.md#name-resolution), which is also why
+declaring a name never shadows an intrinsic.*
 
 ### The app layer (after onboarding)
 

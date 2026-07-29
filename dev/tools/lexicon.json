@@ -1,10 +1,14 @@
 {
   "$comment": "Frozen, hand-owned source for the topics.json 'lexicon' block. Edit here to change the classified BR keyword inventory; run tools/gen_topics.py to rebuild topics.json. Originally derived from the BR runtime token tables (table1k commands, table3k statements, table4k clause keywords, table6k/table7k functions). Counts are recomputed by gen_topics.py, so only the name lists and notes here are authoritative.",
-  "note": "BR's lexicon is positional. Only system-function names (table6k u table7k) are reserved against variable names, and a variable never starts 'FN'. Statement, clause, and command keywords are keywords only by position: a variable or label may reuse their spelling. Resolve keyword-vs-variable-vs-label by position + symbol table, not by the lexeme.",
+  "note": "BR's lexicon is positional. Only system-function names (table6k u table7k) are reserved against variable names, and a variable never starts 'FN'. Statement, clause, and command keywords are keywords only by position: a variable or label may reuse their spelling. Resolve keyword-vs-variable-vs-label by position + arity, not by the lexeme and not by a symbol table: BR checks whether the mandatory operands the name requires are present — present means it IS that keyword/function, absent means it falls through to a variable. So declaring a name never shadows an intrinsic (DIM ABS is legal and PRINT ABS(3) still calls ABS), and X(3) vs SIN(3) turns on what the name requires, not on whether it was DIM'd. Full rule: br_tree/10-language/syntax/spec.md#name-resolution.",
   "reserved_against_variables": {
     "note": "The only spellings a variable cannot take. Matched in full (never abbreviated).",
     "intrinsics_outside_tables": [
       "ABS",
+      "AIDX",
+      "DIDX",
+      "INT",
+      "NEXT",
       "SGN"
     ],
     "names": [

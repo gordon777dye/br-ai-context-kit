@@ -36,6 +36,29 @@ Two kinds of content, both load-bearing:
 - **String variables end in `$`**; size is declared `DIM NAME$*30`. Arrays are 1-based. Default
   string max (un-`DIM`'d) is **18 characters** — see §2, this is the single biggest source of
   silent runtime failure in practice.
+- **What a token *is* is decided by arity, not by a symbol table.** Meeting a name that matches a
+  keyword or intrinsic, BR checks whether the **mandatory operands that name requires are
+  present**. Present ⇒ it *is* that keyword/function. Absent ⇒ BR moves on and the token ends up a
+  variable. This is the machinery behind BR's positional lexicon, and it does **not** work the way
+  a C/Python/JS-trained instinct expects — *declaring a name does not shadow anything.* Only the
+  126 names in `table6k`/`table7k` are reserved; six intrinsics resolved outside those tables
+  (`ABS`, `INT`, `SGN`, `AIDX`, `DIDX`, `NEXT`) are not, so all of this is true at once:
+
+  ```
+  00010 DIM ABS          ! legal: no argument supplied, so it is a name
+  00020 LET ABS = 7
+  00030 PRINT ABS        ! 7  — the variable
+  00040 PRINT ABS(3)     ! 3  — the intrinsic, same program, same spelling
+  ```
+
+  and `DIM ABS(3)` is **rejected** — `ABS(3)` supplies ABS's required argument, so it reads as a
+  call and no subscript reading survives. Hence: such a variable can never be subscripted, and
+  `X(3)` vs `SIN(3)` is settled by *what the name requires*, never by whether it was `DIM`'d.
+  Legal, and a trap worth avoiding in code you want read. **All of this is about keywords and
+  *system* functions** — user/library `FN…` functions never enter the contest, since a variable
+  never starts `FN`, and their signature rules are their own (see the `DEF`/`FNEND` bullet below).
+  (Full rule:
+  [10-language/syntax#name-resolution](../br_tree/10-language/syntax/spec.md#name-resolution).)
 - You will never read abbreviations in source files; BR expands abbreviations.
 - **I/O carries trailing error clauses**, not exceptions: `READ #1,…: A$ NOKEY L900 EOF L990`.
   Handle `EOF`, `NOKEY`, `IOERR`, `CONV`, `LOCKED` explicitly.

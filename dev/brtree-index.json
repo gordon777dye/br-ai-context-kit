@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.py.",
-  "generated": "2026-07-13",
+  "generated": "2026-07-29",
   "source": "br_tree/",
-  "source_sha256": "26df5cdd0c7b037e37452ff4d4e9378c56ed7ec5d2aa67c3d831bc4bcdc44e0c",
+  "source_sha256": "ba925219386db671ed8a6b46d15149be63da119fc3d00b71119f49f065815b2a",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -26,6 +26,9 @@
     ],
     "BAUD": [
       "30-io-file/serial-comm"
+    ],
+    "BELL": [
+      "40-io-printing/statements"
     ],
     "BORDER": [
       "20-io-screen/windows-cursor"
@@ -578,6 +581,9 @@
     "ScreenIO": [
       "50-libraries/screenio"
     ],
+    "TAB": [
+      "40-io-printing/statements"
+    ],
     "TEXT": [
       "20-io-screen/controls"
     ],
@@ -680,6 +686,9 @@
     "hexadecimal": [
       "10-language/data-manipulation/data-types"
     ],
+    "identifier": [
+      "10-language/syntax"
+    ],
     "inf": [
       "10-language/data-manipulation/data-types"
     ],
@@ -691,6 +700,9 @@
     ],
     "locking": [
       "30-io-file/file-model"
+    ],
+    "name-resolution": [
+      "10-language/syntax"
     ],
     "null": [
       "10-language/data-manipulation/data-types"
@@ -1089,6 +1101,7 @@
       "anchors": [
         "syntax",
         "semantics",
+        "mat-qualifier",
         "tables",
         "string-functions",
         "conversion-functions",
@@ -1231,12 +1244,16 @@
         "label",
         "continuation",
         "!:",
-        "abbreviation"
+        "abbreviation",
+        "identifier",
+        "name-resolution"
       ],
       "related": [
         "conditionals",
         "other-flow",
-        "functions-udf"
+        "functions-udf",
+        "system-functions",
+        "expressions"
       ],
       "anchors": [
         "syntax",
@@ -1244,6 +1261,7 @@
         "line-numbers",
         "comments",
         "identifiers",
+        "name-resolution",
         "line-labels",
         "multiple-statements",
         "line-continuation",
@@ -1253,7 +1271,7 @@
         "examples",
         "see-also"
       ],
-      "summary": "How BR source is written: line numbers, comments, identifiers, line labels, and multiple statements per line. The control statements that use line refs are in other-flow and conditionals."
+      "summary": "How BR source is written: line numbers, comments, identifiers, line labels, and multiple statements per line — and how BR decides what a bare token is, which is by arity rather than by symbol table and catches most newcomers out. The control statements that use line refs are in other-flow and conditionals."
     },
     {
       "path": "20-io-screen/controls",
@@ -1698,6 +1716,8 @@
         "OPEN",
         "PAGEOFLOW",
         "NEWPAGE",
+        "BELL",
+        "TAB",
         "HEADING",
         "USING",
         "PIC",
