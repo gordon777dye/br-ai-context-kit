@@ -3,12 +3,12 @@
   "note": "BR's lexicon is positional. Only system-function names (table6k u table7k) are reserved against variable names, and a variable never starts 'FN'. Statement, clause, and command keywords are keywords only by position: a variable or label may reuse their spelling. Resolve keyword-vs-variable-vs-label by position + arity, not by the lexeme and not by a symbol table: BR checks whether the mandatory operands the name requires are present — present means it IS that keyword/function, absent means it falls through to a variable. So declaring a name never shadows an intrinsic (DIM ABS is legal and PRINT ABS(3) still calls ABS), and X(3) vs SIN(3) turns on what the name requires, not on whether it was DIM'd. Full rule: br_tree/10-language/syntax/spec.md#name-resolution.",
   "reserved_against_variables": {
     "note": "The only spellings a variable cannot take. Matched in full (never abbreviated).",
+    "intrinsics_outside_tables_note": "Intrinsics the expression parser resolves without consulting table6k/table7k. Each one must have a demonstrable resolution path in the BR source, and each does: ABS/INT/SGN are matched by name in command3.cpp's numeric parser but only when immediately followed by '(', so the bare name is still a variable; AIDX/DIDX are matched by memcmp in command5.cpp's MAT path and are legal nowhere else. NEXT was on this list and has been removed - it is a keyword (table3k FOR/NEXT, table4k record positioning), not a function, and had no resolution path at all.",
     "intrinsics_outside_tables": [
       "ABS",
       "AIDX",
       "DIDX",
       "INT",
-      "NEXT",
       "SGN"
     ],
     "names": [

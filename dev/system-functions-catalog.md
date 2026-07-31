@@ -129,7 +129,6 @@ Never take arguments:
 | `PROGRAM$` | str | current program name (ref home: 70-commands/information) |
 | `TIME$` | str | current time `hh:mm:ss` |
 | `NXTROW` / `NXTCOL` | num | row / col of the next cursor position |
-| `NEXT` | num | next position within a 2-D control (INPUT FIELDS `NEXT` clause) |
 | `CURROW` / `CURCOL` | num | current/ending cursor row / column |
 | `CURPOS` | num | cursor position within the field data |
 | `SERIAL` | num | serial number of this BR copy |
@@ -142,6 +141,15 @@ Never take arguments:
 
 Optionally bare (also have a parenthesized form): `DATE$`, `KSTAT$`, `NXTFLD`, `CMDKEY`,
 `FKEY`, `CURFLD`, `CURTAB`, `RND` (bare = next value; `LET RND(seed)` seeds).
+
+<!-- corrected: `NEXT` was listed here as "next position within a 2-D control (INPUT FIELDS NEXT
+clause)". It is not a function or an atom of any kind. Every other atom above resolves in
+table6k or table7k; NEXT is in neither, and unlike ABS/INT/SGN (command3.cpp, gated on a following
+`(`) and AIDX/DIDX (command5.cpp, MAT path) it has no resolution path in the expression parser at
+all. It is a *keyword*: table3k as the FOR/NEXT loop terminator, table4k as the record-positioning
+clause on DELETE/READ/RESTORE/REWRITE, beside FIRST/LAST/PRIOR/SAME (synbc.cpp). Both readings are
+already carried by the keyword pack. The "2-D control" gloss was wrong as well as the placement. -->
+
 
 ## String & character
 

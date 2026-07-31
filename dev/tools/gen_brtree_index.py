@@ -58,11 +58,17 @@ def lead_paragraph(body):
 
 
 def build():
-    specs, hash_material = [], []
+    specs, hash_material, unreadable = [], [], []
     for path in sorted(glob.glob(os.path.join(BRTREE, "**", "spec.md"), recursive=True)):
         raw = io.open(path, "r", encoding="utf-8").read()
         m = fm_re.match(raw)
         if not m:
+            # Every spec leaf has frontmatter, so a miss is a broken delimiter or a
+            # malformed block - not a file to skip. Skipping silently drops the spec
+            # from the index and takes its keywords with it, and the only symptom is
+            # the spec count in the summary line quietly going down. Collected and
+            # raised below rather than one at a time, so one run reports them all.
+            unreadable.append(os.path.relpath(path, BRTREE).replace("\\", "/"))
             continue
         fm, body = m.group(1), raw[m.end():]
         d = {}
@@ -85,6 +91,13 @@ def build():
             "summary": lead_paragraph(body),
         })
         hash_material.append(rel + "\n" + fm)
+
+    if unreadable:
+        raise SystemExit(
+            "ERROR: %d spec.md file(s) have no readable frontmatter, so they would be "
+            "left out of the index entirely:\n  %s\n"
+            "Check the opening and closing '---' delimiters."
+            % (len(unreadable), "\n  ".join(unreadable)))
 
     kw_index = {}
     for s in specs:

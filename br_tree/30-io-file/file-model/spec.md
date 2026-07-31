@@ -8,7 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (linked files); no conflicts
 recovered-fold: Display_Files, File_Handle, File_Ref, Multi-User_Programming, NEW, NOSHR, OUTIN, OUTPUT, REC, RECL, RELATIVE, RESERVE (12 redirect-collision pages folded from re-fetched source; verbatim retained on the BR wiki)
 related: [statements, keys-indexes, form-spec]
-keywords: [OPEN, INTERNAL, EXTERNAL, KEYED, RELATIVE, DISPLAY, SHR, RESERVE, LINKED, WSID, locking]
+keywords: [OPEN, INTERNAL, EXTERNAL, KEYED, RELATIVE, DISPLAY, SHR, RESERVE, RELEASE, LINKED, WSID, locking]
+corrections:
+  - "RELEASE added to keywords. The spec documents the RELEASE I/O clause alongside RESERVE (§record locking: `RESERVE` keeps existing locks while reading more records; `RELEASE` reads without locking / drops locks) and the `PROTECT name,RELEASE` form, but declared only RESERVE. The keyword index is built from this list, so the table4k RELEASE clause routed to 50-libraries/library-facility — which documents `LIBRARY RELEASE`, an unrelated sense — and not here."
 ---
 
 # File model (types, access, sharing)

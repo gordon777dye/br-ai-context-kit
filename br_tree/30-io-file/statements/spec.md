@@ -8,7 +8,9 @@ kind: spec
 status: 2b           # reference base verified comprehensive; misfiled command pages relocated; added 2026-07-03: CLOSE trailing-colon terminates the statement (second colon needed before a following statement); no conflicts
 recovered-fold: LINPUT, OPEN_DISPLAY, OPEN_external, READ(disambig), REREAD, RESTORE(disambig), RESTORE_file (7 redirect-collision pages folded from re-fetched source — external short-record 4271, DELETE-invalid-on-external, TRANSLATE/0608/4146, RESTORE modes+linked anchors, LINPUT/WAIT/TIMEOUT, REREAD dup-key idiom; verbatim retained on the BR wiki)
 related: [file-model, form-spec, keys-indexes, serial-comm]
-keywords: [OPEN, CLOSE, READ, WRITE, REWRITE, DELETE, RESTORE, REREAD, REC, KEY]
+keywords: [OPEN, CLOSE, READ, WRITE, REWRITE, DELETE, RESTORE, REREAD, REC, KEY, FIRST, LAST, PRIOR, NEXT, SAME, EOF, NOKEY, NOREC, OUTIN, SEQUENTIAL, OUTPUT, WAIT]
+corrections:
+  - "Twelve keywords added. The spec's own BNF defines the <position> production (FIRST/LAST/PRIOR/NEXT/SAME), the I/O exit clauses (EOF/NOKEY/NOREC), the OPEN modes OUTIN/SEQUENTIAL/OUTPUT and the WAIT= clause, and Positional_Parameters.md sits beside it covering the positional five in detail - but the frontmatter declared none of them. The keyword index is built from this list, so all twelve routed to no spec at all: BR's own record-positioning vocabulary was documented here and reachable from nowhere. Only single-sense spellings were added, plus NEXT. DROP, FREE and INPUT are also defined in this BNF and still omitted, because each also names a command or a statement and a class-blind index would attach this spec to that sense too."
 ---
 
 # File I/O statements

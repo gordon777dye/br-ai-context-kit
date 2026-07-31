@@ -2,7 +2,7 @@
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.py.",
   "generated": "2026-07-31",
   "source": "br_tree/",
-  "source_sha256": "6079b291dee6ad9ba6bee9197261d28cef814187be2f3e4016c715411d115573",
+  "source_sha256": "45f297745892a006a237b1fe15af974526362a69d839f0159ea27955063df759",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -167,6 +167,9 @@
     "ENV": [
       "00-configuration/environment"
     ],
+    "EOF": [
+      "30-io-file/statements"
+    ],
     "ERR": [
       "10-language/flow-control/error-handling"
     ],
@@ -188,6 +191,9 @@
     ],
     "FILTER": [
       "20-io-screen/fields-attributes"
+    ],
+    "FIRST": [
+      "30-io-file/statements"
     ],
     "FMT": [
       "20-io-screen/fields-attributes"
@@ -276,6 +282,9 @@
     "KSTAT$": [
       "10-language/data-manipulation/system-functions"
     ],
+    "LAST": [
+      "30-io-file/statements"
+    ],
     "LEN": [
       "10-language/data-manipulation/system-functions"
     ],
@@ -350,7 +359,14 @@
       "40-io-printing/statements"
     ],
     "NEXT": [
-      "10-language/flow-control/other-flow"
+      "10-language/flow-control/other-flow",
+      "30-io-file/statements"
+    ],
+    "NOKEY": [
+      "30-io-file/statements"
+    ],
+    "NOREC": [
+      "30-io-file/statements"
     ],
     "NOT": [
       "10-language/data-manipulation/expressions"
@@ -390,6 +406,12 @@
     ],
     "OR": [
       "10-language/data-manipulation/expressions"
+    ],
+    "OUTIN": [
+      "30-io-file/statements"
+    ],
+    "OUTPUT": [
+      "30-io-file/statements"
     ],
     "PAGEOFLOW": [
       "40-io-printing/statements"
@@ -434,6 +456,9 @@
     "PRINTER": [
       "00-configuration/config-directives"
     ],
+    "PRIOR": [
+      "30-io-file/statements"
+    ],
     "PROC": [
       "70-commands/program-management"
     ],
@@ -457,6 +482,7 @@
       "30-io-file/file-model"
     ],
     "RELEASE": [
+      "30-io-file/file-model",
       "50-libraries/library-facility"
     ],
     "REM": [
@@ -514,6 +540,9 @@
     "RUN": [
       "70-commands/program-management"
     ],
+    "SAME": [
+      "30-io-file/statements"
+    ],
     "SAVE": [
       "70-commands/program-management"
     ],
@@ -522,6 +551,9 @@
     ],
     "SEARCH": [
       "30-io-file/keys-indexes"
+    ],
+    "SEQUENTIAL": [
+      "30-io-file/statements"
     ],
     "SERVER": [
       "00-configuration/client-server"
@@ -614,6 +646,9 @@
     ],
     "VERIFY": [
       "30-io-file/keys-indexes"
+    ],
+    "WAIT": [
+      "30-io-file/statements"
     ],
     "WEB_SERVER12": [
       "60-integration/web"
@@ -1482,6 +1517,7 @@
         "DISPLAY",
         "SHR",
         "RESERVE",
+        "RELEASE",
         "LINKED",
         "WSID",
         "locking"
@@ -1616,7 +1652,19 @@
         "RESTORE",
         "REREAD",
         "REC",
-        "KEY"
+        "KEY",
+        "FIRST",
+        "LAST",
+        "PRIOR",
+        "NEXT",
+        "SAME",
+        "EOF",
+        "NOKEY",
+        "NOREC",
+        "OUTIN",
+        "SEQUENTIAL",
+        "OUTPUT",
+        "WAIT"
       ],
       "related": [
         "file-model",
