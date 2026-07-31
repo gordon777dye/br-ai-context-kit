@@ -1,7 +1,6 @@
 ---
 title: Help_Facility
 file: Help_Facility.md
-source: https://brulescorp.com/brwiki2/index.php?title=Help
 category: 20-io-screen
 subcategory: 20-io-screen/windows-cursor
 kind: statement

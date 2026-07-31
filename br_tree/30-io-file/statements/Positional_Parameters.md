@@ -1,7 +1,6 @@
 ---
 title: Positional_Parameters
 file: Positional_Parameters.md
-source: https://brulescorp.com/brwiki2/index.php?title=Positional
 category: 30-io-file
 subcategory: 30-io-file/statements
 kind: statement

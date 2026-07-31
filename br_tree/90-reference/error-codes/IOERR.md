@@ -1,7 +1,6 @@
 ---
 title: IOERR
 file: IOERR.md
-source: https://brulescorp.com/brwiki2/index.php?title=IOErr
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

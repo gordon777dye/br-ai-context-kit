@@ -1,7 +1,6 @@
 ---
 title: PCL
 file: PCL.md
-source: https://brulescorp.com/brwiki2/index.php?title=PCL
 category: 40-io-printing
 subcategory: 40-io-printing/pcl-pdf
 kind: statement

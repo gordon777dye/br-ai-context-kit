@@ -1,7 +1,6 @@
 ---
 title: Properties,_Events,_and_Methods_(PEM)_and_.NET_controls
 file: Properties,_Events,_and_Methods_(PEM)_and_.NET_controls.md
-source: https://brulescorp.com/brwiki2/index.php?title=Properties,
 category: 20-io-screen
 subcategory: 20-io-screen/controls
 kind: control

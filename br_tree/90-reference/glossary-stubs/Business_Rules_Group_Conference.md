@@ -1,7 +1,6 @@
 ---
 title: Business_Rules_Group_Conference
 file: Business_Rules_Group_Conference.md
-source: https://brulescorp.com/brwiki2/index.php?title=Business
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

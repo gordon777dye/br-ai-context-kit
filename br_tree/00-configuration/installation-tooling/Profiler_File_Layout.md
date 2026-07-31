@@ -1,7 +1,6 @@
 ---
 title: Profiler_File_Layout
 file: Profiler_File_Layout.md
-source: https://brulescorp.com/brwiki2/index.php?title=Profiler
 category: 00-configuration
 subcategory: 00-configuration/installation-tooling
 kind: config-directive

@@ -1,7 +1,6 @@
 ---
 title: PRINTER
 file: PRINTER.md
-source: https://brulescorp.com/brwiki2/index.php?title=Printer
 category: 40-io-printing
 subcategory: 40-io-printing/statements
 kind: statement

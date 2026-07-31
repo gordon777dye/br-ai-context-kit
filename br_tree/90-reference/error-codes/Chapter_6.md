@@ -1,7 +1,6 @@
 ---
 title: Chapter_6
 file: Chapter_6.md
-source: https://brulescorp.com/brwiki2/index.php?title=Chapter
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

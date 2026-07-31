@@ -1,7 +1,6 @@
 ---
 title: Procedure_files
 file: Procedure_files.md
-source: https://brulescorp.com/brwiki2/index.php?title=Procedure
 category: 70-commands
 subcategory: 70-commands/program-management
 kind: command

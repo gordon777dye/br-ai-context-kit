@@ -1,7 +1,6 @@
 ---
 title: 18_Quintillion
 file: 18_Quintillion.md
-source: https://brulescorp.com/brwiki2/index.php?title=18
 category: 90-reference
 subcategory: 90-reference/limits-constants
 kind: constant

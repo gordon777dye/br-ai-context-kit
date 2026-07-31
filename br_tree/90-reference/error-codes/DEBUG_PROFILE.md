@@ -1,7 +1,6 @@
 ---
 title: DEBUG_PROFILE
 file: DEBUG_PROFILE.md
-source: https://brulescorp.com/brwiki2/index.php?title=DEBUG
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

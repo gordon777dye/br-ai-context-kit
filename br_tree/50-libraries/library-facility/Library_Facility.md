@@ -1,7 +1,6 @@
 ---
 title: Library_Facility
 file: Library_Facility.md
-source: https://brulescorp.com/brwiki2/index.php?title=Library
 category: 50-libraries
 subcategory: 50-libraries/library-facility
 kind: statement

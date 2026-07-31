@@ -1,7 +1,6 @@
 ---
 title: PROCIN
 file: PROCIN.md
-source: https://brulescorp.com/brwiki2/index.php?title=ProcIn
 category: 70-commands
 subcategory: 70-commands/information
 kind: command

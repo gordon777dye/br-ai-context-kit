@@ -1,7 +1,6 @@
 ---
 title: FKEY
 file: FKEY.md
-source: https://brulescorp.com/brwiki2/index.php?title=FKey
 category: 20-io-screen
 subcategory: 20-io-screen/windows-cursor
 kind: function

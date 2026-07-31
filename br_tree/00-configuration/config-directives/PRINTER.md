@@ -1,6 +1,5 @@
 # Printer
 
-**Source:** https://brulescorp.com/brwiki2/index.php?title=Printer
 
 ---
 

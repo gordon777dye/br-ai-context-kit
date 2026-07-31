@@ -92,7 +92,7 @@ advanced-features/Labels.md,10-language/syntax/spec.md,Labels,10-language,10-lan
 advanced-features/Linux.md,00-configuration/platform/spec.md,Linux,00-configuration,00-configuration/platform,config-directive,pruned-2b,med
 advanced-features/LOGGING.md,00-configuration/config-directives/LOGGING.md,LOGGING,00-configuration,00-configuration/config-directives,config-directive,ok,low
 advanced-features/MAC.md,00-configuration/platform/spec.md,MAC,00-configuration,00-configuration/platform,config-directive,pruned-2b,med
-advanced-features/Main_Page.md,90-reference/glossary-stubs/Main_Page.md,Main_Page,90-reference,90-reference/glossary-stubs,concept,ok,med
+advanced-features/Main_Page.md,90-reference/glossary-stubs/Main_Page.md,Main_Page,90-reference,90-reference/glossary-stubs,concept,deleted-wiki-chrome,med
 advanced-features/MAXRECALL.md,00-configuration/config-directives/MAXRECALL.md,MAXRECALL,00-configuration,00-configuration/config-directives,config-directive,pruned-2b,low
 advanced-features/Mixed.md,00-configuration/config-directives/Mixed.md,Mixed,00-configuration,00-configuration/config-directives,config-directive,pruned-2b,low
 advanced-features/NSIS_Setup.md,00-configuration/installation-tooling/spec.md,NSIS_Setup,00-configuration,00-configuration/installation-tooling,config-directive,pruned-2b,med

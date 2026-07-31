@@ -1,7 +1,6 @@
 ---
 title: Anchor_Record
 file: Anchor_Record.md
-source: https://brulescorp.com/brwiki2/index.php?title=Anchor
 category: 30-io-file
 subcategory: 30-io-file/file-model
 kind: statement

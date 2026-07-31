@@ -1,7 +1,6 @@
 ---
 title: BR_Service_Opening_(disambiguation)
 file: BR_Service_Opening_(disambiguation).md
-source: https://brulescorp.com/brwiki2/index.php?title=BR
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

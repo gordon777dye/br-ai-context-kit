@@ -39,7 +39,6 @@ _48 entries._
 | [Line_Label_(disambiguation)](Line_Label_(disambiguation).md) | concept | *Line Label (program) |
 | [List_(disambiguation)](List_(disambiguation).md) | concept |  |
 | [LOCKED_(disambiguation)](LOCKED_(disambiguation).md) | concept | *Locked_Error_Cond| Locked (Error Condition) |
-| [Main_Page](Main_Page.md) | concept | Welcome to the . This wiki is dedicated to the Business Rules! programming language (a.k.a. BR) and the software developers who use it. Busi |
 | [None](None.md) | concept | The optional "NONE line-ref" parameter allows you to specify the line that control should go to when the value of the numeric expression doe |
 | [On_(disambiguation)](On_(disambiguation).md) | concept |  |
 | [Open_(disambiguation)](Open_(disambiguation).md) | concept | In Business Rules! Open (OPE) is used only in statements. |

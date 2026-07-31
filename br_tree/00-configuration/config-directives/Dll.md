@@ -1,7 +1,6 @@
 ---
 title: Dll
 file: Dll.md
-source: https://brulescorp.com/brwiki2/index.php?title=Dll
 category: 00-configuration
 subcategory: 00-configuration/config-directives
 kind: config-directive

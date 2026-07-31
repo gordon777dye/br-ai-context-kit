@@ -1,7 +1,6 @@
 ---
 title: Native_Windows_Printing
 file: Native_Windows_Printing.md
-source: https://brulescorp.com/brwiki2/index.php?title=Native_Windows_Printing
 category: 40-io-printing
 subcategory: 40-io-printing/pcl-pdf
 kind: concept

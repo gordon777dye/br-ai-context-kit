@@ -1,7 +1,6 @@
 ---
 title: Multi-spooled_printers
 file: Multi-spooled_printers.md
-source: https://brulescorp.com/brwiki2/index.php?title=Multi-spooled
 category: 00-configuration
 subcategory: 00-configuration/config-directives
 kind: config-directive

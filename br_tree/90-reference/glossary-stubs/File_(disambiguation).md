@@ -1,7 +1,6 @@
 ---
 title: File_(disambiguation)
 file: File_(disambiguation).md
-source: https://brulescorp.com/brwiki2/index.php?title=File
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

@@ -216,7 +216,7 @@ OPEN `#`<channel> `:` <file-open-string> `,` `EXTERNAL` `,`
 00110 OPEN #1: "NAME=MILES.DAT,RECL=255,NEW", INTERNAL, OUTPUT, SEQUENTIAL
 00150 WRITE #1, USING 160: DATE, MILES, GALLONS, MPG 
 00160 FORM N 6, N 6.2, N 6.2, N 6.3
-00200 CLOSE #1
+00200 CLOSE #1:
 
 ! Keyed lookup in INTERNAL file (most common pattern in QSMRP)
 00310 OPEN #2: "NAME=CUSTOMER.DAT, KFNAME=CUSTOMER.KEY", INTERNAL, INPUT, KEYED
@@ -225,7 +225,7 @@ OPEN `#`<channel> `:` <file-open-string> `,` `EXTERNAL` `,`
 00340 PRINT "Found: " & CUST_NAME$
 00350 GOTO 500
 00400 PRINT "Customer not found"
-00500 CLOSE #2
+00500 CLOSE #2:
 
 ! Multi-record lock with INTERNAL file (RESERVE/RELEASE pattern)
 00150 OPEN #3: "NAME=INVENTORY.DAT, KFNAME=INVENTORY.KEY", INTERNAL, OUTIN, SHR
@@ -233,7 +233,7 @@ OPEN `#`<channel> `:` <file-open-string> `,` `EXTERNAL` `,`
 00170 IF QTY > ALLOCATED THEN REWRITE #3, RESERVE: QTY, ALLOCATED ELSE RESTORE #3:
 00180 GOTO 500
 00300 PRINT "Part not found"
-00500 CLOSE #3
+00500 CLOSE #3:
 00550 !
 00600 FORM N 7,N 7
 
@@ -373,7 +373,7 @@ READ `#`<channel> [ `,` `USING` <form-ref> ] [ `,` <position> ] [ `,` {`RESERVE`
 00320   READ #3, REC=I: A$, B NOREC 350
 00330   PRINT A$, B
 00340 NEXT I
-00350 CLOSE #3
+00350 CLOSE #3:
 
 ! Re-interpret buffered record
 00400 READ #1, USING SHORTFORM: KEY$
@@ -440,14 +440,14 @@ REREAD `#`<channel> [ `,` `USING` <form-ref> ] [ `,` {`RESERVE` | `RELEASE`}] `:
 00130 REREAD #1, USING 140: CUST_KEY$, NAME$, BALANCE
 00140 FORM C 10, C 30, N 10.2                    ! full record FORM
 00150 PRINT NAME$, BALANCE
-00300 CLOSE #1
+00300 CLOSE #1:
 
 ! Release a record lock without repositioning
 00400 OPEN #2: "NAME=inv.int,KPS=1,KLN=8", INTERNAL, OUTIN, SHR, KEYED
 00410 READ #2, KEY=PART$, RESERVE: QTY           ! locks the record
 00420 IF QTY > 0 THEN GOSUB ALLOCATE
 00430 REREAD #2, RELEASE:                        ! drop the lock (no reposition)
-00440 CLOSE #2
+00440 CLOSE #2:
 ```
 
 **See also:**
@@ -516,14 +516,14 @@ WRITE `#`<channel> [ `,` `USING` <form-ref> ]  [ `,` {`RESERVE` | `RELEASE`}] `:
 00120   WRITE #1, USING 130: "Record", I
 00130   FORM C 20, N 8
 00140 NEXT I
-00150 CLOSE #1
+00150 CLOSE #1:
 
 ! Reuse a deleted slot
 00200 OPEN #2: "NAME=test.int", INTERNAL, OUTIN
 00210 READ #2, REC=50: A$ NOREC 220
 00220 DELETE #2:
 00230 WRITE #2, REC=50: "New data"        ! reuse slot 50
-00240 CLOSE #2
+00240 CLOSE #2:
 
 ! Trap duplicate record
 00300 WRITE #3: A$, B DUPREC 400
@@ -587,7 +587,7 @@ REWRITE `#`<channel> [ `,` `USING` <form-ref> ] [ `,` { `REC=`<n> | `KEY=`<k$> }
 00110 READ #1, REC=5: A$, B, C, D
 00120 LET C = C * 1.1                         ! increase C by 10%
 00130 REWRITE #1: A$, B, C, D                 ! update all fields
-00140 CLOSE #1
+00140 CLOSE #1:
 
 ! Partial update (only change the amount)
 00200 DIM AMOUNT$*20
@@ -595,13 +595,13 @@ REWRITE `#`<channel> [ `,` `USING` <form-ref> ] [ `,` { `REC=`<n> | `KEY=`<k$> }
 00220 LET AMOUNT$ = AMOUNT$ + 100
 00230 REWRITE #1, USING 240: CUSTNAME$, AMOUNT$
 00240 FORM C 30, C 20
-00300 CLOSE #1
+00300 CLOSE #1:
 
 ! Update including the key field (BR updates all related key files)
 00400 OPEN #2: "NAME=test.int,KPS=1,KLN=10", INTERNAL, OUTIN, KEYED
 00410 READ #2, KEY="ABC": A$, B, C
 00420 REWRITE #2, KEY="ABC": "XYZ", B, C      ! change the key value ABC → XYZ
-00430 CLOSE #2
+00430 CLOSE #2:
 ```
 
 **See also:**
@@ -670,14 +670,14 @@ DELETE `#`<channel> [ `,` { `REC=`<n> | `KEY=`<k$> } ] [ `,` { `RESERVE` | `RELE
 00100 OPEN #1: "NAME=test.int", INTERNAL, OUTIN
 00110 READ #1, REC=10: A$, B, C
 00120 DELETE #1:                              ! delete record 10
-00130 CLOSE #1
+00130 CLOSE #1:
 
 ! Delete by key
 00200 OPEN #2: "NAME=test.int,KPS=1,KLN=20", INTERNAL, OUTIN, KEYED
 00210 DELETE #2, KEY="OLDKEY": IOERR 300
 00220 CONTINUE 350
 00300 PRINT "Delete failed"
-00350 CLOSE #2
+00350 CLOSE #2:
 
 ! Batch delete with loop
 00400 OPEN #3: "NAME=test.int", INTERNAL, OUTIN, RELATIVE
@@ -685,7 +685,7 @@ DELETE `#`<channel> [ `,` { `REC=`<n> | `KEY=`<k$> } ] [ `,` { `RESERVE` | `RELE
 00420   READ #3, REC=I: A$ NOREC 450
 00430   IF A$ = "REMOVE" THEN DELETE #3:
 00440 NEXT I
-00450 CLOSE #3
+00450 CLOSE #3:
 ```
 
 **See also:**
@@ -700,6 +700,11 @@ DELETE `#`<channel> [ `,` { `REC=`<n> | `KEY=`<k$> } ] [ `,` { `RESERVE` | `RELE
 
 <a id="restore"></a>
 ## RESTORE — Reposition file pointer
+
+> **Different statement from the channel-less [RESTORE](#data--read--restore--internal-data-table),
+> which resets the internal `DATA` table.** The punctuation is where the difference shows: **this
+> form ends in a required colon** (`RESTORE #1:`), while the `DATA`-table form takes **no colon at
+> all** (`RESTORE`, `RESTORE 900`). Writing either one the other way is a compile error.
 
 **Syntax:**
 ```bnf
@@ -770,7 +775,7 @@ RESTORE `#`<channel> [ `,` <position> ] [ `,` { `RESERVE` | `RELEASE` } ] `:` [ 
 00220 READ #1: A$ EOF 300
 00230 PRINT "Second pass:", A$
 00240 GOTO 220
-00300 CLOSE #1
+00300 CLOSE #1:
 
 ! Use PRIOR to walk backward
 00400 OPEN #2: "NAME=test.int", INTERNAL, INPUT, SEQUENTIAL
@@ -778,7 +783,7 @@ RESTORE `#`<channel> [ `,` <position> ] [ `,` { `RESERVE` | `RELEASE` } ] `:` [ 
 00420 READ #2, PRIOR: A$ NOKEY 500            ! read backward
 00430 PRINT A$
 00440 GOTO 420
-00500 CLOSE #2
+00500 CLOSE #2:
 
 ! Linked list traversal
 00600 READ #3, REC=ANCHOR_KEY, KEY=STARTKEY: DATA$  ! read first
@@ -845,7 +850,7 @@ CLOSE `#`<channel>  [`,` { `DROP` | `FREE` } ] [ `,` `RELEASE` ] `:`
 ! Normal close
 00100 OPEN #1: "NAME=test.int", INTERNAL, INPUT
 00110 READ #1: A$
-00120 CLOSE #1
+00120 CLOSE #1:
 
 ! Close with drop (empty the file)
 00200 OPEN #2: "NAME=test.int", INTERNAL, OUTIN, NOSHR
@@ -853,7 +858,7 @@ CLOSE `#`<channel>  [`,` { `DROP` | `FREE` } ] [ `,` `RELEASE` ] `:`
 00220 CLOSE #2, DROP:                         ! file is now empty
 00230 OPEN #2: "NAME=test.int", INTERNAL, OUTPUT
 00240 WRITE #2: "New data"
-00250 CLOSE #2
+00250 CLOSE #2:
 
 ! Close with free (delete the file)
 00300 OPEN #3: "NAME=test.int", INTERNAL, INPUT, NOSHR
@@ -928,7 +933,7 @@ CLOSE `#`<channel>  [`,` { `DROP` | `FREE` } ] [ `,` `RELEASE` ] `:`
 ! Record layout shared by WRITE and READ
 00100 OPEN #1: "NAME=cust.int,RECL=64,NEW", INTERNAL, OUTPUT
 00110 WRITE #1, USING 900: "ACME", 1250.75, 30
-00120 CLOSE #1
+00120 CLOSE #1:
 00900 FORM C 20, N 10.2, N 4            ! name, balance, terms
 
 ! Repeat a group across a MAT
@@ -1336,7 +1341,7 @@ INPUT <variable-list> [ `CONV` <ref> ] [ `SOFLOW` <ref> ] [ `EOF` <ref> ] [ `TIM
 00620   LINPUT #1: LINE$ EOF 650
 00630   PRINT "Line:", LINE$
 00640 LOOP
-00650 CLOSE #1
+00650 CLOSE #1:
 ```
 
 **See also:**
@@ -1855,7 +1860,7 @@ RINPUT [`#`<window>`,`] `FIELDS` <field-specs> [`,` `ATTR` <attrs>] [`,` `HELP` 
 00140 GOTO 400
 00200 PRINT "Invalid entry; please re-enter" : RETRY
 00300 PRINT "Customer not found"
-00400 CLOSE #1
+00400 CLOSE #1:
 
 ! MAT-driven edit form
 00500 DIM FLDDEF$(3)*30
@@ -2458,13 +2463,18 @@ RINPUT [`#`<window>`,`] `FIELDS` <field-specs> [`,` `ATTR` <attrs>] [`,` `HELP` 
 ## DATA / READ / RESTORE — Internal data table
 
 > **Different statements from the file-I/O [READ](#read--record-input-keying-locking-position) and [RESTORE](#restore--reposition-file-pointer).** A `READ`/`RESTORE` **without** a `#channel` operates on the compiled-in **data table**; **with** a `#channel` they are the file-record statements. Same keywords, different behavior.
+>
+> **The colon tells them apart.** These channel-less forms take **no colon** — `RESTORE`,
+> `RESTORE 900`, `READ A$, B$`. The file forms end in (or carry) a **required** one — `RESTORE #1:`,
+> `READ #1: A$, B$`. Neither is optional in its own form, so a colon here or a missing colon there
+> is a compile error.
 
 **Syntax:**
 ```bnf
 `DATA` <value> [`,` <value>]*
-`READ` <variable-list>              -- channel-less: reads the internal data table
+`READ` <variable-list>              -- channel-less: reads the internal data table; no colon
 `READ` `MAT` <array>                -- fill a whole array from the table
-`RESTORE` [<line-ref>]              -- reset the table pointer (optionally to a DATA line)
+`RESTORE` [<line-ref>]              -- reset the table pointer (optionally to a DATA line); no colon
 ```
 
 **What it does:**
@@ -2980,7 +2990,7 @@ LOOP UNTIL CHOICE = 3
 00210   READ #1: DATA$ EOF 250
 00220   PRINT DATA$
 00230 LOOP
-00250 CLOSE #1
+00250 CLOSE #1:
 
 ! Menu-driven loop
 00300 DO
@@ -3155,7 +3165,7 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 00220   IF DATA$ = "STOP" THEN EXIT DO
 00230   PRINT DATA$
 00240 LOOP
-00250 CLOSE #1
+00250 CLOSE #1:
 
 ! Exit group for multiple error conditions
 00300 EXIT CONV 400, SOFLOW 400
@@ -3373,7 +3383,7 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 00020 READ #1: A$, B EOF 50
 00030 PRINT A$, B
 00040 GOTO 20
-00050 CLOSE #1
+00050 CLOSE #1:
 00060 STOP
 
 90000 GENERAL_ERROR:
@@ -3489,7 +3499,7 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 00220 READ #1: A$ EOF 250
 00230 PRINT A$
 00240 GOTO 220
-00250 CLOSE #1
+00250 CLOSE #1:
 00260 STOP
 
 00300 IF ERR = 4270 THEN CONTINUE 250   ! EOF, move to close
@@ -3807,7 +3817,7 @@ FNEND
 00120   READ #1: RECORD$ EOF 200
 00130   PRINT RECORD$
 00140 LOOP
-00200 CLOSE #1
+00200 CLOSE #1:
 ```
 
 ### Interactive Data Entry with Validation
@@ -3833,7 +3843,7 @@ FNEND
 00140 PRINT "Found: ", NAME$, "Balance: ", BALANCE
 00150 LET BALANCE = BALANCE + 100
 00160 REWRITE #1: NAME$, BALANCE
-00170 CLOSE #1
+00170 CLOSE #1:
 00180 END
 00200 PRINT "Customer not found"
 00210 GOTO 100

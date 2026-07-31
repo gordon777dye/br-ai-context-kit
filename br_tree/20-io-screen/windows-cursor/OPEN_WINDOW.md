@@ -1,7 +1,6 @@
 ---
 title: OPEN_WINDOW
 file: OPEN_WINDOW.md
-source: https://brulescorp.com/brwiki2/index.php?title=Open
 category: 20-io-screen
 subcategory: 20-io-screen/windows-cursor
 kind: statement

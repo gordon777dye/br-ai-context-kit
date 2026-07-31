@@ -1,11 +1,11 @@
 ---
 title: Chapter_3
 file: Chapter_3.md
-source: https://brulescorp.com/brwiki2/index.php?title=Chapter
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code
 related: [Answers 3.1, 0726, Answers 3.2, Answers 3.3, Answers 3.4, Answers 3.5, Answers 3.6, Answers 3.7, Answers 3.8]
+corrections: "Two naming claims corrected against the runtime (§3 line-label and variable-naming passages). The original text said names must begin with a letter and that line labels could be any length. Both are wrong: names are 1-30 characters, an underscore counts as a letter throughout, and `_a = 1` compiles. The two `must begin with a letter` lines left in place are Quick Quiz distractors (Q3.4-1c, Q3.5-2c), not assertions - they are false, which is the point of them, and no answer key was ever fetched."
 ---
 ===3.1 More Operation & Programming Fundamentals===
   
@@ -266,7 +266,7 @@ A line label is simply a name for a line. If you have ever attended a school whe
  00080 CONVRSN: PRINT "Please enter numbers, not letters." 
  00090 RETRY 
 
-In this case, CONVRSN is the line label. When line labels are used, they must be placed immediately after the line number. They can be any length and include letters, numbers or underscores, but they must begin with a letter and cannot include spaces. 
+In this case, CONVRSN is the line label. When line labels are used, they must be placed immediately after the line number. They can be 1–30 characters of letters, numbers and underscores, and cannot include spaces. An underscore counts as a letter throughout, so a label may begin with one too. *(Corrected — the original said labels could be "any length" and had to "begin with a letter"; both are wrong. See `corrections:` in the frontmatter.)* 
 
 Immediately after the label comes a colon, which tells BR that the preceding was a label and that the statement follows. Labels must be unique once you have used a line label in a program, you cannot use the same name as a label for another line. Labels can have the same name as a keyword or variable name, or as in the following case, they can also have the name of an error condition.
 
@@ -343,7 +343,7 @@ A numeric variable indicates to Business Rules! that an arithmetic operation wil
 
 `image:3.9.png`
  
-A string variable indicates to Business Rules! that no mathematical operation will be performed with the value of the variable. Business Rules! will accept any value (either numbers or letters) for the variable. But it will refuse all attempts to use arithmetic with the variable, even if the value happens to be a number (there is a way to get around this rule; we will learn about it in a later chapter). The only way that Business Rules! can tell the difference between numeric and string variables is by the way that you name them. Both types of variables must always begin with a letter. 
+A string variable indicates to Business Rules! that no mathematical operation will be performed with the value of the variable. Business Rules! will accept any value (either numbers or letters) for the variable. But it will refuse all attempts to use arithmetic with the variable, even if the value happens to be a number (there is a way to get around this rule; we will learn about it in a later chapter). The only way that Business Rules! can tell the difference between numeric and string variables is by the way that you name them: a string variable's name ends in `$`. Both types must begin with a letter or an underscore, which Business Rules! treats as a letter throughout. *(Corrected — the original said "must always begin with a letter". See `corrections:` in the frontmatter.)* 
 
 The vital difference between them is that string variables must end with a dollar sign ($), and numeric variables must not. 
   

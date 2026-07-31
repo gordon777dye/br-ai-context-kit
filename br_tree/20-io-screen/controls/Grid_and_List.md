@@ -1,7 +1,6 @@
 ---
 title: Grid_and_List
 file: Grid_and_List.md
-source: https://brulescorp.com/brwiki2/index.php?title=Grid_and_List
 category: 20-io-screen
 subcategory: 20-io-screen/controls
 kind: concept

@@ -1,7 +1,6 @@
 ---
 title: Picture
 file: Picture.md
-source: https://brulescorp.com/brwiki2/index.php?title=Picture
 category: 20-io-screen
 subcategory: 20-io-screen/controls
 kind: statement

@@ -1,7 +1,6 @@
 ---
 title: RD
 file: RD.md
-source: https://brulescorp.com/brwiki2/index.php?title=RD
 category: 00-configuration
 subcategory: 00-configuration/config-directives
 kind: config-directive

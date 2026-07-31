@@ -1,7 +1,6 @@
 ---
 title: Couldn't_'lock_in_progress'
 file: Couldn't_'lock_in_progress'.md
-source: https://brulescorp.com/brwiki2/index.php?title=Couldn't
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

@@ -1,7 +1,6 @@
 ---
 title: Round_Table_Webinar_Notes_-_June_2008
 file: Round_Table_Webinar_Notes_-_June_2008.md
-source: https://brulescorp.com/brwiki2/index.php?title=Round
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

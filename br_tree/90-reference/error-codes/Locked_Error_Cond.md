@@ -1,7 +1,6 @@
 ---
 title: Locked_Error_Cond
 file: Locked_Error_Cond.md
-source: https://brulescorp.com/brwiki2/index.php?title=Locked
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

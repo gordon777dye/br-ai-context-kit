@@ -1,7 +1,6 @@
 ---
 title: MAT
 file: MAT.md
-source: https://brulescorp.com/brwiki2/index.php?title=Mat
 category: 10-language
 subcategory: 10-language/data-manipulation/declaration
 kind: statement

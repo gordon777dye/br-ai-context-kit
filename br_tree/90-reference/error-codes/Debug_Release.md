@@ -1,7 +1,6 @@
 ---
 title: Debug_Release
 file: Debug_Release.md
-source: https://brulescorp.com/brwiki2/index.php?title=Debug
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

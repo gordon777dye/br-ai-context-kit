@@ -1,7 +1,6 @@
 ---
 title: LOGGING
 file: LOGGING.md
-source: https://brulescorp.com/brwiki2/index.php?title=Logging
 category: 00-configuration
 subcategory: 00-configuration/config-directives
 kind: config-directive

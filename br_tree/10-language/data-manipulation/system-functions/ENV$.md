@@ -1,7 +1,6 @@
 ---
 title: ENV$
 file: ENV$.md
-source: https://brulescorp.com/brwiki2/index.php?title=Env$
 category: 10-language
 subcategory: 10-language/data-manipulation/system-functions
 kind: function

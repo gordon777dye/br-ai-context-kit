@@ -1,7 +1,6 @@
 ---
 title: EXIT
 file: EXIT.md
-source: https://brulescorp.com/brwiki2/index.php?title=Exit
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

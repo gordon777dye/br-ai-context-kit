@@ -1,7 +1,6 @@
 ---
 title: CFORM$
 file: CFORM$.md
-source: https://brulescorp.com/brwiki2/index.php?title=CForm$
 category: 10-language
 subcategory: 10-language/data-manipulation/system-functions
 kind: function

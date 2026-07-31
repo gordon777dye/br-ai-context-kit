@@ -1,7 +1,6 @@
 ---
 title: FORM
 file: FORM.md
-source: https://brulescorp.com/brwiki2/index.php?title=Form
 category: 30-io-file
 subcategory: 30-io-file/form-spec
 kind: statement

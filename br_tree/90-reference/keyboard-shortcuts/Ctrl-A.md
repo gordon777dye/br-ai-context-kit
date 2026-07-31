@@ -1,7 +1,6 @@
 ---
 title: Ctrl-A
 file: Ctrl-A.md
-source: https://brulescorp.com/brwiki2/index.php?title=Ctrl-A
 category: 90-reference
 subcategory: 90-reference/keyboard-shortcuts
 kind: shortcut

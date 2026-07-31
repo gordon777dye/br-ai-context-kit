@@ -1,13 +1,21 @@
 ---
 title: Keyword_Abbreviation
 file: Keyword_Abbreviation.md
-source: https://brulescorp.com/brwiki2/index.php?title=Keyword_Abbreviation
 category: 10-language
 subcategory: 10-language/syntax
 kind: concept
 related: [Alert, Auto, Break, ChDir, Clear, Config, Copy, Date, Del, Dir]
 provenance: recovered-2b (redirect-collision casualty re-fetched from wiki)
+corrections: "All 15 stale abbreviations corrected against BR's own matcher (tokensub over the keyword tables). Values here are computed, not transcribed; see spec.md#abbreviations for the rule and brls abbreviations.json for the full comparison."
 ---
+'''These abbreviations have been corrected against Business Rules' own keyword matcher.'''
+The list as originally published is stale in fifteen places: it gave abbreviations that later
+releases made ambiguous (`DE` against `DEBUG`, `DI` against `DISPLAY`, `FR` against `FRE`,
+`REN` against `RENUM`, `LI` against `LIBRARY`), one the interpreter has no way to match at all
+(`CD` for `ChDir` — not a prefix of the word), and nine that are more cautious than BR requires.
+Each corrected line carries an HTML comment saying why. The rule the values are computed from is
+in [syntax](spec.md#abbreviations).
+
 Primary and secondary keywords can be abbreviated on input, thereby increasing programmer productivity. Primary keywords are the names of statements and commands. Secondary keywords are other keywords used in statements (they are always capitalized in syntax diagrams, meaning they must be typed in exactly as is or with an acceptable abbreviation). Lists of the shortest acceptable abbreviations for each of these keywords are included in this APPENDIX.
 
 An abbreviation, which is longer than what is listed is also, accepted. DELETE could be entered as DEL, DELE, or DELET, for instance.
@@ -27,9 +35,9 @@ Business Rules automatically expands abbreviated keywords only when the abbrevia
 
 `Auto` (AU)
 
-`Break`
+`Break` (B)  <!-- corrected: no other command begins with B -->
 
-`ChDir` (CH or CD)
+`ChDir` (CH)  <!-- corrected: CD is not a prefix of CHDIR and appears nowhere in BR -->
 
 `Clear` (CL)
 
@@ -39,23 +47,23 @@ Business Rules automatically expands abbreviated keywords only when the abbrevia
 
 `Date` (DA)
 
-`Del` (DE)
+`Del` (DEL)  <!-- corrected: DE now also matches DEBUG -->
 
-`Dir` (DI)
+`Dir` (DIR)  <!-- corrected: DI now also matches DISPLAY -->
 
-`Display`
+`Display` (DIS)
 
 `Drop` (DR)
 
-`Edit` (ED)
+`Edit` (E)  <!-- corrected: no other command begins with E -->
 
-`Free` (FR)
+`Free` (FREE)  <!-- corrected: FR now also matches the FRE command -->
 
-`Go`
+`Go` (G)  <!-- corrected: GO is an exact match, taken before GO END -->
 
 `Go End`
 
-`Index`
+`Index` (I)  <!-- corrected: no other command begins with I -->
 
 `List` (LIS)
 
@@ -67,11 +75,11 @@ Business Rules automatically expands abbreviated keywords only when the abbrevia
 
 `Proc`
 
-`ProcErr`
+`ProcErr` (PROCE)  <!-- corrected: PROC is an exact match and wins first -->
 
 `Protect` (PROT)
 
-`Rename` (REN)
+`Rename` (RENA)  <!-- corrected: REN now also matches RENUM -->
 
 `Renum` (RENU)
 
@@ -85,7 +93,7 @@ Business Rules automatically expands abbreviated keywords only when the abbrevia
 
 `Skip` (SK)
 
-`Sort`
+`Sort` (SO)
 
 `Status` (ST)
 
@@ -146,7 +154,7 @@ There are two special situations where it will seem as if the same abbreviation 
 
 `let` (le)
 
-`linput` (li)
+`linput` (lin)  <!-- corrected: li now also matches LIBRARY -->
 
 `mat` (m)
 
@@ -170,7 +178,7 @@ There are two special situations where it will seem as if the same abbreviation 
 
 `option` (opt)
 
-`pause` (pau)
+`pause` (pa)
 
 `print` (pr)
 
@@ -208,7 +216,7 @@ There are two special situations where it will seem as if the same abbreviation 
 
 `use` (u)
 
-`write` (wr)
+`write` (w)  <!-- corrected: no other statement begins with W -->
 
 
 <noinclude>

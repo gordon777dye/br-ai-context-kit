@@ -1,7 +1,6 @@
 ---
 title: NXTFLD
 file: NXTFLD.md
-source: https://brulescorp.com/brwiki2/index.php?title=Nxtfld
 category: 10-language
 subcategory: 10-language/data-manipulation/system-functions
 kind: function

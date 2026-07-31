@@ -1,7 +1,6 @@
 ---
 title: Backward_Compatibility
 file: Backward_Compatibility.md
-source: https://brulescorp.com/brwiki2/index.php?title=Backward
 category: 00-configuration
 subcategory: 00-configuration/platform
 kind: config-directive

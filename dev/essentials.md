@@ -85,9 +85,32 @@ Two kinds of content, both load-bearing:
   with a separate `PRINT "X"` first, then `INPUT A$` on its own. A lesser-known third form, **plain
   `RINPUT <var>`** (a single variable, not a list, no `FIELDS`), *is* valid: it prints the
   variable's current value and prompts for a replacement.
+- **A required colon is required at the end of the line too.** `00120 CLOSE #1` does not compile;
+  it is `CLOSE #1:`. There is no end-of-line exemption — the colon is part of the statement, not a
+  separator you may drop when nothing follows. `CLOSE`, `DELETE`, `RELEASE` and `RESERVE` always
+  need it; the file forms of `READ`, `WRITE`, `REREAD`, `REWRITE`, `RESTORE`, `PRINT`, `INPUT`,
+  `LINPUT`, `RINPUT` and `OPEN` carry it before their operand list.
 - **A statement whose own syntax ends in a required colon needs a *second* colon to chain another
   statement on the same physical line.** `CLOSE #n:` terminates the `CLOSE`; `CLOSE #n: STOP` on
   one line mis-parses `STOP` as part of the `CLOSE`. Write `CLOSE #n: : STOP` (two colons) instead.
+- **The colon belongs to the *branch*, not to the statement name — and `RESTORE` is where that
+  bites.** `RESTORE` is two statements sharing a spelling, and only one of them takes a colon:
+
+  ```
+  00100 RESTORE                        ! DATA-table pointer to the top      — NO colon
+  00110 RESTORE 900                    ! DATA-table pointer to line 900     — NO colon
+  00120 RESTORE #1:                    ! file #1 back to its first record   — colon REQUIRED
+  00130 RESTORE #1, KEY=CUST$: NOKEY 800
+  ```
+
+  With no `#channel` it repositions the compiled-in `DATA` table and ends there; with a `#channel`
+  it is the file statement and its syntax ends in a required colon. So "does `RESTORE` need a
+  colon?" has no single answer — *`RESTORE #n` does, bare `RESTORE` does not*, and writing either
+  one the other way is a compile error. `READ` splits exactly the same way (`READ A$, B$` reads the
+  `DATA` table with no colon; `READ #1: A$, B$` reads a record), which is the same trap seen twice.
+  (The two statements are documented separately:
+  [RESTORE (file)](statement-semantics.md#restore) and
+  [DATA / READ / RESTORE](statement-semantics.md#data-read-restore).)
 - **`LIBRARY "name":` with a library name but no function list LOADS that library immediately —
   it does not detach a linkage.** The only way to fully detach a library linkage is to end the main
   program. Don't infer a "no functions ⇒ unlink" meaning from the empty list.

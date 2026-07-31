@@ -1,7 +1,6 @@
 ---
 title: Ctrl+Shift+Tab
 file: Ctrl+Shift+Tab.md
-source: https://brulescorp.com/brwiki2/index.php?title=Ctrl+Shift+Tab
 category: 90-reference
 subcategory: 90-reference/keyboard-shortcuts
 kind: shortcut

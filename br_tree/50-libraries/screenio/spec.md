@@ -1,7 +1,7 @@
 ---
 title: ScreenIO library
 file: spec.md
-source: screenio.brs (shipping source) + filelay/screenio,screenfld (schema) + brwiki2 ScreenIO_Library manual; §ScreenIO Library
+source: screenio.brs (shipping source) + filelay/screenio,screenfld (schema) + the ScreenIO_Library manual; §ScreenIO Library
 category: 50-libraries
 subcategory: 50-libraries/screenio
 kind: spec
@@ -86,7 +86,7 @@ FNEND
 - [60-integration/web](../../60-integration/web/spec.md) — web integration; the PhpIO library deploys ScreenIO screens to the web
 - [00-configuration/installation-tooling](../../00-configuration/installation-tooling/spec.md) — **Lexi** (the no-line-numbers preprocessor, relocated there)
 
-*(The **live** wiki [ScreenIO Library](https://brulescorp.com/brwiki2/index.php?title=ScreenIO_Library)
+*(The **live** wiki ScreenIO Library
 page is a full ~206-section manual — only the *local* snapshots of it were empty stubs. The
 deep-reference pages here are built from the shipping `screenio.brs` source, the `filelay/` schema, and
 that wiki manual. The misfiled `Lexi` page — an editor preprocessor, not ScreenIO — was relocated to

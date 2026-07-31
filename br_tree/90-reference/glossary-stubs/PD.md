@@ -1,7 +1,6 @@
 ---
 title: PD
 file: PD.md
-source: https://brulescorp.com/brwiki2/index.php?title=PD
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

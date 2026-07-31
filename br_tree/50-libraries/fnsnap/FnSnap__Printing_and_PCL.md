@@ -1,7 +1,6 @@
 ---
 title: FnSnap__Printing_and_PCL
 file: FnSnap__Printing_and_PCL.md
-source: https://brulescorp.com/brwiki2/index.php?title=FnSnap:
 category: 50-libraries
 subcategory: 50-libraries/fnsnap
 kind: function

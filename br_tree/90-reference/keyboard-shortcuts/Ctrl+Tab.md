@@ -1,7 +1,6 @@
 ---
 title: Ctrl+Tab
 file: Ctrl+Tab.md
-source: https://brulescorp.com/brwiki2/index.php?title=Ctrl+Tab
 category: 90-reference
 subcategory: 90-reference/keyboard-shortcuts
 kind: shortcut

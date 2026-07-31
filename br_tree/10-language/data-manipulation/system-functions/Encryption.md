@@ -1,7 +1,6 @@
 ---
 title: Encryption
 file: Encryption.md
-source: https://brulescorp.com/brwiki2/index.php?title=Encryption
 category: 10-language
 subcategory: 10-language/data-manipulation/system-functions
 kind: function

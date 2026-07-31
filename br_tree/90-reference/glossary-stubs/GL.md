@@ -1,7 +1,6 @@
 ---
 title: GL
 file: GL.md
-source: https://brulescorp.com/brwiki2/index.php?title=GL
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

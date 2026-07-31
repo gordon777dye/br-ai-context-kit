@@ -1,7 +1,6 @@
 ---
 title: BR_StartService_failed
 file: BR_StartService_failed.md
-source: https://brulescorp.com/brwiki2/index.php?title=BR
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

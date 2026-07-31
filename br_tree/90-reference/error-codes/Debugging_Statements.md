@@ -1,7 +1,6 @@
 ---
 title: Debugging_Statements
 file: Debugging_Statements.md
-source: https://brulescorp.com/brwiki2/index.php?title=Debugging
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

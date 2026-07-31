@@ -1,7 +1,6 @@
 ---
 title: ON_ERROR_GOSUB
 file: ON_ERROR_GOSUB.md
-source: https://brulescorp.com/brwiki2/index.php?title=On
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

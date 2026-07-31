@@ -4,20 +4,20 @@ file: error-reference.md
 category: dev
 kind: reference
 status: 1a
-description: Distilled reference for 70 of the most critical BR error codes, organized by category with causes, scenarios, fixes, and example code.
+description: Distilled reference for 71 of the most critical BR error codes, organized by category with causes, scenarios, fixes, and example code.
 ---
 
 # BR Error Code Reference
 
-This is a curated, model-friendly distillation of 70 critical BR error codes. Each entry includes the cause, common scenarios, fixes, example recovery code, and related errors. Organized by category for quick lookup.
+This is a curated, model-friendly distillation of 71 critical BR error codes, in 69 write-ups (4194/4195/4196 share one). Each entry gives the cause, common scenarios, fixes, example recovery code and related errors. Organized by category for quick lookup.
 
 ## Table of Contents
 
-1. **[File I/O Errors (41xx)](#file-io-errors)** — 27 codes
-2. **[Function Definition Errors (03xx)](#function-definition)** — 10 codes
+1. **[File I/O Errors (41xx)](#file-io-errors)** — 26 codes
+2. **[Function Definition Errors (03xx)](#function-definition)** — 11 codes
 3. **[Flow Control Errors (02xx)](#flow-control)** — 9 codes
 4. **[Array & Subscript Errors (01xx)](#array-subscript)** — 7 codes
-5. **[Syntax & Parsing Errors (10xx)](#syntax-parsing)** — 10 codes
+5. **[Syntax & Parsing Errors (10xx)](#syntax-parsing)** — 11 codes
 6. **[Critical System Errors (90xx)](#critical-system)** — 2 codes
 7. **[Other Important Errors](#other)** — 5 codes
 
@@ -30,7 +30,7 @@ This is a curated, model-friendly distillation of 70 critical BR error codes. Ea
 **Cause:** File number reference is missing or invalid in an OPEN or I/O statement. The file number must be prefixed with a pound sign (#).
 
 **Common scenarios:**
-- Using `OPEN "filename"` instead of `OPEN #1, "filename"`
+- Using `OPEN "NAME=filename"` instead of `OPEN #1: "NAME=filename"`
 - Missing # symbol in READ, WRITE, or PRINT statements
 - Variable list missing in READ data statement
 
@@ -41,9 +41,9 @@ This is a curated, model-friendly distillation of 70 critical BR error codes. Ea
 
 **Example recovery code:**
 ```br
-! WRONG: OPEN "data.dat"
+! WRONG: OPEN "NAME=data.dat", INTERNAL, INPUT   ! no #channel
 ! RIGHT:
-OPEN #1, NAME="data.dat", ACCESS=INPUT, FORM=INTERNAL
+OPEN #1: "NAME=data.dat", INTERNAL, INPUT
 READ #1: recvar
 CLOSE #1:
 ```
@@ -69,8 +69,8 @@ CLOSE #1:
 **Example recovery code:**
 ```br
 0010 LET filename$ = "mydata.dat"
-0020 OPEN #1, NAME=filename$, ACCESS=INPUT, FORM=INTERNAL
-0030 READ #1: record
+0020 OPEN #1: "NAME=" & FILENAME$, INTERNAL, INPUT
+0030 READ #1: RECORD$
 0040 CLOSE #1:
 ```
 
@@ -95,10 +95,10 @@ CLOSE #1:
 
 **Example recovery code:**
 ```br
-0010 EXECUTE "REINDEX", "#1", "data.dat"
+0010 EXECUTE "INDEX data.dat data.key 1 10 REPLACE"
 0020 ! Verify data after reindex
-0030 OPEN #1, NAME="data.dat", ACCESS=UPDATE, FORM=INTERNAL
-0040 READ #1, KEY=mykey: record
+0030 OPEN #1: "NAME=data.dat,KFNAME=data.key", INTERNAL, OUTIN, KEYED
+0040 READ #1, KEY=MYKEY$: RECORD$ NOKEY 0090
 ```
 
 **Related errors:** 4123, 4127, 4180
@@ -110,7 +110,7 @@ CLOSE #1:
 **Cause:** Mismatch between the file type and the access mode being attempted (e.g., trying to print to an internal file, or access a file opened as a different type).
 
 **Common scenarios:**
-- Attempting PRINT to an internal file (FORM=INTERNAL)
+- Attempting PRINT to a file opened INTERNAL
 - Opening same file as both internal and external
 - Program file opened as key file
 - Damaged file header preventing proper type detection
@@ -124,13 +124,13 @@ CLOSE #1:
 **Example recovery code:**
 ```br
 ! Display file - use PRINT
-OPEN #1, NAME="report.txt", ACCESS=OUTPUT, FORM=DISPLAY
-PRINT #1, AT(10,5): "Report Header"
+OPEN #1: "NAME=report.txt,REPLACE", DISPLAY, OUTPUT
+PRINT #1: "Report Header"
 
 ! Internal file - use READ/WRITE
-OPEN #2, NAME="data.dat", ACCESS=UPDATE, FORM=INTERNAL
-READ #2, KEY="ABC": record
-WRITE #2: record
+OPEN #2: "NAME=data.dat,KFNAME=data.key", INTERNAL, OUTIN, KEYED
+READ #2, KEY="ABC": RECORD$ NOKEY 9000
+REWRITE #2: RECORD$
 ```
 
 **Related errors:** 4121, 4123, 4125
@@ -156,10 +156,10 @@ WRITE #2: record
 **Example recovery code:**
 ```br
 0010 ! Attempt to reindex corrupted file
-0020 EXECUTE "REINDEX", "#1", "data.dat"
+0020 EXECUTE "INDEX data.dat data.key 1 10 REPLACE"
 0030 ! If reindex fails, restore from backup
-0040 OPEN #1, NAME="backup.dat", ACCESS=INPUT, FORM=INTERNAL
-0050 OPEN #2, NAME="data.dat", ACCESS=CREATE, FORM=INTERNAL
+0040 OPEN #1: "NAME=backup.dat", INTERNAL, INPUT
+0050 OPEN #2: "NAME=data.dat,RECL=128,REPLACE", INTERNAL, OUTPUT
 ```
 
 **Related errors:** 4120, 4124, 4127
@@ -185,10 +185,10 @@ WRITE #2: record
 **Example recovery code:**
 ```br
 ! WRONG: KFNAME and NAME same file
-! OPEN #1, NAME="data.dat", KFNAME="data.dat"
+! OPEN #1: "NAME=data.dat,KFNAME=data.dat", INTERNAL, OUTIN, KEYED
 
 ! RIGHT: Separate key and data files
-OPEN #1, NAME="data.dat", KFNAME="data.key", FORM=INTERNAL
+OPEN #1: "NAME=data.dat,KFNAME=data.key", INTERNAL, OUTIN, KEYED
 ```
 
 **Related errors:** 4123, 4125, 4126
@@ -213,12 +213,12 @@ OPEN #1, NAME="data.dat", KFNAME="data.key", FORM=INTERNAL
 **Example recovery code:**
 ```br
 ! Check file version during open
-ON ERROR GOTO handle_error
-OPEN #1, NAME="legacy.dat", ACCESS=INPUT, FORM=INTERNAL, VERSION=3
-GOTO done
-handle_error: LET verno = ERR
-PRINT "File version mismatch. Current error:", verno
-done:
+ON ERROR GOTO HANDLE_ERROR
+OPEN #1: "NAME=legacy.dat,VERSION=3", INTERNAL, INPUT
+GOTO DONE
+HANDLE_ERROR: LET VERNO = ERR
+PRINT "File version mismatch. Current error:"; VERNO
+DONE: !
 ```
 
 **Related errors:** 4122, 4124, 4126
@@ -244,11 +244,11 @@ done:
 **Example recovery code:**
 ```br
 0010 ! Attempt to rebuild truncated file
-0020 EXECUTE "REORG", "data.dat"
-0030 OPEN #1, NAME="data.dat", ACCESS=UPDATE, FORM=INTERNAL
+0020 EXECUTE "INDEX data.dat data.key 1 10 REORG"
+0030 OPEN #1: "NAME=data.dat,KFNAME=data.key", INTERNAL, OUTIN, KEYED
 0040 ! Verify file integrity
-0050 READ #1, KEY="": record UNTIL EOF OR ERR
-0060 IF ERR <> 0 THEN PRINT "File still corrupted"
+0050 READ #1: RECORD$ EOF 0070 IOERR 0060
+0060 PRINT "File still corrupted, error"; ERR
 ```
 
 **Related errors:** 4123, 4124, 4127
@@ -267,14 +267,14 @@ done:
 **Fix:**
 1. Verify all key files use consistent indexing method
 2. Reindex all key files to same type: `EXECUTE "REINDEX", "#1", "data.dat"`
-3. Ensure ISAM=YES/NO setting is consistent across all related files
+3. Ensure every index of a file is opened with the same index type (ISAM or BTREE)
 4. Recreate key files if type conversion is required
 
 **Example recovery code:**
 ```br
-! Open with consistent ISAM setting for all keys
-OPEN #1, NAME="data.dat", KFNAME="key1.idx", ISAM=YES
-OPEN #2, NAME="data.dat", KFNAME="key2.idx", ISAM=YES
+! Open every index of a file with the same index type
+OPEN #1: "NAME=data.dat,KFNAME=key1.idx,ISAM", INTERNAL, OUTIN, KEYED
+OPEN #2: "NAME=data.dat,KFNAME=key2.idx,ISAM", INTERNAL, OUTIN, KEYED
 ! Both key files now same type
 ```
 
@@ -304,7 +304,7 @@ OPEN #2, NAME="data.dat", KFNAME="key2.idx", ISAM=YES
 
 ! RIGHT: Shorter path or use working directory
 LET filename$ = "data.dat"
-OPEN #1, NAME=filename$, FORM=INTERNAL
+OPEN #1: "NAME=" & FILENAME$, INTERNAL, INPUT
 ```
 
 **Related errors:** 4100, 4152, 4180
@@ -329,12 +329,12 @@ OPEN #1, NAME=filename$, FORM=INTERNAL
 **Example recovery code:**
 ```br
 ! Copy instead of rename across locations
-OPEN #1, NAME="local.dat", ACCESS=INPUT, FORM=INTERNAL
-OPEN #2, NAME="@server:remote.dat", ACCESS=CREATE, FORM=INTERNAL
-READ #1: record UNTIL EOF OR ERR
-  WRITE #2: record
-END WHILE
-CLOSE #1: CLOSE #2:
+OPEN #1: "NAME=local.dat", INTERNAL, INPUT
+OPEN #2: "NAME=@server:remote.dat,RECL=128,REPLACE", INTERNAL, OUTPUT
+DO
+   READ #1: RECORD$ EOF 0100
+   WRITE #2: RECORD$
+LOOP
 ```
 
 **Related errors:** 4139, 4150, 4174
@@ -359,9 +359,9 @@ CLOSE #1: CLOSE #2:
 **Example recovery code:**
 ```br
 0010 ! Release file and retry reservation
-0020 RELEASE #1
+0020 RELEASE #1:
 0030 CLOSE #1:
-0040 OPEN #1, NAME=newname$, ACCESS=UPDATE, FORM=INTERNAL
+0040 OPEN #1: "NAME=" & NEWNAME$, INTERNAL, OUTIN
 ```
 
 **Related errors:** 4138, 4170, 4171, 4172
@@ -378,7 +378,7 @@ CLOSE #1: CLOSE #2:
 - Multiple processes creating same file
 
 **Fix:**
-1. Delete existing file if safe to do so: `KILL filename$`
+1. Delete the existing file if that is safe: `EXECUTE "FREE " & FILENAME$`
 2. Use different file name
 3. Use different disk or directory
 4. Check for file locks that prevent deletion
@@ -386,15 +386,15 @@ CLOSE #1: CLOSE #2:
 **Example recovery code:**
 ```br
 0010 LET filename$ = "newdata.dat"
-0020 ON ERROR GOTO handle_exists
-0030 OPEN #1, NAME=filename$, ACCESS=CREATE, FORM=INTERNAL
-0040 GOTO done
-handle_exists:
+0020 ON ERROR GOTO 0050
+0030 OPEN #1: "NAME=" & FILENAME$ & ",RECL=128,NEW", INTERNAL, OUTPUT
+0040 GOTO 0090
+0045 !
 0050 IF ERR = 4150 THEN
-0060   KILL filename$
+0060   EXECUTE "FREE " & FILENAME$
 0070   RETRY
 0080 END IF
-done:
+0090 !
 ```
 
 **Related errors:** 4152, 4153, 4174
@@ -425,9 +425,9 @@ done:
 0020 IF NOT EXISTS(filename$) THEN
 0030   PRINT "File not found:", filename$
 0040   PRINT "Creating new file..."
-0050   OPEN #1, NAME=filename$, ACCESS=CREATE, FORM=INTERNAL
+0050   OPEN #1: "NAME=" & FILENAME$ & ",RECL=128,NEW", INTERNAL, OUTPUT
 0060 ELSE
-0070   OPEN #1, NAME=filename$, ACCESS=UPDATE, FORM=INTERNAL
+0070   OPEN #1: "NAME=" & FILENAME$, INTERNAL, OUTIN
 0080 END IF
 ```
 
@@ -456,14 +456,14 @@ done:
 ```br
 ! WRONG: Loop accumulates open files
 FOR i = 1 TO 1000
-  OPEN #i, NAME="file" & i & ".dat"
+  OPEN #I: "NAME=file" & STR$(I) & ".dat", INTERNAL, INPUT
 NEXT i
 
 ! RIGHT: Reuse file handle
 FOR i = 1 TO 1000
   IF i > 1 THEN CLOSE #1:
-  OPEN #1, NAME="file" & i & ".dat"
-  READ #1: record
+  OPEN #1: "NAME=file" & STR$(I) & ".dat", INTERNAL, INPUT
+  READ #1: RECORD$ EOF 0900
 NEXT i
 CLOSE #1:
 ```
@@ -485,16 +485,16 @@ CLOSE #1:
 1. Verify only the user who locked the file releases it
 2. Have correct user perform the RELEASE statement
 3. Check WSID and SESSION information with STATUS command
-4. Use LOCK #filenumber to re-establish proper lock ownership
+4. Use `RESERVE #filenumber:` to re-establish exclusive access
 
 **Example recovery code:**
 ```br
-0010 LOCK #1
+0010 RESERVE #1:
 0020 ! Perform exclusive operations
-0030 RELEASE #1
+0030 RELEASE #1:
 0040 ! Verify release with STATUS
-0050 LET status$ = STATUS(#1)
-0060 PRINT "File status:", status$
+0050 LET FSTATUS = FILE(1)
+0060 PRINT "File status:"; FSTATUS
 ```
 
 **Related errors:** 4171, 4172, 4173
@@ -520,17 +520,17 @@ CLOSE #1:
 **Example recovery code:**
 ```br
 0010 LET retry_count = 0
-0020 loop: LOCK #1
+0020 RETRY_LOOP: RESERVE #1: IOERR 0030
 0030 IF ERR = 4171 THEN
 0040   LET retry_count = retry_count + 1
 0050   IF retry_count > 3 THEN
 0060     PRINT "Failed to reserve file after 3 retries"
-0070     GOTO done
+0070     GOTO 0120
 0080   END IF
-0090   WAIT 1
-0100   GOTO loop
+0090   LET Z = SLEEP(1)
+0100   GOTO RETRY_LOOP
 0110 END IF
-done:
+0120 !
 ```
 
 **Related errors:** 4172, 4173, 4174
@@ -555,17 +555,17 @@ done:
 
 **Example recovery code:**
 ```br
-0010 ON ERROR GOTO release_error
-0020 RELEASE #1
+0010 ON ERROR GOTO 0050
+0020 RELEASE #1:
 0030 CLOSE #1:
-0040 GOTO done
-release_error:
+0040 GOTO 0100
+0045 !
 0050 IF ERR = 4172 THEN
 0060   ! Force close without release
 0070   CLOSE #1:
 0080   PRINT "File closed (forced)"
 0090 END IF
-done:
+0100 !
 ```
 
 **Related errors:** 4170, 4171, 4173
@@ -593,16 +593,16 @@ done:
 ```br
 0010 LET max_retries = 3
 0020 LET retry = 0
-0030 open_retry:
-0040 OPEN #1, NAME="data.dat", ACCESS=UPDATE, FORM=INTERNAL EXIT=open_fail
-0050 GOTO open_success
-0060 open_fail:
+0030 OPEN_RETRY: !
+0040 OPEN #1: "NAME=data.dat", INTERNAL, OUTIN IOERR OPEN_FAIL
+0050 GOTO OPEN_SUCCESS
+0060 OPEN_FAIL: !
 0070 IF ERR = 4173 AND retry < max_retries THEN
 0080   LET retry = retry + 1
-0090   WAIT 2
-0100   GOTO open_retry
+0090   LET Z = SLEEP(2)
+0100   GOTO OPEN_RETRY
 0110 END IF
-0120 open_success:
+0120 OPEN_SUCCESS: !
 ```
 
 **Related errors:** 4170, 4171, 4172
@@ -627,11 +627,11 @@ done:
 **Example recovery code:**
 ```br
 ! Remote file access (no reservation)
-OPEN #1, NAME="@server:data.dat", ACCESS=UPDATE, FORM=INTERNAL
+OPEN #1: "NAME=@server:data.dat", INTERNAL, OUTIN
 
 ! Local file access (with reservation)
-OPEN #2, NAME="local.dat", ACCESS=UPDATE, FORM=INTERNAL
-LOCK #2
+OPEN #2: "NAME=local.dat", INTERNAL, OUTIN
+RESERVE #2:
 ```
 
 **Related errors:** 4138, 4170, 4171, 4172
@@ -656,8 +656,8 @@ LOCK #2
 5. Remove or comment out invalid drive statement
 
 **Example recovery code:**
-```br
-! In BRConfig.sys
+```text
+! BRConfig.sys — DRIVE is a configuration directive, not a BR statement
 ! WRONG: DRIVE A: C:\BR (missing third parameter)
 ! WRONG: DRIVE A: C:\notexist\
 
@@ -686,7 +686,8 @@ DRIVE B: C:\DATA\ \FILES\
 4. Unmap drive before remapping (if possible)
 
 **Example recovery code:**
-```br
+```text
+! BRConfig.sys and the command console — not program statements
 ! Check drive status
 DIR @:
 
@@ -721,12 +722,12 @@ DRIVE E: C:\DATA\ \FILES\
 **Example recovery code:**
 ```br
 0010 LET client_dir$ = "C:\DATA"
-0020 IF NOT EXISTS(client_dir$) THEN
+0020 IF EXISTS(CLIENT_DIR$) = 0 THEN
 0030   PRINT "Client directory does not exist:", client_dir$
-0040   GOTO done
+0040   GOTO 0070
 0050 END IF
-0060 DIR @: client_dir$ " "
-0070 done:
+0060 EXECUTE "DIR " & CLIENT_DIR$
+0070 !
 ```
 
 **Related errors:** 4180, 4184
@@ -752,17 +753,17 @@ DRIVE E: C:\DATA\ \FILES\
 
 **Example recovery code:**
 ```br
-0010 ON ERROR GOTO net_error
-0020 OPEN #1, NAME="@server:data.dat", ACCESS=UPDATE, FORM=INTERNAL
-0030 WRITE #1: record
-0040 GOTO done
-net_error:
+0010 ON ERROR GOTO 0050
+0020 OPEN #1: "NAME=@server:data.dat", INTERNAL, OUTIN
+0030 WRITE #1: RECORD$
+0040 GOTO 0100
+0045 !
 0050 IF ERR >= 4194 AND ERR <= 4196 THEN
 0060   PRINT "Network error occurred during file operation"
 0070   CLOSE #1:
 0080   PRINT "Retrying connection..."
 0090 END IF
-done:
+0100 !
 ```
 
 **Related errors:** 4138, 4160, 4173
@@ -792,16 +793,16 @@ done:
 ! DEF statement with 3 parameters
 DEF fnCalculate(num_val, str_val, mat values)
   LET result = num_val + LEN(str_val)
-  RETURN result
+  LET FNCALCULATE = RESULT
 FNEND
 
 ! Correct call
-LET mat data(5)
-LET x = fnCalculate(42, "test", mat data)
+DIM DATA(5)
+LET X = FNCALCULATE(42, "test", MAT DATA)
 
 ! WRONG calls that cause error:
-! LET x = fnCalculate(42, "test")  ! Missing array parameter
-! LET x = fnCalculate(42, "test", data)  ! Missing MAT keyword
+! LET X = FNCALCULATE(42, "test")        ! missing the array argument
+! LET X = FNCALCULATE(42, "test", DATA)  ! missing the MAT keyword
 ```
 
 **Related errors:** 0302, 0303, 0304, 0305
@@ -829,16 +830,16 @@ LET x = fnCalculate(42, "test", mat data)
 ```br
 ! Define the function before using it
 DEF fnMyFunction(x)
-  RETURN x * 2
+  LET FNMYFUNCTION = X * 2
 FNEND
 
 ! Now call it
-LET result = fnMyFunction(5)
+LET RESULT = FNMYFUNCTION(5)
 
 ! For internal functions, check version
-IF WBVersion$ >= "4.3" THEN
-  LET arr(1) = "test"
-  LET mat myarr = Str2Mat(arr)
+IF WBVERSION$ >= "4.3" THEN
+  LET ARR$ = "one,two,three"
+  LET N = STR2MAT(ARR$, MAT MYARR$)
 END IF
 ```
 
@@ -863,16 +864,17 @@ END IF
 **Example recovery code:**
 ```br
 ! WRONG: DEF expects reference, call passes literal
-! DEF fnTest(val, &ref)
-! LET x = fnTest("test", &unknownvar)
+! DEF FNTEST(VAL_IN$, &REF$)
+! LET X$ = FNTEST$("test", &UNKNOWNVAR$)   ! the & belongs on the DEF, not the call
 
 ! RIGHT: Pass actual variable
-DEF fnTest(val, &ref)
-  LET ref = val & "modified"
+DEF FNTEST$(VAL_IN$, &REF$)
+  LET REF$ = VAL_IN$ & "modified"
+  LET FNTEST$ = REF$
 FNEND
 
-LET mystring$ = "original"
-LET result = fnTest("test", &mystring$)
+LET MYSTRING$ = "original"
+LET RESULT$ = FNTEST$("test", MYSTRING$)   ! MYSTRING$ comes back changed
 ```
 
 **Related errors:** 0301, 0302, 0304
@@ -898,17 +900,17 @@ LET result = fnTest("test", &mystring$)
 **Example recovery code:**
 ```br
 ! DEF with specific types
-DEF fnProcess(num_val, str_val)
-  RETURN num_val & str_val
+DEF FNPROCESS$(NUM_VAL, STR_VAL$)
+  LET FNPROCESS$ = STR$(NUM_VAL) & STR_VAL$
 FNEND
 
 ! Correct calls
-LET result = fnProcess(42, "test")
-LET result = fnProcess(STR(mynum), "test")
+LET RESULT$ = FNPROCESS$(42, "test")
+LET RESULT$ = FNPROCESS$(MYNUM, "test")
 
 ! WRONG - causes error:
-! LET result = fnProcess("42", "test")  ! String instead of number
-! LET x = fnProcess(y=5, "test")  ! Use := not =
+! LET RESULT$ = FNPROCESS$("42", "test")  ! string where a number is wanted
+! LET X$ = FNPROCESS$(Y=5, "test")        ! use := to assign inside an expression
 ```
 
 **Related errors:** 0301, 0302, 0303, 0306
@@ -933,14 +935,14 @@ LET result = fnProcess(STR(mynum), "test")
 ```br
 ! Define library function
 DEF LIBRARY fnHelper(x)
-  RETURN x * 2
+  LET FNHELPER = X * 2
 FNEND
 
 ! Add LIBRARY statement - MUST be present
-LIBRARY fnHelper
+LIBRARY "helper.br": FNHELPER
 
 ! Now library function can be used
-0100 LET result = fnHelper(5)
+0100 LET RESULT = FNHELPER(5)
 ```
 
 **Related errors:** 0301, 0302, 0320
@@ -975,7 +977,7 @@ LIBRARY fnHelper
 ! RIGHT: FNEND after FOR
 DEF fnTest
   FOR i = 1 TO 10
-    ...
+    PRINT I
   NEXT i
 FNEND
 ```
@@ -1005,16 +1007,15 @@ FNEND
 ! WRONG: GOTO skips function entry
 ! GOTO middle
 ! DEF fnTest
-! middle: fnTest = 5
+! MIDDLE: LET FNTEST = 5
 ! FNEND
 
 ! RIGHT: Proper function call
 DEF fnTest(x)
-  fnTest = x * 2
-  RETURN
+  LET FNTEST = X * 2
 FNEND
 
-LET result = fnTest(5)
+LET RESULT = FNTEST(5)
 ```
 
 **Related errors:** 0306, 0309, 0310
@@ -1047,11 +1048,11 @@ LET result = fnTest(5)
 
 ! RIGHT: Functions at program level
 DEF fnInner(x)
-  RETURN x * 2
+  LET FNINNER = X * 2
 FNEND
 
 DEF fnOuter(x)
-  RETURN fnInner(x) + 1
+  LET FNOUTER = FNINNER(X) + 1
 FNEND
 ```
 
@@ -1079,11 +1080,11 @@ FNEND
 ```br
 ! WRONG: No FNEND
 ! DEF fnMissing(x)
-!   RETURN x * 2
+!   LET FNMISSING = X * 2
 
 ! RIGHT: Add FNEND
 DEF fnMissing(x)
-  RETURN x * 2
+  LET FNMISSING = X * 2
 FNEND
 ```
 
@@ -1117,14 +1118,15 @@ FNEND
 
 ! RIGHT: Use as-is or create local copy
 DEF fnProcess(mat data)
-  LET rows = MAT(data, 1)
-  LET cols = MAT(data, 2)
+  LET ROWS = UDIM(MAT DATA, 1)
+  LET COLS = UDIM(MAT DATA, 2)
   ! ... process existing array
+  LET FNPROCESS = ROWS * COLS
 FNEND
 
 ! Call with array
-LET mat mydata(100)
-LET fnProcess(mat mydata)
+DIM MYDATA(100)
+LET N = FNPROCESS(MAT MYDATA)
 ```
 
 **Related errors:** 0105, 0106, 0123
@@ -1160,15 +1162,15 @@ LET fnProcess(mat mydata)
 
 ! RIGHT: Single definition
 DEF fnHelper(x)
-  RETURN x * 2
+  LET FNHELPER = X * 2
 FNEND
 
 ! Or for library functions:
 DEF LIBRARY fnHelper(x)
-  RETURN x * 2
+  LET FNHELPER = X * 2
 FNEND
 
-LIBRARY fnHelper  ! Not DEF again
+LIBRARY "helper.br": FNHELPER  ! not DEF again
 ```
 
 **Related errors:** 0302, 0305, 0309
@@ -1240,8 +1242,7 @@ LIBRARY fnHelper  ! Not DEF again
 ! RIGHT: Let GOSUB complete
 DEF fnProcess
   GOSUB helper
-  fnProcess = result
-  RETURN
+  LET FNPROCESS = RESULT
 FNEND
 
 helper:
@@ -1275,15 +1276,15 @@ helper:
 
 ! RIGHT: RETRY in error handler
 0010 LET filename$ = "data.dat"
-0020 OPEN #1, NAME=filename$ EXIT=file_error
-0030 GOTO done
-0040 file_error:
+0020 OPEN #1: "NAME=" & FILENAME$, INTERNAL, INPUT IOERR 0040
+0030 GOTO 0100
+0040 FILE_ERROR: !
 0050 IF ERR = 4152 THEN
 0060   PRINT "File not found. Creating..."
-0070   CREATE #1, NAME=filename$
+0070   OPEN #1: "NAME=" & FILENAME$ & ",RECL=128,NEW", INTERNAL, OUTPUT
 0080   RETRY
 0090 END IF
-done:
+0100 !
 ```
 
 **Related errors:** 0201, 0202, 0213
@@ -1318,12 +1319,12 @@ done:
 
 ! RIGHT: Use existing line
 0010 GOTO 0050
-0020 ... other code ...
+0020 ! ... other code ...
 0050 LET x = 5
 
 ! RIGHT: Define and use label correctly
 GOTO process_data
-... other code ...
+! ... other code ...
 process_data:
   LET x = 5
 ```
@@ -1492,12 +1493,12 @@ NEXT i
 **Example recovery code:**
 ```br
 ! WRONG: EXIT references non-EXIT line
-! 0010 INPUT #1: data EXIT=0020
-! 0020 PRINT "Got data"  ! No EXIT here
+! 0010 INPUT #1: DATA$ EXIT 0020
+! 0020 PRINT "Got data"          ! no EXIT group on this line
 
-! RIGHT: EXIT line must have EXIT statement
-0010 INPUT #1: data EXIT=0020
-0020 EXIT
+! RIGHT: the referenced line carries an EXIT group
+0010 INPUT #1: DATA$ EXIT 0020
+0020 EXIT IOERR 0900, EOF 0910
 ```
 
 **Related errors:** 0211, 0213
@@ -1565,8 +1566,8 @@ DIM a(20), b(20)
 MAT a = b
 
 ! Also RIGHT: Array grouping
-DIM x(5), y(5), z(5)
-INPUT #1, FIELDS mat x, mat y, mat z  ! All same size
+DIM X(5), Y(5), Z(5), FSPEC$(3)*20
+INPUT #1, FIELDS MAT FSPEC$: MAT X, MAT Y, MAT Z   ! all the same size
 ```
 
 **Related errors:** 0105, 0120, 0121, 0123
@@ -1676,7 +1677,7 @@ DIM y(100)
 PRINT y(5)
 
 ! For full array operations:
-MAT PRINT x  ! Prints all of x
+PRINT MAT X   ! prints all of X
 ```
 
 **Related errors:** 0120, 0122, 0123
@@ -1702,11 +1703,11 @@ MAT PRINT x  ! Prints all of x
 **Example recovery code:**
 ```br
 ! Set BASE if needed
-BASE 0
+OPTION BASE 0
 DIM x(10)  ! Valid indexes: 0-10
 
 ! Or BASE 1 (default):
-BASE 1
+OPTION BASE 1
 DIM x(10)  ! Valid indexes: 1-10
 
 ! Safe access:
@@ -1886,7 +1887,7 @@ END IF
 ! RIGHT: Balanced quotes
 PRINT "Hello World"
 PRINT "It's a test"  ! Quote inside string OK with double quotes
-PRINT 'It'"'"'s OK'  ! Escape apostrophe in single-quoted string
+PRINT 'It''s OK'     ! doubled quote escapes it inside the same quote type
 ```
 
 **Related errors:** 1000, 1006, 1020
@@ -1956,8 +1957,8 @@ calculate:
 ! RIGHT: Proper syntax
 IF x = 5 THEN PRINT y
 
-! RIGHT: Short attribute name
-ATTRIBUTE myattr = 1
+! RIGHT: short attribute name, set in BRConfig.sys
+! ATTRIBUTE myattr = 1
 ```
 
 **Related errors:** 1000, 1001, 1002
@@ -2118,13 +2119,13 @@ NEXT i
 **Example recovery code:**
 ```br
 ! WRONG: Missing colon
-! OPEN #1, NAME="data.dat"
+! OPEN #1 "NAME=data.dat", INTERNAL, INPUT   ! no colon after #1
 ! READ #1: data
 ! CLOSE #1
 
 ! RIGHT: Colons present
-OPEN #1, NAME="data.dat", FORM=INTERNAL:
-READ #1: data
+OPEN #1: "NAME=data.dat", INTERNAL, INPUT
+READ #1: DATA$ EOF 0900
 CLOSE #1:
 ```
 
@@ -2159,15 +2160,15 @@ DIM data(1000)  ! Reasonable size
 
 ! Or break into chunks:
 LET chunk_size = 10000
-FOR start = 1 TO total BY chunk_size
-  OPEN #1, NAME="data.dat"
-  READ #1, KEY=STR(start): record
+FOR START = 1 TO TOTAL STEP CHUNK_SIZE
+  OPEN #1: "NAME=data.dat,KFNAME=data.key", INTERNAL, INPUT, KEYED
+  READ #1, KEY=STR$(START): RECORD$ NOKEY 9000
   CLOSE #1:
   ! Process chunk
 NEXT start
 
 ! Emergency: Save to file immediately
-LIST > "myprogram.brs"
+EXECUTE "LIST >myprogram.brs"
 ```
 
 **Related errors:** 9001
@@ -2249,10 +2250,10 @@ LET result = fn1(temp4)
 **Example recovery code:**
 ```br
 ! Check if file is open before opening
-IF NOT EXISTS("data.dat") THEN
-  CREATE #1, NAME="data.dat"
+IF EXISTS("data.dat") = 0 THEN
+  OPEN #1: "NAME=data.dat,RECL=128,NEW", INTERNAL, OUTPUT
 ELSE
-  OPEN #1, NAME="data.dat", ACCESS=UPDATE
+  OPEN #1: "NAME=data.dat", INTERNAL, OUTIN
 END IF
 ! ... use file ...
 CLOSE #1:
@@ -2279,10 +2280,10 @@ CLOSE #1:
 
 **Example recovery code:**
 ```br
-OPEN #1, NAME="data.dat", ACCESS=UPDATE
-LOCK #1  ! Reserve for exclusive access
+OPEN #1: "NAME=data.dat", INTERNAL, OUTIN
+RESERVE #1:   ! reserve for exclusive access
 ! ... exclusive operations ...
-RELEASE #1
+RELEASE #1:
 CLOSE #1:
 ```
 

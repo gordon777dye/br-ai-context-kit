@@ -1,7 +1,6 @@
 ---
 title: BR_Forum
 file: BR_Forum.md
-source: https://brulescorp.com/brwiki2/index.php?title=BR_Forum
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

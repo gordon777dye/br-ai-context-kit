@@ -1,7 +1,6 @@
 ---
 title: PROGRAM$
 file: PROGRAM$.md
-source: https://brulescorp.com/brwiki2/index.php?title=Program$
 category: 70-commands
 subcategory: 70-commands/information
 kind: command

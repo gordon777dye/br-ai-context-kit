@@ -1,7 +1,6 @@
 ---
 title: AuditBR
 file: AuditBR.md
-source: https://brulescorp.com/brwiki2/index.php?title=AuditBR
 category: 50-libraries
 subcategory: 50-libraries/fileio
 kind: concept

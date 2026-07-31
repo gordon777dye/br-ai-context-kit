@@ -1,7 +1,6 @@
 ---
 title: ERROR_CODES
 file: ERROR_CODES.md
-source: https://brulescorp.com/brwiki2/index.php?title=Error_Codes
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: concept

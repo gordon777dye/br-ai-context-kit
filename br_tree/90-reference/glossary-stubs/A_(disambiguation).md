@@ -1,7 +1,6 @@
 ---
 title: A_(disambiguation)
 file: A_(disambiguation).md
-source: https://brulescorp.com/brwiki2/index.php?title=A
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

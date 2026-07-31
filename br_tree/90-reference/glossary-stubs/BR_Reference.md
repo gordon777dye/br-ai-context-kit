@@ -1,7 +1,6 @@
 ---
 title: BR_Reference
 file: BR_Reference.md
-source: https://brulescorp.com/brwiki2/index.php?title=BR
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

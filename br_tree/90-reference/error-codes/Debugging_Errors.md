@@ -1,7 +1,6 @@
 ---
 title: Debugging_Errors
 file: Debugging_Errors.md
-source: https://brulescorp.com/brwiki2/index.php?title=Debugging
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

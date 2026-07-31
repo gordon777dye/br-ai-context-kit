@@ -1,7 +1,6 @@
 ---
 title: CMDKEY
 file: CMDKEY.md
-source: https://brulescorp.com/brwiki2/index.php?title=CmdKey
 category: 20-io-screen
 subcategory: 20-io-screen/windows-cursor
 kind: statement

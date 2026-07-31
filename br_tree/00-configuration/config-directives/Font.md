@@ -1,7 +1,6 @@
 ---
 title: Font
 file: Font.md
-source: https://brulescorp.com/brwiki2/index.php?title=Font
 category: 00-configuration
 subcategory: 00-configuration/config-directives
 kind: config-directive

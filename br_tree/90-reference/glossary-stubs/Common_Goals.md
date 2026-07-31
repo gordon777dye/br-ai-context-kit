@@ -1,7 +1,6 @@
 ---
 title: Common_Goals
 file: Common_Goals.md
-source: https://brulescorp.com/brwiki2/index.php?title=Common_Goals
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

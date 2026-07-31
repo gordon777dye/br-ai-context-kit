@@ -1,7 +1,6 @@
 ---
 title: Network_error_processing_authentication
 file: Network_error_processing_authentication.md
-source: https://brulescorp.com/brwiki2/index.php?title=Network
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

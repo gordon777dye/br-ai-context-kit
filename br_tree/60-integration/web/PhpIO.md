@@ -1,7 +1,6 @@
 ---
 title: PhpIO
 file: PhpIO.md
-source: https://brulescorp.com/brwiki2/index.php?title=PhpIO
 category: 50-libraries
 subcategory: 50-libraries/screenio
 kind: statement

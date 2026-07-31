@@ -1,7 +1,6 @@
 ---
 title: HTTP=CLIENT
 file: HTTP=CLIENT.md
-source: https://brulescorp.com/brwiki2/index.php?title=HTTP=CLIENT
 category: 60-integration
 subcategory: 60-integration/web
 kind: reference

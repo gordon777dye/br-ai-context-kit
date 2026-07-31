@@ -1,7 +1,6 @@
 ---
 title: ERROR_mode
 file: ERROR_mode.md
-source: https://brulescorp.com/brwiki2/index.php?title=ERROR
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

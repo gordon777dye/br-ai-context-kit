@@ -1,7 +1,6 @@
 ---
 title: OPEN_internal
 file: OPEN_internal.md
-source: https://brulescorp.com/brwiki2/index.php?title=Open
 category: 30-io-file
 subcategory: 30-io-file/file-model
 kind: statement

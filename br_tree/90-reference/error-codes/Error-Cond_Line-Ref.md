@@ -1,7 +1,6 @@
 ---
 title: Error-Cond_Line-Ref
 file: Error-Cond_Line-Ref.md
-source: https://brulescorp.com/brwiki2/index.php?title=Error-Cond
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

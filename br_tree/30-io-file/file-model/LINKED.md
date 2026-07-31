@@ -1,7 +1,6 @@
 ---
 title: LINKED
 file: LINKED.md
-source: https://brulescorp.com/brwiki2/index.php?title=Linked
 category: 30-io-file
 subcategory: 30-io-file/file-model
 kind: statement

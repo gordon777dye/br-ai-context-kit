@@ -1,7 +1,6 @@
 ---
 title: CHAIN
 file: CHAIN.md
-source: https://brulescorp.com/brwiki2/index.php?title=Chain
 category: 70-commands
 subcategory: 70-commands/program-management
 kind: command

@@ -1,7 +1,6 @@
 ---
 title: PRINTER.SYS
 file: PRINTER.SYS.md
-source: https://brulescorp.com/brwiki2/index.php?title=Printer.Sys
 category: 00-configuration
 subcategory: 00-configuration/config-directives
 kind: config-directive

@@ -1,7 +1,6 @@
 ---
 title: Programming_in_Jungles
 file: Programming_in_Jungles.md
-source: https://brulescorp.com/brwiki2/index.php?title=Programming_in_Jungles
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

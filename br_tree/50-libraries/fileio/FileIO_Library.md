@@ -1,7 +1,6 @@
 ---
 title: FileIO_Library
 file: FileIO_Library.md
-source: https://brulescorp.com/brwiki2/index.php?title=FileIO_Library
 category: 50-libraries
 subcategory: 50-libraries/fileio
 kind: concept
@@ -24,7 +23,7 @@ To download the latest copy of FileIO, click [here.](http://www.sageax.com/downl
 
 The file IO library parses a formatted text file layout and uses this information to structure the opening and the reading of a file “object”. The word object here is used to refer to all the data in a given record layout in one of your files. This library is easy to use, and provided you follow some simple standards, it will simplify your life immensely.
 
-Your programs will need to define one array for all [BR data file form statements](https://brulescorp.com/brwiki2/index.php?title=Form) and add a snippet of code (given below) to the program for interfacing with with the library. For each file you will need to define a couple of arrays and use the library to open them. From that point on access to data is simple and direct.
+Your programs will need to define one array for all BR data file form statements and add a snippet of code (given below) to the program for interfacing with with the library. For each file you will need to define a couple of arrays and use the library to open them. From that point on access to data is simple and direct.
 
 ### File Object Arrays
 
@@ -75,7 +74,7 @@ Because BR libraries do not share global variables with the programs they are ca
  99060    fnend
 ```
 
-Or, for those with [Lexi](https://brulescorp.com/brwiki2/index.php?title=Lexi):  (same but without line numbers)
+Or, for those with Lexi:  (same but without line numbers)
 
 ```
  OPEN: ! ***** Function To Call Library Openfile And Proc Subs
@@ -325,7 +324,7 @@ And that’s all there is to it.
 
 As of V2.48, file layouts support dates in any storage formats on disk. Whether you store your dates in Julian or in YMD or MDY or any other format, specify so in the 4th column of your file layouts, using the FileIO Date Keyword. ex: DATE(Julian) or DATE(YMD) or any other valid BR Date Format.
 
-[![](https://brulescorp.com/brwiki2/images/2/27/Dates0.png)](https://brulescorp.com/brwiki2/index.php?title=File:Dates0.png)
+![
 
 When this is specified, it enables the FileIO data exploration tool (Data Crawler) to display the dates in human readable format. This works for both Viewing, and for Editing.
 
@@ -365,7 +364,7 @@ This works even if your file is working fine. Any time the file is opened with t
 
 ## Utilities
 
-Now that you have your file layouts defined, you have access to several powerful utilities right out of the box using Fileio. Additionally, several more utilities are available as Add-Ons, including our most popular development tool [ScreenIO](https://brulescorp.com/brwiki2/index.php?title=Screenio). You can read more about them in their section below.
+Now that you have your file layouts defined, you have access to several powerful utilities right out of the box using Fileio. Additionally, several more utilities are available as Add-Ons, including our most popular development tool ScreenIO. You can read more about them in their section below.
 
 But for now, lets take a look at some of the wonderful free utilities that come built into Fileio.
 
@@ -375,7 +374,7 @@ Some of these utilities are accessible from your code via library functions, but
 
 The data crawler is the original utility of FileIO. This utility shows you first a list of all data files allowing you to select one.
 
-Select a data file and press enter, and FileIO will then display a listview containing all the data in the data file. This list is sized based on the size of your main BR window (window 0) automatically to take up the full size available to it, so if you want to see more, try [opening window 0](https://brulescorp.com/brwiki2/index.php?title=Open_Window) larger before running FileIO.
+Select a data file and press enter, and FileIO will then display a listview containing all the data in the data file. This list is sized based on the size of your main BR window (window 0) automatically to take up the full size available to it, so if you want to see more, try opening window 0 larger before running FileIO.
 
 At the top of the window is a filter box, and you can type anything you want in there and click "Refresh" and it will reread the data file, shortening the list to show only those records that match (case insensitive) what you have typed.
 
@@ -1050,13 +1049,13 @@ The first parameter is the only required parameter.
 
 #### fnBeginAudit
 
-The [FileIO Compare](https://brulescorp.com/brwiki2/index.php?title=AuditBR) routine is available and can be called from within your programs. To do so, call fnBeginAudit to mark the Start of the compare, then do whatever you need, then run fnCompare to compare everything that has changed between when you ran fnBeginAudit and when you ran fnCompare.
+The FileIO Compare routine is available and can be called from within your programs. To do so, call fnBeginAudit to mark the Start of the compare, then do whatever you need, then run fnCompare to compare everything that has changed between when you ran fnBeginAudit and when you ran fnCompare.
 
-See [the documentation](https://brulescorp.com/brwiki2/index.php?title=AuditBR#fnBeginAudit) for more details.
+See the documentation for more details.
 
 #### fnCompare
 
-See [the documentation](https://brulescorp.com/brwiki2/index.php?title=AuditBR#fnCompare) for more details.
+See the documentation for more details.
 
 #### fnCSVImport
 
@@ -1208,7 +1207,7 @@ This function copies any file, by opening it as an external file and reading and
 
 This fnCopyFile also has a progress bar that displays as the file is transferred, so the user knows your software is busy.
 
-This function works over Client Server. Under Client Server, specify @: at the beginning of your filename, to specify that the file is on the client. If the file is on the server, simply leave the @: off. See the chapter on [using BR's copy command under Client Server](https://brulescorp.com/brwiki2/index.php?title=Copy#Client_Server) for more details on the "@:".
+This function works over Client Server. Under Client Server, specify @: at the beginning of your filename, to specify that the file is on the client. If the file is on the server, simply leave the @: off. See the chapter on using BR's copy command under Client Server for more details on the "@:".
 
 This function's parameters and syntax are modeled off of the built in BR copy command, and like that one, this should work for local transfers, LAN transfers, or even internet transfers. This function will work better for internet transfers then the built in BR Copy Command, however.
 
@@ -1491,7 +1490,7 @@ The syntax is:
 *fnReadScreenSize(&Rows,&Cols;Window)*
 
 - Rows & Cols - returns the screen size in rows and columns.
-- Window - the window to interrogate. If not given, assumes [Window 0(https://brulescorp.com/brwiki2/index.php?title=Open_Window#Comments_and_Examples).
+- Window - the window to interrogate. If not given, assumes Window 0.
 
 #### fnBuildProcFile
 
@@ -1738,7 +1737,7 @@ If you don't specify LogLayout, the default filelay\logfile will be used. This w
 
 #### AnimateDataCrawler
 
-The sister library [ScreenIO](https://brulescorp.com/brwiki2/index.php?title=ScreenIO) has a feature that allows you to use an animation of a clock in your loading screens in your own programs. If you have [ScreenIO](https://brulescorp.com/brwiki2/index.php?title=ScreenIO) then FileIO will automatically detect it and use it to display a loading animation while the data in the data crawler loads.
+The sister library [ScreenIO has a feature that allows you to use an animation of a clock in your loading screens in your own programs. If you have ScreenIO then FileIO will automatically detect it and use it to display a loading animation while the data in the data crawler loads.
 
 Set AnimateDataCrawler to false (0) in your fileio.ini file to bypass the animations if you do have screenio but don't want to see the animations anyway.
 
@@ -1766,7 +1765,7 @@ Many FileIO Add-on packages are currently in the works.
 
 ### ScreenIO Library
 
-The [ScreenIO Library](https://brulescorp.com/brwiki2/index.php?title=ScreenIO_Library) is a sister library to the FileIO library. The ScreenIO library requires the FileIO library in order to run.
+The ScreenIO Library is a sister library to the FileIO library. The ScreenIO library requires the FileIO library in order to run.
 
 The ScreenIO library is a complete Rapid Application Design tool that enables you to implement custom screen functions anywhere in your exiting programs.
 
@@ -1776,7 +1775,7 @@ You can find out the latest information about the ScreenIO library in the Screen
 
 ### Audit BR
 
-The [Audit BR](https://brulescorp.com/brwiki2/index.php?title=AuditBR) developer tool makes a backup copy of your file layouts. Then you run some code you're trying to test, and finally, run Audit BR again, to get a report showing all the changes to any of your data files automatically.
+The Audit BR developer tool makes a backup copy of your file layouts. Then you run some code you're trying to test, and finally, run Audit BR again, to get a report showing all the changes to any of your data files automatically.
 
 AuditBR is now included directly in FileIO. To use it, select the layout from the list of layouts in the Datacrawler and press the "Compare" button.
 
@@ -1839,7 +1838,7 @@ The FileIO Library has been updated in Spring 2009 to provide several new functi
 
 ***Speed Increases:***
 
-Thanks to the BR [Profiler](https://brulescorp.com/brwiki2/index.php?title=Profiler), we have increased the speed of FileIO fnOpen function by ten times when running over a LAN and by 100 times when running over the internet using Client Server.
+Thanks to the BR Profiler, we have increased the speed of FileIO fnOpen function by ten times when running over a LAN and by 100 times when running over the internet using Client Server.
 
 In order to get the new Speed Upgrades, you will need to make sure that you use the latest copy of the fnOpen function in each one of your programs that use FileIO.
 

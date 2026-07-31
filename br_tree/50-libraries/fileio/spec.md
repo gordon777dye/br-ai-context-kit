@@ -1,7 +1,7 @@
 ---
 title: FileIO library
 file: spec.md
-source: fileio.brs (shipping source) + filelay/ layout format + brwiki2 FileIO_Library manual
+source: fileio.brs (shipping source) + filelay/ layout format + the FileIO_Library manual
 category: 50-libraries
 subcategory: 50-libraries/fileio
 kind: spec

@@ -1,7 +1,6 @@
 ---
 title: Common_Categories
 file: Common_Categories.md
-source: https://brulescorp.com/brwiki2/index.php?title=Common
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

@@ -1,7 +1,6 @@
 ---
 title: ERROR
 file: ERROR.md
-source: https://brulescorp.com/brwiki2/index.php?title=Error
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

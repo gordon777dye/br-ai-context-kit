@@ -1,7 +1,6 @@
 ---
 title: FKey_Error_Cond
 file: FKey_Error_Cond.md
-source: https://brulescorp.com/brwiki2/index.php?title=FKey
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

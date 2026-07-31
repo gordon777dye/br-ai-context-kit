@@ -1,7 +1,6 @@
 ---
 title: C
 file: C.md
-source: https://brulescorp.com/brwiki2/index.php?title=C
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

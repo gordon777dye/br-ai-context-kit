@@ -1,7 +1,6 @@
 ---
 title: GF
 file: GF.md
-source: https://brulescorp.com/brwiki2/index.php?title=GF
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

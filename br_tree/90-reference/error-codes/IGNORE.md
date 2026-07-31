@@ -1,7 +1,6 @@
 ---
 title: IGNORE
 file: IGNORE.md
-source: https://brulescorp.com/brwiki2/index.php?title=Ignore
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

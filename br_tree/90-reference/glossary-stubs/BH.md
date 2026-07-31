@@ -1,7 +1,6 @@
 ---
 title: BH
 file: BH.md
-source: https://brulescorp.com/brwiki2/index.php?title=BH
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

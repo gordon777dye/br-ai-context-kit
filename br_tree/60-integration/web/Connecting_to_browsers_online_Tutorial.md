@@ -1,7 +1,6 @@
 ---
 title: Connecting_to_browsers_online_Tutorial
 file: Connecting_to_browsers_online_Tutorial.md
-source: https://brulescorp.com/brwiki2/index.php?title=Connecting
 category: 60-integration
 subcategory: 60-integration/web
 kind: tutorial

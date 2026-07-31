@@ -1,7 +1,6 @@
 ---
 title: Break_(Disambiguation)
 file: Break_(Disambiguation).md
-source: https://brulescorp.com/brwiki2/index.php?title=Break
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

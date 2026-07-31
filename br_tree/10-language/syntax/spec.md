@@ -7,6 +7,7 @@ subcategory: 10-language/syntax
 kind: spec
 status: 2b           # reference base + br_tree enrichment (line continuation, name resolution); no conflicts
 recovered-fold: Keyword_Abbreviation (rules folded; full-table page RETAINED), DIAGRAM_CONVENTIONS (folded+pruned). 2 redirect-collision pages re-fetched; verbatim retained on the BR wiki
+corrections: "§Keyword abbreviations rewritten from the interpreter's own matcher (tokensub, and the syntax-tree keyword compare). The wiki appendix disagrees in 15 places and is stale — do not re-fold it over this section."
 related: [conditionals, other-flow, functions-udf, system-functions, expressions]
 keywords: [REM, comment, line-number, label, continuation, "!:", abbreviation, identifier, name-resolution]
 ---
@@ -151,16 +152,38 @@ is commented out with a bare `!`:
 <a id="abbreviations"></a>
 ### Keyword abbreviations
 Primary keywords (statement/command **names**) and secondary keywords (other words in a statement) may
-be abbreviated to a documented minimum (`DELETE`→`DEL`; any longer prefix also works — `DELE`, `DELET`).
-**Primary** abbreviations are unique; **secondary** ones are not — BR resolves them by context/position.
-Common minimums: `PRINT`→`PR`, `PRINT FIELDS`→`PR F`, `PRINT USING`→`PR U`, `INPUT`→`IN`,
-`INPUT FIELDS`→`IN F`, `LET`→`LE`, `LINPUT`→`LI`, `GOSUB`→`GOS`, `GOTO`→`GOT`, `EXECUTE`→`EXE`,
-`RINPUT`→`RI`, `MAT`→`M`, `NEXT`→`N`; the five `OPEN …` forms and both `READ` forms all share
-`OPE`/`REA`. Commands: `CHDIR`→`CH`/`CD`, `CONFIG`→`CON`, `COPY`→`COP`, `DIR`→`DI`, `LIST`→`LIS`,
-`RENAME`→`REN`, `RENUM`→`RENU`, `STATUS`→`ST`, `TYPE`→`TY`. **Caution:** BR auto-expands abbreviations
-**only inside program statements** — never in commands, procedure files, `BRConfig.sys`, or `EXECUTE`
-literal strings, and never inside literals — so **spell keywords out in full** in those places. Full
-appendix (every command/statement minimum): [Keyword_Abbreviation](Keyword_Abbreviation.md).
+be abbreviated (`DELETE`→`DEL`; any longer prefix also works — `DELE`, `DELET`). **The two are matched
+by different mechanisms, and the minimum differs accordingly.**
+
+**Primary keywords — shortest *unique* prefix.** BR looks the token up in the keyword table for its
+position, scanning only the entries that share its first letter; two partial matches cancel to "not a
+keyword" rather than resolving to the first of them. An exact whole-word match wins outright even where
+a longer keyword extends it (`FRE` is the FRE command, not an abbreviation of `FREE`). Common minimums:
+`PRINT`→`PR`, `PRINT FIELDS`→`PR F`, `PRINT USING`→`PR U`, `INPUT`→`IN`, `INPUT FIELDS`→`IN F`,
+`LET`→`LE`, `LINPUT`→`LIN`, `GOSUB`→`GOS`, `GOTO`→`GOT`, `EXECUTE`→`EXE`, `RINPUT`→`RI`, `MAT`→`M`,
+`NEXT`→`N`, `WRITE`→`W`, `PAUSE`→`PA`; the five `OPEN …` forms and both `READ` forms all share
+`OPE`/`REA`. Commands: `CHDIR`→`CH`, `CONFIG`→`CON`, `COPY`→`COP`, `DIR`→`DIR`, `LIST`→`LIS`,
+`RENAME`→`RENA`, `RENUM`→`RENU`, `STATUS`→`ST`, `TYPE`→`TY`, `DEL`→`DEL`, `FREE`→`FREE`.
+
+**Secondary keywords — any prefix.** Where a statement's syntax admits a particular clause keyword, BR
+compares the token against **that one keyword** and accepts any non-empty prefix of it; it does not
+consult the table, so uniqueness never arises. That is what "secondary abbreviations are not unique —
+BR uses the context and placement of the keyword" means. `SEARCH=` shows the difference at its widest:
+it cannot be shortened at all in a table lookup, `SEARCH` being equally a prefix of `SEARCH>=`, yet a
+bare `S` is accepted where the syntax expects `SEARCH=`. Two exceptions: a clause keyword in an `ON`
+statement needs at least three characters, and for the `=`-suffixed forms BR takes `=>` as `>=` and
+needs no space after the `=`.
+
+**Function names never abbreviate** — always the full spelling.
+
+**Caution:** BR auto-expands abbreviations **only inside program statements** — never in commands,
+procedure files, `BRConfig.sys`, or `EXECUTE` literal strings, and never inside literals — so **spell
+keywords out in full** in those places. Full appendix (every command/statement minimum):
+[Keyword_Abbreviation](Keyword_Abbreviation.md) — but **the appendix is stale in fifteen places** and
+the minimums above supersede it. It gives `CD` for `ChDir`, which is not a prefix of the word and which
+the interpreter has no way to match; `DE`, `DI`, `FR`, `REN` and `LI` have since gone ambiguous against
+`DEBUG`, `DISPLAY`, `FRE`, `RENUM` and `LIBRARY`; and nine entries are more conservative than BR now
+is. The page is retained verbatim as wiki source, so do not "correct" this section back to it.
 
 <a id="diagram-conventions"></a>
 ### Reading the manual's syntax diagrams

@@ -1,7 +1,6 @@
 ---
 title: Index_Facility
 file: Index_Facility.md
-source: https://brulescorp.com/brwiki2/index.php?title=Index
 category: 30-io-file
 subcategory: 30-io-file/keys-indexes
 kind: statement

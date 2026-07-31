@@ -1,7 +1,6 @@
 ---
 title: PRINTER_LIST
 file: PRINTER_LIST.md
-source: https://brulescorp.com/brwiki2/index.php?title=Printer
 category: 70-commands
 subcategory: 70-commands/information
 kind: command

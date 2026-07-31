@@ -1,7 +1,6 @@
 ---
 title: Help_Key
 file: Help_Key.md
-source: https://brulescorp.com/brwiki2/index.php?title=Help
 category: 90-reference
 subcategory: 90-reference/keyboard-shortcuts
 kind: shortcut

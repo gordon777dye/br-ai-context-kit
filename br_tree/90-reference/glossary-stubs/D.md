@@ -1,7 +1,6 @@
 ---
 title: D
 file: D.md
-source: https://brulescorp.com/brwiki2/index.php?title=D
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

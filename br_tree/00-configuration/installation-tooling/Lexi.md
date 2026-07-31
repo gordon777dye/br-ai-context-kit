@@ -1,7 +1,6 @@
 ---
 title: Lexi
 file: Lexi.md
-source: https://brulescorp.com/brwiki2/index.php?title=Lexi
 category: 00-configuration
 subcategory: 00-configuration/installation-tooling
 kind: reference

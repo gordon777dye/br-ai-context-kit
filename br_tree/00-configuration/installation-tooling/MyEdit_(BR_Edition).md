@@ -1,7 +1,6 @@
 ---
 title: MyEdit_(BR_Edition)
 file: MyEdit_(BR_Edition).md
-source: https://brulescorp.com/brwiki2/index.php?title=MyEdit
 category: 00-configuration
 subcategory: 00-configuration/installation-tooling
 kind: config-directive

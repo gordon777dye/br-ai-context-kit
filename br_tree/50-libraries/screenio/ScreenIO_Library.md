@@ -1,7 +1,7 @@
 ---
 title: ScreenIO Library (full wiki manual capture)
 file: ScreenIO_Library.md
-source: https://brulescorp.com/brwiki2/index.php?title=ScreenIO_Library (Sage AX / Gabriel Bakker) — retrieved 2026-06-19
+source: ScreenIO Library manual (Sage AX / Gabriel Bakker) — retrieved 2026-06-19
 category: 50-libraries
 subcategory: 50-libraries/screenio
 kind: reference
@@ -12,7 +12,7 @@ related: [screenio, library-facility]
 # ScreenIO Library — full wiki manual
 
 > **Capture note.** This is a local copy of the live wiki manual
-> [ScreenIO Library](https://brulescorp.com/brwiki2/index.php?title=ScreenIO_Library) (~206 sections, by
+> ScreenIO Library (~206 sections, by
 > **Sage AX / Gabriel Bakker**), retrieved 2026-06-19 via WebFetch. WebFetch runs each page through a
 > summarizing model, so this is a **faithful capture, not a byte-verbatim transcript** — quoted passages
 > are exact, but connective prose may be lightly condensed, and the long Designer-UI sections are more
@@ -568,6 +568,6 @@ Change Requests* (a per-version implemented-features log).
 ## Attribution
 
 ScreenIO Library © Sage AX (Gabriel Bakker). Source manual:
-<https://brulescorp.com/brwiki2/index.php?title=ScreenIO_Library>. Captured here for local development
+. Captured here for local development
 reference, alongside the source-derived
 [Function Reference](ScreenIO_Function_Reference.md) and [Data Model](ScreenIO_Data_Model.md).

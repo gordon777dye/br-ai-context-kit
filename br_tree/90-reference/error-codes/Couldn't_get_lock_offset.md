@@ -1,7 +1,6 @@
 ---
 title: Couldn't_get_lock_offset
 file: Couldn't_get_lock_offset.md
-source: https://brulescorp.com/brwiki2/index.php?title=Couldn't
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

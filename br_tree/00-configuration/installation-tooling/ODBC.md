@@ -1,7 +1,6 @@
 ---
 title: ODBC
 file: ODBC.md
-source: https://brulescorp.com/brwiki2/index.php?title=ODBC
 category: 00-configuration
 subcategory: 00-configuration/installation-tooling
 kind: config-directive

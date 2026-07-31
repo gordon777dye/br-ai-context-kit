@@ -1,7 +1,6 @@
 ---
 title: Display_Menu
 file: Display_Menu.md
-source: https://brulescorp.com/brwiki2/index.php?title=Display
 category: 20-io-screen
 subcategory: 20-io-screen/controls
 kind: statement

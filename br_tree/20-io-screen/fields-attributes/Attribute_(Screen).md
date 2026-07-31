@@ -1,7 +1,6 @@
 ---
 title: Attribute_(Screen)
 file: Attribute_(Screen).md
-source: https://brulescorp.com/brwiki2/index.php?title=Attribute
 category: 20-io-screen
 subcategory: 20-io-screen/fields-attributes
 kind: statement

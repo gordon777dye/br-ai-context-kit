@@ -1,7 +1,6 @@
 ---
 title: PROCERR
 file: PROCERR.md
-source: https://brulescorp.com/brwiki2/index.php?title=ProcErr
 category: 90-reference
 subcategory: 90-reference/error-codes
 kind: error-code

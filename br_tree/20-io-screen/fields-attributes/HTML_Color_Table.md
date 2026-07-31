@@ -1,7 +1,6 @@
 ---
 title: HTML_Color_Table
 file: HTML_Color_Table.md
-source: https://brulescorp.com/brwiki2/index.php?title=HTML
 category: 20-io-screen
 subcategory: 20-io-screen/fields-attributes
 kind: statement

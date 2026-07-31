@@ -1,7 +1,6 @@
 ---
 title: MSG
 file: MSG.md
-source: https://brulescorp.com/brwiki2/index.php?title=Msg
 category: 70-commands
 subcategory: 70-commands/information
 kind: command

@@ -1,7 +1,6 @@
 ---
 title: Multi-User_Considerations_Tutorial
 file: Multi-User_Considerations_Tutorial.md
-source: https://brulescorp.com/brwiki2/index.php?title=Multi-User
 category: 30-io-file
 subcategory: 30-io-file/file-model
 kind: tutorial

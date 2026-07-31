@@ -1,7 +1,6 @@
 ---
 title: Programming_Language
 file: Programming_Language.md
-source: https://brulescorp.com/brwiki2/index.php?title=Programming_Language
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept

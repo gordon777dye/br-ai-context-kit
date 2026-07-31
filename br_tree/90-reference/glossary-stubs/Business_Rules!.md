@@ -1,7 +1,6 @@
 ---
 title: Business_Rules!
 file: Business_Rules!.md
-source: https://brulescorp.com/brwiki2/index.php?title=Business
 category: 90-reference
 subcategory: 90-reference/glossary-stubs
 kind: concept
