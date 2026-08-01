@@ -9,6 +9,7 @@ status: 2b           # reference base; br_tree pages verified (all corroborate);
 corrections:
   - "Precedence table corrected against BR itself, by running the expressions rather than reading about them. Three errors. (1) `^` was listed with `**` as exponentiation; BR rejects `^` with error 1026 — the expression parser in command3.cpp has no case for it at all, and the runtime's EXCL_OR case is commented out. (2) `NOT` and `~` were on one row as equivalent; they are not. BR's own precedence table (table5x, tblopr.cpp) puts `~` at 13 with unary minus and `NOT` at 5, on opposite sides of the relational operators, and it shows: `PRINT NOT 0==5` gives 1 while `PRINT ~ 0==5` gives 0. (3) The `%`, `<<` and `>>` spellings were undocumented; they compile and silently evaluate to 0, because the compiler emits the opcode and run.cpp has no evaluator case for MODULO and has SHIFT_LEFT/SHIFT_RIGHT commented out. Levels renumbered to suit. Caution for anyone re-folding this: the opcode list in basoprcmn.h and the precedence values in table5x describe more operators than the parser accepts or the runtime evaluates, so neither is evidence that a spelling works."
   - "AND and OR merged onto one precedence level, and §AND and OR short-circuit added. The table previously put AND above OR as C and most other languages do. BR does not: the two share a level and a logical chain runs strictly left to right, stopping as soon as the running value settles the outcome (true meeting OR, or false meeting AND). Confirmed against a running BR: `1 OR 0 AND 0` gives 1 because nothing after `1 OR` is evaluated, while `(1 OR 0) AND 0` gives 0, and `0 OR 1 AND 0` gives 0. BR's own table5x gave both the value 4 and was right; the separate levels were the error. Skipped terms are not evaluated at all, so a function call in an abandoned branch never runs."
+  - "Three corrections and one addition from porting BR's expression parser (brls phase 4). (1) §Logical operators still read `parentheses -> NOT -> AND -> OR`, contradicting the precedence table in the same document, which had already been corrected to put AND and OR on one level; it also listed `~` with `NOT`, which §not-vs-tilde had already shown to be wrong. (2) §String expressions called concatenation `precedence level 5` where the table says 6, a leftover from renumbering the table to twelve levels. (3) §associativity added: `**` associates LEFT in BR, so `2**3**2` is 64 and not 512, and unary minus binds tighter than `**`, so `-2**2` is 4 and not -4. Both were derived from the C first and then confirmed against a running BR, which printed 64 and 4. Both follow from table5x (tblopr.cpp) giving `~` and unary `-` the value 13 against RAISE's 9, and from stack() (command3.cpp) breaking out of its unstacking loop only at value 13 — the unary level is the sole right-associative one. Neither grouping was stated anywhere in the kit, and both are the opposite of what C, Python and most calculators do."
 related: [assignment, conditionals, data-types, declaration]
 keywords: [AND, OR, NOT, precedence, ":=", operators]
 ---
@@ -73,12 +74,14 @@ first unequal pair, and are **case-sensitive**. Operators are *binary* (two oper
 <a id="logical-operators"></a>
 ### Logical operators
 `NOT`/`~`, `AND`/`&&`, `OR`/`||` combine relational expressions. Precedence within a logical
-expression: parentheses → `NOT` → `AND` → `OR`, left to right within a level. See the
+expression: parentheses → `NOT` → `AND`/`OR`, which share one level and run **strictly left to
+right** ([below](#short-circuit)). `~` is not a synonym for `NOT` and does not belong on this list
+— it binds tighter than the comparisons rather than looser ([above](#not-vs-tilde)). See the
 [truth tables](#truth-tables).
 
 <a id="concatenation"></a>
 ### String expressions
-- **Concatenation** joins strings with `&` (precedence level 5):
+- **Concatenation** joins strings with `&` (precedence level 6):
   `C$ = A$ & " " & B$`. As an operator it forms a `<string-expression>`.
 - **Substring extraction** reads a slice with 1-based, inclusive positions —
   `S$(2:4)` yields characters 2–4; `INF` denotes beyond end-of-string
@@ -105,6 +108,21 @@ expression: parentheses → `NOT` → `AND` → `OR`, left to right within a lev
 | 10 | `AND` `&&` `OR` `\|\|` | Logical AND/OR — **one level, strictly left to right**, and they short-circuit. See below. | `A=1 OR B=1 AND C=2` |
 | 11 | `=` | Assignment (`LET` / non-conditional context) | `LET X = 5` |
 | 12 | `:=` | Forced assignment (assigns even inside a conditional) | `IF (X := 5) > 2 THEN …` |
+
+<a id="associativity"></a>
+**Two groupings where BR differs from nearly every other language**, both of them consequences of
+the table above rather than special cases:
+
+```business-rules
+PRINT 2**3**2       ! 64, not 512 — `**` groups LEFT: (2**3)**2
+PRINT -2**2         ! 4,  not -4  — unary binds TIGHTER than `**`: (-2)**2
+```
+
+Both confirmed against a running BR. Operators associate **left to right within a level**, and
+`**` is not excepted: BR's operator stacker keeps a pending operator stacked only at the unary
+level, so exponentiation chains left like subtraction does. And unary `-` and `~` sit *above* `**` in the table, not below it, so a sign
+attaches to the base before the exponent applies. Both readings are the opposite of C, Python and
+most calculators. Parenthesise when either could be meant.
 
 <a id="not-vs-tilde"></a>
 **`~` and `NOT` are not interchangeable.** Both negate, but they sit on opposite sides of the

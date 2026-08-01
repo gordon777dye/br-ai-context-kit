@@ -11,10 +11,12 @@ description: The language rules that bite newcomers (and LLMs trained on other B
 
 Two kinds of content, both load-bearing:
 
-1. **§1 — core language rules.** Things the written spec states clearly but that read as
-   surprising if you're coming from another BASIC or from Python/C-family languages. Per-statement
-   detail is in [`statement-semantics.md`](statement-semantics.md) (indexed by
-   [`topics.json`](topics.json)); full detail is in [`../br_tree/`](../br_tree/).
+1. **§1 — core language rules.** Things that read as surprising if you're coming from another
+   BASIC or from Python/C-family languages. Most are stated plainly in the written spec; a
+   handful were **not written down anywhere** until they were recovered from BR's own tables and
+   parser while building the language server, and those are flagged as such where the distinction
+   matters. Per-statement detail is in [`statement-semantics.md`](statement-semantics.md) (indexed
+   by [`topics.json`](topics.json)); full detail is in [`../br_tree/`](../br_tree/).
 2. **§2 onward — runtime gotchas found empirically, not written down anywhere.** These came from
    actually developing and testing programs. **Treat these as "confirmed in at least one BR
    build/config, verify before assuming universal"** — but treat them as real: each was isolated
@@ -49,6 +51,25 @@ Two kinds of content, both load-bearing:
   raise **error 1026**. Worse, **`%`, `<<` and `>>` compile silently and always evaluate to `0`** —
   `PRINT 17%5` prints `0`, with no error and no warning, because BR's compiler emits an opcode its
   runtime has no evaluator for. Treat all six as non-existent.
+- **Everything associates left — `**` included — and unary binds *tighter* than `**`.** Two
+  groupings where BR parts company with C, Python and most calculators:
+
+  ```
+  00010 PRINT 2**3**2      ! 64, not 512   — groups (2**3)**2
+  00020 PRINT -2**2        ! 4,  not -4    — groups (-2)**2
+  ```
+
+  Both confirmed against a running BR. Exponentiation chains left like subtraction does, and a
+  sign attaches to the base before the exponent applies. Neither is a special case: BR's precedence
+  table puts `~` and unary `-` *above* `**`, and its operator stacker treats only that unary level
+  as right-associative. Parenthesise whenever either could be meant.
+- **Assignment binds looser than every operator, so it takes the whole right-hand side.**
+  `LET X = A OR B AND C` assigns the entire condition, which is what you want and worth knowing
+  why: BR never consults a precedence for `=` at all, it pushes an implied open parenthesis after
+  it, so nothing on the right can bind past it. That is also what makes chained assignment work —
+  `LET SUMA = SUMB = SUMC = 0` sets all three.
+- **`NOT` cannot be repeated.** `NOT NOT X` is a compile error, not a double negation: BR stacks
+  the operator once and rejects a second. Use `~ ~ X`, or drop both.
 - **String variables end in `$`**; size is declared `DIM NAME$*30`. Arrays are 1-based. Default
   string max (un-`DIM`'d) is **18 characters** — see §2, this is the single biggest source of
   silent runtime failure in practice.
@@ -127,6 +148,48 @@ Two kinds of content, both load-bearing:
   (The two statements are documented separately:
   [RESTORE (file)](statement-semantics.md#restore) and
   [DATA / READ / RESTORE](statement-semantics.md#data-read-restore).)
+- **A `!` comment ends only at `!:`, never at a bare `:`.** Everything after the `!` is prose to the
+  end of the line unless a `!:` closes it, so `! Convert H:M:S to seconds` is one comment and the
+  colons in it are text. (`!:` is not a special marker: it is an empty comment followed by an
+  ordinary statement separator, which is exactly why it doubles as the sub-line continuation.) A
+  `REM` is stronger still — nothing but the end of the line closes it.
+- **`DATA` items are not expressions, and the ordinary lexical rules do not apply inside one.** An
+  item that does not open with a quote runs **verbatim to the next comma**, so a backslash, an
+  apostrophe, a stray double quote, an operator or a space are all just data:
+
+  ```
+  00010 DATA "Scanning Program",bcp\scanser
+  00020 DATA "340 HENRY FORD II",3001 MILLER ROAD"
+  ```
+
+  Both compile. `DATA` must also be the **first statement on its line** and owns the rest of it.
+- **`MAT A(n)` with no `=` is a statement, not an unfinished one.** It **redimensions** the array at
+  runtime. `MAT A = (0)` assigns, `MAT A(50)` resizes, and `MAT A(50) = B` does both.
+- **A `(…)` may follow a `(…)`, and a slice may follow anything that yields a string.** `FILE$(0)(1:3)`
+  subscripts and then slices; `CONTEXT$(C_DISK)(1:2)` is idiomatic. Only a *name* can be subscripted
+  or called, so a second `(…)` in a chain must be a `start:end` slice.
+- **In a `DIM`, `*length` goes after the subscript and sizes each element.** `DIM FUNCTION$(27)*18`
+  is 27 strings of 18 characters — not `DIM FUNCTION$*18(27)`. The same `*length` on a scalar is
+  `DIM NAME$*30`, and in either position it is a declaration, not a multiplication.
+- **`EXIT DO` leaves a `DO` loop and is not the `EXIT` statement.** BR reads the word after `EXIT`
+  and treats it as a loop exit only when it is `DO` (or `FOR`, or `SELECT`). Bare `EXIT` naming an
+  error-exit group is a different statement and must be alone on its line.
+- **`ELSE` terminates the statement before it**, like `:` and `,` do — you never need a colon in
+  front of it. It also stands alone at the head of a statement, which is what the multi-line form
+  is built from:
+
+  ```
+  00100 IF X>0 THEN !:
+           PRINT "positive" !:
+        ELSE !:
+           PRINT "zero or less"
+  ```
+- **`FORM` and `USING` are a sub-language with their own rules.** Inside one, a comma does not
+  always separate: `PIC(ZZZ,ZZZ.##)` and `DATE(mm/dd/yy)` run **verbatim to their closing `)`**, so
+  the comma and the `#`s are part of the picture. A field width may be a **variable** rather than a
+  literal — `FORM POS POSITION, C LENGTH` is ordinary BR — and a `n*` prefix repeats a
+  specification, where `n` may also be a variable (`ROWS*C COLUMNS`). Spellings are matched
+  longest-first, so `DATE(` is not read as `D`.
 - **`LIBRARY "name":` with a library name but no function list LOADS that library immediately —
   it does not detach a linkage.** The only way to fully detach a library linkage is to end the main
   program. Don't infer a "no functions ⇒ unlink" meaning from the empty list.
