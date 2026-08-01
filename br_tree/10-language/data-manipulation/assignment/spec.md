@@ -6,6 +6,8 @@ category: 10-language
 subcategory: 10-language/data-manipulation/assignment
 kind: spec
 status: 2b           # reference base + br_tree enrichment (multiple assignment, += compound ops, append/prepend idioms); no conflicts
+corrections:
+  - "DATA's value syntax added. The spec gave `DATA <value> [',' <value>]*` and never defined <value>, which left the impression that a value is an expression. It is not: BR's DATA handler (command5.cpp, case DATA_PRI) copies any value not opening with a quote verbatim to the next comma, so `DATA \"x\",bcp\\scanser` and `DATA ...,3001 MILLER ROAD\"` are both valid and their second values contain a backslash and a lone double quote. Also records that DATA must be the first statement on its line (the handler rejects a prior clause with BRENOMULTICLAUSE) and owns the rest of it."
 related: [expressions, declaration, data-types, system-functions]
 keywords: [LET, MAT, DATA, READ, RESTORE, ":="]
 ---
@@ -37,6 +39,9 @@ operator `:=`, `MAT` array operations, substring mutation, and the internal data
 READ <variable-list>            -- from the internal data table
 DATA <value> [',' <value>]*
 RESTORE [<line-ref>]
+
+<value> ::= <quoted-literal>   -- '"' or "'" delimited; a doubled quote embeds one
+          | <unquoted-text>    -- everything up to the next comma, taken verbatim
 ```
 
 <a id="semantics"></a>
@@ -102,6 +107,22 @@ result (but cannot exceed `DIM`). Idioms: **append** with `X$(inf:0)=…` (faste
 line-number order). `READ` pulls the next value(s) into variables, advancing the pointer.
 `RESTORE` resets the pointer (optionally to a specific `DATA` line). `MAT READ` fills a whole
 array at once.
+
+**A `DATA` value is not an expression, and the language's ordinary lexical rules do not apply
+inside one.** A value that does not begin with a quote is taken **verbatim to the next comma** —
+so a backslash, an apostrophe, a stray double quote, an operator or a space are all just data:
+
+```business-rules
+00010 DATA "Scanning Program",bcp\scanser        ! second value is  bcp\scanser
+00020 DATA "340 HENRY FORD II",3001 MILLER ROAD" ! second value keeps its lone quote
+```
+
+A value that *does* begin with `"` or `'` is a quoted literal with the usual doubling rule, and
+only a comma, a `!` comment or the end of the line may follow it — anything else is an error.
+
+Two consequences worth stating: **`DATA` must be the first statement on its line** (a second
+clause raises "invalid operation in multiclause statement"), and it **owns the rest of that
+line**. A tool that lexes `DATA` items by the general rules will report errors in valid programs.
 
 <a id="examples"></a>
 ## Examples

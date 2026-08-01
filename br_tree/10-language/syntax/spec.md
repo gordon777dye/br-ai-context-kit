@@ -7,7 +7,10 @@ subcategory: 10-language/syntax
 kind: spec
 status: 2b           # reference base + br_tree enrichment (line continuation, name resolution); no conflicts
 recovered-fold: Keyword_Abbreviation (rules folded; full-table page RETAINED), DIAGRAM_CONVENTIONS (folded+pruned). 2 redirect-collision pages re-fetched; verbatim retained on the BR wiki
-corrections: "§Keyword abbreviations rewritten from the interpreter's own matcher (tokensub, and the syntax-tree keyword compare). The wiki appendix disagrees in 15 places and is stale — do not re-fold it over this section."
+corrections:
+  - "§Keyword abbreviations rewritten from the interpreter's own matcher (tokensub, and the syntax-tree keyword compare). The wiki appendix disagrees in 15 places and is stale — do not re-fold it over this section."
+  - "§Comments corrected. The section said a `!` comment ends at the end of the current statement, and its example asserted that `LET X = 5 ! set initial value :LET Y = X * 2` still assigns Y. It does not. BR's compiler (command6.cpp, the comment copy loop) scans past every `:` and stops only where the character before the colon is `!` — that is, only at `!:`. A plain colon inside a comment is comment text. The corpus settles it beyond argument: 381 comment bodies in the QSMRP application alone contain a bare colon, `! ***** Convert H:M:S To Seconds` among them, and every one of those programs compiles. REM is unchanged and runs to end of line, but the reason it differs is now stated: the same loop skips the `!:` check for REM."
+  - "NEXT removed from the intrinsics-outside-the-tables list in §Name resolution, and from that section's DIM example. It is not an intrinsic: it resolves in neither table6k nor table7k, and unlike ABS/INT/SGN (command3.cpp, gated on a following open paren) and AIDX/DIDX (command5.cpp, MAT path) the expression parser has no match for it. It is a keyword — table3k for FOR/NEXT, table4k for record positioning. The DIM line stayed true after the edit (no keyword in BR is reserved) but it was illustrating intrinsic-shadowing with something that is not an intrinsic."
 related: [conditionals, other-flow, functions-udf, system-functions, expressions]
 keywords: [REM, comment, line-number, label, continuation, "!:", abbreviation, identifier, name-resolution]
 ---
@@ -51,13 +54,17 @@ Statement separators: `:` or `!:` join multiple statements on one physical line.
 <a id="comments"></a>
 ### Comments — `!` vs `REM`
 Both are non-executable and preserve case. They differ in **scope**:
-- **`!`** ends at the end of the current **statement**. A later statement on the same line
-  (after `:` / `!:`) still runs:
+- **`!`** runs to the end of the line, **unless** it is ended by an explicit `!:`. A plain `:`
+  inside a comment is comment text and does **not** start a new statement:
   ```business-rules
-  00100 LET X = 5 ! set initial value :LET Y = X * 2   ! Y is still assigned
+  00100 LET X = 5 ! set initial value :LET Y = X * 2   ! all of this is comment; Y is NOT assigned
+  00110 LET X = 5 ! set initial value !: LET Y = X * 2 ! Y IS assigned — !: ends the comment
   ```
+  `!:` is the only thing that closes a comment, which is why it doubles as the
+  [line-continuation marker](#line-continuation): a bare `!:` is an empty comment followed by a
+  statement separator.
 - **`REM`** ends at the end of the **line** — everything after it, including `:`-joined
-  statements, is comment text:
+  statements, is comment text. Unlike `!`, **not even `!:` ends it**:
   ```business-rules
   00200 REM whole line is a comment : LET Y = 5        ! Y is NOT assigned
   ```
@@ -80,11 +87,11 @@ the token eventually resolves as a variable.
 
 This is the general rule behind BR's positional lexicon — the same mechanism that lets a label or
 variable reuse a statement-keyword spelling. Its sharpest consequence involves the intrinsics that
-live outside `table6k`/`table7k` (`ABS`, `INT`, `SGN`, `AIDX`, `DIDX`, `NEXT`), which are
+live outside `table6k`/`table7k` (`ABS`, `INT`, `SGN`, `AIDX`, `DIDX`), which are
 therefore not reserved:
 
 ```business-rules
-00010 DIM AIDX, NEXT, ABS, SGN   ! legal — no arguments supplied, so these are names
+00010 DIM AIDX, ABS, SGN         ! legal — no arguments supplied, so these are names
 00020 LET ABS = 7
 00030 PRINT ABS                  ! 7        — the variable
 00040 PRINT ABS(3)               ! 3        — the intrinsic, in the same program

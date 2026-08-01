@@ -6,6 +6,8 @@ category: 10-language
 subcategory: 10-language/data-manipulation/data-types
 kind: spec
 status: 2b           # reference base + br_tree enrichment (hex / null); no conflicts
+corrections:
+  - "Numeric-literal BNF tightened and the compiler's written-form limits added, from command3.cpp's literal scanner. The BNF used <digit>* throughout, admitting a literal with no digits at all, and gave no limits; the compiler rejects more than 15 digits before the point, more than 9 after it, and an exponent over 307 (MAXEXP), and requires at least one digit in an exponent. The string-literal BNF did not show the doubled-quote form, though the examples below already did."
 related: [declaration, assignment, expressions]
 keywords: [numeric, string, hexadecimal, null, inf]
 ---
@@ -22,11 +24,11 @@ string. Declaring a variable's storage (string max length, arrays) lives in
 
 ```bnf
 <numeric-literal> ::= <integer> | <floating-point>
-<integer>        ::= [+|-] <digit>*
-<floating-point> ::= [+|-] <digit>* '.' <digit>* [ E [+|-] <digit>* ]
+<integer>        ::= [+|-] <digit>+
+<floating-point> ::= [+|-] { <digit>+ [ '.' <digit>* ] | '.' <digit>+ } [ E [+|-] <digit>+ ]
 
-<string-literal> ::= '"' <any-char-except-quote>* '"'
-                   | "'" <any-char-except-apostrophe>* "'"
+<string-literal> ::= '"' { <any-char-except-quote> | '""' }* '"'
+                   | "'" { <any-char-except-apostrophe> | "''" }* "'"
 ```
 
 <a id="semantics"></a>
@@ -35,9 +37,23 @@ string. Declaring a variable's storage (string max length, arrays) lives in
 <a id="numeric"></a>
 ### Numeric values
 - Optional leading sign (`+`/`-`), digits `0-9`, optional decimal point; **sign must be first**.
+  (The compiler reads the sign as a unary operator rather than as part of the literal, so a tool
+  that tokenizes BR will see `-5` as two tokens.)
 - **No commas, no currency symbols** in a constant (use `PIC` for display formatting).
 - Up to **15 significant digits**; scientific (E) notation supported.
 - Kinds: **integer** (no fraction), **fixed-point** (has a fraction), **scientific** (E notation).
+- **Limits the compiler enforces on the written form**, each of which rejects the program rather
+  than rounding it:
+
+  | Part | Limit | Note |
+  |---|---|---|
+  | digits before the point | **15** | `PRECISION`, the significant digits of a double |
+  | digits after the point | **9** | independent of the 15 above |
+  | exponent magnitude | **307** | `MAXEXP`; matches `inf ≈ 1E+307` below |
+
+  A literal may open with the decimal point (`.5`), so digits are required on one side or the
+  other but not both. `1E` is **not** a literal with an empty exponent — the exponent needs at
+  least one digit, so that text is the literal `1` followed by the name `E`.
 
 <a id="inf"></a>
 ### Special constant `inf`

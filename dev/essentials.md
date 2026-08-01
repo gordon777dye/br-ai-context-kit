@@ -41,8 +41,8 @@ Two kinds of content, both load-bearing:
   present**. Present ⇒ it *is* that keyword/function. Absent ⇒ BR moves on and the token ends up a
   variable. This is the machinery behind BR's positional lexicon, and it does **not** work the way
   a C/Python/JS-trained instinct expects — *declaring a name does not shadow anything.* Only the
-  126 names in `table6k`/`table7k` are reserved; six intrinsics resolved outside those tables
-  (`ABS`, `INT`, `SGN`, `AIDX`, `DIDX`, `NEXT`) are not, so all of this is true at once:
+  126 names in `table6k`/`table7k` are reserved; five intrinsics resolved outside those tables
+  (`ABS`, `INT`, `SGN`, `AIDX`, `DIDX`) are not, so all of this is true at once:
 
   ```
   00010 DIM ABS          ! legal: no argument supplied, so it is a name
