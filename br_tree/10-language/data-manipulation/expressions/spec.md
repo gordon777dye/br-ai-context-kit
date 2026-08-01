@@ -6,6 +6,9 @@ category: 10-language
 subcategory: 10-language/data-manipulation/expressions
 kind: spec
 status: 2b           # reference base; br_tree pages verified (all corroborate); corrected 2026-07-03: MOD is a function, not an infix operator (removed from precedence table); no conflicts
+corrections:
+  - "Precedence table corrected against BR itself, by running the expressions rather than reading about them. Three errors. (1) `^` was listed with `**` as exponentiation; BR rejects `^` with error 1026 — the expression parser in command3.cpp has no case for it at all, and the runtime's EXCL_OR case is commented out. (2) `NOT` and `~` were on one row as equivalent; they are not. BR's own precedence table (table5x, tblopr.cpp) puts `~` at 13 with unary minus and `NOT` at 5, on opposite sides of the relational operators, and it shows: `PRINT NOT 0==5` gives 1 while `PRINT ~ 0==5` gives 0. (3) The `%`, `<<` and `>>` spellings were undocumented; they compile and silently evaluate to 0, because the compiler emits the opcode and run.cpp has no evaluator case for MODULO and has SHIFT_LEFT/SHIFT_RIGHT commented out. Levels renumbered to suit. Caution for anyone re-folding this: the opcode list in basoprcmn.h and the precedence values in table5x describe more operators than the parser accepts or the runtime evaluates, so neither is evidence that a spelling works."
+  - "AND and OR merged onto one precedence level, and §AND and OR short-circuit added. The table previously put AND above OR as C and most other languages do. BR does not: the two share a level and a logical chain runs strictly left to right, stopping as soon as the running value settles the outcome (true meeting OR, or false meeting AND). Confirmed against a running BR: `1 OR 0 AND 0` gives 1 because nothing after `1 OR` is evaluated, while `(1 OR 0) AND 0` gives 0, and `0 OR 1 AND 0` gives 0. BR's own table5x gave both the value 4 and was right; the separate levels were the error. Skipped terms are not evaluated at all, so a function call in an abandoned branch never runs."
 related: [assignment, conditionals, data-types, declaration]
 keywords: [AND, OR, NOT, precedence, ":=", operators]
 ---
@@ -91,20 +94,98 @@ expression: parentheses → `NOT` → `AND` → `OR`, left to right within a lev
 | Level | Operators | Description | Example |
 |------:|-----------|-------------|---------|
 | 1 | `()` `[]` | Grouping, array indexing | `(5+3)*2`, `ARRAY(5)` |
-| 2 | `^` `**` | Exponentiation | `2**3` = 8 |
-| 3 | `*` `/` | Multiplication, division | `10/2`, `8/2` |
-| 4 | `+` `-` | Addition, subtraction | `5+3`, `10-7` |
-| 5 | `&` | String concatenation | `"Hi" & " there"` |
-| 6 | `==` `~=` `<>` `><` `<` `>` `<=` `=<` `>=` `=>` | Comparison / relational | `X > 10` |
-| 7 | `=` | *is equal to* (comparison; inside `IF`/`WHILE`/`UNTIL`) | `IF X = 5 THEN …` |
-| 8 | `NOT` `~` | Logical NOT (negation) | `NOT FOUND` |
-| 9 | `AND` `&&` | Logical AND | `X>0 AND Y>0` |
-| 10 | `OR` `\|\|` | Logical OR | `A=1 OR B=1` |
+| 2 | `~` unary `-` | **Boolean NOT**, negation — binds tighter than comparison | `~0` = 1 |
+| 3 | `**` | Exponentiation (**not** `^` — see below) | `2**3` = 8 |
+| 4 | `*` `/` | Multiplication, division | `10/2`, `8/2` |
+| 5 | `+` `-` | Addition, subtraction | `5+3`, `10-7` |
+| 6 | `&` | String concatenation | `"Hi" & " there"` |
+| 7 | `==` `~=` `<>` `><` `<` `>` `<=` `=<` `>=` `=>` | Comparison / relational | `X > 10` |
+| 8 | `=` | *is equal to* (comparison; inside `IF`/`WHILE`/`UNTIL`) | `IF X = 5 THEN …` |
+| 9 | `NOT` | **Logical NOT** — binds *looser* than comparison | `NOT FOUND` |
+| 10 | `AND` `&&` `OR` `\|\|` | Logical AND/OR — **one level, strictly left to right**, and they short-circuit. See below. | `A=1 OR B=1 AND C=2` |
 | 11 | `=` | Assignment (`LET` / non-conditional context) | `LET X = 5` |
 | 12 | `:=` | Forced assignment (assigns even inside a conditional) | `IF (X := 5) > 2 THEN …` |
 
+<a id="not-vs-tilde"></a>
+**`~` and `NOT` are not interchangeable.** Both negate, but they sit on opposite sides of the
+comparison operators, so the same expression means different things:
+
+```business-rules
+PRINT NOT 0==5      ! 1  — reads as NOT (0==5)
+PRINT ~ 0==5        ! 0  — reads as (~0) == 5, i.e. 1 == 5
+PRINT ~ (0==5)      ! 1  — parenthesised, now the same as NOT
+```
+
+Use `NOT` for a condition and reserve `~` for negating a single value, or parenthesise.
+
+<a id="short-circuit"></a>
+### `AND` and `OR`: one level, left to right, short-circuiting
+
+**`AND` does not bind tighter than `OR` in BR.** They share a precedence level and a logical chain
+is evaluated strictly left to right — which is the single most likely thing on this page to catch
+out anyone arriving from C, Python, SQL or Visual Basic, where `AND` binds tighter.
+
+Evaluation carries a running value and **stops the moment that value settles the outcome**:
+
+- a running value of **true** meeting `OR` → stop, the answer is true
+- a running value of **false** meeting `AND` → stop, the answer is false
+
+Everything after the stopping point is never looked at.
+
+```business-rules
+PRINT 1 OR 0 AND 0      ! 1  — `1 OR` settles it; neither 0 is ever seen
+PRINT (1 OR 0) AND 0    ! 0  — the parentheses force the AND to be reached
+PRINT 0 OR 1 AND 0      ! 0  — 0 OR 1 -> 1, then 1 AND 0 -> 0
+PRINT 1 AND 0 OR 1      ! 1  — 1 AND 0 -> 0, then 0 OR 1 -> 1
+```
+
+Read left to right, each of those is obvious. Read with `AND` binding tighter, the first and the
+third both come out wrong.
+
+**The rule: when a condition mixes `AND` and `OR`, always parenthesise.** Not as a tie-breaker for
+doubtful cases — always. An unparenthesised `A OR B AND C` is correct BR and is read wrongly by
+almost everyone, including the author six months later, because every other language they know
+groups it the other way. The parentheses cost nothing and remove the question:
+
+```business-rules
+IF A OR B AND C THEN …        ! legal, and misread by nearly every reader
+IF (A OR B) AND C THEN …      ! what BR actually does — say so
+IF A OR (B AND C) THEN …      ! if this is what you meant, the parentheses are load-bearing
+```
+
+**A second consequence: a function call in the abandoned part of a condition never runs.** If it
+has a side effect, reordering the terms changes what the program *does*, not just how fast it does
+it.
+
+> **For anyone re-folding this section.** These rows previously separated `AND` (tighter) from
+> `OR` (looser), matching most other languages. That was wrong, and BR's own precedence table
+> (`table5x`) had it right all along by giving `&&`, `AND`, `||` and `OR` the same value.
+
 **Modulo is a function, not an operator** — use `MOD(a, b)`; there is **no** infix `a MOD b`. See
-[system-functions](../system-functions/spec.md).
+[system-functions](../system-functions/spec.md). Note the trap below: `%` is *accepted* and returns
+the wrong answer.
+
+<a id="non-operators"></a>
+### Spellings that look like operators and are not
+
+BR's runtime carries opcodes for a set of bitwise and shift operations that the language never
+completed. They divide into two kinds, and **the second kind is dangerous**:
+
+| Spelling | What happens | Why |
+|---|---|---|
+| `^` | **Error 1026** (illegal expression) | the expression parser has no case for it; it is *not* exponentiation — use `**` |
+| `&` `\|` between numbers | **Error 1026** | the parser reaches `NUM_ERR`; only the doubled `&&` / `\|\|` are operators |
+| `%` | **compiles, always yields `0`** | the compiler emits a `MODULO` opcode; the runtime evaluator has no case for it |
+| `<<` `>>` | **compiles, always yield `0`** | same — the evaluator's `SHIFT_LEFT` / `SHIFT_RIGHT` cases are commented out |
+
+```business-rules
+PRINT 17%5          ! 0, not 2 — no error, no warning
+PRINT 1<<4          ! 0, not 16
+```
+
+The first three rows fail loudly and cost nothing. `%`, `<<` and `>>` fail **silently**: a program
+using them compiles, runs, and computes zero. Nothing in BR reports it. Treat all six as
+non-existent.
 
 The compound assignment operators `+=` `-=` `*=` `/=` (and multiple assignment `A=B=C=0`) are
 assignment-level — see [assignment](../assignment/spec.md#let).

@@ -27,12 +27,28 @@ Two kinds of content, both load-bearing:
 - **Every line is numbered**; labels go right after the number (`00050 LOOP1: …`).
 - **`=` is context-sensitive.** Inside `IF`/`WHILE`/`UNTIL` it means *compare*; elsewhere it
   *assigns*. Use **`:=`** to force assignment inside a condition (must be parenthesized).
-- **Operators aren't C/Python.** `&` is **string concatenation**, not bitwise-AND. `^` and `**` are
-  **both exponentiation**, not XOR. BR has **no source-level bitwise operators**. **`MOD` is a function only — `MOD(a, b)`, never infix `a MOD b`** (`REM(a, b)` is an
-  alias). Full 12-level precedence (tight → loose): 1 `()`/`[]` · 2 `^`/`**` · 3 `*`/`/`/`MOD` ·
-  4 `+`/`-` · 5 `&` (concat) · 6 comparison (`=`/`<`/`>`/…) · 7 bare `=` (is-equal) · 8 `NOT`/`~` ·
-  9 `AND`/`&&` · 10 `OR`/`||` · 11 `=` assignment · 12 `:=` forced. (Full detail:
+- **Operators aren't C/Python.** `&` is **string concatenation**, not bitwise-AND. Exponentiation is
+  **`**` only — `^` is *not* an operator at all and raises error 1026.** BR has **no working
+  bitwise or shift operators**. **`MOD` is a function only — `MOD(a, b)`, never infix `a MOD b`**
+  (`REM(a, b)` is an alias). Precedence (tight → loose): 1 `()`/`[]` · 2 `~`/unary `-` ·
+  3 `**` · 4 `*`/`/` · 5 `+`/`-` · 6 `&` (concat) · 7 comparison (`==`/`<`/`>`/…) ·
+  8 bare `=` (is-equal) · 9 `NOT` · 10 `AND`/`&&`/`OR`/`||` (one level, left to right) ·
+  11 `=` assignment · 12 `:=` forced. (Full detail:
   [expressions](../br_tree/10-language/data-manipulation/expressions/spec.md).)
+- **`AND` does NOT bind tighter than `OR`.** They are one precedence level, evaluated strictly
+  **left to right** — unlike C, Python, SQL and VB. Evaluation also **stops the moment the running
+  value settles the answer** (true meeting `OR`, false meeting `AND`), and the rest is never
+  evaluated, so a function call in the abandoned branch never runs. `1 OR 0 AND 0` is **1**
+  (nothing after `1 OR` is seen); `(1 OR 0) AND 0` is **0**; `0 OR 1 AND 0` is **0**.
+  **Rule: whenever a condition mixes `AND` and `OR`, always parenthesise** — not only when it looks
+  ambiguous. Unparenthesised, it is legal BR that nearly every reader will group the wrong way.
+- **`~` and `NOT` are not synonyms**, though both negate. `~` binds *tighter* than comparison and
+  `NOT` binds *looser*, so `~ 0==5` is `(~0)==5` → **0** while `NOT 0==5` is `NOT (0==5)` → **1**.
+  Use `NOT` for conditions; parenthesise if you use `~`.
+- **Six spellings compile or look valid and are not operators.** `^`, and `&`/`|` between numbers,
+  raise **error 1026**. Worse, **`%`, `<<` and `>>` compile silently and always evaluate to `0`** —
+  `PRINT 17%5` prints `0`, with no error and no warning, because BR's compiler emits an opcode its
+  runtime has no evaluator for. Treat all six as non-existent.
 - **String variables end in `$`**; size is declared `DIM NAME$*30`. Arrays are 1-based. Default
   string max (un-`DIM`'d) is **18 characters** — see §2, this is the single biggest source of
   silent runtime failure in practice.
