@@ -8,7 +8,13 @@ kind: spec
 status: 2b           # reference base + 50 br_tree function pages folded in + runtime-table gap closure
 recovered-fold: BR_FILENAME$, BRErr$, COS, MSGBOX, NEWPAGE, REM (6 redirect-collision pages folded from re-fetched source — added MSGBOX/BR_FILENAME$/NEWPAGE, REM=MOD alias, BRErr$ corrected to 4.3+; COS already in trig table; verbatim retained on the BR wiki)
 runtime-gap-closure: added the table6k/table7k intrinsics that had no br_tree signature — SGN, RND, XLATE$, RLN, VERSION(file), LINESTATUS$, CURPOS, SCR_FREEZE/THAW, SERIAL, SESSION$, PROCLVL, TIMER, SETENV, VARIABLE$, WBVERSION$, WBPLATFORM$, SYSERR/SYSERR$ (xref), MSG (xref), and the PEM integration set GET$/SET$/INVOKE$/DLL. Sourced from the brulescorp wiki + release notes; the delimiter arg of STR2MAT/MAT2STR documented (there is no DLM$ function).
-source-verified: 'cross-checked against the BR interpreter source (basfn.h/tblfn.cpp function tables, ck_num_sysfn/ck_alph_sysfn arity checkers, numfunct.cpp/strfunct.cpp/trig.cpp impls). Corrections: TRUNC/DEG/RAD are reserved keywords that parse but return a runtime bad-function error (NOT implemented — trig() lacks them); CALL is in table7k but has no function implementation (compiler-rejected); SHIFT is a fixed-0 System/23 no-op; SCR_FREEZE/THAW take no args (freeze/thaw remote display); DLL is ≥2 strings dispatched client-side; SETENV is 1–2 args. Exact arities confirmed for all.'
+source-verified: 'cross-checked against the BR interpreter source (basfn.h/tblfn.cpp function tables, ck_num_sysfn/ck_alph_sysfn arity checkers, numfunct.cpp/strfunct.cpp/trig.cpp impls). Corrections: TRUNC/DEG/RAD are reserved keywords that parse but return a runtime bad-function error (NOT implemented — trig() lacks them); CALL is in table7k but has no function implementation (compiler-rejected); SHIFT is a fixed-0 System/23 no-op; SCR_FREEZE/THAW take no args (freeze/thaw remote display); DLL is ≥2 strings dispatched client-side; SETENV is 1–2 args.'
+corrections:
+  - "LPAD$/RPAD$ take an optional third argument, the pad character. ck_alph_sysfn (command2.cpp) reads `case LPAD_: case RPAD_: // 2-3 string, numeric, optional string` and enforces `BETWEEN(2, 3, subcount)` with PARMCHECK_STRING on the third. Neither this spec nor the dev catalog derived from it carried the third argument, and 46 lines of the QSMRP corpus use it. Found in brls phase 5."
+  - "The source-verified note above claimed 'Exact arities confirmed for all'. It was not true of LPAD$/RPAD$ above, and the dev catalog inherited both the claim and the error, so the claim is withdrawn rather than restated. What is verified is the function roster and the individual corrections listed in that note; the arities as a whole have not been checked case by case against ck_num_sysfn/ck_alph_sysfn. Doing that mechanically is brls NOTES.md item 0b."
+  - "DATE$ and DATE were given as `DATE$(days,\"mask\")` and `DATE(days,\"mask\")`, both arguments required. BR accepts none, one or two of them: ck_alph_sysfn (command2.cpp) reads `case DATE_: // 0-2 with 1 either, numeric, alpha` and ck_num_sysfn (command3.cpp) `case DATE_FN: // 0-2 parameters (1 numeric and 1 string both optional)`. The one-argument forms were never lost from the tree — the DATE$ backing page beside this spec is full of them (`PRINT DATE$(\"mm-dd-yy\")`, `PRINT DATE$(1)`, `DATE(\"m\")`) — it was the summary table here that dropped them, and the dev catalog generated from that table inherited the loss. Bare numeric `DATE` added to the no-parentheses list for the same reason. 1,216 lines of the QSMRP corpus use a form this table called impossible. Found in brls phase 5."
+  - "Nine signatures corrected against BR's own arity checkers (ck_alph_sysfn in command2.cpp, ck_num_sysfn in command3.cpp) and their implementations in strfunct.cpp/numfunct.cpp: TRIM$ takes the same optional strip character as LTRM$/RTRM$; BRERR$ and SYSERR$ take their code optionally, bare meaning the last error; FILE$ takes a second keyword argument querying the open file; SQL_DATE$/BR_DATE$ take the format optionally; HELP$ takes two arguments at most and the second is numeric, not the third string this table listed; LOGIN_NAME$ with an argument sets the name rather than being an atom. Separately, TIME$/CURROW/CURCOL/PROCIN are accepted with one argument by the compiler and ignore it at run time, which is now marked ‡ and explained rather than documented as an optional parameter. Found in brls phase 5 by diffing every arity in the two checkers against the generated pack — 15 of 119 disagreed."
+  - "NXTFLD was given as `NXTFLD[(…)]`, \"4 syntax forms\", and the retained NXTFLD.md backing page documented a parameterised setter at length. NXTFLD takes no arguments and is not assignable. ck_num_sysfn (command3.cpp) lists it under `// 0 parameters` with NXTROW/NXTCOL/CURPOS/TIMER and returns -1 for any subcount; both the bare form (command3.cpp:524) and any parenthesised form (:653) reach that same checker, and the one escape from it, NOT_FN_REF, is guarded by EXTENDED_USER_FUNCTION and so is reachable only by FN… names. numfunct.cpp reads fieldsdata.tnxtFld without popping an argument. The parameterised behaviour described on that page is CURFLD's: ck_num_sysfn reads `case CURFLD: // 0-3 parameters if 2 or more numeric, string, numeric` and numfunct.cpp implements it as `// curfld(pos,attr$,firstkey)` — the page's own prose gives it away, explaining its `LET NXTFLD(NXTFLD,FKEY)` example with the sentence \"The CURFLD function in line 40 is then used to…\". Corroborated by the QSMRP corpus: 696 files call CURFLD with 1-3 arguments and not one of 1,107 files writes NXTFLD with any. NXTFLD added to the no-parentheses list above for the same reason. Determined by the maintainer, who states NXTFLD never supported parameters; found in brls phase 5."
 related: [expressions, assignment, declaration, data-types]
 keywords: [CNVRT$, POS, LEN, TRIM$, UPRC$, LWRC$, STR$, VAL, DATE$, TIME$, RND, MAX, MIN, SUM, MSGBOX, KSTAT$]
 ---
@@ -23,10 +29,10 @@ BR's intrinsic functions — they return a value and are used inside
 <a id="syntax"></a>
 ## Syntax
 
-Most take the form `NAME(args)`. A few system values take **no parentheses**: `DATE$`, `TIME$`,
+Most take the form `NAME(args)`. A few system values take **no parentheses**: `DATE$`, `DATE`, `TIME$`,
 `ERR`, `LINE`, `CNT`, `CODE`, `PROCIN`, `FILENUM`, `INF`, `PI`, `USERID$`, `LOGIN_NAME$`, `WSID`,
 `SERIAL`, `SESSION$`, `PROCLVL`, `TIMER`, `VARIABLE$`, `WBVERSION$`, `WBPLATFORM$`, `SYSERR`,
-`SYSERR$`, `CURPOS`, `RND` (and `PIC$`, whose parentheses are optional). All yield a value usable
+`SYSERR$`, `BRERR$`, `MENU$`, `CURPOS`, `NXTFLD`, `RND` (and `PIC$`, whose parentheses are optional). All yield a value usable
 anywhere an expression is allowed.
 
 <a id="semantics"></a>
@@ -63,15 +69,15 @@ anywhere an expression is allowed.
 | `CHR$(n)` | character for ASCII code `n` |
 | `ORD(s$)` | ASCII ordinate (0–255) of the first char of `s$` (inverse of `CHR$`) |
 | `UPRC$(s$)` / `LWRC$(s$)` | upper / lower case |
-| `TRIM$(s$)` | strip leading **and** trailing spaces |
+| `TRIM$(s$[,c$])` | strip leading **and** trailing spaces (or the 1-char `c$`) — the same optional argument as `LTRM$`/`RTRM$`, read on the same line of `strfunct.cpp` for all three |
 | `LTRM$(s$[,c$])` / `RTRM$(s$[,c$])` | strip leading / trailing spaces (or the 1-char `c$`, nulls allowed) |
-| `LPAD$(s$,n)` / `RPAD$(s$,n)` | pad to length `n` (left / right) |
+| `LPAD$(s$,n[,pad$])` / `RPAD$(s$,n[,pad$])` | pad to length `n` (left / right), with `pad$` if given and a space otherwise |
 | `RPT$(s$,n)` | `s$` repeated `n` times |
 | `LEN(s$)` | actual current length |
 | `POS(s1$,[^]s2$[,[-]start])` | position of `s2$` in `s1$` (0 if none); `^`=case-insensitive (`CONFIG SEARCH_CHAR`); `-start`=search backward |
 | `SREP$(src$[,start],find$,repl$)` | string replace (each occurrence) |
 | `XLATE$(s$,table$[,start])` | translate `s$` through a 256-byte `table$`: each input char of ASCII value `n` is replaced by the `(n+1)`-th char of `table$`; chars past the table's length pass through unchanged. Optional `start` position. A `table$` beginning `STR2UTF`/`UTF2STR` does UTF-8 conversion |
-| `LOGIN_NAME$` | current user's login name (3.83h+) |
+| `LOGIN_NAME$[(name$)]` | current user's login name (3.83h+); **with an argument it sets the name** |
 
 <a id="conversion-functions"></a>
 ### Type conversion & formatting
@@ -111,16 +117,29 @@ anywhere an expression is allowed.
 | `INF` | largest representable number (`1.0E+307`); `1/INF` = smallest |
 | `RND` | pseudo-random number in `0`–`1`. Reseed from the clock with [`RANDOMIZE`](../../flow-control/other-flow/spec.md); `LET RND(seed)` sets a fixed seed for a repeatable sequence. Scale e.g. `INT(RND*100+1)` |
 
+
+<a id="accepted-and-ignored"></a>
+> **‡ Accepted with one argument, and ignored.** BR's arity checkers admit a single argument to
+> `TIME$`, `CURROW`, `CURCOL` and `PROCIN` — `ck_num_sysfn` groups the last three under
+> "optional 1 numeric", `ck_alph_sysfn` groups `TIME$` under "0-1 parameters, optional string" —
+> and the implementations never read it. `strfunct.cpp`'s `TIME_` arm is commented *"return system
+> time, no parms"*; `numfunct.cpp`'s `CURROW`/`CURCOL` return the field data and return; `PROCIN`
+> carries a comment describing a setter it does not implement. So `PRINT TIME$("hh:mm")` compiles,
+> runs and prints the ordinary time. This is the same failure mode as `%`, `<<` and `>>` in
+> [expressions](../expressions/spec.md#non-operators): the compiler agrees and the runtime has
+> nothing to do. Recorded as ignored rather than as an optional parameter, because calling it a
+> parameter is the more damaging error.
+
 <a id="date-functions"></a>
 ### Date / time
 | Function | Returns |
 |---|---|
 | `DATE$` | current date (`yy/mm/dd`) |
-| `TIME$` | current time (`hh:mm:ss`) |
+| `TIME$` ‡ | current time (`hh:mm:ss`) |
 | `DAYS(date[,mask])` | day-count; Y2K-aware (BASEYEAR, auto century) 3.83+; dates from 1700 (3.90+) |
-| `DATE$(days,"mask")` | format a day-count to a string (`"day month, ccyy"`; time masks 4.30+) |
-| `DATE(days,"mask")` | numeric date sibling of `DATE$` (for sorting; stores the days value) |
-| `SQL_DATE$(d,"fmt")` / `BR_DATE$(s,"fmt")` | pack/unpack SQL dates (4.30+) |
+| `DATE$([days][,"mask"])` | format a day-count to a string (`"day month, ccyy"`; time masks 4.30+). **Both arguments are optional and either may stand alone**: `DATE$("mm-dd-yy")` formats today, `DATE$(1)` formats a day-count with the default mask |
+| `DATE([days][,"mask"])` | numeric date sibling of `DATE$` (for sorting; stores the days value); same optional arguments, and bare `DATE` is today |
+| `SQL_DATE$(d[,"fmt"])` / `BR_DATE$(s[,"fmt"])` | pack/unpack SQL dates (4.30+); the format is optional |
 
 > Date *storage* types `DT`/`DL`/`DH` are FORM field types — see
 > [30-io-file/form-spec](../../../30-io-file/form-spec/spec.md), not here. The currency/format-string
@@ -163,7 +182,7 @@ but there is **no `DLM$` function**) — or, as of **4.3**, a `MAT` of delimiter
 ### File / drive query (I/O handlers — see [30-io-file](../../../30-io-file/statements/spec.md#io))
 | Function | Returns |
 |---|---|
-| `FILE$(n)` / `FILE$` | open file's name; with no arg = file of the most recent I/O error |
+| `FILE$([n][,keyword$])` | open file's name; with no arg = file of the most recent I/O error. A second **keyword** argument queries the open file (`"HTTPINFO"`, `"PAGE-URL"`, …) |
 | `FILE(n)` | status: `-1` not open, `0` ok, `10`/`11` EOF in/out, `20`/`21` transmission err in/out |
 | `FILE(n,"WINDOW_RECT"\|"USABLE_RECT"\|"FONTSIZE",MAT a)` | window/usable rect (x,y,w,h px) or char cell size |
 | `FILENUM` | file number of the most recent I/O error (= `FILE$` with no arg) |
@@ -183,7 +202,7 @@ but there is **no `DLM$` function**) — or, as of **4.3**, a `MAT` of delimiter
 | Function | Returns |
 |---|---|
 | `KSTAT$[(n[,secs])]` | unprocessed keystrokes; with `n`, waits for `n` keys (`secs` timeout each). Fn keys = 2 chars; values are BR scancodes (`UNHEX$` to read) |
-| `NXTFLD[(…)]` | relative position of the next control to be occupied (4 syntax forms; pairs with FKEY for hot controls) |
+| `NXTFLD` | relative position of the next control to be occupied — **no arguments, not assignable**; pairs with `FKEY` to identify a clicked hot control. To *set* the next input field, attribute or exit keystroke, use `CURFLD([field][,attr$][,fkey])` — see [windows-cursor](../../../20-io-screen/windows-cursor/spec.md#semantics) |
 | `NXTROW` / `NXTCOL` | row / col of the next cursor position (4.20+; mouse or keyboard; `OPTION 59` for old `CurCol`) |
 | `NEXT` | next cursor position within a 2D control (4.20+; used in an INPUT FIELDS `NEXT` clause) |
 | `CURTAB[(win[,1])]` | active tabbed-window number; `CURTAB(win,1)` raises that tab (4.16+) |
@@ -197,10 +216,10 @@ but there is **no `DLM$` function**) — or, as of **4.3**, a `MAT` of delimiter
 | `ERR` | last error number |
 | `LINE` | current line number |
 | `CNT` | data items successfully processed by the last I/O (`MAT A(CNT)` to size to what was read) |
-| `BRERR$(code)` | the *description* of a BR error code — what `ERR` is to the number (e.g. `BRERR$(682)`; 4.3+) |
+| `BRERR$([code])` | the *description* of a BR error code — what `ERR` is to the number (e.g. `BRERR$(682)`; 4.3+). **Bare** describes the last error |
 | `ENV$(status[,MAT cfg$[,arg]])` | environment / status interrogation (4.30+) — see [environment](../../../00-configuration/environment/spec.md#env-read) |
 | `CODE` | numeric return value of the most recent procedure (set by `EXIT n`) |
-| `PROCIN` | non-zero while a procedure is feeding input (0 = keyboard) |
+| `PROCIN` ‡ | non-zero while a procedure is feeding input (0 = keyboard) |
 | `WSID` | this session's workstation ID |
 | `USERID$` | BR licensee name |
 | `SERIAL` | serial number of this BR software copy |
@@ -211,12 +230,12 @@ but there is **no `DLM$` function**) — or, as of **4.3**, a `MAT` of delimiter
 | `VARIABLE$` | name of the variable that failed in the **last I/O statement** (for debugging / `HELP$` topics); not set for field-spec errors 850–890 or for calculated expressions |
 | `WBVERSION$` | the running BR version, as a string |
 | `WBPLATFORM$` | the platform string; returns `WINDOWS` on a unix/aix/linux client-server run when `CONFIG SHELL DEFAULT CLIENT` is set (so client-side shell/print behavior is used) |
-| `SYSERR` / `SYSERR$` | the underlying **OS** error number / its description (companion to `ERR`/`BRERR$`) — see [90-reference/error-codes](../../../90-reference/error-codes/_index.md) |
+| `SYSERR` / `SYSERR$[(n)]` | the underlying **OS** error number / its description (companion to `ERR`/`BRERR$`); `SYSERR$(n)` describes that code rather than the last — see [90-reference/error-codes](../../../90-reference/error-codes/_index.md) |
 | `SHIFT[(n)]` | always returns **`0`** — a legacy **System/23-compatibility** no-op (any argument is accepted and ignored) |
 | `MSG$("text")` | display text in the 2nd box of the command console |
 | `MSG(action$,arg)` | keyboard control (Windows / Client-Server): `MSG("KB",keys$)` injects keystrokes (special keys in pipes, e.g. `"|CTRL+|c|CTRL-|"`), `MSG("sleeptime",cs)` sets the per-keystroke delay — see [70-commands/information/MSG.md](../../../70-commands/information/MSG.md) |
 | `SLEEP(seconds)` | pause; fractional seconds, ms resolution (3.83h+) |
-| `HELP$([*]kw[,file][,mark])` | enter HELP mode / show a topic (see [windows-cursor §help](../../../20-io-screen/windows-cursor/spec.md#help-facility)) |
+| `HELP$([*]kw[,mark])` | enter HELP mode / show a topic (see [windows-cursor §help](../../../20-io-screen/windows-cursor/spec.md#help-facility)). Two arguments at most, the second numeric |
 | `NEWPAGE` | a char that form-feeds the printer / clears the screen and **zeroes the line counter** (`LINES`/`KREC`); `PRINT #255: NEWPAGE` no longer emits a trailing CR — avoid it immediately before `TAB(x)` in an *unformatted* `PRINT` |
 | `BELL` / `TAB(x)` | sound the tone / tab to column `x` within a `PRINT` list |
 

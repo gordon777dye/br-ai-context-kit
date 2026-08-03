@@ -4,12 +4,18 @@ file: error-reference.md
 category: dev
 kind: reference
 status: 1a
-description: Distilled reference for 71 of the most critical BR error codes, organized by category with causes, scenarios, fixes, and example code.
+description: Distilled reference for 70 of the most critical BR error codes, organized by category with causes, scenarios, fixes, and example code.
+corrections:
+  - "Error 0117 \"Invalid numeric expression\" removed: **there is no BR error 117.** BR's own table (brs/wberrdefs.h) runs 105, 106, 108, 120, 121, 122, 123, 130 with nothing between 108 and 120, and br_tree has no page for it — of the 69 write-ups here it was the only one with neither a br_tree page nor a definition in BR's source, which is how gendata found it. The entry was also wrong about its own subject: it gave \"Division by zero: LET x = 5 / 0\" as the leading cause, and BR's divide-by-zero is error **6** (BREDIVIDEBYZERO). Found in brls phase 5."
 ---
 
 # BR Error Code Reference
 
-This is a curated, model-friendly distillation of 71 critical BR error codes, in 69 write-ups (4194/4195/4196 share one). Each entry gives the cause, common scenarios, fixes, example recovery code and related errors. Organized by category for quick lookup.
+This is a curated, model-friendly distillation of 70 critical BR error codes, in 68 write-ups (4194/4195/4196 share one). Each entry gives the cause, common scenarios, fixes, example recovery code and related errors. Organized by category for quick lookup.
+
+Every code here is one BR's own error table defines. Do not add an entry without checking
+`brs/wberrdefs.h` or a `br_tree/90-reference/error-codes/` page for it first — one invented entry
+(0117) reached this file and survived until the generator cross-checked the two.
 
 ## Table of Contents
 
@@ -19,7 +25,7 @@ This is a curated, model-friendly distillation of 71 critical BR error codes, in
 4. **[Array & Subscript Errors (01xx)](#array-subscript)** — 7 codes
 5. **[Syntax & Parsing Errors (10xx)](#syntax-parsing)** — 11 codes
 6. **[Critical System Errors (90xx)](#critical-system)** — 2 codes
-7. **[Other Important Errors](#other)** — 5 codes
+7. **[Other Important Errors](#other)** — 4 codes
 
 ---
 
@@ -2308,45 +2314,6 @@ CLOSE #1:
 4. Use conversion tools if data is wrong encoding
 
 **Related errors:** 4124, 4125, 4180
-
----
-
-### Error 0117 — Invalid numeric expression
-
-**Cause:** Expression with invalid numeric operation or type mismatch in calculation.
-
-**Common scenarios:**
-- Division by zero: `LET x = 5 / 0`
-- String in numeric operation: `LET x = "abc" + 5`
-- Invalid format in numeric conversion
-
-**Fix:**
-1. Add bounds checking before division
-2. Convert strings to numbers with VAL() before arithmetic
-3. Verify operand types match operation requirements
-4. Use error handling for risky operations
-
-**Example recovery code:**
-```br
-! WRONG: Division by zero
-! LET x = 5 / 0
-
-! WRONG: String arithmetic
-! LET x = "abc" + 5
-
-! RIGHT: Check before operation
-IF denominator <> 0 THEN
-  LET x = 5 / denominator
-ELSE
-  PRINT "Cannot divide by zero"
-END IF
-
-! RIGHT: Convert strings
-LET num = VAL("123")
-LET x = num + 5
-```
-
-**Related errors:** 0108, 0120
 
 ---
 

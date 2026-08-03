@@ -7,8 +7,10 @@ subcategory: 10-language/flow-control/other-flow
 kind: spec
 status: 2b           # reference base + br_tree enrichment (STOP/END/PAUSE termination); no conflicts
 recovered-fold: GOSUB, ON_GOSUB, RANDOMIZE (3 redirect-collision pages folded from re-fetched source — added RANDOMIZE, GOSUB error-1011 immediate restriction, ON-GOSUB NONE-is-a-GOSUB-branch; verbatim retained on the BR wiki)
+corrections:
+  - "TRACE added as a statement. BR has a syn.txt tree for it — `TRACE` with three branches, PRINT, OFF and an optional ON — and a primary operation to execute it (TRACE_PRI, primop0.cpp), but the reference documented TRACE only as an option of the RUN and GO *commands*, so the statement form was missing from the tree entirely. It was the one genuinely undocumented statement left in gendata's coverage report. Semantics read from BR's source: primop0.cpp switches on the secondary opcode, where OFF_SEC (0x05) clears RUN_TRACE|RUN_TRACE_PRINT, ON_SEC (0x04) sets RUN_TRACE, and PRINT_SEC (0x06) sets RUN_TRACE_PRINT — the three constants are defined together in basoprcmn.h under the comment `/* trace */`. run.cpp gates the per-line output on RUN_TRACE and picks FILENBR_MAIN_PRINTER (255) over FILENBR_MAINWINDOW (0) on RUN_TRACE_PRINT, printing the line number with L_05ld (`%05i`). That gating is why TRACE PRINT alone traces nothing, and command9.cpp shows the console form guarding the same bit differently. A bare TRACE is left marked unverified rather than assumed equivalent to TRACE ON: command4.cpp stores no operand byte when an optional keyword is absent, so primop0 reads whatever follows the primary op. Added in brls phase 5."
 related: [conditionals, syntax, functions-udf]
-keywords: [FOR, NEXT, DO, LOOP, WHILE, UNTIL, GOTO, GOSUB, RETURN, ON GOTO, ON GOSUB, EXIT, RANDOMIZE, STOP, END, PAUSE]
+keywords: [FOR, NEXT, DO, LOOP, WHILE, UNTIL, GOTO, GOSUB, RETURN, ON GOTO, ON GOSUB, EXIT, RANDOMIZE, STOP, END, PAUSE, TRACE]
 ---
 
 # Loops & branching
@@ -38,6 +40,7 @@ ON <num-expr> GOTO  <line-ref> [',' <line-ref>]* [NONE <line-ref>]
 ON <num-expr> GOSUB <line-ref> [',' <line-ref>]* [NONE <line-ref>]
 EXIT DO                   -- there is no EXIT FOR; leave a FOR loop with GOTO
 RANDOMIZE                 -- reseed RND from the system clock
+TRACE {ON|OFF|PRINT}      -- line-number tracing, under program control
 ```
 
 <a id="semantics"></a>
@@ -103,6 +106,43 @@ e.g. `INT(RND*100+1)` for 1–100.)
   `CODE`=0.
 - **`PAUSE`** interrupts execution so the operator can enter commands / inspect variables; `GO`
   resumes and restores the screen (a handy debugging breakpoint).
+
+<a id="trace"></a>
+### TRACE
+Turns **line-number tracing** on and off from inside the program, rather than from the console. As
+each line executes, BR writes its line number — five digits, zero-padded — to the main window, or
+to the system printer when the print destination is selected, and logs a `Trace line <n> in
+<program>` event.
+
+| Form | Effect |
+|---|---|
+| `TRACE ON` | start tracing |
+| `TRACE OFF` | stop tracing, and clear the print destination |
+| `TRACE PRINT` | send trace output to the printer instead of the window |
+
+`TRACE` is the statement form of the `RUN`/`GO` command options — the same two run flags — so
+`TRACE ON` and a console `RUN TRACE` do the same thing, and `TRACE OFF` matches `NOTRACE`. See
+[70-commands/information](../../../70-commands/information/spec.md) for the command side. The value
+of the statement is that it can bracket **one suspect region** of a long program instead of tracing
+the whole run:
+
+```business-rules
+02000 TRACE ON
+02010 GOSUB POST_LEDGER
+02020 TRACE OFF
+```
+
+Two things to know before relying on it:
+
+- **`TRACE PRINT` does not start tracing.** It only selects the destination; the trace output is
+  still gated on tracing being on, so `TRACE PRINT` on its own produces nothing. Write
+  `TRACE ON` as well. (The console form is defensive here where the statement is not: `RUN PRINT`
+  sets the destination *only* if tracing is already on, while the statement sets it either way and
+  the setting then applies to the next `TRACE ON`.)
+- **Write `TRACE ON`, not a bare `TRACE`.** BR's grammar marks the `ON` keyword optional, so a bare
+  `TRACE` compiles, but the compiler emits no operand for it and the runtime reads the byte that
+  follows the statement instead. What that byte is has not been established, so the effect of a
+  bare `TRACE` is unverified — the two-word form is unambiguous.
 
 <a id="examples"></a>
 ## Examples

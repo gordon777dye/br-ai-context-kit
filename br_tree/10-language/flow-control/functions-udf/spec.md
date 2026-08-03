@@ -6,6 +6,8 @@ category: 10-language
 subcategory: 10-language/flow-control/functions-udf
 kind: spec
 status: 2b           # reference base + br_tree enrichment (single-line DEF, string-fn length, recursion, function-authoring gotchas: return-name-is-call, single exit, no-paren calls, no array dims in params); no conflicts
+corrections:
+  - "§Scope & local variables: \"it's own\" -> \"its own\"."
 related: [other-flow, syntax, system-functions]
 keywords: [DEF, FNEND, FN, LIBRARY]
 ---
@@ -108,7 +110,7 @@ not `FNGETNAME$()` (empty `()` is a syntax error). Call a function for its side 
   by-reference optional defaults an array to dimension 1 and a string to length 18. A function may be
   all-optional (`DEF FNX(;A,B$)`); a caller may **not** pass more arguments than are defined, and the
   variable types (numeric/string) must match.
-- Each library has it's own set of global variables. The rules for clearing these variables are sophisticated and need to be carefully considered.
+- Each library has its own set of global variables. The rules for clearing these variables are sophisticated and need to be carefully considered.
 - When library globals are cleared depends on how the library was loaded (resident vs. release vs.
   `OPTION RETAIN`) — see the table in
   [library-facility](../../../50-libraries/library-facility/spec.md).

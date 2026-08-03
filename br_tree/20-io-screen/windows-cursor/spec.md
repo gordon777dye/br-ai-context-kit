@@ -10,6 +10,9 @@ recovered-fold: CURFLD, CURWINDOW, EROW, FNKEY, GUI_Console, GUI_Mode, Parent=No
 related: [input-output, fields-attributes, controls]
 keywords: [OPEN WINDOW, WINDOW, BORDER, NEWPAGE, CAPTION, cursor, PARENT]
 canonical: window-open   # canonical home for the window OPEN spec (printing guide links here)
+corrections:
+  - "CURWINDOW's argument is optional: numfunct.cpp passes `parms` through to the client and sends 0 when there are none, and ck_num_sysfn groups it under \"optional 1 numeric\". The signature required it."
+  - "CURROW/CURCOL are accepted with one argument by BR's compiler and ignore it at run time; noted where they are introduced. Found in brls phase 5."
 ---
 
 # Windows & cursor
@@ -57,6 +60,9 @@ PRINT '#'<window> ',' BORDER [<border-spec>] [ ':' <caption> ]
   active); `CURPOS` positions the cursor. The **`CURSOR SSEE`** config (BRConfig.sys / `CONFIG` /
   `EXECUTE`) sets the block-cursor *shape* — `SS`/`EE` are hex start/end scan lines `00`–`0D`
   (e.g. `CONFIG CURSOR 080D` = lower-half block). **GUI mode**: `ENV$("GUIMODE")` returns `ON`/`OFF`.
+  BR's compiler accepts one argument on `CURROW` or `CURCOL` and the runtime ignores it —
+  `numfunct.cpp` returns the field data and returns — so `CURROW(1)` compiles and means `CURROW`;
+  see [system-functions §accepted-and-ignored](../../10-language/data-manipulation/system-functions/spec.md#accepted-and-ignored).
 
 <a id="keyboard-results"></a>
 ### Keyboard-result functions
@@ -91,7 +97,7 @@ After an `INPUT`/`RINPUT`/`INPUT FIELDS`/`INPUT SELECT`, these report how and wh
     (Comboboxes with the `x` attribute return FKEY **209**; loop with `LET CURFLD(CURFLD,FKEY)` to stop
     blinking.) `CURROW`/`CURCOL` give the ending row/column; **`OPTION 43`** restores old INPUT SELECT
     `NXTFLD`/CURFLD behavior.
-- **`CURWINDOW(<n>)`** — returns the window currently in focus **when it was opened `PARENT=NONE`** (`-1`
+- **`CURWINDOW([<n>])`** — returns the window currently in focus **when it was opened `PARENT=NONE`** (`-1`
   if no PARENT=NONE window is active); passing `<n>` raises/focuses that window. Used with PARENT=NONE
   windows and FKEY 93.
 

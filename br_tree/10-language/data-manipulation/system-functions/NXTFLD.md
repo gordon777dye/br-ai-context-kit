@@ -4,29 +4,23 @@ file: NXTFLD.md
 category: 10-language
 subcategory: 10-language/data-manipulation/system-functions
 kind: function
-related: [internal function, Curfld, FKEY, cursor, INPUT FIELDS, RINPUT FIELDS, INPUT SELECT, RINPUT SELECT, attribute, Array]
+corrections:
+  - "This page documented NXTFLD as taking parameters — \"4 possible combinations of syntax\", a `NXTFLD([<New_current_field>][,<attribute$>][,`FKEY`])` setter, ListView/Grid two-parameter forms, worked examples writing `LET NXTFLD(NXTFLD,FKEY)` and `LET NXTFLD(1,\"RX\")`, a \"Previously, the NxtFld statement supported 3 parameters\" list, and several paragraphs of prose about what the first, second and third parameters mean. **NXTFLD never supported parameters.** All of it is removed. Evidence: ck_num_sysfn (command3.cpp) lists NXTFLD_FN under `// 0 parameters` alongside NXTROW/NXTCOL/CURPOS/TIMER and returns -1 for any subcount; both the bare form (command3.cpp:524) and any parenthesised form (:653) are checked by that one function, and its only escape, NOT_FN_REF, is guarded by EXTENDED_USER_FUNCTION and so is reachable only by FN… names; numfunct.cpp implements `case NXTFLD_FN:` as a read of fieldsdata.tnxtFld that never pops an argument; and syn.txt has no NXTFLD, so there is no statement form either. The parameterised behaviour described here is CURFLD's — `case CURFLD: // 0-3 parameters if 2 or more numeric, string, numeric` in the same checker, implemented in numfunct.cpp as `// curfld(pos,attr$,firstkey)`, which is the (field, attribute$, FKEY) signature this page claimed for NXTFLD. This page's own prose gave it away: it explained its `LET NXTFLD(NXTFLD,FKEY)` example with the sentence \"The CURFLD function in line 40 is then used to reenact the operator's field exit operation.\" Corroborated by the QSMRP corpus, where 696 files call CURFLD with 1-3 arguments and not one of 1,107 files writes NXTFLD with any. Determined by the maintainer, who states NXTFLD never took parameters; found in brls phase 5."
+related: [internal function, Curfld, FKEY, cursor, INPUT FIELDS, RINPUT FIELDS, INPUT SELECT, RINPUT SELECT, Array]
 ---
-The **NxtFld** `internal function` is similar to `Curfld` except that it  returns the relative position of the next control to be occupied during an INPUT operation (the one the user clicked on or attempted to move to). 
+The **NxtFld** `internal function` is similar to `Curfld` except that it returns the relative position of the next control to be occupied during an INPUT operation (the one the user clicked on or attempted to move to).
 
-Two methods are used to identify clicked controls: Fkey numbers and NXTFLD. This will keep track of which control was clicked when a user clicks on a hot control (a control that has an Fkey assigned). If the control is a GRID or LIST then it keeps track of where the user clicked within the control. 
+**NXTFLD takes no arguments and is not assignable.** It is written bare, like `ERR` or `CNT`. To *set* the next input field — or its attributes, or an FKEY value to be applied before the next INPUT — use [`CURFLD`](spec.md#screen-query), which takes those three parameters; see also [20-io-screen/windows-cursor](../../../20-io-screen/windows-cursor/spec.md#semantics).
 
-If a control that is part of an active Input Fields operation is double clicked, then NXTFLD will identify the relative position of the control within the Fields operation. However, for hot field identification it is necessary to use Fkey values to identify the respective controls. 
+Two methods are used to identify clicked controls: Fkey numbers and NXTFLD. This will keep track of which control was clicked when a user clicks on a hot control (a control that has an Fkey assigned). If the control is a GRID or LIST then it keeps track of where the user clicked within the control.
+
+If a control that is part of an active Input Fields operation is double clicked, then NXTFLD will identify the relative position of the control within the Fields operation. However, for hot field identification it is necessary to use Fkey values to identify the respective controls.
 
 ===Interrogating the Next Control===
 
-It is desirable to know which control was clicked when a user clicks on a hot control (a control that has an Fkey assigned). Furthermore, if the control is a GRID or LIST then it can be useful to know where the user clicked within the control. Two methods are used to identify clicked controls: Fkey numbers and NXTFLD. 
+It is desirable to know which control was clicked when a user clicks on a hot control (a control that has an Fkey assigned). Furthermore, if the control is a GRID or LIST then it can be useful to know where the user clicked within the control. Two methods are used to identify clicked controls: Fkey numbers and NXTFLD.
 
-The **NxtFld** `internal function`  has 4 possible combinations of syntax:
-
- NXTFLD
-  
- NXTFLD([<New_current_field>] [,<attribute$>] [,`FKEY`])
- 
- NXTFLD([<New_current_field>] [,<New_current_row>]) ! if the new current field is a ListView
- 
- NXTFLD([<New_current_field>] [,<New_current_cell>])! if the new current field is a Grid
-
-When used without parameters, the **NxtFld** function returns the number of the field containing the `cursor` from the last `INPUT FIELDS`, `RINPUT FIELDS`, `INPUT SELECT`, or `RINPUT SELECT` operation. With parameters, NxtFld can be used to record the field (same as the C control `attribute`) and/or an attribute for the last field. 
+The **NxtFld** function returns the number of the field containing the `cursor` from the last `INPUT FIELDS`, `RINPUT FIELDS`, `INPUT SELECT`, or `RINPUT SELECT` operation.
 
 ===Comments and Examples===
 
@@ -48,51 +42,5 @@ As NXTFLD returns the subscript in the field definition array of the field conta
  00810 INPUT FIELDS MAT FLD$: HRS,OT,DT,SICK HELP 90
  00820 STOP
  00990 HELP$("HOURS.ENTRY", NXTFLD) : RETRY
-
-===FKEY Parameter===
-
-NxtFld has been extended to allow an additional numeric parameter, an `FKey` value, that causes FIELDS and SELECT statements to execute the specified keystroke before requesting operator input. NXTFLD ignores FKEY values of 100 or less and of 114 or greater. The following code uses NXTFLD and FKEY to trap the operator's field exit keystroke and execute it after verifying the data just entered. NOTE that the AE control attributes are used to interrupt execution of the INPUT FIELDS statement upon field exit.
-
- 00010 PRINT NEWPAGE
- 00020 INPUT FIELDS "10,10,C 10,AEU:R;11,10,C10,U": X$,Y$ HELP 41
- 00030 IF CURFLD=1 THEN PRINT FIELDS "10,22,C": X$
- 00040 IF FKEY>100 THEN LET NXTFLD(NXTFLD,FKEY) : GOTO 20
- 00041 PRINT FKEY
- 00050 STOP
-
-As soon as the operator attempts to exit the first input field, line 30 verifies the entered data by redisplaying it to the right of the field. The CURFLD function in line 40 is then used to reenact the operator's field exit operation: the field just verified is set to the current field, and the operator's attempted exit keystroke (the value of FKEY) is executed. Operator input is then allowed for the next field.
-
-NOTE: If the up arrow was the last key used, the cursor will return to the previous field. If the tab key was used, the cursor will position to the next field with a T (tab stop) attribute.
-
-NOTE that the NXTFLD function in line 40 is executed only if the value of FKEY is greater than 100. Values of 100 or less are ignored, as are interpreted as an attempt to enter the entire screen.
-
-NXTFLD processes field control attributes such as AEP and #. These control attributes are ADDED to the control attributes that are specified for a field. Also, the attributes that are specified with NXTFLD will OVERRIDE (be used instead of) a floating attribute specified with ATTR. The NXTFLD attributes will remain in effect only during the next execution of an INPUT FIELDS or INPUT SELECT statement. Line 20 in the following example uses the X control attribute (see the "X control attribute" discussion in the `BRConfig.sys` Specifications section for more information).
-
- 00010 INPUT FIELDS "10,10,V 10,U;11,10,V 10,U;12,10,V 10,U",attr "HU":X$,Y$,Z$
- 00020 IF X$="" THEN LET NXTFLD(1,"RX") : GOTO 10
- 00030 !.. other editing
- 00040 IF FKEY>100 THEN LET NXTFLD(NXTFLD,FKEY) : GOTO 10
- 00050 !.. output
-
-If the first field displayed by the above code is left blank, the NXTFLD function in line 20 will reposition the cursor to that field and display it in reverse video. The NXTFLD function's X attribute will additionally cause an auto-enter to occur when the operator attempts to re-exit the field. If the field passes the test on line 20, and the enter key or a function key was not pressed, the field attribute will resume as an underline and the cursor will be positioned at the next field the operator was trying to move to.
-
-`ADS` expects that line 40 will become a standard line of code in all programs that use input fields and validate data.
-
-Previously, the NxtFld statement supported 3 parameters:
-
-#  The relative field number.
-#  Optional additional field attributes.
-#  An optional `FKEY` value to be applied for cursor positioning before processing the INPUT.
-
-In the event the first parameter points to a `2D field/control` then instead of the FKEY value, the third (or second numeric) parameter is interpreted as the subscript of the item within the 2D control.  For LISTs, this is a row value. For GRIDs this is a Cell Subscript Value. For TOOLBARs, it is the icon subscript value (relative position in toolbar).  
-
-Also, in the event the first parameter points to a 2D field/control then the NXTFLD function returns the subscript of the current item within the 2D control.
-
-The NXTFLD system function has been extended to support the current selection upon entry to a multi-field control. The first parameter specifies which field/control is to be affected and the second parameter is the subscript of the cursor upon entry to that control. In the event the first parameter points to a 2D field/control then instead of the FKEY value, the third (or second numeric) parameter is interpreted as the subscript of the item within the 2D control.
-*For LISTviews this is a row value.
-*For GRIDs this is a Cell Subscript Value.
-*For TOOLBARs it is the icon subscript value (relative position in toolbar).
-
-Note that NXTFLD with 2 parameters does not set the initial position of the cursor until the respective control is entered. Also if the mouse is used to enter a control, that will override the specified NXTFLD value.
 
 `Option` 43 Use old style Input Select with respect to setting CURFLD to the `NXTFLD` value when a selection is made.

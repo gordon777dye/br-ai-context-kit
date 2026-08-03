@@ -102,15 +102,16 @@ document extracts detailed runtime semantics from the BR language tree for LLM-f
 38. [GOSUB / RETURN](#gosub--return--subroutine-call-and-return)
 39. [EXIT](#exit--loop-or-subroutine-exit)
 40. [EXECUTE](#execute--run-a-command-string-from-code)
+41. [TRACE](#trace--line-number-tracing-under-program-control)
 
 ### Error Handling & Recovery
-41. [ON condition](#on-condition--program-wide-condition-traps)
-42. [ON ERROR](#on-error--catch-all-error-handler)
-43. [RETRY / CONTINUE](#retry--continue--re-execute-or-skip-after-an-error)
+42. [ON condition](#on-condition--program-wide-condition-traps)
+43. [ON ERROR](#on-error--catch-all-error-handler)
+44. [RETRY / CONTINUE](#retry--continue--re-execute-or-skip-after-an-error)
 
 ### Function Definition
-44. [DEF FN / FNEND](#def-fn--fnend--user-defined-function-declaration)
-45. [Library Functions](#library-functions--link-reusable-fn-functions-across-programs)
+45. [DEF FN / FNEND](#def-fn--fnend--user-defined-function-declaration)
+46. [Library Functions](#library-functions--link-reusable-fn-functions-across-programs)
 
 ---
 
@@ -3251,6 +3252,50 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 - STOP / END / PAUSE / CHAIN (`CHAIN` is a statement — not allowed inside `EXECUTE`)
 - `SYSTEM` command (OS shell call / exit-to-OS) — run from a program via `EXECUTE`
 - [70-commands/program-management](../br_tree/70-commands/program-management/spec.md#execute) — full EXECUTE / command reference (comprehensive); [§SYSTEM](../br_tree/70-commands/program-management/spec.md#system) — the SYSTEM shell call
+
+---
+
+<a id="trace"></a>
+## TRACE — Line-number tracing under program control
+
+**Syntax:**
+```bnf
+`TRACE` { `ON` | `OFF` | `PRINT` }
+```
+
+**What it does:**
+1. **`TRACE ON` starts line-number tracing** — as each line executes, BR writes its line number (five digits, zero-padded) to the main window and logs a `Trace line <n> in <program>` event
+2. **`TRACE OFF` stops it**, and also clears the print destination
+3. **`TRACE PRINT` sends trace output to the system printer** instead of the window
+4. **Same two run flags as the console options** — `TRACE ON` is the program-controlled equivalent of `RUN TRACE`, and `TRACE OFF` of `NOTRACE`
+
+**Semantics:**
+- **The point of the statement form** is that it can bracket one suspect region of a long program, instead of tracing the whole run from the console
+- **`TRACE PRINT` does not start tracing** — it selects the destination only, and output is still gated on tracing being on. Write `TRACE ON` as well
+- **Statement and command differ here** — `RUN PRINT` sets the destination *only* if tracing is already on, while the statement sets it either way, so the setting survives to apply to a later `TRACE ON`
+- **Tracing costs a per-line check** even when nothing is printed, so turn it off rather than leaving it set
+
+**Gotchas:**
+1. **Write `TRACE ON`, never a bare `TRACE`** — BR's grammar marks the `ON` keyword optional so a bare `TRACE` compiles, but no operand is emitted for it and the runtime reads the byte that follows the statement instead. The effect is unverified; the two-word form is unambiguous
+2. **`TRACE PRINT` alone looks broken** — it is legal, it changes a flag, and it prints nothing. That is the gating above, not a fault
+3. **Trace output interleaves with program output** — it goes to the same main window, so a screen-formatted program becomes hard to read while tracing; `TRACE PRINT` exists for exactly that case
+
+**Example code:**
+```business-rules
+! Trace one suspect subroutine, not the whole run
+02000 TRACE ON
+02010 GOSUB POST_LEDGER
+02020 TRACE OFF
+02030 !
+! Send the trace to the printer, leaving the screen readable
+02100 TRACE PRINT
+02110 TRACE ON
+```
+
+**See also:**
+- [10-language/flow-control/other-flow](../br_tree/10-language/flow-control/other-flow/spec.md#trace) — TRACE statement (comprehensive)
+- [70-commands/information](../br_tree/70-commands/information/spec.md) — `RUN STEP`/`TRACE` and the console debugging options
+- STOP / END / PAUSE / CHAIN (`PAUSE` as the other in-program debugging aid)
 
 ---
 

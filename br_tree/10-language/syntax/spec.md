@@ -11,6 +11,7 @@ corrections:
   - "§Keyword abbreviations rewritten from the interpreter's own matcher (tokensub, and the syntax-tree keyword compare). The wiki appendix disagrees in 15 places and is stale — do not re-fold it over this section."
   - "§Comments corrected. The section said a `!` comment ends at the end of the current statement, and its example asserted that `LET X = 5 ! set initial value :LET Y = X * 2` still assigns Y. It does not. BR's compiler (command6.cpp, the comment copy loop) scans past every `:` and stops only where the character before the colon is `!` — that is, only at `!:`. A plain colon inside a comment is comment text. The corpus settles it beyond argument: 381 comment bodies in the QSMRP application alone contain a bare colon, `! ***** Convert H:M:S To Seconds` among them, and every one of those programs compiles. REM is unchanged and runs to end of line, but the reason it differs is now stated: the same loop skips the `!:` check for REM."
   - "NEXT removed from the intrinsics-outside-the-tables list in §Name resolution, and from that section's DIM example. It is not an intrinsic: it resolves in neither table6k nor table7k, and unlike ABS/INT/SGN (command3.cpp, gated on a following open paren) and AIDX/DIDX (command5.cpp, MAT path) the expression parser has no match for it. It is a keyword — table3k for FOR/NEXT, table4k for record positioning. The DIM line stayed true after the edit (no keyword in BR is reserved) but it was illustrating intrinsic-shadowing with something that is not an intrinsic."
+  - "§Name resolution said \"these six names\" where the list above it holds five (ABS, INT, SGN, AIDX, DIDX). Left over from the same edit that removed NEXT from that list (see the note above): the list was corrected and the count under it was not. Confirmed against functions.json, whose outside_tables set is exactly those five."
 related: [conditionals, other-flow, functions-udf, system-functions, expressions]
 keywords: [REM, comment, line-number, label, continuation, "!:", abbreviation, identifier, name-resolution]
 ---
@@ -113,7 +114,7 @@ Two corollaries worth stating plainly:
   arguments and so yields a name that `(3)` then subscripts; `SIN` requires one, so `SIN(3)`
   is a call. Reasoning from "is it DIM'd?" gives the wrong answer for any declared intrinsic.
 
-Writing a variable with one of these six names is legal and inadvisable; a language server may
+Writing a variable with one of these five names is legal and inadvisable; a language server may
 reasonably warn about it.
 
 **Scope: this is about keywords and *system* functions.** User-defined and library functions are
