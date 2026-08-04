@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.py.",
-  "generated": "2026-08-02",
+  "generated": "2026-08-03",
   "source": "br_tree/",
-  "source_sha256": "af71d1d5e845156380985fdd4a860c340646877a0fe4fcc33bc44cbef74706cd",
+  "source_sha256": "12a4d83d8ae7294e663e45c3103977f42d1bcc5feba136dd3047a66104a59ddb",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -150,6 +150,7 @@
       "00-configuration/config-directives"
     ],
     "DROP": [
+      "30-io-file/statements",
       "70-commands/file-directory"
     ],
     "DSN": [
@@ -215,6 +216,7 @@
       "30-io-file/form-spec"
     ],
     "FREE": [
+      "30-io-file/statements",
       "70-commands/file-directory"
     ],
     "FileIO": [
@@ -251,7 +253,8 @@
       "30-io-file/keys-indexes"
     ],
     "INPUT": [
-      "20-io-screen/input-output"
+      "20-io-screen/input-output",
+      "30-io-file/file-model"
     ],
     "INPUT FIELDS": [
       "20-io-screen/input-output"
@@ -381,6 +384,9 @@
     "ODBC-MANAGER": [
       "30-io-file/database"
     ],
+    "ON": [
+      "10-language/flow-control/other-flow"
+    ],
     "ON ERROR": [
       "10-language/flow-control/error-handling"
     ],
@@ -445,6 +451,7 @@
       "30-io-file/form-spec"
     ],
     "PRINT": [
+      "10-language/flow-control/other-flow",
       "40-io-printing/statements"
     ],
     "PRINT FIELDS": [
@@ -552,6 +559,9 @@
     "SEARCH": [
       "30-io-file/keys-indexes"
     ],
+    "SELECT": [
+      "20-io-screen/input-output"
+    ],
     "SEQUENTIAL": [
       "30-io-file/statements"
     ],
@@ -588,6 +598,10 @@
     ],
     "STATUS.DATABASE": [
       "30-io-file/database"
+    ],
+    "STEP": [
+      "10-language/flow-control/other-flow",
+      "70-commands/information"
     ],
     "STOP": [
       "10-language/flow-control/other-flow"
@@ -1249,7 +1263,10 @@
         "STOP",
         "END",
         "PAUSE",
-        "TRACE"
+        "TRACE",
+        "STEP",
+        "ON",
+        "PRINT"
       ],
       "related": [
         "conditionals",
@@ -1407,7 +1424,8 @@
         "RINPUT SELECT",
         "INPUT",
         "LINPUT",
-        "RINPUT"
+        "RINPUT",
+        "SELECT"
       ],
       "related": [
         "fields-attributes",
@@ -1528,7 +1546,8 @@
         "RELEASE",
         "LINKED",
         "WSID",
-        "locking"
+        "locking",
+        "INPUT"
       ],
       "related": [
         "statements",
@@ -1672,7 +1691,9 @@
         "OUTIN",
         "SEQUENTIAL",
         "OUTPUT",
-        "WAIT"
+        "WAIT",
+        "DROP",
+        "FREE"
       ],
       "related": [
         "file-model",
@@ -2046,7 +2067,8 @@
         "LIST",
         "TRACE",
         "DISPLAY",
-        "LOGGING"
+        "LOGGING",
+        "STEP"
       ],
       "related": [
         "program-management",

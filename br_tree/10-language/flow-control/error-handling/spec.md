@@ -7,6 +7,8 @@ subcategory: 10-language/flow-control/error-handling
 kind: spec
 status: 2b           # synthesized from the reference; new leaf
 recovered-fold: ATTN_Mode, CONV, EOF, NOREC, Operating_Mode, Operating_System_Error, PAUSE_mode, RETRY (8 redirect-collision pages folded from re-fetched source — full operating-mode table, OS-error 4300/4320+SysErr, ON-eligibility, RETRY caveats; verbatim retained on the BR wiki)
+corrections:
+  - "RETRY and CONTINUE had no syntax line. The spec described both at length in prose and its BNF block covered only the four levels of trapping, so the two recovery statements — which the page's own frontmatter declares as keywords — were documented without a form. `dev/statement-semantics.md`'s retry-continue topic did carry the BNF, which is backwards: the distilled layer held a syntax line the curated reference did not. Added under §recovery, with the fact that both are primary operations taking no operand. That last point is not cosmetic: `syn.txt` gives CONTINUE a two-branch tree taking DO or FOR, and neither form exists — BR compiles them and does nothing, which brls now reports as `non-functional-form`. Stated by the maintainer; see lsp/brls/LSP_PLAN.md finding 32. Added in brls phase 5."
 related: [other-flow, conditionals]
 keywords: [ON ERROR, ERROR, IOERR, RETRY, CONTINUE, EXIT, ERR, LINE, SOFLOW, ZDIV]
 ---
@@ -69,6 +71,15 @@ with `ON`; but `EOF` and `NOREC` are accepted **only** on a statement or in `EXI
 
 <a id="recovery"></a>
 ## Recovery & ON options
+
+```bnf
+RETRY                -- re-execute the statement that caused the error
+CONTINUE             -- resume at the statement *after* the one that caused it
+```
+
+**Both are primary operations taking no operand.** There is no `CONTINUE DO`, no
+`CONTINUE FOR`, and no secondary operation of any kind on either — `syn.txt`
+carries a two-branch tree for `CONTINUE` that BR does not implement.
 
 - **`RETRY`** re-executes the statement (clause) that caused the most recent error — analogous to
   `RETURN` at the end of a subroutine; **`CONTINUE`** instead resumes at the *next* statement (common

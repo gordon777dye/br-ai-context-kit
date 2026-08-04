@@ -24,7 +24,8 @@ usability against the `numfunct.cpp`/`strfunct.cpp`/`trig.cpp` implementations.
 > the one numeric argument this file's own *prose* documents while its signature column omitted it.
 > Those eight are corrected. The rest of the roster has **not** been checked case by case, and the
 > mechanical check — generating the arities from the two checkers, which state each range in a
-> comment on every `case` — is specified in `lsp/brls/NOTES.md` item 0b.
+> comment on every `case` — is specified in `lsp/brls/LSP_PLAN.md`, under
+> *Where the authority sits*.
 
 Entries marked **✗** are keywords in the runtime tables that are **not usable**:
 either reserved-but-unimplemented (`TRUNC`, `DEG`, `RAD` — parse but error at runtime) or compiler-rejected

@@ -1,6 +1,6 @@
 {
   "$comment": "Topic index + lexicon over statement-semantics.md and tools/lexicon.json. Router for the interpret/code bundles (see APP-DEV-GUIDE.md). 'lines' are 1-based inclusive ranges for cheap section loading; regenerate with tools/gen_topics.py.",
-  "generated": "2026-08-02",
+  "generated": "2026-08-03",
   "source": "statement-semantics.md",
   "source_sha256": "3e3729ec2ceafc541356d9a4b3643e4c19b2b1b12269ffa6d82bb744bf2edeb7",
   "count": 49,
@@ -451,6 +451,7 @@
       "for-next"
     ],
     "ON": [
+      "trace",
       "on-condition"
     ],
     "ON ERROR": [
@@ -477,7 +478,8 @@
       "stop-end-pause-chain"
     ],
     "PRINT": [
-      "print"
+      "print",
+      "trace"
     ],
     "PRINT FIELDS": [
       "print-fields"
@@ -519,6 +521,9 @@
     ],
     "SORT": [
       "sort"
+    ],
+    "STEP": [
+      "for-next"
     ],
     "STOP": [
       "stop-end-pause-chain"
@@ -1156,7 +1161,8 @@
       "title": "FOR / NEXT — Loop construct, nesting",
       "keywords": [
         "FOR",
-        "NEXT"
+        "NEXT",
+        "STEP"
       ],
       "semantics": {
         "file": "statement-semantics.md",
@@ -1244,7 +1250,9 @@
       "kind": "statement",
       "title": "TRACE — Line-number tracing under program control",
       "keywords": [
-        "TRACE"
+        "TRACE",
+        "ON",
+        "PRINT"
       ],
       "semantics": {
         "file": "statement-semantics.md",
