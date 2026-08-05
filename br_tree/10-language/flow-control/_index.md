@@ -1,6 +1,6 @@
 # 10-language/flow-control
 
-
+Directing execution: loops and jumps, user-defined functions, and error trapping.
 
 _0 entries._
 

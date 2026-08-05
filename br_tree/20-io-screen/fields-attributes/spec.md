@@ -7,7 +7,9 @@ subcategory: 20-io-screen/fields-attributes
 kind: spec
 status: 2b           # reference base + br_tree enrichment; L/^ resolved (br_tree wins): L=scroll-out, ^ dropped
 related: [input-output, controls, windows-cursor]
-keywords: [FMT, PIC, attribute, FILTER, color, DATE]
+keywords: [FMT, PIC, attribute, FILTER, color, DATE, CU, CL, GU, GL, VL, VU]
+corrections:
+  - "keywords: `CU`, `CL`, `GU`, `GL`, `VL`, `VU` added. These are the case-converting **screen** field codes and are absent from BR's FORM format table altogether — using one in a FORM raises error 1006, as the form-spec leaf says. `GU`/`GL` routed nowhere at all; the others were briefly routed to form-spec while its keyword roster was being completed, which sends a reader looking one up to the page saying it does not work there rather than to the page that documents it. This spec is their home. Found in brls phase 10."
 ---
 
 # Field formats & attributes

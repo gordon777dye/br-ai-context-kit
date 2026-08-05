@@ -283,15 +283,14 @@ READ `#`<channel> [ `,` `USING` <form-ref> ] [ `,` <position> ] [ `,` {`RESERVE`
              | `FIRST` | `LAST` | `PRIOR` | `NEXT` | `SAME`
 <form-ref> ::= <line-ref> | <form-string>
 <form-string> ::= `"` `FORM` <form-item> [ `,` <form-item> ]* `"`
-<form-item> ::= { `POS` | `X` | `SKIP` } <n>        -- positioning / line skip (n = integer or num-var)
-         | [ <n> `*` ] <format-spec>          -- a field, optionally repeated n times
-         | [ <n> `*` ] `(` <form-item> [`,` <form-item>]* `)` -- repeat a parenthesized group
-         | `"<literal>"` | `PIC(` <pic-spec> `)`    -- literal text / picture
-<format-spec> ::= <form-string-spec> | <form-numeric-spec> | <pic-spec>
-<form-string-spec> ::= <string> `` ` `` <form-qty>
-<form-qty> ::= <integer> | <numeric-variable>
-<form-numeric-spec> ::= <string> `` ` `` {<integer>[`.`<integer>] | <numeric-variable>}
-<pic-spec> ::= `PIC(` <string> `)` | `FMT(` <string> `)`
+<form-item> ::= { `POS` | `X` | `SKIP` } <qty>      -- positioning / line skip; never takes a repeat factor
+         | [ <qty> `*` ] <format-spec>        -- a field, optionally repeated
+         | [ <qty> `*` ] `(` <flat> [`,` <flat>]* `)` -- repeat a group; groups do not nest
+         | <literal> | `PIC(` <picture> `)` | `DATE(` <mask> `)`
+<flat>   ::= { `POS` | `X` | `SKIP` } <qty> | [ <qty> `*` ] <format-spec>
+         | <literal> | `PIC(` <picture> `)` | `DATE(` <mask> `)`
+<format-spec> ::= <string-code> [ ` ` <qty> ] | <numeric-code> ` ` <qty> [ `.` <qty> ]
+<qty> ::= <integer> | <numeric-variable>      -- width and decimals resolve separately: `PD 6.PRICE_`
 
 ```
 
@@ -884,11 +883,12 @@ CLOSE `#`<channel>  [`,` { `DROP` | `FREE` } ] [ `,` `RELEASE` ] `:`
 ```bnf
 [<line-number>] `FORM` <form-item> [ `,` <form-item> ]*
 
-<form-item>    ::= <format-spec>                        -- one field
-                 | <n> `*` <format-spec>                -- repeat a field n times
-                 | <n> `*` `(` <form-item> [`,` <form-item>]* `)` -- repeat a group
+<form-item>    ::= [ <n> `*` ] <format-spec>          -- one field, optionally repeated
+                 | [ <n> `*` ] `(` <flat> [`,` <flat>]* `)` -- repeat a group; groups do not nest
                  | { `POS` | `X` | `SKIP` } <n>         -- absolute column / skip columns / skip lines
+                                                        --   (never carries a repeat factor)
                  | `"` <literal> `"`                    -- literal text (output only)
+<flat>         ::= [ <n> `*` ] <format-spec> | { `POS` | `X` | `SKIP` } <n> | `"` <literal> `"`
 <format-spec>  ::= `C` <len>            -- character, fixed length (blank-padded)
                  | `V` <len>            -- variable-length character (trailing-blank aware)
                  | `G` <len>            -- character, blanks trimmed
@@ -897,9 +897,13 @@ CLOSE `#`<channel>  [`,` { `DROP` | `FREE` } ] [ `,` `RELEASE` ] `:`
                  | `PD` <len>[`.`<dec>] -- packed decimal
                  | `ZD` <len>[`.`<dec>] -- zoned decimal (signed overpunch)
                  | `PIC(` <picture> `)` -- picture-formatted / edited numeric
+                 | `DATE(` <mask> `)`   -- date held as a day count, read/written readably
                  | ...                  -- further print-edit codes: see form-spec
-<len>          ::= <integer> | <numeric-variable>
+<len>, <dec>   ::= <integer> | <numeric-variable>   -- independently: `PD 6.PRICE_` is legal
 ```
+
+The code and its width are separated by a **space that is part of the syntax**: `X2` is not `X 2`
+and is not a format at all. See [form-spec](../br_tree/30-io-file/form-spec/spec.md#syntax).
 
 **What it does:**
 1. **Describes a record or print line as an ordered list of fields** — Each `<form-item>` maps the next bytes/columns of the buffer to the next variable in the I/O statement's list.
@@ -915,13 +919,16 @@ CLOSE `#`<channel>  [`,` { `DROP` | `FREE` } ] [ `,` `RELEASE` ] `:`
 - **Character trimming** — `C` is fixed length (blank-padded); `V`/`G` are trailing-blank aware. The choice governs whether trailing spaces are stored/compared.
 - **String literals are output-only** — A `"text"` item prints literal text on output; on input it is skipped over (advances the column).
 - **Inline FORM string** — Instead of a line reference, a statement may carry the spec inline as a string: `WRITE #1, USING "FORM C 10, N 6.2": A$, B` — identical semantics, no separate line.
-- **Run-time widths** — `<len>` may be a numeric variable, so a FORM can adapt at run time (e.g., width held in `N`).
+- **Run-time widths** — `<len>` may be a numeric variable, so a FORM can adapt at run time (e.g., width held in `N`); so may `<dec>`, independently of the width.
+- **A FORM statement is compiled when its line is read; a `USING` string is compiled when the statement runs.** One routine does both, so the same malformed text is a load-time syntax error in the first position and error **801** in the second — the program loads and ships and fails on first execution. `USING <line-ref>` additionally checks that the named line's first statement really is a FORM, answering error **707** if not. See [form-spec §when-a-form-is-compiled](../br_tree/30-io-file/form-spec/spec.md#when-a-form-is-compiled).
 
 **Common errors:**
 - ERR CONV — value/type mismatch between a FORM item and its variable (e.g., non-numeric bytes into an `N` field)
 - ERR SOFLOW — a string longer than its `C`/`V` width on output
 - ERR OFLOW — a number too large for its `N`/`PIC` field
-- ERR — malformed FORM item / unknown format code (reported when the referencing statement runs)
+- 1006 — malformed FORM item / unknown format code **in a FORM statement**, reported as the line is read
+- 801 — the same, in a `USING` string, reported when the referencing statement runs
+- 707 — `USING <line-ref>` names a line whose first statement is not a FORM
 
 **Gotchas:**
 1. **The FORM cycles silently** — An accidentally short FORM re-applies from the start rather than erroring; count items against your variable list.

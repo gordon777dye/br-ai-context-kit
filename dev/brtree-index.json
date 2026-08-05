@@ -2,7 +2,7 @@
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.py.",
   "generated": "2026-08-05",
   "source": "br_tree/",
-  "source_sha256": "e5509542894ad04a53cecfd2f66e969970c0c3cc8b1e250406c81bb9e5efabb2",
+  "source_sha256": "2ad134301769aa5b192364a544dc4f16cacc81c1f052f69c832b7ac92168390d",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -27,11 +27,20 @@
     "AutoIt": [
       "00-configuration/installation-tooling"
     ],
+    "B": [
+      "30-io-file/form-spec"
+    ],
     "BAUD": [
       "30-io-file/serial-comm"
     ],
     "BELL": [
       "40-io-printing/statements"
+    ],
+    "BH": [
+      "30-io-file/form-spec"
+    ],
+    "BL": [
+      "30-io-file/form-spec"
     ],
     "BORDER": [
       "20-io-screen/windows-cursor"
@@ -51,8 +60,14 @@
     "BUTTON": [
       "20-io-screen/controls"
     ],
+    "C": [
+      "30-io-file/form-spec"
+    ],
     "CAPTION": [
       "20-io-screen/windows-cursor"
+    ],
+    "CC": [
+      "30-io-file/form-spec"
     ],
     "CHAIN": [
       "70-commands/program-management"
@@ -62,6 +77,9 @@
     ],
     "CHECK": [
       "20-io-screen/controls"
+    ],
+    "CL": [
+      "20-io-screen/fields-attributes"
     ],
     "CLEAR": [
       "70-commands/program-management"
@@ -106,6 +124,15 @@
     "COPY": [
       "70-commands/file-directory"
     ],
+    "CR": [
+      "30-io-file/form-spec"
+    ],
+    "CU": [
+      "20-io-screen/fields-attributes"
+    ],
+    "D": [
+      "30-io-file/form-spec"
+    ],
     "DATA": [
       "10-language/data-manipulation/assignment"
     ],
@@ -119,7 +146,8 @@
       "00-configuration/environment"
     ],
     "DATE": [
-      "20-io-screen/fields-attributes"
+      "20-io-screen/fields-attributes",
+      "30-io-file/form-spec"
     ],
     "DATE$": [
       "10-language/data-manipulation/system-functions"
@@ -136,6 +164,9 @@
     "DELETE": [
       "30-io-file/statements"
     ],
+    "DH": [
+      "30-io-file/form-spec"
+    ],
     "DIM": [
       "10-language/data-manipulation/declaration"
     ],
@@ -145,6 +176,9 @@
     "DISPLAY": [
       "30-io-file/file-model",
       "70-commands/information"
+    ],
+    "DL": [
+      "30-io-file/form-spec"
     ],
     "DLL": [
       "00-configuration/installation-tooling"
@@ -161,6 +195,9 @@
     ],
     "DSN": [
       "30-io-file/database"
+    ],
+    "DT": [
+      "30-io-file/form-spec"
     ],
     "DUPREC": [
       "10-language/flow-control/error-handling"
@@ -244,6 +281,15 @@
     "FnSnap": [
       "50-libraries/fnsnap"
     ],
+    "G": [
+      "30-io-file/form-spec"
+    ],
+    "GF": [
+      "30-io-file/form-spec"
+    ],
+    "GL": [
+      "20-io-screen/fields-attributes"
+    ],
     "GO": [
       "70-commands/program-management"
     ],
@@ -255,6 +301,12 @@
     ],
     "GRID": [
       "20-io-screen/controls"
+    ],
+    "GU": [
+      "20-io-screen/fields-attributes"
+    ],
+    "GZ": [
+      "30-io-file/form-spec"
     ],
     "HEADING": [
       "40-io-printing/statements"
@@ -303,6 +355,9 @@
     ],
     "KSTAT$": [
       "10-language/data-manipulation/system-functions"
+    ],
+    "L": [
+      "30-io-file/form-spec"
     ],
     "LAST": [
       "30-io-file/statements"
@@ -379,6 +434,9 @@
     "MSGBOX": [
       "10-language/data-manipulation/system-functions"
     ],
+    "N": [
+      "30-io-file/form-spec"
+    ],
     "NEWPAGE": [
       "20-io-screen/windows-cursor",
       "40-io-printing/statements"
@@ -403,6 +461,9 @@
     ],
     "NWP": [
       "40-io-printing/pcl-pdf"
+    ],
+    "NZ": [
+      "30-io-file/form-spec"
     ],
     "ODBC": [
       "00-configuration/installation-tooling",
@@ -464,6 +525,9 @@
     ],
     "PCL": [
       "40-io-printing/pcl-pdf"
+    ],
+    "PD": [
+      "30-io-file/form-spec"
     ],
     "PDF": [
       "00-configuration/installation-tooling",
@@ -578,6 +642,9 @@
     "RUN": [
       "70-commands/program-management"
     ],
+    "S": [
+      "30-io-file/form-spec"
+    ],
     "SAME": [
       "30-io-file/statements"
     ],
@@ -690,11 +757,20 @@
       "30-io-file/form-spec",
       "40-io-printing/statements"
     ],
+    "V": [
+      "30-io-file/form-spec"
+    ],
     "VAL": [
       "10-language/data-manipulation/system-functions"
     ],
     "VERIFY": [
       "30-io-file/keys-indexes"
+    ],
+    "VL": [
+      "20-io-screen/fields-attributes"
+    ],
+    "VU": [
+      "20-io-screen/fields-attributes"
     ],
     "WAIT": [
       "30-io-file/statements"
@@ -721,6 +797,12 @@
     ],
     "WebForm": [
       "60-integration/web"
+    ],
+    "X": [
+      "30-io-file/form-spec"
+    ],
+    "ZD": [
+      "30-io-file/form-spec"
     ],
     "ZDIV": [
       "10-language/flow-control/error-handling"
@@ -1435,7 +1517,13 @@
         "attribute",
         "FILTER",
         "color",
-        "DATE"
+        "DATE",
+        "CU",
+        "CL",
+        "GU",
+        "GL",
+        "VL",
+        "VU"
       ],
       "related": [
         "input-output",
@@ -1630,9 +1718,31 @@
       "keywords": [
         "FORM",
         "USING",
-        "PIC",
         "POS",
-        "SKIP"
+        "SKIP",
+        "PIC",
+        "DATE",
+        "C",
+        "CC",
+        "CR",
+        "V",
+        "G",
+        "N",
+        "NZ",
+        "GZ",
+        "GF",
+        "X",
+        "B",
+        "BL",
+        "BH",
+        "PD",
+        "ZD",
+        "DT",
+        "DH",
+        "DL",
+        "D",
+        "S",
+        "L"
       ],
       "related": [
         "statements",
@@ -1644,6 +1754,7 @@
         "repetition",
         "format-codes",
         "semantics",
+        "when-a-form-is-compiled",
         "examples",
         "see-also"
       ],

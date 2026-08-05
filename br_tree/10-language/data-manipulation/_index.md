@@ -1,6 +1,6 @@
 # 10-language/data-manipulation
 
-
+Working with values in memory: declaration, assignment, expressions, conditionals, data types and the intrinsic functions.
 
 _0 entries._
 

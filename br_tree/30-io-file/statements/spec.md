@@ -11,6 +11,7 @@ related: [file-model, form-spec, keys-indexes, serial-comm]
 keywords: [OPEN, CLOSE, READ, WRITE, REWRITE, DELETE, RESTORE, REREAD, REC, KEY, FIRST, LAST, PRIOR, NEXT, SAME, EOF, NOKEY, NOREC, OUTIN, SEQUENTIAL, OUTPUT, WAIT, DROP, FREE]
 corrections:
   - "The exit clauses were enumerated per statement and are one repeatable production. Section io gave READ `[EOF] [NOKEY] [NOREC] [ERROR]` and REWRITE `[NOKEY] [NOREC]`, which reads as the admissible set for each statement and is not: BR matches an exit clause by a table lookup (`getExit`, command4.cpp) rather than against an expected keyword, so any of the 17 error conditions is admissible wherever a statement's syntax tree admits exits, and they repeat with a space rather than a comma. Replaced with an `<exits>` production pointing at the roster in 10-language/flow-control/error-handling, keeping the per-statement note about which conditions can actually fire - that part was the useful content and is a semantic claim, not a grammatical one. DELETE and RESTORE already used `[ <error-condition> ]`, a third notation for the same thing, and now use `<exits>` too. This spec's enumeration is where brls transcribed a 14-name roster from, which is how the error was found; see lsp/brls/LSP_PLAN.md finding 33. Sources are level 1: BR's `synexits`/`table4v`/`table4k` and the READ/REWRITE trees in `lsp/syn.txt`. Added in brls phase 7."
+  - "`USING` was given as taking a `<line-ref>` only, on all four record-I/O statements. BR's syntax tree gives each of READ, REREAD, WRITE and REWRITE a **two-way branch** there — a line reference or an alpha expression — exactly as PRINT has, so `READ #1, USING \"FORM C 20,N 6.2\": A$, B` and `USING F$` are as legal as naming a FORM line, and the inline string is not a PRINT-only convenience. A `<form-ref>` production added, with a note that the two forms differ in *when* the layout is compiled and so in what a mistake in it costs. Source is level 1: the USING nodes in all five statements' trees in `lsp/syn.txt`. The printing spec already had this right. Added in brls phase 10."
   - "Twelve keywords added. The spec's own BNF defines the <position> production (FIRST/LAST/PRIOR/NEXT/SAME), the I/O exit clauses (EOF/NOKEY/NOREC), the OPEN modes OUTIN/SEQUENTIAL/OUTPUT and the WAIT= clause, and Positional_Parameters.md sits beside it covering the positional five in detail - but the frontmatter declared none of them. The keyword index is built from this list, so all twelve routed to no spec at all: BR's own record-positioning vocabulary was documented here and reachable from nowhere. Only single-sense spellings were added, plus NEXT. DROP, FREE and INPUT are also defined in this BNF and still omitted, because each also names a command or a statement and a class-blind index would attach this spec to that sense too."
 ---
 
@@ -51,18 +52,26 @@ OPEN '#'<channel> ':' <file-open-string> ',' 'EXTERNAL' ','
 <a id="io"></a>
 ### Record I/O
 ```bnf
-READ    '#'<channel> [ ',' 'USING' <line-ref> ] [ ',' <position> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <variable-list> <exits>
-REREAD  '#'<channel> [ ',' 'USING' <line-ref> ] ':' <variable-list> <exits>      -- re-reads buffered record; no EOF
-WRITE   '#'<channel> [ ',' 'USING' <line-ref> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <expression-list> <exits>
-REWRITE '#'<channel> [ ',' 'USING' <line-ref> ] [ ',' { 'REC='<n> | 'KEY='<k$> } ] [ ',' { 'RESERVE' | 'RELEASE' } ] [ ',' 'WAIT=' <integer> ] ':' <expression-list> <exits>   -- WAIT= only with REC=/KEY=
+READ    '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' <position> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <variable-list> <exits>
+REREAD  '#'<channel> [ ',' 'USING' <form-ref> ] ':' <variable-list> <exits>      -- re-reads buffered record; no EOF
+WRITE   '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <expression-list> <exits>
+REWRITE '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' { 'REC='<n> | 'KEY='<k$> } ] [ ',' { 'RESERVE' | 'RELEASE' } ] [ ',' 'WAIT=' <integer> ] ':' <expression-list> <exits>   -- WAIT= only with REC=/KEY=
 DELETE  '#'<channel> [ ',' { 'REC='<n> | 'KEY='<k$> } ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <exits>
 RESTORE '#'<channel> [ ',' <position> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <exits>
 CLOSE   '#'<channel> [ ',' { 'DROP' | 'FREE' } ] [ ',' 'RELEASE' ] ':'
 
 <position> ::= 'REC=' <numeric-expr> | 'KEY[>]=' <string-expr> | 'SEARCH[>]=' <string-expr>
              | 'FIRST' | 'LAST' | 'PRIOR' | 'NEXT' | 'SAME'
+<form-ref> ::= <line-ref> | <string-expr>          -- a FORM line, or the layout as a "FORM …" string
 <exits>    ::= [ <error-condition> <line-ref> ]*   -- space-separated, repeatable, any of the 17
 ```
+
+**`USING` takes either form on all four statements.** BR's syntax tree gives each of them a two-way
+branch — a line reference, or an alpha expression — so the inline string is not a `PRINT`-only
+convenience: `READ #1, USING "FORM C 20,N 6.2": A$, B` is as legal as naming a `FORM` line, and so is
+`USING F$` with the layout held in a variable. The two are **not** interchangeable in one respect,
+which is when the layout gets compiled and therefore what a mistake in it costs — see
+[form-spec](../form-spec/spec.md#when-a-form-is-compiled).
 
 **`<exits>` is one production, not a per-statement list.** BR matches an exit clause by a table
 lookup rather than against an expected keyword, so **any** of the 17 error conditions is admissible

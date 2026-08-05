@@ -9,9 +9,9 @@ _Backing keyword pages below._
 | File | Kind | Summary |
 |---|---|---|
 | [CFORM$](CFORM$.md) | function | CFORM$(<form|form statement>) |
-| [DATE$](DATE$.md) | function | Date$([*]<format$>) |
+| [DATE$](DATE$.md) | function | Date$ Date$(<days>) Date$([*]<format$>) Date$(<days>,[*]<format$>) |
 | [DATE_(Internal_Function)](DATE_(Internal_Function).md) | function | See also Date (disambiguation) |
 | [DAYS](DAYS.md) | function | DAYS (<date>[,<format$>]) |
-| [Encryption](Encryption.md) | function | Encryption encompasses a number of different operations. These operations can be used independently or in combination to meet different need |
+| [Encryption](Encryption.md) | function | Encryption encompasses a number of different operations. These operations can be used independently or in combination to meet different… |
 | [ENV$](ENV$.md) | function | ENV$(<variable>) |
-| [NXTFLD](NXTFLD.md) | function | The NxtFld internal function is similar to Curfld except that it returns the relative position of the next control to be occupied during an  |
+| [NXTFLD](NXTFLD.md) | function | The NxtFld internal function is similar to Curfld except that it returns the relative position of the next control to be occupied during an… |

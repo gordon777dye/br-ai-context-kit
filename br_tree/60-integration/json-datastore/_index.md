@@ -2,7 +2,7 @@
 
 In-memory object/data store and JSON build/parse/serve functions.
 
-**📄 Guide → [spec.md](spec.md)** _(status: 2b)_ — In-memory storage of named objects (JSON or other strings) plus functions to build, parse, and
+**📄 Guide → [spec.md](spec.md)** _(status: 2b)_ — In-memory storage of named objects (JSON or other strings) plus functions to build, parse, and serve JSON — the data layer behind BR web…
 
 _Backing keyword pages below._
 
