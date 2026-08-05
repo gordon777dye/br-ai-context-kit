@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.py.",
-  "generated": "2026-08-03",
+  "generated": "2026-08-05",
   "source": "br_tree/",
-  "source_sha256": "12a4d83d8ae7294e663e45c3103977f42d1bcc5feba136dd3047a66104a59ddb",
+  "source_sha256": "e5509542894ad04a53cecfd2f66e969970c0c3cc8b1e250406c81bb9e5efabb2",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -14,6 +14,9 @@
     ],
     "AND": [
       "10-language/data-manipulation/expressions"
+    ],
+    "ATTN": [
+      "10-language/flow-control/error-handling"
     ],
     "ATTRIBUTE": [
       "00-configuration/config-directives"
@@ -94,6 +97,9 @@
     "CONTINUE": [
       "10-language/flow-control/error-handling"
     ],
+    "CONV": [
+      "10-language/flow-control/error-handling"
+    ],
     "COPIES": [
       "40-io-printing/statements"
     ],
@@ -156,6 +162,9 @@
     "DSN": [
       "30-io-file/database"
     ],
+    "DUPREC": [
+      "10-language/flow-control/error-handling"
+    ],
     "EDIT": [
       "70-commands/editing"
     ],
@@ -169,12 +178,16 @@
       "00-configuration/environment"
     ],
     "EOF": [
+      "10-language/flow-control/error-handling",
       "30-io-file/statements"
     ],
     "ERR": [
       "10-language/flow-control/error-handling"
     ],
     "ERROR": [
+      "10-language/flow-control/error-handling"
+    ],
+    "EVENT": [
       "10-language/flow-control/error-handling"
     ],
     "EXECUTE": [
@@ -196,6 +209,9 @@
     "FIRST": [
       "30-io-file/statements"
     ],
+    "FKEY": [
+      "10-language/flow-control/error-handling"
+    ],
     "FMT": [
       "20-io-screen/fields-attributes"
     ],
@@ -204,6 +220,9 @@
     ],
     "FNEND": [
       "10-language/flow-control/functions-udf"
+    ],
+    "FNKEY": [
+      "10-language/flow-control/error-handling"
     ],
     "FONT": [
       "00-configuration/config-directives",
@@ -319,6 +338,9 @@
       "50-libraries/library-facility",
       "70-commands/program-management"
     ],
+    "LOCKED": [
+      "10-language/flow-control/error-handling"
+    ],
     "LOGGING": [
       "00-configuration/config-directives",
       "70-commands/information"
@@ -366,9 +388,14 @@
       "30-io-file/statements"
     ],
     "NOKEY": [
+      "10-language/flow-control/error-handling",
       "30-io-file/statements"
     ],
+    "NONE": [
+      "10-language/flow-control/error-handling"
+    ],
     "NOREC": [
+      "10-language/flow-control/error-handling",
       "30-io-file/statements"
     ],
     "NOT": [
@@ -383,6 +410,9 @@
     ],
     "ODBC-MANAGER": [
       "30-io-file/database"
+    ],
+    "OFLOW": [
+      "10-language/flow-control/error-handling"
     ],
     "ON": [
       "10-language/flow-control/other-flow"
@@ -420,6 +450,7 @@
       "30-io-file/statements"
     ],
     "PAGEOFLOW": [
+      "10-language/flow-control/error-handling",
       "40-io-printing/statements"
     ],
     "PARENT": [
@@ -638,6 +669,9 @@
     ],
     "TIME$": [
       "10-language/data-manipulation/system-functions"
+    ],
+    "TIMEOUT": [
+      "10-language/flow-control/error-handling"
     ],
     "TRACE": [
       "10-language/flow-control/other-flow",
@@ -1192,7 +1226,21 @@
         "ERR",
         "LINE",
         "SOFLOW",
-        "ZDIV"
+        "ZDIV",
+        "ATTN",
+        "CONV",
+        "DUPREC",
+        "EOF",
+        "EVENT",
+        "FKEY",
+        "FNKEY",
+        "LOCKED",
+        "NOKEY",
+        "NONE",
+        "NOREC",
+        "OFLOW",
+        "PAGEOFLOW",
+        "TIMEOUT"
       ],
       "related": [
         "other-flow",

@@ -8,9 +8,10 @@ kind: spec
 status: 2b           # synthesized from the reference; new leaf
 recovered-fold: ATTN_Mode, CONV, EOF, NOREC, Operating_Mode, Operating_System_Error, PAUSE_mode, RETRY (8 redirect-collision pages folded from re-fetched source — full operating-mode table, OS-error 4300/4320+SysErr, ON-eligibility, RETRY caveats; verbatim retained on the BR wiki)
 corrections:
+  - "The error-condition roster was one list of 13 and is two rosters of 17 and 13. `<error-condition>` is used as a nonterminal in all four levels of the trapping BNF and was never given a production; §conditions named 13 words informally and said only that \"not every condition works with ON\". BR keeps the two sets in different places, and neither matches that list. A statement or EXIT clause is whatever `getExit` accepts — a table4k clause keyword whose token value appears in BR's `synexits` table, which is 17 words; `ON` takes its conditions from `ON`'s own syntax tree in `syn.txt`, which is 13, two of them taking an operand. Missing from the old list as statement clauses: ERROR, EVENT, LOCKED, TIMEOUT. Missing as ON conditions: ATTN, ERROR, EVENT, FKEY, FNKEY, LOCKED. Also added: that the clauses repeat with a space and not a comma, and the LOCKED-before-IOERR-before-ERROR ordering rule. LOCKED, TIMEOUT and the ordering rule were already in the tree, in `90-reference/error-codes/Locked_Error_Cond.md`, `IOERR.md` and the file-I/O and screen specs — they had simply never been folded into the roster, and three backing pages (`Error-Cond_Line-Ref.md`, `EXIT.md`, `EXIT_Error_Cond.md`) point at an `Error Conditions` page this tree does not have, which is where a complete roster would have lived. EVENT is listed as compiling and never firing - nothing in BR raises the condition, so the branch is unreachable in both rosters; it is a forward look left in the tables, the same shape as SELECT and CASE. Stated by the maintainer, and consistent with the QSMRP corpus, which traps it 0 times. brls reports it as `non-functional-form`. Sources are level 1: BR's `synexits`/`table4v`/`table4k` (carried verbatim in `lsp/brls/brsz/`) and `lsp/syn.txt`. Found in brls phase 7, when `ON POS(…) GOTO A,B,C NONE Done` and a second exit clause on one statement were both rejected by a parser whose roster had been transcribed from the file-I/O spec's BNF; see lsp/brls/LSP_PLAN.md finding 33. HELP is deliberately left out of the frontmatter keywords for the reason DROP/FREE/INPUT are, below: it also names a command."
   - "RETRY and CONTINUE had no syntax line. The spec described both at length in prose and its BNF block covered only the four levels of trapping, so the two recovery statements — which the page's own frontmatter declares as keywords — were documented without a form. `dev/statement-semantics.md`'s retry-continue topic did carry the BNF, which is backwards: the distilled layer held a syntax line the curated reference did not. Added under §recovery, with the fact that both are primary operations taking no operand. That last point is not cosmetic: `syn.txt` gives CONTINUE a two-branch tree taking DO or FOR, and neither form exists — BR compiles them and does nothing, which brls now reports as `non-functional-form`. Stated by the maintainer; see lsp/brls/LSP_PLAN.md finding 32. Added in brls phase 5."
 related: [other-flow, conditionals]
-keywords: [ON ERROR, ERROR, IOERR, RETRY, CONTINUE, EXIT, ERR, LINE, SOFLOW, ZDIV]
+keywords: [ON ERROR, ERROR, IOERR, RETRY, CONTINUE, EXIT, ERR, LINE, SOFLOW, ZDIV, ATTN, CONV, DUPREC, EOF, EVENT, FKEY, FNKEY, LOCKED, NOKEY, NONE, NOREC, OFLOW, PAGEOFLOW, TIMEOUT]
 ---
 
 # Error handling
@@ -50,17 +51,90 @@ ON ERROR { GOTO <line-ref> | GOSUB <line-ref> | IGNORE | SYSTEM }
 <a id="conditions"></a>
 ## Error conditions
 
-`CONV` (conversion/type), `DUPREC` (WRITE over existing record), `EOF` (no more records / no
-space), `IOERR` (any untrapped I/O error), `NOKEY` (key absent), `NOREC` (record deleted/out of
-range), `OFLOW` (numeric overflow), `PAGEOFLOW` (page length reached), `SOFLOW` (string overflow),
-`ZDIV` (divide by zero), `HELP` (Help key), `NONE` (no `ON GOTO/GOSUB` match), `EXIT` (references
-an `EXIT` group). These are the same condition words used on I/O statements
+`<error-condition>` above stands for **two rosters, not one**, and BR keeps them in two different
+places. A name in one is not necessarily in the other.
+
+### On a statement, or in an `EXIT` group — 17
+
+```bnf
+<statement> [ <error-condition> <line-ref> ]*      -- space-separated, not comma-separated
+```
+
+`CONV` `DUPREC` `EOF` `ERROR` `EVENT`† `EXIT` `HELP` `IOERR` `LOCKED` `NOKEY` `NONE` `NOREC`
+`OFLOW` `PAGEOFLOW` `SOFLOW` `TIMEOUT` `ZDIV`
+
+† **`EVENT` compiles and can never fire** — nothing in BR raises the condition. It is admissible
+everywhere the others are and traps nothing, in either roster.
+
+The clauses **repeat with no delimiter between them** — `… NOKEY 910 EOF 900` is two clauses, not
+one clause and a syntax error. A `line-ref` may also be `IGNORE` or `SYSTEM`, which are actions
+rather than branch targets (`… ERROR IGNORE`).
+
+**Order matters when several are listed**, because each of these traps a superset of the one before:
+list `LOCKED` before `IOERR` before `ERROR`, or the broader one takes the error first. At the `ON`
+level BR instead picks the most specific action for the error that occurred —
+[`Locked_Error_Cond.md`](../../../90-reference/error-codes/Locked_Error_Cond.md),
+[`IOERR.md`](../../../90-reference/error-codes/IOERR.md).
+
+### With `ON` — 13
+
+```bnf
+ON <on-condition> { GOTO <line-ref> | GOSUB <line-ref> | IGNORE | SYSTEM }
+```
+
+`ATTN` `CONV` `ERROR` `EVENT`† `FKEY <n>` `FNKEY <n>` `HELP` `IOERR` `LOCKED` `OFLOW` `PAGEOFLOW`
+`SOFLOW` `ZDIV`
+
+`FKEY` and `FNKEY` are the two that take an operand. `ON FNKEY` is the pre-4.20 spelling and needs
+[`OPTION 58`](../../../00-configuration/platform/Backward_Compatibility.md); as of 4.20 the name is
+just `FKEY` ([20-io-screen/windows-cursor](../../../20-io-screen/windows-cursor/spec.md)).
+
+### Which roster a name is in
+
+| Statement / `EXIT` only | Both | `ON` only |
+|---|---|---|
+| `DUPREC` `EOF` `EXIT` `NOKEY` `NONE` `NOREC` `TIMEOUT` | `CONV` `ERROR` `EVENT` `HELP` `IOERR` `LOCKED` `OFLOW` `PAGEOFLOW` `SOFLOW` `ZDIV` | `ATTN` `FKEY <n>` `FNKEY <n>` |
+
+**This is the table behind "not every condition works with `ON`".** `CONV` is in the middle column,
+`EOF` and `NOREC` in the left with five others, and `ATTN` on the right — so `EXIT ATTN 900` is not
+a form: `ATTN` is a clause keyword BR declares, but its token value is not among the exits, so the
+lookup that reads an exit clause never matches it.
+
+**A statement and an `EXIT` group share one roster** because they share one code path. `EXIT` is not
+table-driven — its syntax tree covers only `EXIT FOR` and `EXIT SELECT`, and the error-condition form
+goes to a hand-written routine. That routine, having ruled out `EXIT DO`, marks the line
+non-executable and *resumes normal compilation*, so the condition list that follows is read by the
+same matcher that reads the clauses on a `READ`.
+
+### What each one traps
+
+| Condition | Traps |
+|---|---|
+| `ATTN` | the Ctrl-A interrupt (see [§modes](#modes)) |
+| `CONV` | conversion/type — four cases, below |
+| `DUPREC` | `WRITE` over an existing record |
+| `EOF` | no more records / no space — three cases, below |
+| `ERROR` | the broadest trap: everything `IOERR` traps and more |
+| `EVENT` | **nothing — it never fires.** BR accepts the clause in both rosters and no part of the runtime raises the condition, so the branch is unreachable. A forward look left in the tables, like `SELECT` and `CASE` |
+| `EXIT` | references an `EXIT` group |
+| `FKEY <n>` / `FNKEY <n>` | function key `<n>` during RUN (F1–F10 default `IGNORE`; during `INPUT`, keys set `CMDKEY` instead) |
+| `HELP` | the Help key |
+| `IOERR` | any untrapped I/O error; everything `LOCKED` traps and more |
+| `LOCKED` | the record is locked at another workstation (**0061**) or file-sharing rules are violated (**4148**) |
+| `NOKEY` | key absent |
+| `NONE` | no match on a computed `ON … GOTO/GOSUB` |
+| `NOREC` | record deleted / out of range — three cases, below |
+| `OFLOW` | numeric overflow |
+| `PAGEOFLOW` | page length reached |
+| `SOFLOW` | string overflow (`ON … IGNORE` truncates instead) |
+| `TIMEOUT` | a `WAIT=<sec>` expired with no input (**4145**) |
+| `ZDIV` | divide by zero |
+
+These are the same condition words used on I/O statements
 ([30-io-file/statements](../../../30-io-file/statements/spec.md#io)) and screen
 ([20-io-screen/input-output](../../../20-io-screen/input-output/spec.md)).
 
-**Not every condition works with `ON`.** `CONV` may appear on a statement, in an `EXIT` group **and**
-with `ON`; but `EOF` and `NOREC` are accepted **only** on a statement or in `EXIT` — never with
-`ON error`. Specifics worth knowing:
+Specifics worth knowing:
 - **`CONV`** traps four conversions: non-numeric characters in a numeric field (or vice versa); a number
   too big for the field; an I/O-list item whose type disagrees with its `FORM` spec; or a negative value
   output through a `PIC` that specifies no sign.
