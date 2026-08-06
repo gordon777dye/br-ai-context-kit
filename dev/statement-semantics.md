@@ -2094,28 +2094,41 @@ RINPUT [`#`<window>`,`] `FIELDS` <field-specs> [`,` `ATTR` <attrs>] [`,` `HELP` 
 **Syntax:**
 ```bnf
 [<line-number>] `OPTION` <option-clause> [ `,` <option-clause> ]*
-<option-clause> ::= `BASE` { `0` | `1` }                 -- array subscript lower bound
-                  | `COLLATE` { `NATIVE` | `ALTERNATE` }  -- string comparison order
+<option-clause> ::= `BASE` { `0` | `1` }                              -- array subscript lower bound
+                  | `PRTZO` <1..128>                                  -- print-zone width
+                  | `INVP`                                            -- European decimal/comma
+                  | `COLLATE` { `NATIVE` | `ALTERNATE` | `EBCIDIC` }   -- string comparison order
+                  | `RETAIN`                                          -- resident library keeps its variables
 ```
+
+**The roster is closed and is these five.** `OPTION` has no syntax tree: `OPTION_PRI`
+(command5.cpp, reached through `syntxfn2`) tokenizes each word, resolves it through **table4k**, and
+switches on the table4v token value, with `default: goto SYNTAX_ERR`. `EBCIDIC` is table4k's own
+spelling of that keyword.
 
 **What it does:**
 1. **Sets program-wide language options** — `OPTION` changes how the *current program* interprets certain constructs; it is a directive, not a computation.
 2. **`OPTION BASE 0 | 1`** — Selects the lower bound for array subscripts: `1` (default) makes arrays 1-based; `0` makes them 0-based. Governs every `DIM` that follows.
-3. **`OPTION COLLATE NATIVE | ALTERNATE`** — Chooses the collating sequence used by string relational operators: `NATIVE` (the platform/character-set order — e.g. ASCII, digits before letters) vs. `ALTERNATE` (the alternate/EBCDIC-like order, digits after letters).
+3. **`OPTION PRTZO <n>`** — Sets the print-zone width the `,` separator in a print list advances to, 1 to 128 (default 24).
+4. **`OPTION INVP`** — Inverts the roles of `.` and `,` in the `PIC`, `N`, `NZ`, `L`, `G` and `GZ` format specifications and in `INPUT FIELDS`, for European number entry and display.
+5. **`OPTION COLLATE NATIVE | ALTERNATE | EBCIDIC`** — Chooses the collating sequence used by string relational operators: `NATIVE` (the platform/character-set order — e.g. ASCII, digits before letters), `ALTERNATE` (digits after letters) or `EBCIDIC` (EBCDIC order).
+6. **`OPTION RETAIN`** — A RESIDENT library keeps its variables across unloads.
 
 **Semantics:**
-- **Two faces of OPTION** — This topic covers the *program statement* `OPTION` (a small set of language toggles). The name `OPTION` is also the large family of **numbered configuration toggles** (`OPTION 1`…`OPTION 99`, plus `INVP`) set in `BRConfig.sys` or at run time via `EXECUTE "CONFIG OPTION n"` — those are *configuration*, not program statements. See the br_tree OPTION table for the full 0–99 list.
+- **Two faces of OPTION** — This topic covers the *program statement* `OPTION` (a small set of language toggles). The name `OPTION` is also the large family of **numbered configuration toggles** (`OPTION 1`…`OPTION 99`) set in `BRConfig.sys` or at run time via `EXECUTE "CONFIG OPTION n"` — those are *configuration*, not program statements. See the br_tree OPTION table for the full 0–99 list.
 - **Position-independent and program-wide** — `OPTION` is a non-executable directive processed before the run, so it may appear on **any line, anywhere in the program**, and its effect applies to the **entire program** regardless of where it sits (like `DIM`). There is no "before/after" ordering relative to the `DIM`s it governs.
 - **Must stand alone on its line** — `OPTION` cannot share a line with other statements (no `:` statement-compounding); it occupies its own line.
 - **Scope is the program** — Options apply to the program unit that declares them; a chained or loaded program re-establishes its own options.
 
 **Common errors:**
-- ERR — `OPTION` combined with another statement on the same line (it must stand alone)
-- ERR — unrecognized option clause
+- **1100** `BRENOMULTICLAUSE` — `OPTION` combined with another statement on the same line (it must stand alone). Raised on a *prior* clause, so it is the second statement's line that is refused
+- **1006** `WBEBADSYNTAX` — a word that is not one of the five, a `BASE` other than 0 or 1, or a `PRTZO` outside 1–128
+- **1022** `BREMISSINGKEYWORD` — `COLLATE` followed by anything but `NATIVE`, `ALTERNATE` or `EBCIDIC`
+- **1152** `BRESTMTATRUNTIME` — an `OPTION` compiled while a program is active
 
 **Gotchas:**
 1. **`OPTION BASE 0` changes element counts** — `DIM A(10)` under base 0 has **11** elements (0–10); code that assumes 1-based indexing can silently misbehave.
-2. **Statement vs. config** — Don't confuse the language `OPTION BASE`/`COLLATE` with the numbered `OPTION n` configuration toggles; only the former is a program statement.
+2. **Statement vs. config** — Don't confuse the language `OPTION BASE`/`COLLATE` with the numbered `OPTION n` configuration toggles; only the former is a program statement. `INVP` and `COLLATE` are *both*, reaching the same setting from either side.
 3. **Applies program-wide, not from its position** — Unlike an executable statement, `OPTION` affects the whole program no matter where the line appears; conventionally placed at the top for readability, but that is style, not a requirement.
 
 **Example code:**

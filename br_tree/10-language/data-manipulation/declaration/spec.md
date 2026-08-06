@@ -8,7 +8,22 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (OPTION BASE/statement, DIMONLY); no conflicts
 recovered-fold: Array_Name, Numeric_Variable (2 redirect-collision pages folded from re-fetched source — FN-prefix reserved, scalar/array/string co-existence; verbatim retained on the BR wiki). NOTE 2026-07-29 - that fold also changed the first-character rule to "letter" only, following the wiki; reverted to "letter or _" after testing the runtime, which accepts `_a = 1`. The wiki is wrong on this point.
 related: [data-types, assignment, expressions]
-keywords: [DIM, MAT, OPTION]
+keywords: [DIM, MAT, OPTION, BASE, PRTZO, INVP, COLLATE, RETAIN]
+corrections: |
+  2026-08-05 §option: the OPTION statement's roster completed and closed. It named BASE and
+  COLLATE, alluded to INVP without naming it, and did not mention PRTZO or RETAIN as OPTION words
+  at all; COLLATE was given two values where BR tests three. Level 1: OPTION_PRI in command5.cpp
+  (reached through syntxfn2) tokenizes each word, resolves it through table4k, and switches on the
+  table4v token value — SOURCE_BASE, PRTZO, SOURCE_INVP, COLLATE, RETAIN — with
+  `default: goto SYNTAX_ERR` returning WBEBADSYNTAX (1006), which is what closes the roster.
+  COLLATE's own argument is tested against WBALTERNATE, NATIVE and EBCIDIC, returning
+  BREMISSINGKEYWORD (1022) otherwise; `EBCIDIC` is table4k's spelling and not a typo introduced
+  here. The ranges are from the same routine: OPTN_GETNUM checks BASE against 0..1 and PRTZO
+  against 1..128. Found in brls phase 11, where the completion list had no roster to offer after
+  OPTION; the five spellings are now generated into the language pack from table4k
+  (cmd/gendata/options.go) and pinned by langdata.TestOptionsAreBRsOwnRoster.
+  The BRConfig.sys COLLATE directive in 00-configuration/config-directives is a different reader in
+  a different file and was deliberately left alone.
 ---
 
 # Declaration (variables & arrays)
@@ -66,14 +81,23 @@ DIM <variable-list>
 
 <a id="option"></a>
 ### OPTION statement & base
-The `OPTION` statement sets program-wide choices: **`OPTION BASE 0`** makes every array include a
-**zero element** (`OPTION BASE 1` is the default, 1-based); **`OPTION COLLATE`** picks letters-vs-
-numbers-first sort order — **`NATIVE`** (platform/character-set order, e.g. ASCII digits-before-letters)
-or **`ALTERNATE`** (EBCDIC-like, digits after letters); **`OPTION`** also selects American vs inverted-European decimal/comma
-format. (The numbered `OPTION <nn>` feature toggles are configuration — see
-[config-directives](../../../00-configuration/config-directives/spec.md#behavior).) `OPTION` is a
-non-executable directive: it **must occupy its own line** (it cannot be compounded with `:`), but it
-may appear **anywhere** in the program and takes effect **program-wide** regardless of position.
+The `OPTION` statement sets program-wide choices. It takes a **comma-separated list** drawn from a
+**closed roster of five words** — anything else after `OPTION` is error 1006:
+
+| Option | Takes | Effect |
+|---|---|---|
+| `BASE` | `0` or `1` | `BASE 0` makes every array include a **zero element**; `BASE 1` is the default, 1-based. Any other value is error 1006 |
+| `PRTZO` | `1`–`128` | Print-zone width, for the `,` separator in a print list (default 24). Outside the range is error 1006 |
+| `INVP` | — | Inverted (European) decimal/comma format: the roles of `.` and `,` swap in `PIC`, `N`, `NZ`, `L`, `G` and `GZ` [format specifications](../../../30-io-file/form-spec/spec.md) and in `INPUT FIELDS` |
+| `COLLATE` | `NATIVE`, `ALTERNATE` or `EBCIDIC` | Letters-vs-numbers sort order: `NATIVE` is the platform/character-set order (ASCII: digits before letters), `ALTERNATE` moves digits *after* letters, `EBCIDIC` uses EBCDIC order. A fourth word is error 1022. **`EBCIDIC` is BR's own spelling** of the keyword |
+| `RETAIN` | — | A RESIDENT library keeps its variables across unloads — see [library-facility](../../../50-libraries/library-facility/spec.md) |
+
+`OPTION` is a non-executable directive: it **must occupy its own line** (it cannot be compounded
+with `:`), but it may appear **anywhere** in the program and takes effect **program-wide**
+regardless of position. (The numbered `OPTION <nn>` feature toggles are configuration, and a
+different thing entirely — see
+[config-directives](../../../00-configuration/config-directives/spec.md#behavior). `INVP` and
+`COLLATE` are *both*: a BRConfig.sys directive and an option of this statement.)
 The **`DIMONLY`** BRConfig.sys/`CONFIG` setting forbids creating a variable during editing unless it
 was declared in a `DIM` — a discipline aid against typo-variables.
 

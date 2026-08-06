@@ -2,7 +2,7 @@
   "$comment": "Topic index + lexicon over statement-semantics.md and tools/lexicon.json. Router for the interpret/code bundles (see APP-DEV-GUIDE.md). 'lines' are 1-based inclusive ranges for cheap section loading; regenerate with tools/gen_topics.py.",
   "generated": "2026-08-05",
   "source": "statement-semantics.md",
-  "source_sha256": "1be9764092e874c213b40e1e77c62276e0cf91c882de1cabc49898a2267531be",
+  "source_sha256": "31c00975fa919cb2b3c1f7eb58ccc15bb6ada7b485cb34012337b3d1da3c143e",
   "count": 49,
   "lexicon": {
     "note": "BR's lexicon is positional. Only system-function names (table6k u table7k) are reserved against variable names, and a variable never starts 'FN'. Statement, clause, and command keywords are keywords only by position: a variable or label may reuse their spelling. Resolve keyword-vs-variable-vs-label by position + arity, not by the lexeme and not by a symbol table: BR checks whether the mandatory operands the name requires are present — present means it IS that keyword/function, absent means it falls through to a variable. So declaring a name never shadows an intrinsic (DIM ABS is legal and PRINT ABS(3) still calls ABS), and X(3) vs SIN(3) turns on what the name requires, not on whether it was DIM'd. Full rule: br_tree/10-language/syntax/spec.md#name-resolution.",
@@ -956,7 +956,7 @@
         "anchor": "option",
         "lines": [
           2092,
-          2136
+          2149
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/declaration/spec.md#option"
@@ -972,8 +972,8 @@
         "file": "statement-semantics.md",
         "anchor": "dim",
         "lines": [
-          2138,
-          2248
+          2151,
+          2261
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/declaration/spec.md"
@@ -989,8 +989,8 @@
         "file": "statement-semantics.md",
         "anchor": "let",
         "lines": [
-          2250,
-          2306
+          2263,
+          2319
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/assignment/spec.md#let"
@@ -1006,8 +1006,8 @@
         "file": "statement-semantics.md",
         "anchor": "forced-assignment",
         "lines": [
-          2308,
-          2357
+          2321,
+          2370
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/assignment/spec.md#forced-assignment"
@@ -1023,8 +1023,8 @@
         "file": "statement-semantics.md",
         "anchor": "mat",
         "lines": [
-          2359,
-          2417
+          2372,
+          2430
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/assignment/spec.md#mat"
@@ -1038,8 +1038,8 @@
         "file": "statement-semantics.md",
         "anchor": "substring-assignment",
         "lines": [
-          2419,
-          2469
+          2432,
+          2482
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/assignment/spec.md#substring"
@@ -1057,8 +1057,8 @@
         "file": "statement-semantics.md",
         "anchor": "data-read-restore",
         "lines": [
-          2471,
-          2535
+          2484,
+          2548
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/assignment/spec.md#data-table"
@@ -1077,8 +1077,8 @@
         "file": "statement-semantics.md",
         "anchor": "if-then-else",
         "lines": [
-          2537,
-          2619
+          2550,
+          2632
         ]
       },
       "br_tree": "../br_tree/10-language/data-manipulation/conditionals/spec.md"
@@ -1094,8 +1094,8 @@
         "file": "statement-semantics.md",
         "anchor": "goto",
         "lines": [
-          2621,
-          2671
+          2634,
+          2684
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1112,8 +1112,8 @@
         "file": "statement-semantics.md",
         "anchor": "on-goto-gosub",
         "lines": [
-          2673,
-          2727
+          2686,
+          2740
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1129,8 +1129,8 @@
         "file": "statement-semantics.md",
         "anchor": "randomize",
         "lines": [
-          2729,
-          2763
+          2742,
+          2776
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1149,8 +1149,8 @@
         "file": "statement-semantics.md",
         "anchor": "stop-end-pause-chain",
         "lines": [
-          2765,
-          2828
+          2778,
+          2841
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1168,8 +1168,8 @@
         "file": "statement-semantics.md",
         "anchor": "for-next",
         "lines": [
-          2830,
-          2917
+          2843,
+          2930
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1187,8 +1187,8 @@
         "file": "statement-semantics.md",
         "anchor": "do-loop",
         "lines": [
-          2919,
-          3033
+          2932,
+          3046
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1205,8 +1205,8 @@
         "file": "statement-semantics.md",
         "anchor": "gosub-return",
         "lines": [
-          3035,
-          3124
+          3048,
+          3137
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1222,8 +1222,8 @@
         "file": "statement-semantics.md",
         "anchor": "exit",
         "lines": [
-          3126,
-          3194
+          3139,
+          3207
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md"
@@ -1239,8 +1239,8 @@
         "file": "statement-semantics.md",
         "anchor": "execute",
         "lines": [
-          3196,
-          3264
+          3209,
+          3277
         ]
       },
       "br_tree": "../br_tree/70-commands/program-management/spec.md#execute"
@@ -1258,8 +1258,8 @@
         "file": "statement-semantics.md",
         "anchor": "trace",
         "lines": [
-          3266,
-          3308
+          3279,
+          3321
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/other-flow/spec.md#trace"
@@ -1275,8 +1275,8 @@
         "file": "statement-semantics.md",
         "anchor": "on-condition",
         "lines": [
-          3310,
-          3380
+          3323,
+          3393
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/error-handling/spec.md"
@@ -1292,8 +1292,8 @@
         "file": "statement-semantics.md",
         "anchor": "on-error",
         "lines": [
-          3382,
-          3456
+          3395,
+          3469
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/error-handling/spec.md"
@@ -1310,8 +1310,8 @@
         "file": "statement-semantics.md",
         "anchor": "retry-continue",
         "lines": [
-          3458,
-          3568
+          3471,
+          3581
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/error-handling/spec.md"
@@ -1328,8 +1328,8 @@
         "file": "statement-semantics.md",
         "anchor": "def-fn",
         "lines": [
-          3570,
-          3717
+          3583,
+          3730
         ]
       },
       "br_tree": "../br_tree/10-language/flow-control/functions-udf/spec.md"
@@ -1346,8 +1346,8 @@
         "file": "statement-semantics.md",
         "anchor": "library-functions",
         "lines": [
-          3719,
-          3784
+          3732,
+          3797
         ]
       },
       "br_tree": "../br_tree/50-libraries/library-facility/spec.md"
@@ -1361,8 +1361,8 @@
         "file": "statement-semantics.md",
         "anchor": "cross-reference-map",
         "lines": [
-          3786,
-          3838
+          3799,
+          3851
         ]
       },
       "br_tree": null
@@ -1376,8 +1376,8 @@
         "file": "statement-semantics.md",
         "anchor": "error-code-quick-reference",
         "lines": [
-          3840,
-          3861
+          3853,
+          3874
         ]
       },
       "br_tree": null
@@ -1391,8 +1391,8 @@
         "file": "statement-semantics.md",
         "anchor": "quick-start-examples",
         "lines": [
-          3863,
-          3925
+          3876,
+          3938
         ]
       },
       "br_tree": null

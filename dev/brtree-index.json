@@ -2,7 +2,7 @@
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.py.",
   "generated": "2026-08-05",
   "source": "br_tree/",
-  "source_sha256": "2ad134301769aa5b192364a544dc4f16cacc81c1f052f69c832b7ac92168390d",
+  "source_sha256": "dd2b86f44f207287391430774547cf60568d82eaf8928633ad575722f0404ea9",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -29,6 +29,9 @@
     ],
     "B": [
       "30-io-file/form-spec"
+    ],
+    "BASE": [
+      "10-language/data-manipulation/declaration"
     ],
     "BAUD": [
       "30-io-file/serial-comm"
@@ -94,7 +97,8 @@
       "10-language/data-manipulation/system-functions"
     ],
     "COLLATE": [
-      "00-configuration/config-directives"
+      "00-configuration/config-directives",
+      "10-language/data-manipulation/declaration"
     ],
     "COM": [
       "30-io-file/serial-comm"
@@ -336,6 +340,9 @@
     "INTERNAL": [
       "30-io-file/file-model"
     ],
+    "INVP": [
+      "10-language/data-manipulation/declaration"
+    ],
     "IOERR": [
       "10-language/flow-control/error-handling"
     ],
@@ -567,6 +574,9 @@
     "PROTECT": [
       "70-commands/file-directory"
     ],
+    "PRTZO": [
+      "10-language/data-manipulation/declaration"
+    ],
     "RADIO": [
       "20-io-screen/controls"
     ],
@@ -614,6 +624,9 @@
     "RESTORE": [
       "10-language/data-manipulation/assignment",
       "30-io-file/statements"
+    ],
+    "RETAIN": [
+      "10-language/data-manipulation/declaration"
     ],
     "RETRY": [
       "10-language/flow-control/error-handling"
@@ -1177,7 +1190,12 @@
       "keywords": [
         "DIM",
         "MAT",
-        "OPTION"
+        "OPTION",
+        "BASE",
+        "PRTZO",
+        "INVP",
+        "COLLATE",
+        "RETAIN"
       ],
       "related": [
         "data-types",
