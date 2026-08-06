@@ -2169,7 +2169,7 @@ spelling of that keyword.
 3. **Declares arrays** — `DIM ARR(100)` declares a 1-D array; `DIM MAT(10,10)` declares 2-D
 4. **Multi-dimensional arrays** — Up to 7 dimensions; syntax `DIM X(d1, d2, …, d7)`
 5. **String arrays** — `DIM NAMES$(100)*30` declares 100 strings, each up to 30 characters
-6. **MAT redimensioning** — `MAT ARRAY(new-size)` resizes an array at runtime, preserving existing values when growing, or losing the truncated portion when shrinking
+6. **MAT redimensioning** — `MAT ARRAY(new-size)` resizes an array at runtime, preserving existing values when growing, or losing the truncated portion when shrinking. **Not to be confused with a sub-array**: `MAT A(5)` resizes A to five elements, `MAT A(1:5)` *names* five of them — see [MAT](#mat--whole-array-assignment-operations)
 
 **Semantics:**
 - **DIM is Non-executable** — DIM is processed before the run; it can appear anywhere (beginning, middle, or end)
@@ -2375,18 +2375,22 @@ spelling of that keyword.
 
 **Syntax:**
 ```bnf
-`MAT` <array> [`(` <dim> [`,` <dim>]* `)`] `=` <mat-rhs>
-<mat-rhs> ::= `(` <expression> `)`                        -- init every element
-            | <array> | <sub-array>                        -- copy / copy subarray
-            | <num-array> { `+` | `-` } <num-array>         -- element-wise arithmetic
-            | `(` <num-expr> `)` <op> <num-array>           -- scalar × array
+`MAT` <array-ref> [ `=` <mat-rhs> ]
+<array-ref> ::= <array>                                    -- the whole array
+              | <array> `(` <dim> [`,` <dim>]* `)`          -- redimension (see DIM)
+              | <array> `(` <first> `:` <last> `)`          -- sub-array: a run of elements
+<mat-rhs>   ::= `(` <expression> `)`                        -- init every element
+            | <array-ref2>                                  -- copy / copy sub-array
+            | <num-array-ref2> { `+` | `-` } <num-array-ref2>  -- element-wise arithmetic
+            | `(` <num-expr> `)` { `*` | `/` } <num-array-ref2>  -- scalar × array
             | `AIDX(` <array> `)` | `DIDX(` <array> `)`     -- ascending / descending sort index
+<array-ref2> ::= <array> | <array> `(` <first> `:` <last> `)`   -- MAT is implied here
 ```
 
 **What it does:**
 1. **Operates on a whole array in one statement** — far faster than an element-by-element loop
 2. **Initialize** — set every element to one value
-3. **Copy** — duplicate an array or a subarray
+3. **Copy** — duplicate an array or a run of its elements
 4. **Element-wise arithmetic** — add/subtract arrays, or scale by a scalar
 5. **Sort index** — build an index array giving sorted order (the data array is left unchanged)
 
@@ -2394,19 +2398,46 @@ spelling of that keyword.
 - **Initialize** — `MAT A = (0)`, `MAT B$ = ("")`; the scalar **must be parenthesized**
 - **Copy** — `MAT A = B`; a subarray copy `MAT A(6:10) = B` copies `B(1:5)` into `A(6:10)`
 - **Arithmetic** — `MAT A = B + C` (element-wise); `MAT SAL = (1.064) * SAL` scales every element (scalar parenthesized)
+- **`*` and `/` need the parenthesized scalar first** — they are only reachable from the `(<num-expr>)` form; `+` and `-` take either
+- **String arrays take no operator** — a string target ends the statement after one right-hand operand, so `MAT A$ = B$` and nothing more
 - **Sort index** — `MAT ORDER = AIDX(CUST$)` builds an **ascending** index; `DIDX` a descending one; `CUST$` is *not* reordered — `ORDER` holds the visiting sequence, so index into the original with it
 - **Conformability** — element-wise operands must match in shape; a size mismatch errors
 - **Assign vs. redimension** — `MAT A = …` moves **values** (this section); `MAT A(n)` alone **resizes** the array (see DIM)
 
+**Sub-array references (`MAT A(first:last)`)** — the same characters that write a **substring** of a
+string, on an array reference instead:
+
+- **A `MAT` reference gets the array reading; anything else gets the substring.** What the name was
+  dimensioned as does not enter into it. `A$(1:5)` is five characters of the string `A$`;
+  `MAT A$(1:5)` is five elements of the array `MAT A$`. They are two different variables in BR
+  (`A$` and `MAT A$`), so the two readings are not two views of one thing
+- **Inside a `MAT` statement the qualifier is implied** at the target and at every right-hand array
+  operand: `MAT FA$(1:5) = SP$(1:5)` is a run of elements on **both** sides, and the bare `SP$(1:5)`
+  there means what `MAT SP$(1:5)` means anywhere else. A parenthesized right-hand side is an
+  ordinary expression instead, so the `(1:5)` in `MAT A$ = (B$(1:5))` is a substring again
+- **It aliases, it does not copy.** The reference is a temporary array descriptor over the original's
+  own storage, of length `last - first + 1`, so `MAT A(6:10) = B` writes `A(6)` through `A(10)`
+- **One dimension, one range.** The array must be one-dimensional and the reference must carry
+  exactly one `first:last` pair; more is **error 0123** at run time, not at compile time
+- **Bounds are checked at run time** — `first` and `last` must both be within the array's *current*
+  size and `first <= last`, else **error 0122**. Positions are in the program's `OPTION BASE`
+- **The `=` is optional**, as it is after a redimension. `MAT A(1:5)` alone compiles: it computes the
+  descriptor and discards it
+
 **Common errors:**
+- **0123 array dimension conflict** — a sub-array of a multi-dimensional array, or more than one range
+- **0122 invalid array element** — a sub-array bound outside the array, or `first > last`
 - **Shape mismatch** — element-wise arithmetic or copy between arrays of different dimensions
 - **Type mismatch** — mixing string and numeric arrays in one operation
+- **0121 invalid reference to an array** — a right-hand operand that is not an array reference at all
 
 **Gotchas:**
 1. **Scalars need parentheses** — `MAT A = (0)` not `MAT A = 0`; `(1.064) * SAL` not `1.064 * SAL`
 2. **Copy can reshape** — `MAT A = B` copies values and can take B's shape; `MAT A(10,10)` only resizes
 3. **Sort index doesn't move data** — `AIDX`/`DIDX` return an ordering; you dereference the original array through it
 4. **Not `MAT` redimensioning** — declaring/sizing is under DIM; this is value movement
+5. **`(m:n)` is a redimension away from a sub-array** — `MAT A(5)` resizes A to five elements and
+   `MAT A(1:5)` names five of them. The comma and the colon are the whole difference
 
 **Example code:**
 ```business-rules
@@ -2417,6 +2448,9 @@ spelling of that keyword.
 00140 MAT SAL = (1.064) * SAL       ! 6.4% raise to every salary
 00150 MAT ORDER = AIDX(CUST$)       ! ascending sort index (CUST$ unchanged)
 00160 FOR I = 1 TO UDIM(CUST$) : PRINT CUST$(ORDER(I)) : NEXT I
+00170 MAT FA$(1:5) = SP$(1:5)       ! five elements, both sides — not substrings
+00180 MAT A(6:10) = B               ! writes A(6)..A(10) from B(1)..B(5)
+00190 READ #1: MAT LINE$(1:12)      ! a sub-array as an I/O operand
 ```
 
 **See also:**

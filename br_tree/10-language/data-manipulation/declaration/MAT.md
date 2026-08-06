@@ -11,6 +11,12 @@ See Also: `Mat for Beginners`
 The **Mat** (M) `statement` performs several array (or **Matrix**) operations. It can change the number of dimensions or elements, assign new values, and apply an expression to all elements.  Each element is an individual `Variable|variable`.
 
 ===MAT subarray operator===
+> Folded into [assignment §mat-sub-array](../assignment/spec.md#mat-sub-array), which is the spec that
+> owns MAT operations and which also carries what this page does not: that the element reading applies
+> to a **MAT reference** (written, or implied at a MAT statement's operands) and never to what the name
+> was dimensioned as, that the reference *aliases* the array's storage, and the run-time error numbers.
+> Retained here because the rest of this page is a deep reference.
+
 Arrays may now be subscripted with a starting and ending element number to process a portion of an array. This works much the same as Business Rules sub-string feature, except it works with elements instead of characters.
 
  00100 MAT A(6:10)=B     ! copies B(1)..B(5) into A(6)..A(10);

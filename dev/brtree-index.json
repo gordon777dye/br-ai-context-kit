@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.py.",
-  "generated": "2026-08-05",
+  "generated": "2026-08-06",
   "source": "br_tree/",
-  "source_sha256": "dd2b86f44f207287391430774547cf60568d82eaf8928633ad575722f0404ea9",
+  "source_sha256": "9fc578a49dddc743a0f2d2acc6e7f118ac63ce12275c6324d0504db2fcaf05df",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -1116,6 +1116,7 @@
         "let",
         "forced-assignment",
         "mat",
+        "mat-sub-array",
         "substring",
         "data-table",
         "examples",

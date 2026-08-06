@@ -24,6 +24,15 @@ corrections: |
   (cmd/gendata/options.go) and pinned by langdata.TestOptionsAreBRsOwnRoster.
   The BRConfig.sys COLLATE directive in 00-configuration/config-directives is a different reader in
   a different file and was deliberately left alone.
+
+  2026-08-06 §redimensioning: a redimension and a sub-array were not distinguished here, and this
+  leaf is where the confusion was reachable — `MAT A(5)` resizes, `MAT A(1:5)` names five elements
+  and resizes nothing, and a sub-array cannot be redimensioned at all (error 0315, matching
+  run.cpp's setNoRedim(true) on the SUB_ARRAY descriptor). Added, with a pointer to
+  assignment/spec.md#mat-sub-array, where the sub-array operator now lives: it had been documented
+  only on this leaf's retained deep page MAT.md (§MAT subarray operator), under the leaf that owns
+  redimensioning rather than the one that owns MAT operations, so a reader of the MAT-operations
+  section had no path to it. Found in brls phase 12; see LSP_PLAN.md finding 37.
 ---
 
 # Declaration (variables & arrays)
@@ -111,8 +120,15 @@ and you cannot exceed the original `DIM` size without re-`DIM`ming.
 00420 MAT B(25)         ! shrink to 25
 00430 MAT A(10,10) = A  ! reshape 100 → 10×10
 ```
+**A redimension is not a sub-array.** `MAT A(5)` resizes A to five elements; `MAT A(1:5)` *names*
+five of them and resizes nothing. The comma and the colon are the whole difference, and a sub-array
+cannot be redimensioned at all — error [0315](../../../90-reference/error-codes/0315.md).
+
 The value-moving forms of `MAT` (copy, arithmetic, sort) are in
-[assignment](../assignment/spec.md#mat).
+[assignment](../assignment/spec.md#mat), and the sub-array operator at
+[§mat-sub-array](../assignment/spec.md#mat-sub-array) — which is where the
+[deep MAT page](MAT.md)'s §MAT subarray operator material was folded, it having sat under this leaf
+while the operator belongs to MAT *operations*.
 
 <a id="tables"></a>
 ## Tables
