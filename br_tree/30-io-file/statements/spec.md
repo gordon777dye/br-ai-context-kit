@@ -8,10 +8,11 @@ kind: spec
 status: 2b           # reference base verified comprehensive; misfiled command pages relocated; added 2026-07-03: CLOSE trailing-colon terminates the statement (second colon needed before a following statement); no conflicts
 recovered-fold: LINPUT, OPEN_DISPLAY, OPEN_external, READ(disambig), REREAD, RESTORE(disambig), RESTORE_file (7 redirect-collision pages folded from re-fetched source — external short-record 4271, DELETE-invalid-on-external, TRANSLATE/0608/4146, RESTORE modes+linked anchors, LINPUT/WAIT/TIMEOUT, REREAD dup-key idiom; verbatim retained on the BR wiki)
 related: [file-model, form-spec, keys-indexes, serial-comm]
-keywords: [OPEN, CLOSE, READ, WRITE, REWRITE, DELETE, RESTORE, REREAD, REC, KEY, FIRST, LAST, PRIOR, NEXT, SAME, EOF, NOKEY, NOREC, OUTIN, SEQUENTIAL, OUTPUT, WAIT, DROP, FREE]
+keywords: [OPEN, CLOSE, READ, WRITE, REWRITE, DELETE, RESTORE, REREAD, REC, KEY, "LINK=", FIRST, LAST, PRIOR, NEXT, SAME, EOF, NOKEY, NOREC, OUTIN, SEQUENTIAL, OUTPUT, WAIT, DROP, FREE]
 corrections:
   - "The exit clauses were enumerated per statement and are one repeatable production. Section io gave READ `[EOF] [NOKEY] [NOREC] [ERROR]` and REWRITE `[NOKEY] [NOREC]`, which reads as the admissible set for each statement and is not: BR matches an exit clause by a table lookup (`getExit`, command4.cpp) rather than against an expected keyword, so any of the 17 error conditions is admissible wherever a statement's syntax tree admits exits, and they repeat with a space rather than a comma. Replaced with an `<exits>` production pointing at the roster in 10-language/flow-control/error-handling, keeping the per-statement note about which conditions can actually fire - that part was the useful content and is a semantic claim, not a grammatical one. DELETE and RESTORE already used `[ <error-condition> ]`, a third notation for the same thing, and now use `<exits>` too. This spec's enumeration is where brls transcribed a 14-name roster from, which is how the error was found; see lsp/brls/LSP_PLAN.md finding 33. Sources are level 1: BR's `synexits`/`table4v`/`table4k` and the READ/REWRITE trees in `lsp/syn.txt`. Added in brls phase 7."
   - "`USING` was given as taking a `<line-ref>` only, on all four record-I/O statements. BR's syntax tree gives each of READ, REREAD, WRITE and REWRITE a **two-way branch** there — a line reference or an alpha expression — exactly as PRINT has, so `READ #1, USING \"FORM C 20,N 6.2\": A$, B` and `USING F$` are as legal as naming a FORM line, and the inline string is not a PRINT-only convenience. A `<form-ref>` production added, with a note that the two forms differ in *when* the layout is compiled and so in what a mistake in it costs. Source is level 1: the USING nodes in all five statements' trees in `lsp/syn.txt`. The printing spec already had this right. Added in brls phase 10."
+  - "LINK= folded in, and the positioning sets corrected per statement. LINK= was the last clause keyword in BR's tables with no spec at all: the only kit page that mentioned it was the retained deep page file-model/LINKED.md, which describes it as a READ parameter, so the statements that take it were documented here and the parameter itself was reachable from nowhere - the same misfiling as the MAT sub-array operator in brls phase 12. Level 1 gives more than that page does. LINK= is a *positioning* parameter in BR's own grouping: command5.cpp's sec_kw[] lists it beside PRIOR/LAST/KEYONLY/FIRST/NEXT/SAME, and primop1.cpp dispatches it in the same switch as REC=/KEY=/SEARCH=, so it belongs in the <position> production rather than in a clause of its own. Four statements admit it, not one - READ, RESTORE, REWRITE and DELETE, from their syn.txt trees. Its three rules come from primop1.cpp's GETKEY guard `(!g_ufcbcur || (ufmode < ACCESSTYPE_KEYED && !uflinked) || (uflinked && workx >= 0)) return BRENOTKEYED`, where workx is 1 for KEY=, 0 for SEARCH= and -1 for LINK=: the file must be opened LINKED or KEYED (else 0702); on a LINKED file LINK= is the only one of the three accepted, because KEY= and SEARCH= hit the `uflinked && workx >= 0` arm (0702); and since workx = -1 is truthy in C, LINK= takes the KEY length branch `blen != ftotalkeylen` rather than the SEARCH prefix branch, so the string must be the exact total key length (0718). 4282 for a data mismatch was already on its own error page and nothing linked to it. Also corrected in the same production, from the trees and confirmed against two corpora: REWRITE and DELETE admit the positional five and LINK= as well as REC=/KEY= - the spec allowed only REC=/KEY= - but not KEY>= or SEARCH=/SEARCH>=, which is a real asymmetry and now a separate <update-position> production; and WRITE admits REC=, which the spec omitted entirely (257 uses in the second corpus, 24 in QSMRP). QSMRP alone would have left the REWRITE/DELETE question open - it writes neither form - and the second corpus settled it with `DELETE ..., LAST` and `REWRITE ..., SAME`. LINK= itself is written 0 times in either corpus, which is why nobody had missed it; that is not the non-functional-form pattern of finding 32, since it has a live runtime handler and its own error pages - these two codebases simply do not use LINKED files. Found in brls phase 13, as the one source-side entry its routing pass could not close. See lsp/brls/LSP_PLAN.md finding 38."
   - "Twelve keywords added. The spec's own BNF defines the <position> production (FIRST/LAST/PRIOR/NEXT/SAME), the I/O exit clauses (EOF/NOKEY/NOREC), the OPEN modes OUTIN/SEQUENTIAL/OUTPUT and the WAIT= clause, and Positional_Parameters.md sits beside it covering the positional five in detail - but the frontmatter declared none of them. The keyword index is built from this list, so all twelve routed to no spec at all: BR's own record-positioning vocabulary was documented here and reachable from nowhere. Only single-sense spellings were added, plus NEXT. DROP, FREE and INPUT are also defined in this BNF and still omitted, because each also names a command or a statement and a class-blind index would attach this spec to that sense too."
 ---
 
@@ -54,14 +55,17 @@ OPEN '#'<channel> ':' <file-open-string> ',' 'EXTERNAL' ','
 ```bnf
 READ    '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' <position> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <variable-list> <exits>
 REREAD  '#'<channel> [ ',' 'USING' <form-ref> ] ':' <variable-list> <exits>      -- re-reads buffered record; no EOF
-WRITE   '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <expression-list> <exits>
-REWRITE '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' { 'REC='<n> | 'KEY='<k$> } ] [ ',' { 'RESERVE' | 'RELEASE' } ] [ ',' 'WAIT=' <integer> ] ':' <expression-list> <exits>   -- WAIT= only with REC=/KEY=
-DELETE  '#'<channel> [ ',' { 'REC='<n> | 'KEY='<k$> } ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <exits>
+WRITE   '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' 'REC=' <numeric-expr> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <expression-list> <exits>
+REWRITE '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' <update-position> ] [ ',' { 'RESERVE' | 'RELEASE' } ] [ ',' 'WAIT=' <integer> ] ':' <expression-list> <exits>   -- WAIT= only with REC=/KEY=
+DELETE  '#'<channel> [ ',' <update-position> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <exits>
 RESTORE '#'<channel> [ ',' <position> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <exits>
 CLOSE   '#'<channel> [ ',' { 'DROP' | 'FREE' } ] [ ',' 'RELEASE' ] ':'
 
 <position> ::= 'REC=' <numeric-expr> | 'KEY[>]=' <string-expr> | 'SEARCH[>]=' <string-expr>
+             | 'LINK=' <string-expr>                     -- LINKED files only; see below
              | 'FIRST' | 'LAST' | 'PRIOR' | 'NEXT' | 'SAME'
+<update-position> ::= 'REC=' <numeric-expr> | 'KEY=' <string-expr> | 'LINK=' <string-expr>
+             | 'FIRST' | 'LAST' | 'PRIOR' | 'NEXT' | 'SAME'   -- no KEY>= / SEARCH= / SEARCH>=
 <form-ref> ::= <line-ref> | <string-expr>          -- a FORM line, or the layout as a "FORM …" string
 <exits>    ::= [ <error-condition> <line-ref> ]*   -- space-separated, repeatable, any of the 17
 ```
@@ -72,6 +76,21 @@ convenience: `READ #1, USING "FORM C 20,N 6.2": A$, B` is as legal as naming a `
 `USING F$` with the layout held in a variable. The two are **not** interchangeable in one respect,
 which is when the layout gets compiled and therefore what a mistake in it costs — see
 [form-spec](../form-spec/spec.md#when-a-form-is-compiled).
+
+<a id="positioning-per-statement"></a>
+**Positioning is not the same set on every statement**, and BR's own syntax trees are what say so:
+
+| statement | admits |
+|---|---|
+| `READ`, `RESTORE` | the full `<position>` |
+| `REWRITE`, `DELETE` | `<update-position>` — no `KEY>=`, no `SEARCH=`/`SEARCH>=`, because an update has to name one record and not the next-greater one |
+| `WRITE` | `REC=` only |
+| `REREAD` | none — it re-decodes the buffered record and never moves |
+
+The positional five are easy to overlook on `REWRITE` and `DELETE` because `REC=` and `KEY=` are what
+almost everyone writes, but they are admitted and they are used: real code writes `DELETE #n, LAST:`
+and `REWRITE #n, SAME:`. **`NEXT` on a `READ` is not a repositioning** — `primop1.cpp` special-cases
+it to plain sequential access (`sd.atype = 0`) where every other statement records it as a position.
 
 **`<exits>` is one production, not a per-statement list.** BR matches an exit clause by a table
 lookup rather than against an expected keyword, so **any** of the 17 error conditions is admissible
@@ -139,6 +158,23 @@ that matter on a `READ`, `NOKEY` and `NOREC` on a `REWRITE`.
   file-channel number (`1–199` or `300–999`). By default RESTORE **releases all record locks** held on
   the channel; **`,RESERVE`** keeps them and **`,RELEASE`** releases them explicitly. (To *merely*
   release record locks, `REREAD #n: RELEASE` is faster than `RESTORE #n:`.)
+- <a id="link"></a>**`LINK=<string-expr>`** verifies that a linked record belongs to the master you
+  think it does. Admitted on `READ`, `RESTORE`, `REWRITE` and `DELETE`, and it is a **positioning
+  parameter** in BR's own grouping — `command5.cpp` lists it beside `FIRST`/`LAST`/`PRIOR`/`SAME`, and
+  the runtime dispatches it in the same switch as `REC=`/`KEY=`/`SEARCH=`. Three rules, all enforced
+  before any I/O happens:
+  - **The file must be opened `LINKED`** (or `KEYED`), else **error 0702**.
+  - **On a `LINKED` file, `LINK=` is the *only* one of the three key parameters accepted** — `KEY=` and
+    `SEARCH=` there answer **0702** as well. This is the one place the `<position>` production is
+    misleading if read as a menu: which member is legal depends on how the file was opened.
+  - **The string must be exactly the total key length** (`KPS=`/`KLN=` as given on the creating
+    `OPEN`), not a prefix — so it behaves like `KEY=` and not like `SEARCH=`. A wrong length is
+    **error 0718**.
+
+  Data that does not match at read time is **error 4282**, which also covers operating-system error 82,
+  so check the `LINK=` string before assuming a disk problem. Linked-file structure — anchor records,
+  the next/previous pointers in positions 1–8, and what `RESTORE` and `KREC` do with them — is on the
+  deep page [LINKED](../file-model/LINKED.md).
 - <a id="close"></a>**CLOSE** options (both require the file opened `NOSHR`): **`DROP`** empties the
   file's *contents* — the file remains (internal files keep only the header record, all space freed);
   **`FREE`** *erases* the file from the system. A trailing **`,RELEASE`** also releases the file's

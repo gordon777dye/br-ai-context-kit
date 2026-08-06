@@ -49,8 +49,18 @@ In linked files, the RESTORE file statement plays two important roles.
 Also see `Restore File`
 
 ;READ FILE STATEMENT:
-The READ file statement now accepts the LINK=string parameter for Verifying that linked records belong to a master. It can be used only on LINKED files that have been opened using the KPSI7E4W2= and KLNE2E4W2= parameters<br>
+The READ file statement now accepts the LINK=string parameter for Verifying that linked records belong to a master. It can be used only on LINKED files that have been opened using the `KPS=` and `KLN=` parameters<br>
 Also see `Read file`.
+
+> Two corrections to the paragraph above, from BR's own source. **`LINK=` is admitted on four
+> statements, not one** — READ, RESTORE, REWRITE and DELETE all carry it in their `syn.txt` trees — and
+> BR groups it with the *positioning* parameters (`command5.cpp`'s `sec_kw[]`, beside
+> FIRST/LAST/PRIOR/SAME) rather than with the FORM or locking clauses. On a LINKED file it is also the
+> **only** key parameter accepted: `KEY=` and `SEARCH=` there answer error 0702, and the LINK= string
+> must be the exact total key length or 0718. Folded with those rules into
+> [statements §link](../statements/spec.md#link), the spec that owns the four statements.
+> (The parameter names above read `KPSI7E4W2=` and `KLNE2E4W2=` in the source this page came from —
+> corrupted wikitext for `KPS=` and `KLN=`, fixed here.)
 
 ;WRITE STATEMENT:
 The WRITE statement may be used to insert a record into an existing linked list. (A linked list is not considered to be "existing" unless an anchor point has been established for it with a RESTORE statement.)<br>

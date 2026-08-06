@@ -8,7 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (OPTION BASE/statement, DIMONLY); no conflicts
 recovered-fold: Array_Name, Numeric_Variable (2 redirect-collision pages folded from re-fetched source — FN-prefix reserved, scalar/array/string co-existence; verbatim retained on the BR wiki). NOTE 2026-07-29 - that fold also changed the first-character rule to "letter" only, following the wiki; reverted to "letter or _" after testing the runtime, which accepts `_a = 1`. The wiki is wrong on this point.
 related: [data-types, assignment, expressions]
-keywords: [DIM, MAT, OPTION, BASE, PRTZO, INVP, COLLATE, RETAIN]
+keywords: [DIM, MAT, OPTION, BASE, PRTZO, INVP, COLLATE, RETAIN, NATIVE, ALTERNATE, EBCIDIC]
 corrections: |
   2026-08-05 §option: the OPTION statement's roster completed and closed. It named BASE and
   COLLATE, alluded to INVP without naming it, and did not mention PRTZO or RETAIN as OPTION words

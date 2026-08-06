@@ -8,7 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment
 recovered-fold: 2D_Controls, CELL_RANGE, COLCNT, Combo_Boxes, Display_Buttons, RANGE folded+pruned; Grid_and_List retained (deep grid/list reference). 7 redirect-collision pages re-fetched; verbatim retained on the BR wiki
 related: [input-output, fields-attributes, windows-cursor]
-keywords: [GRID, LIST, TEXT, COMBO, RADIO, CHECK, MENU, FIELDS, BUTTON]
+keywords: [GRID, LIST, TEXT, COMBO, RADIO, CHECK, MENU, FIELDS, BUTTON, BUTTONS]
+corrections:
+  - "BUTTONS added to the frontmatter keywords. The list held `BUTTON`, singular, which is not a spelling any of BR's keyword tables carries: table4k's entry is `BUTTONS`, and this page documents it as `DISPLAY BUTTONS MAT X$: MAT Y$`. Routing is an exact match, so the declaration missed by one letter and the keyword reached nothing. `BUTTON` is kept — it is the control's name in the page's own prose. Found in brls phase 13."
 ---
 
 # GUI controls

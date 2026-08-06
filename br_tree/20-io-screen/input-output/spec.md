@@ -8,7 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (INPUT SELECT, MAT grouping); no conflicts
 recovered-fold: Field_Help, Full_Screen_Processing_Statements, INPUT_FIELDS, PRINT_FIELDS (4 redirect-collision pages folded from re-fetched source — multi-window input, 4.17 field-windowing syntax, hot-field fkey ranges + 10000=Enter, ATTR MAT, field-help spec; verbatim retained on the BR wiki)
 related: [fields-attributes, controls, windows-cursor]
-keywords: [PRINT FIELDS, INPUT FIELDS, RINPUT FIELDS, INPUT SELECT, RINPUT SELECT, INPUT, LINPUT, RINPUT, SELECT]
+keywords: [PRINT FIELDS, INPUT FIELDS, RINPUT FIELDS, INPUT SELECT, RINPUT SELECT, INPUT, LINPUT, RINPUT, SELECT, ATTR, HELP]
+corrections:
+  - "ATTR and HELP added to the frontmatter keywords. Both appear in this page's BNF for INPUT/RINPUT FIELDS — `[',' ATTR <attrs>] [',' HELP <help>]` — and in its semantics, and neither was declared. Found in brls phase 13."
 ---
 
 # Screen input/output (FIELDS)

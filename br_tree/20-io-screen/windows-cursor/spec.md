@@ -8,11 +8,12 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (CMDKEY/FKEY/CURFLD, cursor shape, GUIMODE, borders); no conflicts
 recovered-fold: CURFLD, CURWINDOW, EROW, FNKEY, GUI_Console, GUI_Mode, Parent=None folded+pruned; FKEY retained (scancode tables). 8 redirect-collision pages re-fetched; verbatim retained on the BR wiki
 related: [input-output, fields-attributes, controls]
-keywords: [OPEN WINDOW, WINDOW, BORDER, NEWPAGE, CAPTION, cursor, PARENT]
+keywords: [OPEN WINDOW, WINDOW, BORDER, NEWPAGE, CAPTION, cursor, PARENT, HELP]
 canonical: window-open   # canonical home for the window OPEN spec (printing guide links here)
 corrections:
   - "CURWINDOW's argument is optional: numfunct.cpp passes `parms` through to the client and sends 0 when there are none, and ck_num_sysfn groups it under \"optional 1 numeric\". The signature required it."
   - "CURROW/CURCOL are accepted with one argument by BR's compiler and ignore it at run time; noted where they are introduced. Found in brls phase 5."
+  - "HELP added to the frontmatter keywords. This page documents both senses of the spelling — the field-help clause on INPUT/RINPUT, and the console HELP command reached from READY mode — and declared neither. Found in brls phase 13; see error-handling's note for why the clause had been left undeclared everywhere."
 ---
 
 # Windows & cursor

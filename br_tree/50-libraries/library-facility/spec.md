@@ -8,7 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree fold (NOFILES console, linkage reassignment, loopback/override, maintenance, error CNT); Library_Facility retained; no conflicts
 recovered-fold: NoFiles folded+pruned (4.20+, GUI-OFF/mixed-console modes). FileIO/AuditBR relocated to their own leaf 50-libraries/fileio (2026-06-19). 3 redirect-collision pages re-fetched; verbatim retained on the BR wiki
 related: [fnsnap, screenio, fileio]
-keywords: [LIBRARY, DEF LIBRARY, LOAD, RELEASE, RESIDENT, BRLIBS]
+keywords: [LIBRARY, DEF LIBRARY, LOAD, RELEASE, RESIDENT, BRLIBS, NOFILES]
+corrections:
+  - "NOFILES added to the frontmatter keywords. It is in this page's own `<library-statement>` production and six lines of its semantics, and was not declared. Found in brls phase 13."
 ---
 
 # Library facility

@@ -2,7 +2,7 @@
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.py.",
   "generated": "2026-08-06",
   "source": "br_tree/",
-  "source_sha256": "9fc578a49dddc743a0f2d2acc6e7f118ac63ce12275c6324d0504db2fcaf05df",
+  "source_sha256": "ba29a7ab0d50bc95ade3deac4a6e37f4d9d5e00a25d4031cfa0f35f94edef03a",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -12,11 +12,23 @@
       "10-language/data-manipulation/assignment",
       "10-language/data-manipulation/expressions"
     ],
+    "ALERT": [
+      "70-commands/program-management"
+    ],
+    "ALL": [
+      "70-commands/information"
+    ],
+    "ALTERNATE": [
+      "10-language/data-manipulation/declaration"
+    ],
     "AND": [
       "10-language/data-manipulation/expressions"
     ],
     "ATTN": [
       "10-language/flow-control/error-handling"
+    ],
+    "ATTR": [
+      "20-io-screen/input-output"
     ],
     "ATTRIBUTE": [
       "00-configuration/config-directives"
@@ -48,6 +60,9 @@
     "BORDER": [
       "20-io-screen/windows-cursor"
     ],
+    "BREAK": [
+      "70-commands/information"
+    ],
     "BRLIBS": [
       "50-libraries/library-facility"
     ],
@@ -60,7 +75,13 @@
     "BR_FUNC": [
       "60-integration/web"
     ],
+    "BTREE_VERIFY": [
+      "30-io-file/keys-indexes"
+    ],
     "BUTTON": [
+      "20-io-screen/controls"
+    ],
+    "BUTTONS": [
       "20-io-screen/controls"
     ],
     "C": [
@@ -156,6 +177,9 @@
     "DATE$": [
       "10-language/data-manipulation/system-functions"
     ],
+    "DEBUG": [
+      "00-configuration/installation-tooling"
+    ],
     "DEF": [
       "10-language/flow-control/functions-udf"
     ],
@@ -206,6 +230,12 @@
     "DUPREC": [
       "10-language/flow-control/error-handling"
     ],
+    "EBCIDIC": [
+      "10-language/data-manipulation/declaration"
+    ],
+    "ECHO": [
+      "70-commands/program-management"
+    ],
     "EDIT": [
       "70-commands/editing"
     ],
@@ -244,6 +274,9 @@
     "FIELDS": [
       "20-io-screen/controls"
     ],
+    "FILES": [
+      "70-commands/program-management"
+    ],
     "FILTER": [
       "20-io-screen/fields-attributes"
     ],
@@ -268,6 +301,9 @@
     "FONT": [
       "00-configuration/config-directives",
       "40-io-printing/pcl-pdf"
+    ],
+    "FONTS": [
+      "70-commands/information"
     ],
     "FOR": [
       "10-language/flow-control/other-flow"
@@ -315,11 +351,19 @@
     "HEADING": [
       "40-io-printing/statements"
     ],
+    "HELP": [
+      "10-language/flow-control/error-handling",
+      "20-io-screen/input-output",
+      "20-io-screen/windows-cursor"
+    ],
     "HTTP": [
       "60-integration/web"
     ],
     "IF": [
       "10-language/data-manipulation/conditionals"
+    ],
+    "IGNORE": [
+      "10-language/flow-control/error-handling"
     ],
     "INCLUDE": [
       "00-configuration/config-directives"
@@ -385,6 +429,9 @@
     "LINE": [
       "10-language/flow-control/error-handling"
     ],
+    "LINK=": [
+      "30-io-file/statements"
+    ],
     "LINKED": [
       "30-io-file/file-model"
     ],
@@ -444,6 +491,9 @@
     "N": [
       "30-io-file/form-spec"
     ],
+    "NATIVE": [
+      "10-language/data-manipulation/declaration"
+    ],
     "NEWPAGE": [
       "20-io-screen/windows-cursor",
       "40-io-printing/statements"
@@ -451,6 +501,12 @@
     "NEXT": [
       "10-language/flow-control/other-flow",
       "30-io-file/statements"
+    ],
+    "NOECHO": [
+      "70-commands/program-management"
+    ],
+    "NOFILES": [
+      "50-libraries/library-facility"
     ],
     "NOKEY": [
       "10-language/flow-control/error-handling",
@@ -463,8 +519,17 @@
       "10-language/flow-control/error-handling",
       "30-io-file/statements"
     ],
+    "NORESTORE": [
+      "70-commands/information"
+    ],
+    "NOSTEP": [
+      "70-commands/program-management"
+    ],
     "NOT": [
       "10-language/data-manipulation/expressions"
+    ],
+    "NOTRACE": [
+      "70-commands/program-management"
     ],
     "NWP": [
       "40-io-printing/pcl-pdf"
@@ -472,12 +537,18 @@
     "NZ": [
       "30-io-file/form-spec"
     ],
+    "OBJECT": [
+      "70-commands/program-management"
+    ],
     "ODBC": [
       "00-configuration/installation-tooling",
       "30-io-file/database"
     ],
     "ODBC-MANAGER": [
       "30-io-file/database"
+    ],
+    "OFF": [
+      "10-language/flow-control/other-flow"
     ],
     "OFLOW": [
       "10-language/flow-control/error-handling"
@@ -493,6 +564,9 @@
     ],
     "ON GOTO": [
       "10-language/flow-control/other-flow"
+    ],
+    "ONLY": [
+      "70-commands/program-management"
     ],
     "OPEN": [
       "30-io-file/database",
@@ -571,6 +645,12 @@
     "PROC": [
       "70-commands/program-management"
     ],
+    "PROCERR": [
+      "70-commands/program-management"
+    ],
+    "PROFILE": [
+      "00-configuration/installation-tooling"
+    ],
     "PROTECT": [
       "70-commands/file-directory"
     ],
@@ -582,6 +662,9 @@
     ],
     "RANDOMIZE": [
       "10-language/flow-control/other-flow"
+    ],
+    "RD": [
+      "00-configuration/config-directives"
     ],
     "READ": [
       "10-language/data-manipulation/assignment",
@@ -698,11 +781,18 @@
     "SORT": [
       "40-io-printing/sort"
     ],
+    "SOURCE": [
+      "70-commands/editing",
+      "70-commands/program-management"
+    ],
     "SPOOLCMD": [
       "00-configuration/config-directives"
     ],
     "SQL": [
       "30-io-file/database"
+    ],
+    "STACKS": [
+      "00-configuration/config-directives"
     ],
     "STATUS": [
       "70-commands/information"
@@ -726,6 +816,9 @@
     "STYLE": [
       "00-configuration/config-directives"
     ],
+    "SUBPROC": [
+      "70-commands/program-management"
+    ],
     "SUBSTITUTE": [
       "00-configuration/config-directives"
     ],
@@ -747,11 +840,17 @@
     "THEN": [
       "10-language/data-manipulation/conditionals"
     ],
+    "TIME": [
+      "70-commands/information"
+    ],
     "TIME$": [
       "10-language/data-manipulation/system-functions"
     ],
     "TIMEOUT": [
       "10-language/flow-control/error-handling"
+    ],
+    "TO": [
+      "10-language/flow-control/other-flow"
     ],
     "TRACE": [
       "10-language/flow-control/other-flow",
@@ -759,6 +858,9 @@
     ],
     "TRIM$": [
       "10-language/data-manipulation/system-functions"
+    ],
+    "TYPE": [
+      "70-commands/file-directory"
     ],
     "UNTIL": [
       "10-language/flow-control/other-flow"
@@ -970,7 +1072,9 @@
         "SETENV",
         "ATTRIBUTE",
         "KEYBOARD",
-        "SCREEN"
+        "SCREEN",
+        "RD",
+        "STACKS"
       ],
       "related": [
         "environment",
@@ -1039,7 +1143,9 @@
         "Lexi",
         "DLL",
         "PEM",
-        "AutoIt"
+        "AutoIt",
+        "DEBUG",
+        "PROFILE"
       ],
       "related": [
         "config-directives",
@@ -1196,7 +1302,10 @@
         "PRTZO",
         "INVP",
         "COLLATE",
-        "RETAIN"
+        "RETAIN",
+        "NATIVE",
+        "ALTERNATE",
+        "EBCIDIC"
       ],
       "related": [
         "data-types",
@@ -1335,13 +1444,15 @@
         "EVENT",
         "FKEY",
         "FNKEY",
+        "HELP",
         "LOCKED",
         "NOKEY",
         "NONE",
         "NOREC",
         "OFLOW",
         "PAGEOFLOW",
-        "TIMEOUT"
+        "TIMEOUT",
+        "IGNORE"
       ],
       "related": [
         "other-flow",
@@ -1414,7 +1525,9 @@
         "PAUSE",
         "TRACE",
         "STEP",
+        "TO",
         "ON",
+        "OFF",
         "PRINT"
       ],
       "related": [
@@ -1498,7 +1611,8 @@
         "CHECK",
         "MENU",
         "FIELDS",
-        "BUTTON"
+        "BUTTON",
+        "BUTTONS"
       ],
       "related": [
         "input-output",
@@ -1580,7 +1694,9 @@
         "INPUT",
         "LINPUT",
         "RINPUT",
-        "SELECT"
+        "SELECT",
+        "ATTR",
+        "HELP"
       ],
       "related": [
         "fields-attributes",
@@ -1614,7 +1730,8 @@
         "NEWPAGE",
         "CAPTION",
         "cursor",
-        "PARENT"
+        "PARENT",
+        "HELP"
       ],
       "related": [
         "input-output",
@@ -1792,7 +1909,8 @@
         "SEARCH",
         "KEYED",
         "REORG",
-        "VERIFY"
+        "VERIFY",
+        "BTREE_VERIFY"
       ],
       "related": [
         "statements",
@@ -1858,6 +1976,7 @@
         "REREAD",
         "REC",
         "KEY",
+        "LINK=",
         "FIRST",
         "LAST",
         "PRIOR",
@@ -1883,6 +2002,7 @@
         "syntax",
         "open",
         "io",
+        "positioning-per-statement",
         "semantics",
         "external",
         "display",
@@ -1892,6 +2012,7 @@
         "write",
         "delete",
         "restore",
+        "link",
         "close",
         "rec",
         "examples",
@@ -2065,7 +2186,8 @@
         "LOAD",
         "RELEASE",
         "RESIDENT",
-        "BRLIBS"
+        "BRLIBS",
+        "NOFILES"
       ],
       "related": [
         "fnsnap",
@@ -2177,7 +2299,8 @@
         "LIST",
         "AUTO",
         "RENUM",
-        "DEL"
+        "DEL",
+        "SOURCE"
       ],
       "related": [
         "program-management",
@@ -2213,7 +2336,8 @@
         "CHDIR",
         "FREE",
         "PROTECT",
-        "DROP"
+        "DROP",
+        "TYPE"
       ],
       "related": [
         "program-management",
@@ -2246,7 +2370,12 @@
         "TRACE",
         "DISPLAY",
         "LOGGING",
-        "STEP"
+        "STEP",
+        "BREAK",
+        "TIME",
+        "ALL",
+        "FONTS",
+        "NORESTORE"
       ],
       "related": [
         "program-management",
@@ -2288,7 +2417,18 @@
         "EXECUTE",
         "CHAIN",
         "PROC",
-        "SYSTEM"
+        "SYSTEM",
+        "SUBPROC",
+        "PROCERR",
+        "ALERT",
+        "FILES",
+        "ECHO",
+        "NOECHO",
+        "SOURCE",
+        "OBJECT",
+        "ONLY",
+        "NOSTEP",
+        "NOTRACE"
       ],
       "related": [
         "file-directory",

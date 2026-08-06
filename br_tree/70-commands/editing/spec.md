@@ -8,7 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree fold (EDIT, AUTO proc-restriction/restart, DEL SOURCE, abbreviations); no conflicts
 recovered-fold: RENUM (folded+pruned — LABELS_ONLY 4.18a, segment reorder, collision/99999 errors; verbatim retained on the BR wiki)
 related: [program-management, information]
-keywords: [EDIT, LIST, AUTO, RENUM, DEL]
+keywords: [EDIT, LIST, AUTO, RENUM, DEL, SOURCE]
+corrections:
+  - "SOURCE added to the frontmatter keywords. `DEL … SOURCE` is in this page's BNF and semantics, and was not declared. Found in brls phase 13."
 ---
 
 # Program editing commands

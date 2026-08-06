@@ -8,7 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree fold (SUBSTITUTE, CONFIG mechanism, GUI/CONSOLE/INSERT/KEYBOARD/STYLE/RD/DATABASE…); deep tables retained; no conflicts
 recovered-fold: PrintDir, DATAHILITE, FIELDBREAK, FLOWSTACK, FORSTACK, HELPDFLT, Min_Fontsize, BRCONFIG.SYS (8 redirect-collision pages folded from re-fetched source; verbatim retained on the BR wiki)
 related: [environment, client-server, platform, installation-tooling]
-keywords: [CONFIG, DRIVE, OPTION, DATABASE, SUBSTITUTE, STYLE, PRINTER, FONT, COLLATE, LOGGING, WORKPATH, PRINTDIR, SPOOLCMD, INCLUDE, SETENV, ATTRIBUTE, KEYBOARD, SCREEN]
+keywords: [CONFIG, DRIVE, OPTION, DATABASE, SUBSTITUTE, STYLE, PRINTER, FONT, COLLATE, LOGGING, WORKPATH, PRINTDIR, SPOOLCMD, INCLUDE, SETENV, ATTRIBUTE, KEYBOARD, SCREEN, RD, STACKS]
+corrections:
+  - "RD and STACKS added to the frontmatter keywords. `RD <0-15>` is in this page's directive list with a retained deep page of its own (RD.md), and `STATUS STACKS` is named where the stack settings are documented; neither was declared. Found in brls phase 13."
 ---
 
 # BRConfig.sys directives
