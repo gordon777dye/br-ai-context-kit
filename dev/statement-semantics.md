@@ -280,6 +280,8 @@ OPEN `#`<channel> `:` <file-open-string> `,` `EXTERNAL` `,`
 READ `#`<channel> [ `,` `USING` <form-ref> ] [ `,` <position> ] [ `,` {`RESERVE` | `RELEASE`}] 
       `:` <variable-list> [ `EOF` <line-ref> ] [ `NOKEY` <line-ref> ] [ `NOREC` <line-ref> ] [ `ERROR` <line-ref> ]
 <position> ::= `REC=` <numeric-expr> | `KEY[>]=` <string-expr> | `SEARCH[>]=` <string-expr>
+             | `LINK=` <string-expr>   -- LINKED files only; exact total key length, else 0718
+             | `POS=` <numeric-expr>   -- absolute byte, external RELATIVE files; do not mix with REC=
              | `FIRST` | `LAST` | `PRIOR` | `NEXT` | `SAME`
 <form-ref> ::= <line-ref> | <form-string>
 <form-string> ::= `"` `FORM` <form-item> [ `,` <form-item> ]* `"`
@@ -464,7 +466,9 @@ REREAD `#`<channel> [ `,` `USING` <form-ref> ] [ `,` {`RESERVE` | `RELEASE`}] `:
 
 **Syntax:**
 ```bnf
-WRITE `#`<channel> [ `,` `USING` <form-ref> ]  [ `,` {`RESERVE` | `RELEASE`}] `:` <expression-list> 
+WRITE `#`<channel> [ `,` `USING` <form-ref> ] [ `,` { `REC=`<n> | `POS=`<n> } ]
+      [ `,` {`RESERVE` | `RELEASE`}] `:` <expression-list>
+      -- REC= writes a specific slot (see below); POS= is an absolute byte, external RELATIVE only
 ```
 
 **What it does:**
@@ -546,9 +550,13 @@ WRITE `#`<channel> [ `,` `USING` <form-ref> ]  [ `,` {`RESERVE` | `RELEASE`}] `:
 
 **Syntax:**
 ```bnf
-REWRITE `#`<channel> [ `,` `USING` <form-ref> ] [ `,` { `REC=`<n> | `KEY=`<k$> } ] 
-       [ `,` {`RESERVE` | `RELEASE`}] [ `,` `WAIT=`<integer> ] `:` <expression-list> [ { `NOKEY` | `NOREC` } <line-ref> ]
-       ! WAIT= only with REC=/KEY= positioning — see Semantics
+REWRITE `#`<channel> [ `,` `USING` <form-ref> ] [ `,` <update-position> ]
+       [ `,` {`RESERVE` | `RELEASE`}] `:` <expression-list> [ { `NOKEY` | `NOREC` } <line-ref> ]
+<update-position> ::= `REC=` <numeric-expr> | `KEY=` <string-expr> | `LINK=` <string-expr>
+             | `POS=` <numeric-expr>
+             | `FIRST` | `LAST` | `PRIOR` | `NEXT` | `SAME`
+             -- no `KEY>=` and no `SEARCH=`/`SEARCH>=`: an update names one record,
+             --   not the next-greater one
 ```
 
 **What it does:**
@@ -619,7 +627,10 @@ REWRITE `#`<channel> [ `,` `USING` <form-ref> ] [ `,` { `REC=`<n> | `KEY=`<k$> }
 
 **Syntax:**
 ```bnf
-DELETE `#`<channel> [ `,` { `REC=`<n> | `KEY=`<k$> } ] [ `,` { `RESERVE` | `RELEASE` } ] `:` [ <error-condition> ]
+DELETE `#`<channel> [ `,` <update-position> ] [ `,` { `RESERVE` | `RELEASE` } ] `:` [ <error-condition> ]
+<update-position> ::= `REC=` <numeric-expr> | `KEY=` <string-expr> | `LINK=` <string-expr>
+             | `FIRST` | `LAST` | `PRIOR` | `NEXT` | `SAME`
+             -- as REWRITE, but no `POS=`; and no `KEY>=`/`SEARCH=`/`SEARCH>=`
 ```
 
 **What it does:**
@@ -711,6 +722,8 @@ DELETE `#`<channel> [ `,` { `REC=`<n> | `KEY=`<k$> } ] [ `,` { `RESERVE` | `RELE
 RESTORE `#`<channel> [ `,` <position> ] [ `,` { `RESERVE` | `RELEASE` } ] `:` [ <error-condition> ]
 
 <position> ::= `REC=` <numeric-expr> | `KEY[>]=` <string-expr> | `SEARCH[>]=` <string-expr>
+             | `LINK=` <string-expr>   -- LINKED files only; exact total key length, else 0718
+             | `POS=` <numeric-expr>   -- absolute byte, external RELATIVE files
              | `FIRST` | `LAST` | `PRIOR` | `NEXT` | `SAME`
 ```
 
@@ -1164,6 +1177,9 @@ PRINT [`#`<file-num> `:`] [<print-options>] [<print-list>]
 -- formatted --
 PRINT [`#`<file-num> `:`] `USING` { <form-ref> | <string-expr> } `:` <expression-list>
 
+-- window border and caption --
+PRINT `#`<window> `,` `BORDER` [<border-spec>] [ `:` <caption> ]
+
 -- special OPEN parameters --
 OPEN `#`<channel> `:` `"` `NAME=`<printer-spec> [`,` `RECL=`<n>] [`,` `EOL=`<eol>] [`,` `COPIES=`<n>] [`,` `CONV=`<char>] [`,` `PAGEOFLOW=`<n>]`"` `,` `DISPLAY` `,` `OUTPUT`
 <eol> ::= { `CR` | `CRLF` | `NONE` }
@@ -1172,6 +1188,7 @@ OPEN `#`<channel> `:` `"` `NAME=`<printer-spec> [`,` `RECL=`<n>] [`,` `EOL=`<eol
 **What it does:**
 1. **Evaluates expressions and outputs them** — to the screen (`#0`, default) or a specified file/printer channel
 2. **Supports options** — `BELL` (sound beep), `NEWPAGE` (clear screen or form-feed printer), `TAB(col)` (move cursor)
+3. **Redraws a window border and sets its caption** — `PRINT #<window>, BORDER [<spec>] [: <caption>]`, the run-time counterpart of `OPEN`'s `BORDER=` parameter. Written 215 times in the QSMRP corpus and documented until now only under [OPEN … window](#open--window-)
 3. **Auto-wraps** — Text beyond the screen width or printer width wraps to the next line
 4. **Handles multiple types** — Numbers, strings, arrays (in row order)
 
@@ -1439,6 +1456,8 @@ OPEN `#`<channel> `:` <comm-open-string> `,` `DISPLAY` `,` { `INPUT` | `OUTPUT` 
 ```bnf
 `DISPLAY` [`#`<win>`,`] `MENU` `:` `MAT` <text$>`,` `MAT` <data$>`,` `MAT` <status$>          -- show/update a native menu
 `INPUT`   `MENU` [ `TEXT` | `DATA` | `STATUS` ] `:` `MAT` <text$>[`,` `MAT` <data$>`,` `MAT` <status$>]   -- read current menu
+
+`DISPLAY` [`#`<win>`,`] `BUTTONS` `MAT` <spec$> `:` `MAT` <caption$>                        -- the button bar
 ```
 
 **What it does:**
@@ -1452,6 +1471,13 @@ OPEN `#`<channel> `:` <comm-open-string> `,` `DISPLAY` `,` { `INPUT` | `OUTPUT` 
 - **Result functions** — `MENU$` returns the selected item's `data$`; `MENU` returns its subscript
 - **Status codes** (`MAT status$`) — `E` send FKEY 98 (item has no submenu), `P` protect/grey, `C` checkable, `X` checked (with `C`), `R` retain across program end / `CHAIN`
 - **Windows only** — a character-mode / non-Windows console has no native menu bar
+- **`DISPLAY BUTTONS` is the other half of DISPLAY**, and the only other keyword its syntax tree
+  admits: the button bar on the top or bottom row. Each `spec$` is
+  `"row,col,caption-form-spec,attributes,fkey-or-hex-scancode"` and the matching `caption$` is the
+  label; `P` in the attributes greys the button. A click returns that FKEY and raises an FKEY
+  interrupt, and a two-digit hex scancode (`X02`) may be given instead of a number so a clicked
+  button and its key yield the same `KSTAT$`. Fully described under
+  [GUI controls](../br_tree/20-io-screen/controls/spec.md#buttons), and missing from here until now
 
 **Common errors:**
 - **Expecting `INPUT MENU` to wait** — it returns immediately; a menu pick surfaces via `KSTAT$`/`FKEY`, not by blocking
@@ -3359,9 +3385,9 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 **Syntax:**
 ```bnf
 `ON` <error-condition> { `GOTO` <line-ref> | `GOSUB` <line-ref> | `IGNORE` | `SYSTEM` }
-`ON FKEY` <n>          { `GOTO` <line-ref> | `GOSUB` <line-ref> | `IGNORE` | `SYSTEM` }
+`ON` { `FKEY` | `FNKEY` } <n>  { `GOTO` <line-ref> | `GOSUB` <line-ref> | `IGNORE` | `SYSTEM` }
 
-<error-condition> ::= `CONV` | `DUPREC` | `IOERR` | `NOKEY` | `OFLOW`
+<error-condition> ::= `ATTN` | `CONV` | `DUPREC` | `IOERR` | `NOKEY` | `OFLOW`
                     | `PAGEOFLOW` | `SOFLOW` | `ZDIV` | `HELP`   -- ON-eligible conditions
 ```
 
@@ -3380,6 +3406,8 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 - **Not every condition is ON-eligible** — `CONV` works on a statement, in an `EXIT` group **and** with `ON`; but **`EOF` and `NOREC` are accepted only on a statement or in an `EXIT` group — never with `ON`** (they are position/data conditions tied to a specific I/O)
 - **`PAGEOFLOW`** — commonly `ON PAGEOFLOW GOSUB` to emit a footer/header, then `CONTINUE`
 - **`ON FKEY <n>`** — traps function keys during RUN (F1–F10 default to `IGNORE`); during `INPUT`, function keys instead set `CMDKEY` rather than trapping
+- **`ON FNKEY <n>` is the same statement under a second spelling**, and it is switched on and off by a config directive rather than always available: `config.cpp` case **58** calls `setConfigAllowFnkeySyntax`, which rewrites the `FNKEY` entry of `table4xCompiling` to point at `FKEY` when the option is off (`tblopr.cpp`, and BR's own comment there reads "FNKEY has been disabled by changing to FKEY"). `STATUS` reports its state under key `58`. The directive itself is undocumented in the reference
+- **`ON ATTN`** — traps the Attention key; written 59 times in the QSMRP corpus and previously absent from the condition list above
 - **`ON HELP`** — traps the Help key (field help); `ON HELP GOSUB <line>` opens a program-driven help screen, then `RETURN`/`CONTINUE`. (`HELP` is also a statement-level FIELDS error condition — see [INPUT FIELDS](#input-fields--formatted-input-with-field-attributes).)
 
 **Four levels of trapping (processed in order):**
