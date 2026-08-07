@@ -277,8 +277,9 @@ OPEN `#`<channel> `:` <file-open-string> `,` `EXTERNAL` `,`
 
 **Syntax:**
 ```bnf
-READ `#`<channel> [ `,` `USING` <form-ref> ] [ `,` <position> ] [ `,` {`RESERVE` | `RELEASE`}] 
+READ `#`<channel> [ `,` `USING` <form-ref> ] [ `,` <position> ] [ `,` {`RESERVE` | `RELEASE`}] [ `,` `KEYONLY` ]
       `:` <variable-list> [ `EOF` <line-ref> ] [ `NOKEY` <line-ref> ] [ `NOREC` <line-ref> ] [ `ERROR` <line-ref> ]
+      -- KEYONLY reads the key, not the record; READ only, and the colon must follow it
 <position> ::= `REC=` <numeric-expr> | `KEY[>]=` <string-expr> | `SEARCH[>]=` <string-expr>
              | `LINK=` <string-expr>   -- LINKED files only; exact total key length, else 0718
              | `POS=` <numeric-expr>   -- absolute byte, external RELATIVE files; do not mix with REC=
@@ -313,6 +314,13 @@ READ `#`<channel> [ `,` `USING` <form-ref> ] [ `,` <position> ] [ `,` {`RESERVE`
    - **`NEXT`** — Reads the record after the current position
    - **`SAME`** — Reads the current position again (useful for checking 
    for updated data on unlocked records before rewriting)
+6. **`KEYONLY` reads the key instead of the record** — `READ #n, KEYONLY: key$, recnum` takes the key
+   and its relative record number from the **index**, without touching the master record: one file's
+   worth of I/O on a sequential key scan rather than two, and a key still comes back when the master
+   record is locked. `FORM` is the key length plus `B 4`. A master record must have been read first
+   (else error 0718), and a following `REREAD`/`REWRITE`/`DELETE` errors. Accepted on `READ` alone and
+   only immediately before the colon. Full description under
+   [keys-indexes](../br_tree/30-io-file/keys-indexes/spec.md#keyonly)
 
 **Error conditions:**
 - **`EOF`** — No more records (end of file reached); `ERR` = 4270 (file) or 57 (data)

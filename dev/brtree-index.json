@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.py.",
-  "generated": "2026-08-06",
+  "generated": "2026-08-07",
   "source": "br_tree/",
-  "source_sha256": "ba29a7ab0d50bc95ade3deac4a6e37f4d9d5e00a25d4031cfa0f35f94edef03a",
+  "source_sha256": "78682d4aabd5f120bc8fa5cab88eea9c3ef3666791ee79aec1d50e84ac6cfe55",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -403,6 +403,10 @@
     "KEYED": [
       "30-io-file/file-model",
       "30-io-file/keys-indexes"
+    ],
+    "KEYONLY": [
+      "30-io-file/keys-indexes",
+      "30-io-file/statements"
     ],
     "KSTAT$": [
       "10-language/data-manipulation/system-functions"
@@ -1908,6 +1912,7 @@
         "KEY",
         "SEARCH",
         "KEYED",
+        "KEYONLY",
         "REORG",
         "VERIFY",
         "BTREE_VERIFY"
@@ -1923,6 +1928,7 @@
         "open-keyed",
         "key-clause",
         "keyed-io",
+        "keyonly",
         "duplicates",
         "tables",
         "examples",
@@ -1977,6 +1983,7 @@
         "REC",
         "KEY",
         "LINK=",
+        "KEYONLY",
         "FIRST",
         "LAST",
         "PRIOR",
@@ -2013,6 +2020,7 @@
         "delete",
         "restore",
         "link",
+        "keyonly",
         "close",
         "rec",
         "examples",

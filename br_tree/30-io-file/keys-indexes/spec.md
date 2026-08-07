@@ -8,8 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment
 recovered-fold: BTREE, Key_Spec, KFNAME, KLN, KREC (5 redirect-collision pages folded from re-fetched source — Btree2 no-mix rule, KLN/KPS split-key segment param, KREC=index-record vs REC=master + display/linked behavior; verbatim retained on the BR wiki)
 related: [statements, file-model, form-spec]
-keywords: [INDEX, KEY, SEARCH, KEYED, REORG, VERIFY, BTREE_VERIFY]
+keywords: [INDEX, KEY, SEARCH, KEYED, KEYONLY, REORG, VERIFY, BTREE_VERIFY]
 corrections:
+  - "KEYONLY declared in the frontmatter keywords and given an anchor, so the statements spec can link to it: this page owns the index side of the construct and READ's own production now admits it. Also corrected on the same list: `DELETE #n, KEY=k$:` said \"only KEY= is allowed (not >=/SEARCH)\", which is right about the key parameters and wrong as a whole - DELETE also takes REC=, LINK= and the positional five, from its syn.txt tree and confirmed in the second corpus. Found in brls phases 13 and 15; see lsp/brls/LSP_PLAN.md findings 40 and 41."
   - "BTREE_VERIFY added to the frontmatter keywords. `BTREE_VERIFY <master>[ OFF]` is documented on this page and was not declared. Found in brls phase 13."
 ---
 
@@ -84,8 +85,11 @@ master name; consistent share params).
 - `REWRITE` without `KEY=` updates the last record read (fast); with `KEY=` it searches first
   (slower). **Changing the key field value is allowed** — BR automatically updates all related key
   files opened as a group (the old error 0059 is deprecated).
-- `DELETE #n, KEY=k$:` — only `KEY=` is allowed (not `>=`/`SEARCH`).
-- **`READ #n, KEYONLY: key$, recnum`** reads the key + relative record number from the index
+- `DELETE #n, KEY=k$:` — of the *key* parameters only `KEY=` is allowed, not `KEY>=` or
+  `SEARCH=`/`SEARCH>=`, because a delete has to name one record and not the next-greater one. It does
+  also take `REC=`, `LINK=` and the positional five — see
+  [statements](../statements/spec.md#positioning-per-statement).
+- <a id="keyonly"></a>**`READ #n, KEYONLY: key$, recnum`** reads the key + relative record number from the index
   **without** touching the master record (faster sequential key scans; returns the key when the
   master record is locked). Valid only for `INPUT KEYED`/`OUTIN KEYED`; a master record must have
   been read first (else error 0718); use `FORM` of key length + `B 4`; it moves the master pointer
