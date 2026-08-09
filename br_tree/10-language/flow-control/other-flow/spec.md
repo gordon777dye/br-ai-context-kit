@@ -10,6 +10,10 @@ recovered-fold: GOSUB, ON_GOSUB, RANDOMIZE (3 redirect-collision pages folded fr
 corrections:
   - "TRACE added as a statement. BR has a syn.txt tree for it — `TRACE` with three branches, PRINT, OFF and an optional ON — and a primary operation to execute it (TRACE_PRI, primop0.cpp), but the reference documented TRACE only as an option of the RUN and GO *commands*, so the statement form was missing from the tree entirely. It was the one genuinely undocumented statement left in gendata's coverage report. Semantics read from BR's source: primop0.cpp switches on the secondary opcode, where OFF_SEC (0x05) clears RUN_TRACE|RUN_TRACE_PRINT, ON_SEC (0x04) sets RUN_TRACE, and PRINT_SEC (0x06) sets RUN_TRACE_PRINT — the three constants are defined together in basoprcmn.h under the comment `/* trace */`. run.cpp gates the per-line output on RUN_TRACE and picks FILENBR_MAIN_PRINTER (255) over FILENBR_MAINWINDOW (0) on RUN_TRACE_PRINT, printing the line number with L_05ld (`%05i`). That gating is why TRACE PRINT alone traces nothing, and command9.cpp shows the console form guarding the same bit differently. A bare TRACE is left marked unverified rather than assumed equivalent to TRACE ON: command4.cpp stores no operand byte when an optional keyword is absent, so primop0 reads whatever follows the primary op. Added in brls phase 5."
   - "TO and OFF added to the frontmatter keywords. Both are table4k clause keywords this page's own BNF documents — `FOR <v> = <e> TO <e>` and `TRACE {ON|OFF|PRINT}` — and neither was declared, so a reader looking either one up reached nothing. STEP, ON and PRINT, from the same two trees, were declared already; these two were the siblings that got missed. Found in brls phase 13."
+  - "A note added under §ON…GOTO/GOSUB that `FKEY`/`FNKEY` used bare or with an operator (`ON FKEY-89
+    GOTO A,B`) is this form and not error-handling's `ON FKEY <n> …` condition — the full rule and its
+    sourcing are on that page, since it is the condition form's grammar (one target, no repeat) that
+    forces the general form to be the only reading whenever a second target follows."
 related: [conditionals, syntax, functions-udf]
 keywords: [FOR, NEXT, DO, LOOP, WHILE, UNTIL, GOTO, GOSUB, RETURN, ON GOTO, ON GOSUB, EXIT, RANDOMIZE, STOP, END, PAUSE, TRACE, STEP, TO, ON, OFF, PRINT]
 ---
@@ -85,6 +89,11 @@ Multi-way branch: the numeric expression is **rounded to the nearest integer** a
 selected subroutine's `RETURN` (menu dispatch pattern); its `NONE` target is itself a **GOSUB** branch
 (the routine there must also `RETURN`), not an error handler, and an `ON … GOSUB` may carry trailing
 error-condition clauses.
+
+**`FKEY`/`FNKEY` as the numeric expression** — `ON FKEY-89 GOTO A,B` and `ON FKEY GOTO A,B` are this
+form, not [error-handling](../error-handling/spec.md)'s `ON FKEY <n> …` condition, whenever more than
+one target follows or nothing/an operator sits where the condition's `<n>` belongs; see that page for
+why the two cannot be confused for one another mid-statement.
 
 <a id="exit"></a>
 ### EXIT

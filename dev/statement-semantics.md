@@ -2298,18 +2298,21 @@ spelling of that keyword.
 
 **Syntax:**
 ```bnf
-[`LET`] <variable> `=` <expression>
+[`LET`] <variable> `=` <expression> [ <error-condition> <line-ref> ]*
 [`LET`] <variable> [`=` <variable>]* `=` <expression>          -- multiple assignment
 [`LET`] <variable> { `+=` | `-=` | `*=` | `/=` } <expression>  -- compound (in-place)
-[`LET`] <function-call>                                        -- call a function for effect
+[`LET`] <function-call> [ <error-condition> <line-ref> ]*      -- call a function for effect
 ```
 
 **What it does:**
 1. **Evaluates the right-hand expression** and stores the result in the variable
-2. **`LET` is optional** — `X = Y*2+Z` is an implicit `LET`
+2. **`LET` is optional** — `X = Y*2+Z` is an implicit `LET`, and it is optional on the call-for-effect form
+   too — `fnCloseDisplayWindow` and `STR2MAT("300,400,700",MAT DEPT$,",")` both run with no `LET` written
 3. **Multiple assignment** — assigns one value to several variables at once
 4. **Compound operators** — update a variable in place (`+=`, `-=`, `*=`, `/=`)
 5. **Function-call form** — `LET` can invoke a function for its side effect (the assignment target is optional)
+6. **Trailing error-condition clause** — either form, assigned or called, `LET` written or implied, may close
+   with the same `[<error-condition> <line-ref>]*` clause list any statement takes (see [ON condition](#on-condition--program-wide-condition-traps) for the roster, and the full one in error-handling)
 
 **Semantics:**
 - **Optional `LET`** — the keyword is almost always omitted; `PUMA = COUGAR` copies `COUGAR` into `PUMA`
@@ -2319,6 +2322,7 @@ spelling of that keyword.
 - **Immediate mode** — an assignment typed **without** a line number also **prints** its result
 - **Function for effect** — `LET FNSETUP(X)` runs the function and discards/uses the return; for a **library** function `LET` loads and runs it. The target is optional
 - **Use `=`, not `:=`, in a `LET`** — the forced-assignment operator is for conditions/expressions (see next section)
+- **Error-condition clause** — `LET VAL(F$(N)) CONV skipval` (or, with `LET` dropped, `X = 5 CONV 900`) traps a conversion failure the same way `CONV` traps it after any other statement
 
 **Common errors:**
 - **Type mismatch** — assigning a string to a numeric variable (or vice versa)
@@ -2339,15 +2343,18 @@ spelling of that keyword.
 00090 LET COUNT -= 1                  ! decrement in place
 00100 NAME$ = "ACME " & DIV$          ! string concatenation
 00110 FNSETUP                          ! call a function for effect (no target)
+00120 LET VAL(F$(N)) CONV skipval      ! call for effect, trapping a conversion failure
 ```
 
 **See also:**
 - Forced assignment (`:=`) (assign inside a condition)
 - MAT (whole-array assignment)
 - IF / THEN / ELSE (`=` as comparison)
+- ON condition (the trailing error-condition clause's roster)
 - [10-language/data-manipulation/assignment](../br_tree/10-language/data-manipulation/assignment/spec.md#let) — full LET / assignment reference (comprehensive)
 - [10-language/data-manipulation/expressions](../br_tree/10-language/data-manipulation/expressions/spec.md) — operators forming the RHS
 - [10-language/data-manipulation/data-types](../br_tree/10-language/data-manipulation/data-types/spec.md) — value kinds being assigned
+- [10-language/flow-control/error-handling](../br_tree/10-language/flow-control/error-handling/spec.md#conditions) — the error-condition roster and clause repetition rule
 
 ---
 
@@ -2579,6 +2586,7 @@ string, on an array reference instead:
 - **Type agreement** — a numeric variable needs a numeric `DATA` value; string values may be quoted
 - **`RESTORE` re-reads** — bare `RESTORE` returns to the first value; `RESTORE <line-ref>` resets to the first `DATA` value on/after that line (re-read a subset)
 - **`READ MAT`** — fills all elements of a (dimensioned) array at once; often chained with a `MAT` assignment (e.g., build a sort index with `AIDX`)
+- **A value can be empty** — a `DATA` value is whatever text sits between one comma and the next, verbatim, and that can be nothing: `DATA ,ISA,GS` starts with an empty value, `DATA A,B,,` has one between the two commas together. `READ` assigns it as a null string or 0 depending on the receiving variable. A single trailing comma at the true end of the statement just ends the list — it does not add one more empty value on top of whatever the last comma already introduced.
 
 **Common errors:**
 - **Out of data** — a `READ` past the last table value
@@ -2866,6 +2874,7 @@ string, on an array reference instead:
 - **`PAUSE` is a breakpoint** — like `STOP` for inspection, but intended for interactive debugging; `GO` resumes and repaints the screen
 - **`CHAIN` closes files by default** — it closes all files (except procedure files) and **resets the new program's variables**; **`FILES`** keeps files open at their current positions (pointers are *not* moved — use `RESTORE` to reposition)
 - **Passing values across `CHAIN`** — trailing `MAT <array>` / `<var>` names carry those values into the chained program (dimensions need not match; the caller's values win)
+- **`USE` in the chained-to program is a leftover, not a requirement** — older IBM Business BASIC programs declared the incoming names with a `USE <var-list>` statement (same item shapes as `DIM`: a plain name, `MAT name`, either with a dimension list and a `*length`); in Business Rules `USE` is accepted for compatibility and otherwise treated as a comment — nothing checks its contents against what `CHAIN` actually passed
 - **`CHAIN` targets** — `"<program>"` follows the same extension search as `LOAD` (`.BR`→`.BRO`, `CHAINDFLT`); `"PROC=…"` ends the program and starts a procedure; `"SUBPROC=…"` starts a **nested** procedure without disturbing the running one
 
 **Common errors:**
@@ -3416,6 +3425,11 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 - **`ON FKEY <n>`** — traps function keys during RUN (F1–F10 default to `IGNORE`); during `INPUT`, function keys instead set `CMDKEY` rather than trapping
 - **`ON FNKEY <n>` is the same statement under a second spelling**, and it is switched on and off by a config directive rather than always available: `config.cpp` case **58** calls `setConfigAllowFnkeySyntax`, which rewrites the `FNKEY` entry of `table4xCompiling` to point at `FKEY` when the option is off (`tblopr.cpp`, and BR's own comment there reads "FNKEY has been disabled by changing to FKEY"). `STATUS` reports its state under key `58`. The directive itself is undocumented in the reference
 - **`ON ATTN`** — traps the Attention key; written 59 times in the QSMRP corpus and previously absent from the condition list above
+- **`ON FKEY`/`ON FNKEY` branch to exactly one target, never a comma list** — `FKEY`/`FNKEY` are also
+  plain callable functions, so with no `<n>` or an operator where it belongs (`ON FKEY-89 GOTO A,B`,
+  `ON FKEY GOTO A,B`), the whole line is the *other* `ON` statement, [ON … GOTO / GOSUB — Computed
+  (indexed) branch](#on--goto--gosub--computed-indexed-branch), using FKEY's return value as the
+  selector — only `ON FKEY <n> …` / `ON FKEY(<n>) …` with nothing else before the verb is this form
 - **`ON HELP`** — traps the Help key (field help); `ON HELP GOSUB <line>` opens a program-driven help screen, then `RETURN`/`CONTINUE`. (`HELP` is also a statement-level FIELDS error condition — see [INPUT FIELDS](#input-fields--formatted-input-with-field-attributes).)
 
 **Four levels of trapping (processed in order):**
@@ -3655,7 +3669,7 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 **Syntax:**
 ```bnf
 -- single-line form (the whole function is one expression)
-`DEF FN`<name>[`$` `*` <len>] [ `(` <parameter-list> `)` ] `=` <expression>
+`DEF FN`<name>[`$` `*` <len>] [ `(` <parameter-list> `)` ] `=` <expression> [ <error-condition> <line-ref> ]*
 
 -- multi-line form
 `DEF FN`<name>[`$` `*` <len>] [ `(` <parameter-list> `)` ]
@@ -3677,6 +3691,10 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 4. **Arrays are passed only by reference** - &MAT is illegal
 5. **Return value** — Assigned via `LET FN<name> = <expression>` (or just `FN<name> = <expression>`)
 6. **DEF LIBRARY** — Marks a function as callable from other programs via the LIBRARY facility
+7. **Trailing error-condition clause (single-line only)** — the body expression may close with the same
+   `[<error-condition> <line-ref>]*` clause list any statement takes; the corpus writes only `CONV`
+   (guarding a `VAL()`/`CNVRT$()` call), never another condition, but the grammar is not narrowed to
+   that one — see [ON condition](#on-condition--program-wide-condition-traps) for the roster
 
 **Naming:**
 - **Function name** — `FN` + up to 28 more characters (**30 max, `FN` included**; a string function's trailing `$` is extra) (e.g., `FNCALC`, `FNPROCESS`)
@@ -3708,6 +3726,7 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 ```business-rules
 DEF FNHYPOT(X, Y) = SQR(X*X + Y*Y)
 DEF FNRAND100 = INT(RND*100+1)
+DEF FNVAL(PC$*80) = VAL(PC$) CONV Ignore   ! trailing CONV falls through to 0 on a non-numeric string
 ```
 
 **Multi-line functions:**
@@ -3792,6 +3811,7 @@ FNEND
 **See also:**
 - LIBRARY (link a `DEF LIBRARY` function for cross-program use)
 - GOSUB / RETURN (subroutine alternative)
+- ON condition (the trailing error-condition clause's roster)
 - [10-language/flow-control/functions-udf](../br_tree/10-language/flow-control/functions-udf/spec.md) — full DEF/FN reference: params, scope, recursion (comprehensive)
 - [50-libraries/library-facility](../br_tree/50-libraries/library-facility/spec.md) — LIBRARY statement, loading strategies
 - [10-language/data-manipulation/system-functions](../br_tree/10-language/data-manipulation/system-functions/spec.md) — built-in functions
@@ -4004,4 +4024,4 @@ FNEND
 
 ---
 
-**Document Status:** Extracted from `context/br_tree/` specs (2b status, verified and folded). Synthesized for LLM consumption. Last updated: 2026-07-01.
+**Document Status:** Extracted from `context/br_tree/` specs (2b status, verified and folded). Synthesized for LLM consumption. Last updated: 2026-08-08 — LET and DEF FN sections gained the trailing error-condition clause (`CONV`, etc.) and, for LET, the call-with-no-`LET`-keyword form; both were found missing from `context/br_tree/10-language/data-manipulation/assignment/spec.md` and `.../flow-control/functions-udf/spec.md` while fixing the brls parser gaps that had been rejecting them outright.

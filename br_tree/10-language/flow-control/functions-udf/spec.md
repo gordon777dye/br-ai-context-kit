@@ -8,8 +8,18 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (single-line DEF, string-fn length, recursion, function-authoring gotchas: return-name-is-call, single exit, no-paren calls, no array dims in params); no conflicts
 corrections:
   - "§Scope & local variables: \"it's own\" -> \"its own\"."
-related: [other-flow, syntax, system-functions]
-keywords: [DEF, FNEND, FN, LIBRARY]
+  - "Single-line DEF's syntax line carried no error-condition clause, though the QSMRP and a second
+    corpus both write one routinely — `DEF FNVAL(PC$*80)=VAL(PC$) CONV Ignore`, over a dozen distinct
+    call sites. It is the same statement-level clause list documented in error-handling#conditions —
+    any statement may take `[<error-condition> <line-ref>]*` from the 17-word statement/EXIT roster,
+    not a DEF-specific one — so every condition in that roster (`CONV`, `IOERR`, `EOF`, `TIMEOUT`, …)
+    is permissible after a single-line DEF's body, and not only `CONV`. The corpus writes `CONV`
+    exclusively because a single-line DEF's body is a plain expression evaluation — a VAL()/CNVRT$()
+    call is what fails there — but the grammar does not narrow it to that one condition. Added to the
+    syntax line and semantics. Found harvesting brls's failure corpus: the clause was rejected outright
+    (parser gap, since fixed), not merely undocumented."
+related: [other-flow, syntax, system-functions, error-handling]
+keywords: [DEF, FNEND, FN, LIBRARY, CONV]
 ---
 
 # User-defined functions (DEF / FN)
@@ -35,7 +45,7 @@ qualifier, atoms and assignables) apply only to them. Nor do `FN…` names take 
 
 ```bnf
 -- single-line form (the whole function is one expression)
-DEF FN<name>[$ '*' <len>] [ '(' <parameter-list> ')' ] '=' <expression>
+DEF FN<name>[$ '*' <len>] [ '(' <parameter-list> ')' ] '=' <expression> [ <error-condition> <line-ref> ]*
 
 -- multi-line form
 DEF FN<name>[$ '*' <len>] [ '(' <parameter-list> ')' ]
@@ -67,6 +77,11 @@ not `FNGETNAME$()` (empty `()` is a syntax error). Call a function for its side 
 <a id="def"></a>
 ### Defining a function
 - **Single-line** functions compute one expression: `DEF FNY(X) = (X-INT(X/100)*100)*10000+INT(X/100)`.
+  The expression may be followed by any of the statement-level
+  [error-condition clauses](../error-handling/spec.md#conditions) — `[<error-condition> <line-ref>]*`,
+  the same trailing clause list every statement takes, not one specific to DEF. `CONV` is what shows
+  up in practice, guarding a `VAL()`/`CNVRT$()` call in the body: `DEF FNVAL(PC$*80)=VAL(PC$) CONV
+  Ignore` falls through to 0 on a non-numeric string instead of raising an error.
 - **Multi-line** functions run between `DEF FN<name>` and `FNEND` and **return a value** by assigning
   to their own name: `LET FN<name> = <expression>` (if never assigned, they return 0 / null). Only
   multi-line functions can do file I/O, change by-reference params, and **recurse** (a fresh local

@@ -8,8 +8,17 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (multiple assignment, += compound ops, append/prepend idioms); no conflicts
 corrections:
   - "The MAT sub-array operator folded in, with a §mat-sub-array section and a BNF that defines it. <sub-array-reference> was used in the <mat-rhs> production and never defined, and the target admitted only a <dimension> list — so `MAT A(6:10) = B`, this section's own example, was not derivable from this section's own grammar. The operator was not undocumented: it is on the retained deep page `declaration/MAT.md` (§MAT subarray operator), under the leaf that owns *redimensioning* rather than the one that owns MAT operations, so a reader here had no path to it. Facts carried across from that page: the notation, the five worked examples, expression-valued bounds, and that multi-dimensional matrices are not supported. Facts added from level 1 that no kit page had: which of the two readings of `(m:n)` applies is decided by whether the reference is a MAT reference — written, or *implied* at a MAT statement's target and right-hand array operands (get_array in command5.cpp compiles them by inserting the characters `MAT `, so `MAT B(1:5) = A(6:10)` is elements on both sides, while a parenthesized right-hand side is an ordinary expression and slices a string); that the reference *aliases* the original's storage rather than copying it (run.cpp's SUB_ARRAY builds a descriptor with curDmat[0] = last - first + 1 over the original data pointer); that the one-dimension and one-range limits and the bounds check are enforced at **run time**, so `MAT A(1:5,2:3)` compiles and answers 0123 while a bad bound answers 0122; and that the `=` is optional after a sub-array as it is after a redimension (MAT_PRI: `if (!*sp) goto MAT_END`). The no-redimension rule already had an error page and is now linked: 0315, which matches run.cpp's setNoRedim(true) on the descriptor. Two further MAT rules read off MAT_PRI's switch while establishing the above: `*` and `/` are reachable only from the parenthesized-scalar form, so `MAT A = B * C` is a syntax error; and a **string** target ends the statement after one right-hand operand, so `MAT A$ = B$ + C$` is rejected. `MAT.md` is retained rather than pruned — it is a deep reference with much more than sub-arrays on it. Pinned in brls by TestSubArrayIsAnArrayAndNotAString and TestSubArrayNeedsNoRightHandSide; see LSP_PLAN.md finding 37."
-  - "DATA's value syntax added. The spec gave `DATA <value> [',' <value>]*` and never defined <value>, which left the impression that a value is an expression. It is not: BR's DATA handler (command5.cpp, case DATA_PRI) copies any value not opening with a quote verbatim to the next comma, so `DATA \"x\",bcp\\scanser` and `DATA ...,3001 MILLER ROAD\"` are both valid and their second values contain a backslash and a lone double quote. Also records that DATA must be the first statement on its line (the handler rejects a prior clause with BRENOMULTICLAUSE) and owns the rest of it."
-related: [expressions, declaration, data-types, system-functions]
+  - "DATA's value syntax added. The spec gave `DATA <value> [',' <value>]*` and never defined <value>, which left the impression that a value is an expression. It is not: BR's DATA handler (command5.cpp, case DATA_PRI) copies any value not opening with a quote verbatim to the next comma, so `DATA \"x\",bcp\\scanser` and `DATA ...,3001 MILLER ROAD\"` are both valid and their second values contain a backslash and a lone double quote. Also records that DATA must be the first statement on its line (the handler rejects a prior clause with BRENOMULTICLAUSE) and owns the rest of it. One more consequence of 'verbatim to the next comma' that stayed implicit: the text between two commas can be zero characters, so a value can be **empty** — `DATA ,ISA,GS` starts with an empty value and `DATA A,B,,` (two commas together) has an empty one between them — READ assigns it as a null string or 0 depending on the receiving variable's type. A trailing comma with nothing after it at all (true end of statement, not another comma) does not add one more empty value beyond that; it just ends the list. Found the same way: brls's DATA reader stopped at the first comma with nothing before it, rejecting real corpus lines."
+  - "§LET said the assignment target is optional when LET calls a function (`FNSCRNH(LINES)`) but not
+    that `LET` itself is also optional there, the same as it is for `X = 5`. The corpus writes both:
+    bare `fnCloseDisplayWindow` and `str2mat(\"...\",MAT DEPT$,\",\")`, no `LET`, called purely for
+    effect. Also missing: `LET`'s own operand — assigned or called — may be followed by a trailing
+    [error-condition clause](../../flow-control/error-handling/spec.md#conditions), and that carries
+    over too when `LET` is dropped: `VAL(F$(N)) CONV skipval` is a complete statement, same as
+    `LET VAL(F$(N)) CONV skipval`. Added to the syntax line and semantics. Found harvesting brls's
+    failure corpus: both forms were rejected outright (parser gaps, since fixed), not merely
+    undocumented."
+related: [expressions, declaration, data-types, system-functions, error-handling]
 keywords: [LET, MAT, DATA, READ, RESTORE, ":="]
 ---
 
@@ -25,7 +34,8 @@ operator `:=`, `MAT` array operations, substring mutation, and the internal data
 ## Syntax
 
 ```bnf
-[LET] <variable> = <expression>
+[LET] <variable> = <expression> [ <error-condition> <line-ref> ]*
+[LET] <function-call> [ <error-condition> <line-ref> ]*    -- call for effect; return value discarded
 <forced-assignment> ::= <variable> ':=' <expression>
 
 <mat-assignment>  ::= MAT <array-reference> [ '=' <mat-rhs> ]
@@ -46,7 +56,7 @@ DATA <value> [',' <value>]*
 RESTORE [<line-ref>]
 
 <value> ::= <quoted-literal>   -- '"' or "'" delimited; a doubled quote embeds one
-          | <unquoted-text>    -- everything up to the next comma, taken verbatim
+          | <unquoted-text>    -- everything up to the next comma, taken verbatim (may be empty)
 ```
 
 <a id="semantics"></a>
@@ -58,6 +68,13 @@ Assigns a value or computed expression; `LET` is optional (`X = Y*2+Z` is an imp
 String values must be quoted and cannot be used in arithmetic. In immediate mode (no line number)
 an assignment also prints its result. `LET` also **calls a function** (the assignment target is
 optional: `FNSCRNH(LINES)` runs a function for effect; for a library function `LET` loads & runs it).
+**`LET` is optional there too** — a bare call is a complete statement, the same as a bare assignment
+is: `fnCloseDisplayWindow` and `STR2MAT("300,400,700",MAT DEPT$,",")` both run with no `LET` written,
+their return values discarded.
+
+Either form — assigned or called, `LET` written or implied — may close with a trailing
+[error-condition clause](../../flow-control/error-handling/spec.md#conditions), the same one any
+statement takes: `LET VAL(F$(N)) CONV skipval` and, with `LET` dropped, `X = 5 CONV 900`.
 - **Multiple assignment** — assign one value to several variables at once:
   `LET SUMA = SUMB = SUMC = SUMD = 0`.
 - **Compound assignment operators** `+=`, `-=`, `*=`, `/=` update a variable in place:
