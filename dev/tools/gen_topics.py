@@ -12,13 +12,13 @@ Router / lexical index for the interpret + code task bundles (see ../APP-DEV-GUI
     statement/clause/command keywords are positional.
 
 Fully self-contained within context/dev/ — no ../lsp/ dependency.
-Run from anywhere:  python tools/gen_topics.py
+Run from anywhere:  tools/gen_topics.exe
   --verify : don't write; check topics.json is in sync with statement-semantics.md
              (source hash, range validity, and a full regenerate-and-compare). Exit 1 on drift.
 """
 import io, os, re, sys, json, hashlib, datetime
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.abspath(sys.executable if getattr(sys, "frozen", False) else __file__))
 DEV = os.path.dirname(HERE)                      # context/dev
 sem_path = os.path.join(DEV, "statement-semantics.md")
 out_path = os.path.join(DEV, "topics.json")
@@ -178,7 +178,7 @@ lexicon = {
 doc = {
     "$comment": "Topic index + lexicon over statement-semantics.md and tools/lexicon.json. "
                 "Router for the interpret/code bundles (see APP-DEV-GUIDE.md). 'lines' are 1-based "
-                "inclusive ranges for cheap section loading; regenerate with tools/gen_topics.py.",
+                "inclusive ranges for cheap section loading; regenerate with tools/gen_topics.exe.",
     "generated": datetime.date.today().isoformat(),
     "source": "statement-semantics.md",
     "source_sha256": src_hash,
@@ -194,7 +194,7 @@ def _drop_generated(d):
 if "--verify" in sys.argv:
     name = os.path.basename(out_path)
     if not os.path.exists(out_path):
-        print("VERIFY FAIL: %s missing — run tools/gen_topics.py" % name); sys.exit(1)
+        print("VERIFY FAIL: %s missing — run tools/gen_topics.exe" % name); sys.exit(1)
     with io.open(out_path, "r", encoding="utf-8") as f:
         existing = json.load(f)
     problems = classification_problems([aid for aid, _, _ in found])
@@ -216,7 +216,7 @@ if "--verify" in sys.argv:
         prev_end = hi
     if _drop_generated(existing) != _drop_generated(doc):
         problems.append("content drift: regenerated index differs from on-disk "
-                        "(line ranges / keywords / br_tree links / lexicon) - run tools/gen_topics.py")
+                        "(line ranges / keywords / br_tree links / lexicon) - run tools/gen_topics.exe")
     if problems:
         print("VERIFY FAIL (%d issue%s):" % (len(problems), "" if len(problems) == 1 else "s"))
         for p in problems:

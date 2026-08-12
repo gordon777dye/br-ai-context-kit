@@ -12,14 +12,14 @@ app data model instead of statement-semantics.md.
 
 Regenerate whenever data-model.md is (re)generated or hand-edited.
 
-  Usage: python tools/gen_datamodel_index.py [data-model.md]
+  Usage: tools/gen_datamodel_index.exe [data-model.md]
          (defaults to ../../app/data-model.md relative to this tool)
   --verify : don't write; check data-model-index.json is in sync with data-model.md
              (source hash, range validity, and a full regenerate-and-compare). Exit 1 on drift.
 """
 import io, os, re, sys, json, hashlib, datetime
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.abspath(sys.executable if getattr(sys, "frozen", False) else __file__))
 CONTEXT = os.path.dirname(os.path.dirname(HERE))          # context/
 default_md = os.path.join(CONTEXT, "app", "data-model.md")
 positional = [a for a in sys.argv[1:] if not a.startswith("-")]
@@ -62,7 +62,7 @@ for k, (name, aline) in enumerate(found):
 rel_md = os.path.relpath(md_path, os.path.dirname(out_path)).replace("\\", "/")
 doc = {
     "$comment": "Per-file section index over data-model.md. 'lines' are 1-based inclusive "
-                "ranges for cheap per-file loading; regenerate with tools/gen_datamodel_index.py.",
+                "ranges for cheap per-file loading; regenerate with tools/gen_datamodel_index.exe.",
     "generated": datetime.date.today().isoformat(),
     "source": rel_md,
     "source_sha256": src_hash,
@@ -77,7 +77,7 @@ def _drop_generated(d):
 if verify_mode:
     name = os.path.basename(out_path)
     if not os.path.exists(out_path):
-        print("VERIFY FAIL: %s missing — run tools/gen_datamodel_index.py" % name); sys.exit(1)
+        print("VERIFY FAIL: %s missing — run tools/gen_datamodel_index.exe" % name); sys.exit(1)
     with io.open(out_path, "r", encoding="utf-8") as f:
         existing = json.load(f)
     problems = []
@@ -99,7 +99,7 @@ if verify_mode:
         prev_end = hi
     if _drop_generated(existing) != _drop_generated(doc):
         problems.append("content drift: regenerated index differs from on-disk "
-                        "(line ranges / recl / field or key counts) - run tools/gen_datamodel_index.py")
+                        "(line ranges / recl / field or key counts) - run tools/gen_datamodel_index.exe")
     if problems:
         print("VERIFY FAIL (%d issue%s):" % (len(problems), "" if len(problems) == 1 else "s"))
         for p in problems:

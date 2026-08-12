@@ -1,33 +1,24 @@
-# Toolset — QSMRP
-
-> **Sample.** This is a filled-in example for the QSMRP application, written to the STEP 2 spec in
-> [`INSTRUCTIONS.md`](INSTRUCTIONS.md). Adapt every value to your app; the **BR launch environment**
-> and **canonical invocations** sections are required, the rest are as-needed.
-
----
+# BR Launch
 
 ## BR launch environment
 
-AI models need to know how to invoke Business Rules for compilation and testing. Here is where you tell it how it can do that from a terminal command line (e.g. cmd.exe or PowerShell). 
-
-**You will need to create 2 other config files for simple AI access.** Note- you can use a standard set of configuration statements in a config file that you INCLUDE into each config variant.
+AI models need to know how to invoke Business Rules for compilation and testing. The executable and
+all three config files are fixed, kit-relative paths — nothing here is machine-specific.
+`brconfig.ai_util`/`brconfig.ai_user` are generated from `brconfig.sys` by INSTRUCTIONS.md STEP 2, 
+never hand-edited.
 
 | Fact | Value | Nature |
 |---|---|---|
-| **BR executable** | `$BR_EXE` — default `C:\BRnative\brnative.exe` | Server-specific - your existing BR pathname
-| **`brconfig.sys`** | `$BR_CONFIG` — default `C:\ads\qsmrp\brconfig.sys` | Existing app startup |
-| **`brconfig.sys`** | `$BR_TEST` — default `C:\ads\qsmrp\br_test.sys` | AI utility |
-| **`brconfig.sys`** | `$BR_TEST2` — default `C:\ads\qsmrp\br_test2.sys` | AI User Interface |
-
-
-  **SET THE MACHINE SPECIFIC PATHS HERE:**
-  (See INSTRUCTIONS step 2)
+| **BR executable** | `$BR_EXE` | Ships with the kit |
+| **`brconfig.sys`** | `$BR_CONFIG` | Existing app startup config |
+| **`brconfig.ai_util`** | `$BR_AI_UTIL` | AI Utility — headless (`UNATTENDED`) |
+| **`brconfig.ai_user`** | `$BR_AI_USER` | AI User — interactive, for testing user interfaces |
 
 ```powershell
-$env:BR_EXE = "C:\ADS\qsmrp\context\dev\tools\brserver-433-x64-Debug-2026-07-26.exe"
-$env:BR_CONFIG = "C:\ads\qsmrp\context\app\bin\brconfig.sys"
-$env:BR_TEST = "C:\ads\qsmrp\context\app\bin\br_test.sys"
-$env:BR_TEST2 = "C:\ads\sys\br.d\br_test2.sys"
+$env:BR_EXE     = "context\dev\tools\brserver-433-Win32-Debug.exe"
+$env:BR_CONFIG  = "context\dev\tools\brconfig.sys"
+$env:BR_AI_UTIL = "context\dev\tools\brconfig.ai_util"
+$env:BR_AI_USER = "context\dev\tools\brconfig.ai_user"
 ```
 
 ## AI Canonical invocations
@@ -35,82 +26,42 @@ $env:BR_TEST2 = "C:\ads\sys\br.d\br_test2.sys"
 Copy these verbatim (the STEP 1 compile check uses the same form).
 
 ```
-"$BR_EXE" -"$BR_CONFIG"                        # start BR into the app (interactive)
-"$BR_EXE" "RUN glp\trial_bal" -"$BR_TEST"      # run a program
-"$BR_EXE" "RUN cnp\menu" -"$BR_TEST2"          # run a statement/command at startup
+"$BR_EXE" -"$BR_CONFIG"                           # start BR into the app (interactive)
+"$BR_EXE" "RUN glp\trial_bal" -"$BR_AI_UTIL"       # run a program, headless
+"$BR_EXE" "RUN cnp\menu" -"$BR_AI_USER"            # run a statement/command, interactive
+"$BR_EXE" "PROC cnp\batch.prc" -"$BR_AI_UTIL"      # run a procedure, headless
 ```
 
-- **`-<config-file>`** names an alternate config file — a dash **immediately followed** by the
+- **`-<config-file>`** names a config file — a dash **immediately followed** by the
   path/filename (e.g. `-"$BR_CONFIG"`), no space. With none given, BR looks for `brconfig.sys`, then
   `wbconfig.sys`.
-- The **first quoted argument** is a BR statement/command to run the instant BR starts (e.g.
-  `"RUN cnp\menu"`, `"PROC start"`); a workstation id is `-<wsid>`, a login is `@<name>`. Note that your default startup command is best placed in the configuration file using an EXECUTE configuration statement.
+- The **first quoted argument** is a BR statement/command to run the instant BR starts 
+  (e.g. `"RUN cnp\menu"`, `"PROC start"`). 
 - Syntax reference: [br_tree — Startup command line](../br_tree/00-configuration/platform/spec.md).
-- Startup sequence baked into config: `cnp\startup.br` runs after login; `cnp\initfile.br` creates DB
-  files on a fresh install. Main menu entry point is `cnp\menu.bro`.
 
 ---
 
 ## Development commands
 
 ### Compile / syntax-check
-Sources auto-compile `.br.brs` → `.br` on modification. To force a compile-check of one source
+Sources compile `.br.brs` → `.br` on modification. To force a compile-check of one source
 (the STEP 1 feedback loop):
 
 ```
-"$BR_EXE" "LOAD program.brs source" -"$BR_CONFIG"   # parses; reports first error + line
+"$BR_EXE" "LOAD program.brs source" -"$BR_AI_UTIL"   # parses; reports first error + line
 ```
 
 The **`source`** keyword is required to load a `.brs` as source — `LOAD` defaults to object mode and
 will not infer source from the extension ([LOAD](../br_tree/70-commands/program-management/spec.md#loading)).
 
-### Run a program from the console
+### Run a program with console input
 ```
-"$BR_EXE" -"$BR_CONFIG"
-> RUN "cop\xlate850"                           # or: EXECUTE "program_name" from code
+"$BR_EXE" "RUN cop\xlate850" -"$BR_AI_USER"
 ```
-
-### EDI (in `cop\`)
-```
-> RUN "cop\xlate850"     # translate inbound 850
-> RUN "cop\load850"      # load translated 850
-> RUN "cop\send856"      # transmit 856
-```
-X12 sets in use: 810, 820, 830, 850, 856, 860, 862, 997.
-
-### File / DB maintenance
-```
-> RUN "cnp\reorg<file>"  # reorganize a data file (cnp\reorg*.br)
-> RUN "cnp\histpurg"     # purge history
-> RUN "cnp\initfile"     # (re)create DB files from filelay\ — new installs only
-```
-
-### Reindex
-Rebuild indexes after bulk operations. `invent` and `oed\orderl` are large — expect ~10–20 s per 10k
-records.
-
 ---
-
-## Utilities & entry points
-
-| Task | Program |
-|---|---|
-| Main menu / dispatch | `cnp\menu.bro` |
-| Post-login startup | `cnp\startup.br` |
-| Create DB files | `cnp\initfile.br` |
-| Conversions (upgrades) | `cvt\*` |
 
 ## Deploy notes
 
-- Deploy = copy compiled `.br` (+ any changed `.brs`) into the app tree; no build server.
+- Deploy = copy compiled `.br` and `.brs` into the app tree; no further build required.
 - ScreenIO event-code changes require recompiling the **screen**, not just the program.
-- Security/permissions live in `cnd\security`; menu & program access is permission-gated.
 
----
-
-## Prerequisites recap
-
-- **Node.js** (v14+) — only to (re)generate `app\data-model.*` via `dev\tools\extract-schema.js`.
-- **BR runtime** — the values above; used to run the app and compile-check generated code.
-
-Both are build/run-time tools, not part of the delivered `context\`.

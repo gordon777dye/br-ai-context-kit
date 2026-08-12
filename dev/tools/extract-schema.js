@@ -104,7 +104,7 @@ L.push('');
 L.push('> Each file section carries an `<a id="…">` anchor (its file name). For cheap per-file');
 L.push('> retrieval, `data-model-index.json` maps every file to its 1-based inclusive line range —');
 L.push('> load just that slice instead of the whole document. Regenerate the index with');
-L.push('> `tools/gen_datamodel_index.py` after (re)generating or hand-editing this file.');
+L.push('> `tools/gen_datamodel_index.exe` after (re)generating or hand-editing this file.');
 L.push('');
 L.push('| File | Recl | Fields | Keys |');
 L.push('|---|---|---|---|');

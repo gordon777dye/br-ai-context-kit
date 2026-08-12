@@ -5,7 +5,7 @@ plus a summary and a low-confidence review list. Moves nothing."""
 import os, csv, re, sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent   # context/br_tree
+ROOT = Path(sys.executable if getattr(sys, "frozen", False) else __file__).resolve().parent.parent   # context/br_tree
 SRC_DIRS = ["advanced-features","commands","context","data_operations","error-handling",
             "examples","file-operations","flow_and_branching","libraries-procedures",
             "printing-reporting","screen-operations","screenio-library","statements"]

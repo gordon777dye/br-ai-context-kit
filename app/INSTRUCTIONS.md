@@ -1,16 +1,23 @@
-# Onboarding the BR Kit to a New Application
+# Onboarding the BR Context Kit to a New Application
 
-**Purpose.** This document is a procedure for teaching an AI Large Language Model (LLM) the *coding style, 
-data model, and toolset* of *your particular* BR application, on top of the generic BR kit in `context\`. 
-Follow it once per application. Let your favorite AI model do the work (except for step 2). 
+**Purpose.** This document is a procedure **for teaching an AI Large Language Model (LLM)** the *coding style, 
+data model, and toolset* of *your particular BR application*. Let your favorite AI model perform it once. 
 
-Once onboarding is complete, the reader may be a human or an LLM.
+When onboarding is complete, the reader may be a human or an AI model.
 
-Please document any errors in dev\ERRORS.md. This includes any inaccuracies *or ambiguities* found during the onboarding process.
+Please document any errors in ERRORS.md. This includes any inaccuracies *or ambiguities* found during the onboarding process.
 
 ---
 
-## The principle — add a layer, don't edit the language
+## Prerequisite
+
+The user should place a copy of the application's `brconfig.sys` at `dev\tools\brconfig.sys`. No
+need for a license file. STEP 2 derives everything else from this one file. The remainder of this
+procedure is best done by an AI model.
+
+---
+
+## Instructions to AI -The principle: add a layer, don't edit the language
 
 `context\` ships in three layers. **Only the third is app-specific; leave the other two alone.**
 
@@ -28,7 +35,7 @@ Onboarding adds an **app axis** beside the existing **language axis**; keep them
   - `brtree-index.json` (any BR keyword — config, screen, printing, functions, commands) →
     `br_tree\<spec>#<anchor>` — a concept→spec router over *all* leaves; use it for non-statement
     tokens or to reach the authoritative spec directly. Complements `topics.json`, doesn't replace it.
-- **App axis** (new): `dev\APP-DEV-GUIDE.md` → always-load `conventions.md` + `toolset.md`; on-demand
+- **App axis** (new): `dev\APP-DEV-GUIDE.md` → always-load `conventions.md` + `BR_launch.md`; on-demand
   `data-model.md` (by file), `exemplars\` (by archetype), `architecture.md`.
 
 The app axis links *into* the language axis for statement detail — it does not live inside it.
@@ -46,8 +53,9 @@ brevity as it ascends. (Language facts still ascend into `topics.json`; app fact
 ```
 context\app\
   INSTRUCTIONS.md       # this sheet (stays)
-  data-model.md/.json   # STEP 1 — generated from the app's filelay\ folder
-  toolset.md            # STEP 2 — BR launch env, canonical invocations, run/build commands
+  data-model.md         # STEP 1 — generated from the app's filelay\ folder
+  data-model-index.json
+  BR_launch.md          # STEP 2 — BR launch env, canonical invocations, run/build commands
   exemplars\            # STEP 4 — ~10–20 blessed real programs, annotated
   conventions.md        # STEP 5 — house style, derived from the app's own source
   architecture.md       # STEP 6 — module map + core data flows
@@ -58,40 +66,61 @@ language keyword router.
 
 ---
 
-## Prerequisites
-
-The prompts needed to generate the *docs* ship inside `context\`. However, two types of shell calls will be used in the 
-onboarding process that are **not** part of `context\` and support for them must exist on the machine doing the onboarding:
-
-| Needed for | Dependency | Notes |
-|---|---|---|
-| STEP 1 — data model | **Node.js** (v14+), to run `dev\tools\extract-schema.js` | Command-line only; run once per `filelay\` change. Not needed at model runtime — it produces static `data-model.{json,md}`. |
-| STEP 2 BR executable path | **The BR runtime** (`br` / `brnative`) | This is the app's own *existing* BR executable — nothing extra to obtain. **You will need to edit** its executable path/name and the `brconfig.sys` location in `app\toolset.md` (see STEP 2). This is the only step that cannot be done by AI.|
-
-Also assumed present (inputs, not tools):
-
-- The application's **`filelay\`** data-dictionary directory (input to STEP 1). If your data dictionary does not use filelay record layouts **it will be necessary to create a set of filelay layouts from your toolset**. AI models are really good at such conversions, and the specs for the filelay format are in the appendix to this document. So, if you do not have filelay file layouts, ask your AI agent to create them from either your toolset or your program source code. 
-- Read access to the application's **source tree** (`*.brs`) — the raw material for exemplars (STEP 4)
-  and conventions (STEP 5). In the event some of your `.brs` files are stale or missing, STEP 3 audits source 
-  status and refreshes out of date `.brs` files before examining source in subsequent steps.
-
----
-
 ## Procedure
 
 Do them in order; ROI is highest at the top. The data model (STEP 1) and exemplars (STEP 4) alone
 deliver most of the value (correct file I/O + demonstrated style) — but STEP 3 (audit source
 currency, using the BR runtime configured in STEP 2) comes first so the source used to create those 
-exemplars is current.
+exemplars is current. STEP 0 gates STEP 1: `extract-schema.exe` only parses `filelay\`, so STEP 1
+has nothing to read until STEP 0 confirms or creates it.
 
-### STEP 1 — Data model (automated, do first) ◆ highest ROI
+### STEP 0 — Locate or create `filelay\` ◆ prerequisite for STEP 1
+STEP 1 does **not** inspect the app's actual data files to learn their layout. `extract-schema.exe`
+only parses the plain-text **`filelay\`** directory (Appendix A): one hand-declared layout file per
+data file, giving the FORM spec, disk position, and key composition of every field. If `filelay\`
+doesn't exist, STEP 1 has nothing to read.
+
+1. **Search the app tree for an existing `filelay\` directory** — check case variants too, and don't
+   assume it sits directly under the app root: FileIO's `DefaultFileLayoutPath$` setting (in
+   `fileio.ini`) can relocate it anywhere, so a real app's dictionary may live elsewhere in the
+   tree. If found and it holds one layout file per data file in the Appendix A format, note its
+   actual path as `<filelay-path>` and skip to STEP 1.
+2. **If none exists, synthesize one — from authoritative sources only, never by guessing at record
+   shape:**
+   - **Best source: the app's own data dictionary**, if one exists. It need not be a text file — a
+     dictionary can just as easily be stored as a BR `INTERNAL` (binary) file, since BR reads its
+     own internal formats most conveniently. If it's in `INTERNAL` format, write a short BR program
+     to read it and export its contents into `app\filelay\` in the Appendix A format.
+   - If no dictionary — text or `INTERNAL` — can be located, ask the user where it lives and in
+     what format, rather than guessing.
+   - **Cross-check against the app's own BR source once a draft layout exists**: named `FORM`
+     declarations and the `OPEN`/`DIM` statements that reference them describe the real on-disk
+     field order. Treat this as **confirmation only, not the primary source** — `FORM` specs can
+     jump position (`POS n`), skip bytes (`X n`), and be partial, so they don't reliably reconstruct
+     a complete layout on their own.
+   - **Do not derive a field layout from the raw `.dat` bytes.** A record's field boundaries aren't
+     recoverable from binary data without the FORM spec — reverse-engineering a plausible-looking
+     layout that way is exactly the kind of guess [README.md's rule](../README.md) forbids.
+   - Write each confirmed layout into `app\filelay\`, in the exact format given in **Appendix A**:
+     header line (data file, prefix, version `0`), key lines, optional `recl=`, `====` divider, then
+     one field line per field in on-disk order. Appendix A's "Conversion checklist" is the
+     step-by-step for this. Note this path as `<filelay-path>` (`app\filelay\`) for STEP 1.
+3. **Sanity-check before moving on:** every layout file has a header line, a divider, and at least
+   one field line; if `recl=` is given, be sure it's consistent with the sum of field sizes. If not,
+   stop and report the discrepancy to the user. A solid `filelay\` folder is required to proceed. If
+   the user tells you to ignore the discrepancy then do so.
+
+### STEP 1 — Data model (automated) ◆ highest ROI
 The LLM cannot write valid `OPEN` / `READ…USING` / `KEY=` without the real field layouts and key
 composition. This step is deterministic.
 
 ```
-node dev\tools\extract-schema.js <app>\filelay context\app
-python dev\tools\gen_datamodel_index.py
+dev\tools\extract-schema.exe <filelay-path> context\app
+dev\tools\gen_datamodel_index.exe
 ```
+
+`<filelay-path>` is the directory STEP 0 resolved — not necessarily `<app>\filelay`; use whatever
+path STEP 0 found or created.
 
 - **Produces:** `app\data-model.md` (readable) — per file: data path, record length, key indexes
   **with their composing fields in order**, and every field's FORM type/position. Each file section
@@ -102,37 +131,42 @@ python dev\tools\gen_datamodel_index.py
 - **Verify:** the extractor prints `layouts: N, total fields: M`; the indexer prints `files: N …`.
 - **Re-run both** whenever `filelay\` changes — they are generated, never hand-edited.
 
-### STEP 2 — Toolset entries (fill in the blanks)
-First create 2 br_test.sys configuration files by copying your app's configuration file and making 
-the following changes:
+### STEP 2 — BR launch entries (fully automated)
+The BR executable and all three config files are fixed, kit-relative paths — nothing here is
+machine-specific, so this step takes no input beyond the `brconfig.sys` already placed per the
+Prerequisite.
 
-br_test.sys:
-- Remove any EXECUTE statement
-- Include a LOGIING statement with the ", UNATTENDED" keyword
+**Fixed locations:**
 
-The UNATTEND keyword lets AI run BR in a headless (with no user input) mode. 
+| Role | Path |
+|---|---|
+| BR executable | `dev\tools\brserver-433-Win32-Debug.exe` |
+| Existing app startup config | `dev\tools\brconfig.sys` |
+| AI Utility config (headless) | `dev\tools\brconfig.ai_util` |
+| AI User config (interactive) | `dev\tools\brconfig.ai_user` |
 
-br_test2.sys:
-- Same as br_test.sys without the UNATTENDED keyword on the logging statement
+**Generate `dev\tools\brconfig.ai_user`** from `dev\tools\brconfig.sys`:
+1. Copy `brconfig.sys`.
+2. Remove every line that is an `EXECUTE` statement — matched on the line's leading token
+   (case-insensitive, ignoring leading whitespace); don't touch commented-out (`REM`/`!`) lines.
+3. Remove every line that is a `LOGGING` statement, matched the same way. 
+4. Prepend, as the new first line of the file:
+   ```
+   LOGGING 10, context\app\startlog.txt
+   ```
 
-Next **Modify `app\toolset.md`** and fill in these **required** values — they are everything the model
-(and the STEP 3 / feedback-loop tooling) needs to run and check code. 
+**Generate `dev\tools\brconfig.ai_util`** from the `brconfig.ai_user` just produced:
+1. Copy `brconfig.ai_user`.
+2. Replace its `LOGGING` line with:
+   ```
+   LOGGING 10, context\app\startlog.txt, unattended
+   ```
 
-Modify toolset.md to have the correct paths:
+The UNATTEND keyword lets AI run BR in a headless (with no user input) mode.
 
-```powershell
-$env:BR_EXE = "C:\ADS\sys\br.d\br432g-32.exe"        # your normal app BR executable
-$env:BR_CONFIG = "C:\ads\sys\br.d\brconfig.sys"      #  ships with the app
-$env:BR_TEST = "C:\ads\sys\br.d\br_test.sys"         # the config file for AI internal use
-$env:BR_TEST2 = "C:\ads\sys\br.d\br_test2.sys"       # the config file for testing user interfaces
-```
+Both are regenerated whenever `brconfig.sys` changes — generated, never hand-edited (same
+convention as `data-model.md`/`topics.json`).
 
-- **Executable path is machine-specific** → kept in `$BR_EXE`; provide an absolute path to your BR executable.
-- **`brconfig.sys` is app-owned** → a fixed path (override via `$BR_CONFIG` only if a box needs to).
-- **Parameters** — an optional quoted BR statement first, then the config as `-<config-filename>`
-  (a dash **attached** to the path): `"$BR_EXE" ["<statement>"] -"$BR_CONFIG"`. Syntax:
-  [br_tree — Startup command line](../br_tree/00-configuration/platform/spec.md).
-Full worked example: [`toolset.md`](toolset.md).
 
 ### STEP 3 — Audit source currency (`.brs` vs `.br`) ◆ automated; no user decision
 STEPS 4–5 learn the house style by reading the app's **`.brs` source**. Because BR can edit a program
@@ -193,7 +227,7 @@ The two routers stay single-responsibility: `topics.json` = "what does this BR s
 `APP-DEV-GUIDE.md` = "how this app is built."
 
 1. In `dev\APP-DEV-GUIDE.md` (the app entry point) add a terse pointer row for each app doc — in the
-   "Start here" table and the §2 reference map. Mark **`conventions.md` and `toolset.md` as
+   "Start here" table and the §2 reference map. Mark **`conventions.md` and `BR_launch.md` as
    always-load** when writing app code; **`data-model.md` (by file), `exemplars\` (by archetype), and
    `architecture.md` as on-demand** lookups. Full detail stays in the `app\` docs (progressive
    restatement).
@@ -206,14 +240,17 @@ The two routers stay single-responsibility: `topics.json` = "what does this BR s
 
 ## Done criteria
 
+- [ ] `filelay\` exists (found or synthesized per STEP 0), one layout file per data file, in
+      Appendix A format — no guessed field layouts; any file without a locatable FORM/DIM source
+      was flagged to the user instead.
 - [ ] `app\data-model.md` regenerates cleanly from `filelay\` (0 unparsed files).
 - [ ] Source currency audited (STEP 3): every `.br`/`.wb` has an as-new-or-newer source file; any
       stale `.brs` was refreshed before exemplars/conventions were derived.
 - [ ] `app\exemplars\` holds ≥10 annotated, representative programs across task archetypes.
 - [ ] `app\conventions.md` states each rule and points to an exemplar that shows it.
-- [ ] `app\toolset.md` lets a newcomer build, run, test, and deploy without asking.
+- [ ] `app\BR_launch.md` lets a newcomer build, run, test, and deploy without asking.
 - [ ] `app\architecture.md` names entry points and the core data flows.
-- [ ] `APP-DEV-GUIDE.md` has terse pointer rows to every app doc (conventions/toolset marked
+- [ ] `APP-DEV-GUIDE.md` has terse pointer rows to every app doc (conventions/BR_launch marked
       always-load; data-model/exemplars/architecture on-demand); `topics.json` left as the language router.
 - [ ] `br_tree\` and `dev\` (except the `APP-DEV-GUIDE.md` pointer rows) are **unchanged**.
 
@@ -223,6 +260,7 @@ With STEP 1 (real schema) plus a compile pass in BR itself (`.brs` → `.br`), g
 then includes "compiles against our data model," not just "looks right."
 
 ## Maintenance
+- If a data file is added or its layout changes, update `filelay\` (STEP 0) first, then re-run STEP 1.
 - Re-run STEP 1 after any `filelay\` change.
 - Re-run the STEP 3 audit after recompiling; decompile any program whose `.brs` is now older than its
   `.br` before you re-derive exemplars or conventions.

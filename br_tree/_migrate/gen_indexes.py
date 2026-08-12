@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Phase 4: generate _index.md for every folder, a special error-code index,
 a per-category index, and the root master map + routing guide."""
-import re
+import re, sys
 from pathlib import Path
-ROOT=Path(__file__).resolve().parent.parent
+ROOT=Path(sys.executable if getattr(sys, "frozen", False) else __file__).resolve().parent.parent
 TOPS=[t for t in ["00-configuration","10-language","20-io-screen","30-io-file","40-io-printing",
       "50-libraries","60-integration","70-commands","90-reference","99-examples"] if (ROOT/t).is_dir()]
 

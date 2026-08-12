@@ -2,10 +2,10 @@
 """Phases 1-2: scaffold target tree, move each file per MANIFEST.csv, inject
 metadata frontmatter (category/subcategory/kind/related). Reversible: MANIFEST
 records old->new for every file."""
-import csv, re, shutil
+import csv, re, shutil, sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(sys.executable if getattr(sys, "frozen", False) else __file__).resolve().parent.parent
 MAN = ROOT/"_migrate"/"MANIFEST.csv"
 
 def harvest_related(body):

@@ -10,13 +10,13 @@ over the whole language reference (all spec.md leaves), not just statements.
     (BR keyword -> [spec paths]) so a lookup resolves "which spec covers X" in one read.
 
 Self-contained: no PyYAML (frontmatter here is regular enough to parse directly).
-Run from anywhere:  python tools/gen_brtree_index.py
+Run from anywhere:  tools/gen_brtree_index.exe
   --verify : don't write; check brtree-index.json is in sync with br_tree/
              (source hash + regenerate-and-compare). Exit 1 on drift.
 """
 import io, os, re, sys, glob, json, hashlib, datetime
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+HERE = os.path.dirname(os.path.abspath(sys.executable if getattr(sys, "frozen", False) else __file__))
 DEV = os.path.dirname(HERE)                       # context/dev
 BRTREE = os.path.join(os.path.dirname(DEV), "br_tree")
 out_path = os.path.join(DEV, "brtree-index.json")
@@ -108,7 +108,7 @@ def build():
     doc = {
         "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the "
                     "spec path(s) that document it; each spec record carries title, status, anchors, "
-                    "and lead summary. Regenerate with tools/gen_brtree_index.py.",
+                    "and lead summary. Regenerate with tools/gen_brtree_index.exe.",
         "generated": datetime.date.today().isoformat(),
         "source": "br_tree/",
         "source_sha256": src_hash,
@@ -128,14 +128,14 @@ doc, src_hash = build()
 if "--verify" in sys.argv:
     name = os.path.basename(out_path)
     if not os.path.exists(out_path):
-        print("VERIFY FAIL: %s missing - run tools/gen_brtree_index.py" % name); sys.exit(1)
+        print("VERIFY FAIL: %s missing - run tools/gen_brtree_index.exe" % name); sys.exit(1)
     existing = json.load(io.open(out_path, "r", encoding="utf-8"))
     problems = []
     if existing.get("source_sha256") != src_hash:
         problems.append("source_sha256 mismatch: br_tree/ spec frontmatter changed since last generate")
     if _drop_generated(existing) != _drop_generated(doc):
         problems.append("content drift: regenerated index differs from on-disk "
-                        "(keywords / related / anchors / titles) - run tools/gen_brtree_index.py")
+                        "(keywords / related / anchors / titles) - run tools/gen_brtree_index.exe")
     if problems:
         print("VERIFY FAIL (%d issue%s):" % (len(problems), "" if len(problems) == 1 else "s"))
         for p in problems:
