@@ -12,7 +12,7 @@ Please document any errors in ERRORS.md. This includes any inaccuracies *or ambi
 ## Prerequisite
 
 The user should place a copy of the application's `brconfig.sys` at `dev\tools\brconfig.sys`. No
-need for a license file. STEP 2 derives everything else from this one file. The remainder of this
+need for a license file. STEP 1 derives everything else from this one file. The remainder of this
 procedure is best done by an AI model.
 
 ---
@@ -52,39 +52,78 @@ brevity as it ascends. (Language facts still ascend into `topics.json`; app fact
 
 ```
 context\app\
-  INSTRUCTIONS.md       # this sheet (stays)
-  data-model.md         # STEP 1 — generated from the app's filelay\ folder
+  ONBOARDING.md         # this sheet (stays)
+  BR_launch.md          # STEP 1 — BR launch env, canonical invocations, run/build commands
+  data-model.md         # STEP 3 — generated from the app's filelay\ folder
   data-model-index.json
-  BR_launch.md          # STEP 2 — BR launch env, canonical invocations, run/build commands
-  exemplars\            # STEP 4 — ~10–20 blessed real programs, annotated
-  conventions.md        # STEP 5 — house style, derived from the app's own source
-  architecture.md       # STEP 6 — module map + core data flows
+  exemplars\            # STEP 5 — ~10–20 blessed real programs, annotated
+  conventions.md        # STEP 6 — house style, derived from the app's own source
+  architecture.md       # STEP 7 — module map + core data flows
 ```
 
-`dev\APP-DEV-GUIDE.md` holds pointers to the generated app docs (STEP 7); `topics.json` is the
+`dev\APP-DEV-GUIDE.md` holds pointers to the generated app docs (STEP 8); `topics.json` is the
 language keyword router. 
 
 ---
 
 ## Procedure
 
-Do them in order; ROI is highest at the top. The data model (STEP 1) and exemplars (STEP 4) alone
-deliver most of the value (correct file I/O + demonstrated style) — but STEP 3 (audit source
-currency, using the BR runtime configured in STEP 2) comes first so the source used to create those 
-exemplars is current. STEP 0 gates STEP 1: `extract-schema.exe` only parses `filelay\`, so STEP 1
-has nothing to read until STEP 0 confirms or creates it.
+Do them in order. STEP 1 (BR launch) and STEP 2 (locate/create `filelay\`) are prerequisites —
+nothing else can run BR or read data layouts without them. After that, ROI is highest at the top:
+the data model (STEP 3) and exemplars (STEP 5) alone deliver most of the value (correct file I/O +
+demonstrated style) — but STEP 4 (audit source currency, using the BR runtime STEP 1 configured)
+comes first so the source used to create those exemplars is current. STEP 2 gates STEP 3:
+`extract-schema.exe` only parses `filelay\`, so STEP 3 has nothing to read until STEP 2 confirms or
+creates it.
 
-### STEP 0 — Locate or create `filelay\` ◆ prerequisite for STEP 1
-STEP 1 does **not** inspect the app's actual data files to learn their layout. `extract-schema.exe`
+### STEP 1 — BR launch entries (fully automated)
+The BR executable and all three config files are fixed, kit-relative paths — nothing here is
+machine-specific, so this step takes no input beyond the `brconfig.sys` already placed per the
+Prerequisite.
+
+**Fixed locations:**
+
+| Role | Path |
+|---|---|
+| BR executable | `dev\tools\brserver-433-Win32-Debug.exe` |
+| Existing app startup config | `dev\tools\brconfig.sys` |
+| AI Utility config (headless) | `dev\tools\brconfig.ai_util` |
+| AI User config (interactive) | `dev\tools\brconfig.ai_user` |
+
+**Generate `dev\tools\brconfig.ai_user`** from `dev\tools\brconfig.sys`:
+1. Copy `brconfig.sys`. If `dev\tools\brconfig.sys` doesn't exist, request the user
+   to place it there. Don't proceed without it.
+2. Remove every line that is an `EXECUTE` statement — matched on the line's leading token
+   (case-insensitive, ignoring leading whitespace); don't touch commented-out (`REM`/`!`) lines.
+3. Remove every line that is a `LOGGING` statement, matched the same way.
+4. Prepend, as the new first line of the file:
+   ```
+   LOGGING 10, context\app\startlog.txt
+   ```
+
+**Generate `dev\tools\brconfig.ai_util`** from the `brconfig.ai_user` just produced:
+1. Copy `brconfig.ai_user`.
+2. Replace its `LOGGING` line with:
+   ```
+   LOGGING 10, context\app\startlog.txt, unattended
+   ```
+
+The UNATTEND keyword lets AI run BR in a headless (with no user input) mode.
+
+Both are regenerated whenever `brconfig.sys` changes — generated, never hand-edited (same
+convention as `data-model.md`/`topics.json`).
+
+### STEP 2 — Locate or create `filelay\` ◆ prerequisite for STEP 3
+STEP 3 does **not** inspect the app's actual data files to learn their layout. `extract-schema.exe`
 only parses the plain-text **`filelay\`** directory (Appendix A): one hand-declared layout file per
 data file, giving the FORM spec, disk position, and key composition of every field. If `filelay\`
-doesn't exist, STEP 1 has nothing to read.
+doesn't exist, STEP 3 has nothing to read.
 
 1. **Search the app tree for an existing `filelay\` directory** — check case variants too, and don't
    assume it sits directly under the app root: FileIO's `DefaultFileLayoutPath$` setting (in
    `fileio.ini`) can relocate it anywhere, so a real app's dictionary may live elsewhere in the
    tree. If found and it holds one layout file per data file in the Appendix A format, note its
-   actual path as `<filelay-path>` and skip to STEP 1.
+   actual path as `<filelay-path>` and skip to STEP 3.
 2. **If none exists, synthesize one — from authoritative sources only, never by guessing at record
    shape:**
    - **Best source: the app's own data dictionary**, if one exists. It need not be a text file — a
@@ -104,13 +143,13 @@ doesn't exist, STEP 1 has nothing to read.
    - Write each confirmed layout into `app\filelay\`, in the exact format given in **Appendix A**:
      header line (data file, prefix, version `0`), key lines, optional `recl=`, `====` divider, then
      one field line per field in on-disk order. Appendix A's "Conversion checklist" is the
-     step-by-step for this. Note this path as `<filelay-path>` (`app\filelay\`) for STEP 1.
+     step-by-step for this. Note this path as `<filelay-path>` (`app\filelay\`) for STEP 3.
 3. **Sanity-check before moving on:** every layout file has a header line, a divider, and at least
    one field line; if `recl=` is given, be sure it's consistent with the sum of field sizes. If not,
    stop and report the discrepancy to the user. A solid `filelay\` folder is required to proceed. If
    the user tells you to ignore the discrepancy then do so.
 
-### STEP 1 — Data model (automated) ◆ highest ROI
+### STEP 3 — Data model (automated) ◆ highest ROI
 The LLM cannot write valid `OPEN` / `READ…USING` / `KEY=` without the real field layouts and key
 composition. This step is deterministic.
 
@@ -119,8 +158,8 @@ dev\tools\extract-schema.exe <filelay-path> context\app
 dev\tools\gen_datamodel_index.exe
 ```
 
-`<filelay-path>` is the directory STEP 0 resolved — not necessarily `<app>\filelay`; use whatever
-path STEP 0 found or created.
+`<filelay-path>` is the directory STEP 2 resolved — not necessarily `<app>\filelay`; use whatever
+path STEP 2 found or created.
 
 - **Produces:** `app\data-model.md` (readable) — per file: data path, record length, key indexes
   **with their composing fields in order**, and every field's FORM type/position. Each file section
@@ -131,45 +170,8 @@ path STEP 0 found or created.
 - **Verify:** the extractor prints `layouts: N, total fields: M`; the indexer prints `files: N …`.
 - **Re-run both** whenever `filelay\` changes — they are generated, never hand-edited.
 
-### STEP 2 — BR launch entries (fully automated)
-The BR executable and all three config files are fixed, kit-relative paths — nothing here is
-machine-specific, so this step takes no input beyond the `brconfig.sys` already placed per the
-Prerequisite.
-
-**Fixed locations:**
-
-| Role | Path |
-|---|---|
-| BR executable | `dev\tools\brserver-433-Win32-Debug.exe` |
-| Existing app startup config | `dev\tools\brconfig.sys` |
-| AI Utility config (headless) | `dev\tools\brconfig.ai_util` |
-| AI User config (interactive) | `dev\tools\brconfig.ai_user` |
-
-**Generate `dev\tools\brconfig.ai_user`** from `dev\tools\brconfig.sys`:
-1. Copy `brconfig.sys`.
-2. Remove every line that is an `EXECUTE` statement — matched on the line's leading token
-   (case-insensitive, ignoring leading whitespace); don't touch commented-out (`REM`/`!`) lines.
-3. Remove every line that is a `LOGGING` statement, matched the same way. 
-4. Prepend, as the new first line of the file:
-   ```
-   LOGGING 10, context\app\startlog.txt
-   ```
-
-**Generate `dev\tools\brconfig.ai_util`** from the `brconfig.ai_user` just produced:
-1. Copy `brconfig.ai_user`.
-2. Replace its `LOGGING` line with:
-   ```
-   LOGGING 10, context\app\startlog.txt, unattended
-   ```
-
-The UNATTEND keyword lets AI run BR in a headless (with no user input) mode.
-
-Both are regenerated whenever `brconfig.sys` changes — generated, never hand-edited (same
-convention as `data-model.md`/`topics.json`).
-
-
-### STEP 3 — Audit source currency (`.brs` vs `.br`) ◆ automated; no user decision
-STEPS 4–5 learn the house style by reading the app's **`.brs` source**. Because BR can edit a program
+### STEP 4 — Audit source currency (`.brs` vs `.br`) ◆ automated; no user decision
+STEPS 5–6 learn the house style by reading the app's **`.brs` source**. Because BR can edit a program
 while it is compiled (*incremental compilation*), the `.brs` on disk may be **stale or absent**. A
 timestamp audit settles this mechanically — no need to ask which copy is authoritative:
 
@@ -180,7 +182,7 @@ timestamp audit settles this mechanically — no need to ask which copy is autho
 - **Fail** (source missing, or older than its `.br`) → the compiled file was changed more recently, so
   the `.brs` is genuinely stale. **Decompile just those programs** to refresh the source. This is safe
   to run unattended: a *newer* `.brs` always passes the audit and is never touched, so no hand-edit can
-  be lost — which is why STEP 3 needs no user decision or permission gate.
+  be lost — which is why STEP 4 needs no user decision or permission gate.
 
 Decompiling: After identifying a missing or stale .brs file refresh it by running BR with the command: 
 `LIST < <path\program-name> > <path\program-name.br.brs> : EXECUTE "system"` 
@@ -188,7 +190,7 @@ Decompiling: After identifying a missing or stale .brs file refresh it by runnin
 Or put the LIST commands into a procedure (batch) file and execute it with "PROC <batch-file-pathname>". 
 If you go this route then end the proc with `EXECUTE "system"`
 
-### STEP 4 — Blessed exemplars ◆ the real way style is learned
+### STEP 5 — Blessed exemplars ◆ the real way style is learned
 An LLM learns style far better from a few gold-standard *real programs* than from prose about style.
 
 1. Pick **one representative, correct program per task archetype** the app actually has — e.g. a
@@ -200,7 +202,7 @@ An LLM learns style far better from a few gold-standard *real programs* than fro
 3. Choose files that are **minimal but complete** and genuinely typical — not the biggest or most
    clever. These are few-shot examples; their style is what the model will imitate.
 
-### STEP 5 — Conventions sheet (derived, not guessed)
+### STEP 6 — Conventions sheet (derived, not guessed)
 A 1–2 page `app\conventions.md` that **names** the rules the exemplars embody, so the model can
 apply them to code it hasn't seen.
 
@@ -216,12 +218,12 @@ apply them to code it hasn't seen.
 > library function names into a "standard API" list — that manufactures a surface the model will
 > call incorrectly. Teach usage by whole-file exemplar instead.
 
-### STEP 6 — Architecture map
+### STEP 7 — Architecture map
 `app\architecture.md` — the directory taxonomy, entry points, and 2–3 **core data flows**
 (e.g. order → allocation → ship → EDI). Make them short, like a module table in 
 your AI agent's memory file (`CLAUDE.md`).
 
-### STEP 7 — Wire the app layer into the entry point
+### STEP 8 — Wire the app layer into the entry point
 Make the app layer **discoverable** — through `APP-DEV-GUIDE.md`, not by overloading the keyword router.
 The two routers stay single-responsibility: `topics.json` = "what does this BR statement mean";
 `APP-DEV-GUIDE.md` = "how this app is built."
@@ -240,11 +242,11 @@ The two routers stay single-responsibility: `topics.json` = "what does this BR s
 
 ## Done criteria
 
-- [ ] `filelay\` exists (found or synthesized per STEP 0), one layout file per data file, in
+- [ ] `filelay\` exists (found or synthesized per STEP 2), one layout file per data file, in
       Appendix A format — no guessed field layouts; any file without a locatable FORM/DIM source
       was flagged to the user instead.
 - [ ] `app\data-model.md` regenerates cleanly from `filelay\` (0 unparsed files).
-- [ ] Source currency audited (STEP 3): every `.br`/`.wb` has an as-new-or-newer source file; any
+- [ ] Source currency audited (STEP 4): every `.br`/`.wb` has an as-new-or-newer source file; any
       stale `.brs` was refreshed before exemplars/conventions were derived.
 - [ ] `app\exemplars\` holds ≥10 annotated, representative programs across task archetypes.
 - [ ] `app\conventions.md` states each rule and points to an exemplar that shows it.
@@ -255,14 +257,14 @@ The two routers stay single-responsibility: `topics.json` = "what does this BR s
 - [ ] `br_tree\` and `dev\` (except the `APP-DEV-GUIDE.md` pointer rows) are **unchanged**.
 
 ## The feedback loop (why this works)
-With STEP 1 (real schema) plus a compile pass in BR itself (`.brs` → `.br`), generated code is
+With STEP 3 (real schema) plus a compile pass in BR itself (`.brs` → `.br`), generated code is
 **verifiable**: it can be checked against the actual files and the grammar before it ships. "Style"
 then includes "compiles against our data model," not just "looks right."
 
 ## Maintenance
-- If a data file is added or its layout changes, update `filelay\` (STEP 0) first, then re-run STEP 1.
-- Re-run STEP 1 after any `filelay\` change.
-- Re-run the STEP 3 audit after recompiling; decompile any program whose `.brs` is now older than its
+- If a data file is added or its layout changes, update `filelay\` (STEP 2) first, then re-run STEP 3.
+- Re-run STEP 3 after any `filelay\` change.
+- Re-run the STEP 4 audit after recompiling; decompile any program whose `.brs` is now older than its
   `.br` before you re-derive exemplars or conventions.
 - Refresh exemplars when the house pattern for an archetype changes.
 - Language corrections go to `br_tree\` and flow to **every** app — never fork them into `app\`.
@@ -271,7 +273,7 @@ then includes "compiles against our data model," not just "looks right."
 
 # Appendix A — the `filelay` file format
 
-STEP 1 consumes a **`filelay\`** directory: one plain-text layout file per data file, describing its
+STEP 3 consumes a **`filelay\`** directory: one plain-text layout file per data file, describing its
 keys and field record layout. If your application's data dictionary is in some other form, convert it
 to this format and place the results in `filelay\`. This appendix is the complete spec.
 (Source: FileIO Library, `br_tree\50-libraries\fileio\`.)

@@ -110,6 +110,9 @@ Two kinds of content, both load-bearing:
   *recursive call*, not the value-so-far — build an incremental result in a scratch variable, never
   by reading `FN<name>` back (you *may* assign it more than once — last write wins — just never
   read it back); and a function has **one exit** — no early return, `GOTO` a label before `FNEND`.
+  **`END DEF` is accepted as a synonym for `FNEND`** — BR's compiler checks the word after `END`
+  and rewrites `END DEF` to behave exactly like `FNEND` on the spot (verified against BR's own
+  source, `command5.cpp`'s `END_PRI` case), so a function closed either way is closed correctly.
   **BR skips over `DEF…FNEND` blocks in normal top-to-bottom execution flow** — unlike some other
   BASICs, you do **not** need a `STOP`/`GOTO` guard before a function definition to keep execution
   from falling into it with unset parameters. **See §2 for two more `DEF FN` traps not in the

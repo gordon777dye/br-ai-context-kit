@@ -4,7 +4,7 @@
 
 AI models need to know how to invoke Business Rules for compilation and testing. The executable and
 all three config files are fixed, kit-relative paths — nothing here is machine-specific.
-`brconfig.ai_util`/`brconfig.ai_user` are generated from `brconfig.sys` by INSTRUCTIONS.md STEP 2, 
+`brconfig.ai_util`/`brconfig.ai_user` are generated from `brconfig.sys` by ONBOARDING.md STEP 1, 
 never hand-edited.
 
 | Fact | Value | Nature |
@@ -23,7 +23,7 @@ $env:BR_AI_USER = "context\dev\tools\brconfig.ai_user"
 
 ## AI Canonical invocations
 
-Copy these verbatim (the STEP 1 compile check uses the same form).
+Copy these verbatim (the STEP 3 compile check uses the same form).
 
 ```
 "$BR_EXE" -"$BR_CONFIG"                           # start BR into the app (interactive)
@@ -45,7 +45,7 @@ Copy these verbatim (the STEP 1 compile check uses the same form).
 
 ### Compile / syntax-check
 Sources compile `.br.brs` → `.br` on modification. To force a compile-check of one source
-(the STEP 1 feedback loop):
+(the STEP 3 feedback loop):
 
 ```
 "$BR_EXE" "LOAD program.brs source" -"$BR_AI_UTIL"   # parses; reports first error + line

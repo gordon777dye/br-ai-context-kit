@@ -30,7 +30,7 @@ The rest is done by AI.
 
 ## Start here
 
-**→ [`app\INSTRUCTIONS.md`](app\INSTRUCTIONS.md)** - Onboarding instructions - do this first. 
+**→ [`app\ONBOARDING.md`](app\ONBOARDING.md)** - Onboarding instructions - do this first. 
 All of this should be done by AI at your direction. Just tell your AI agent (one step at a time)
  to execute the instructions.
 

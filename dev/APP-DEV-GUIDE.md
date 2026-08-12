@@ -52,7 +52,7 @@ declaring a name never shadows an intrinsic.*
 ### The app layer (after onboarding)
 
 The above is the **language axis**. Once a codebase is onboarded (see
-[`../app/INSTRUCTIONS.md`](../app/INSTRUCTIONS.md)), a third layer under [`../app/`](../app/) carries
+[`../app/ONBOARDING.md`](../app/ONBOARDING.md)), a third layer under [`../app/`](../app/) carries
 *this application's* specifics — reached **directly**, not through `topics.json` (which stays a
 language keyword router; app conventions/architecture aren't keyword-addressable):
 
@@ -134,7 +134,7 @@ This produces `data-model.md` for *that* app: per file, the data path,
 record length, each key index **with its composing fields** (the order you concatenate to
 build a `KEY=` lookup), and every field's FORM type/position. No app's data model is bundled
 here — generate the one you need. (No `filelay/`? Convert your data dictionary to the filelay format —
-see [`../app/INSTRUCTIONS.md`](../app/INSTRUCTIONS.md) Appendix A — then run the tool.)
+see [`../app/ONBOARDING.md`](../app/ONBOARDING.md) Appendix A — then run the tool.)
 
 `data-model.md` is large. `gen_datamodel_index.exe` builds `data-model-index.json` beside it — a
 per-file map to 1-based inclusive line ranges (the same sharding `topics.json` gives
@@ -214,7 +214,7 @@ how it is formatted. Therror
 | **Syntax-check** a program | `LOAD "<prog>.brs" source` — parses line-by-line, halts on the first error with `ERR`/`LINE` set. The **`source`** keyword is required (`LOAD` defaults to object). |
 | **Run** a program | `RUN "<prog>"` If running attended, end the proc with `EXECUTE "system"` so BR exits instead of waiting at READY. |
 | **Read / maintain data** | Write a short BR program/proc that `OPEN`s the file (layout from `data-model.md`) and `READ`/`REWRITE`/`WRITE`s it — the kit has no external query tool. |
-| **Decompile** `.br` → `.brs` | a proc of `LOAD "<prog>.br"` / `LIST >"<prog>.br.brs"` pairs, ending `EXECUTE "system"` (see [`../app/INSTRUCTIONS.md`](../app/INSTRUCTIONS.md) STEP 3). |
+| **Decompile** `.br` → `.brs` | a proc of `LOAD "<prog>.br"` / `LIST >"<prog>.br.brs"` pairs, ending `EXECUTE "system"` (see [`../app/ONBOARDING.md`](../app/ONBOARDING.md) STEP 4). |
 
 A proc is just BR commands, one per line, ending in `EXECUTE "system"`; run it with
 `"$BR_EXE" 'PROC <path>' -"$BR_CONFIG"` (exact executable and config in `BR_launch.md`). A command that

@@ -7,6 +7,13 @@ subcategory: 10-language/flow-control/functions-udf
 kind: spec
 status: 2b           # reference base + br_tree enrichment (single-line DEF, string-fn length, recursion, function-authoring gotchas: return-name-is-call, single exit, no-paren calls, no array dims in params); no conflicts
 corrections:
+  - "The multi-line `DEF`'s closer was documented as `FNEND` only. BR accepts `END DEF` as a
+    synonym — command5.cpp's `END_PRI` handler tokenizes the word after `END` and, when it is
+    `DEF`, rewrites the statement in place to `FNEND` (`*opsubp = T3_FNEND`) rather than treating
+    it as a return-code expression. Verified against BR's own C source, not the wiki. Added to
+    both closer positions in the syntax block and a semantics bullet. Found auditing brls's `END`
+    handling, which parsed `END DEF` as a plain `END` with a bogus return-code identifier until
+    this was ported."
   - "§Scope & local variables: \"it's own\" -> \"its own\"."
   - "Single-line DEF's syntax line carried no error-condition clause, though the QSMRP and a second
     corpus both write one routinely — `DEF FNVAL(PC$*80)=VAL(PC$) CONV Ignore`, over a dozen distinct
@@ -51,13 +58,13 @@ DEF FN<name>[$ '*' <len>] [ '(' <parameter-list> ')' ] '=' <expression> [ <error
 DEF FN<name>[$ '*' <len>] [ '(' <parameter-list> ')' ]
     <statements>
     [LET] FN<name> = <expression>      -- the return value
-FNEND
+{ FNEND | END DEF }                    -- END DEF is an accepted synonym for FNEND
 
 <parameter-list> ::= <params> [ ';' <params> ]   -- ';' : every param after it is OPTIONAL
                    | ';' <params>                -- an all-optional list (no required params)
 <params>         ::= <parameter> [ ',' <parameter> ]*
 <parameter>      ::= [ MAT | '&' ] <variable> [ '*' <len> ]   -- '&' = by reference; MAT = array
-<def-library>    ::= DEF LIBRARY <function-name>[(<parameter-list>)] … FNEND
+<def-library>    ::= DEF LIBRARY <function-name>[(<parameter-list>)] … { FNEND | END DEF }
 ```
 
 A function name is `FN` + up to 28 more chars (**30 max, `FN` included**); a **string** function's
@@ -92,6 +99,8 @@ not `FNGETNAME$()` (empty `()` is a syntax error). Call a function for its side 
   reading `FN<name>` back.
 - **One exit per function.** A function has exactly one `FNEND` and no early-return statement
   (`RETURN` belongs to `GOSUB`). To leave early, `GOTO` a label placed just before `FNEND`.
+  **`END DEF` is accepted as a synonym for `FNEND`** — BR's compiler recognizes the word after
+  `END` and rewrites `END DEF` to behave exactly as `FNEND`, in the same statement position.
 - **`DEF LIBRARY`** marks a function as callable from other programs through the library facility
   (it must still be linked with a `LIBRARY` statement before another program can call it — see
   [library-facility](../../../50-libraries/library-facility/spec.md)). An entire program can be
