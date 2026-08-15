@@ -11,9 +11,9 @@ Please document any errors in ERRORS.md. This includes any inaccuracies *or ambi
 
 ## Prerequisite
 
-The user should place a copy of the application's `brconfig.sys` at `dev\tools\brconfig.sys`. No
-need for a license file. STEP 1 derives everything else from this one file. The remainder of this
-procedure is best done by an AI model.
+**The user should place a copy** of the application's `brconfig.sys` into `dev\tools\`. The resulting 
+file should be named `context\dev\tools\brconfig.sys`. No need for a license file. Onboardiong STEP 1 
+derives everything else from this one file. The remainder of this procedure is best done by an AI model.
 
 ---
 
@@ -53,13 +53,15 @@ brevity as it ascends. (Language facts still ascend into `topics.json`; app fact
 ```
 context\app\
   ONBOARDING.md         # this sheet (stays)
-  BR_launch.md          # STEP 1 — BR launch env, canonical invocations, run/build commands
   data-model.md         # STEP 3 — generated from the app's filelay\ folder
   data-model-index.json
   exemplars\            # STEP 5 — ~10–20 blessed real programs, annotated
   conventions.md        # STEP 6 — house style, derived from the app's own source
   architecture.md       # STEP 7 — module map + core data flows
 ```
+
+`context\dev\BR_launch.md` (referenced by STEP 1 — BR launch env, canonical invocations, run/build commands) is a
+static, application-agnostic kit file. 
 
 `dev\APP-DEV-GUIDE.md` holds pointers to the generated app docs (STEP 8); `topics.json` is the
 language keyword router. 
@@ -77,15 +79,13 @@ comes first so the source used to create those exemplars is current. STEP 2 gate
 creates it.
 
 ### STEP 1 — BR launch entries (fully automated)
-The BR executable and all three config files are fixed, kit-relative paths — nothing here is
-machine-specific, so this step takes no input beyond the `brconfig.sys` already placed per the
-Prerequisite.
+Create 2 of the 4 files to be used by AI for application development.
 
-**Fixed locations:**
+**Fixed locations:** - files used to compile and test BR programs
 
 | Role | Path |
 |---|---|
-| BR executable | `dev\tools\brserver-433-Win32-Debug.exe` |
+| BR executable | `dev\tools\brserver-433a-Win32-Debug-2026-08-12.exe` |
 | Existing app startup config | `dev\tools\brconfig.sys` |
 | AI Utility config (headless) | `dev\tools\brconfig.ai_util` |
 | AI User config (interactive) | `dev\tools\brconfig.ai_user` |
@@ -108,16 +108,16 @@ Prerequisite.
    LOGGING 10, context\app\startlog.txt, unattended
    ```
 
-The UNATTEND keyword lets AI run BR in a headless (with no user input) mode.
+The UNATTENDED keyword lets AI run BR in a headless (no user prompts) mode.
 
 Both are regenerated whenever `brconfig.sys` changes — generated, never hand-edited (same
 convention as `data-model.md`/`topics.json`).
 
 ### STEP 2 — Locate or create `filelay\` ◆ prerequisite for STEP 3
 STEP 3 does **not** inspect the app's actual data files to learn their layout. `extract-schema.exe`
-only parses the plain-text **`filelay\`** directory (Appendix A): one hand-declared layout file per
-data file, giving the FORM spec, disk position, and key composition of every field. If `filelay\`
-doesn't exist, STEP 3 has nothing to read.
+only parses the plain-text **`filelay\`** directory (described in Appendix A): one 
+hand-declared layout file per data file, giving the FORM spec, disk position, and 
+key composition of every field. If `filelay\`doesn't exist, STEP 3 has nothing to read.
 
 1. **Search the app tree for an existing `filelay\` directory** — check case variants too, and don't
    assume it sits directly under the app root: FileIO's `DefaultFileLayoutPath$` setting (in
@@ -226,11 +226,11 @@ your AI agent's memory file (`CLAUDE.md`).
 ### STEP 8 — Wire the app layer into the entry point
 Make the app layer **discoverable** — through `APP-DEV-GUIDE.md`, not by overloading the keyword router.
 The two routers stay single-responsibility: `topics.json` = "what does this BR statement mean";
-`APP-DEV-GUIDE.md` = "how this app is built."
+`APP-DEV-GUIDE.md` = "how to build this app."
 
-1. In `dev\APP-DEV-GUIDE.md` (the app entry point) add a terse pointer row for each app doc — in the
-   "Start here" table and the §2 reference map. Mark **`conventions.md` and `BR_launch.md` as
-   always-load** when writing app code; **`data-model.md` (by file), `exemplars\` (by archetype), and
+1. In `dev\APP-DEV-GUIDE.md` (the app development entry point) add a terse pointer row for each app 
+   doc — in the "Start here" table and the §2 reference map. Mark **`conventions.md` and `BR_launch.md` 
+   as always-load** when writing app code; **`data-model.md` (by file), `exemplars\` (by archetype), and
    `architecture.md` as on-demand** lookups. Full detail stays in the `app\` docs (progressive
    restatement).
 2. Leave `dev\topics.json` as the **language** keyword→`statement-semantics.md` router. It is keyed by
@@ -250,7 +250,7 @@ The two routers stay single-responsibility: `topics.json` = "what does this BR s
       stale `.brs` was refreshed before exemplars/conventions were derived.
 - [ ] `app\exemplars\` holds ≥10 annotated, representative programs across task archetypes.
 - [ ] `app\conventions.md` states each rule and points to an exemplar that shows it.
-- [ ] `app\BR_launch.md` lets a newcomer build, run, test, and deploy without asking.
+- [ ] `dev\BR_launch.md` lets a newcomer build, run, test, and deploy without asking.
 - [ ] `app\architecture.md` names entry points and the core data flows.
 - [ ] `APP-DEV-GUIDE.md` has terse pointer rows to every app doc (conventions/BR_launch marked
       always-load; data-model/exemplars/architecture on-demand); `topics.json` left as the language router.

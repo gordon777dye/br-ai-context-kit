@@ -289,7 +289,7 @@ A PRINTDIR naming a directory that cannot be resolved — a bad path, or one on 
 
 The failure to find PRINTDIR is now logged, and the print directory is not used:
 
-    PRINTDIR "M:\qsmrp\prt" is not a directory, so it is not being used.
+    PRINTDIR "M:\app\prt" is not a directory, so it is not being used.
 
 Printing itself is unaffected — only the archive copy is skipped. BR retries on each print job, so a directory on a disconnected drive starts working again by itself once the drive returns; the trade-off is one log line per print job until it does.
 

@@ -15,8 +15,10 @@
 /app/conventions.md
 /app/exemplars/
 /app/bin/
-.claude/
-.claude-primary/
+/app/br-load-save*
+/app/corpignore*
+/app/startlog.txt
+.claude*
 
 # --- forward-looking hygiene for clones that onboard/compile a real app ---
 # (not part of the diff; safe to trim. compiled BR objects + node deps)
@@ -32,7 +34,7 @@ node_modules/
 # into the tree: a sandbox index (never the canonical brtree-index.json) and DIR scratch.
 dev/tools/mdpreview/
 dev/tools/wsids
-dev/tools/brconfig.sys
+dev/tools/brconfig*
 dev/src/
 *.brtest.json
 dev/temp_specs.txt

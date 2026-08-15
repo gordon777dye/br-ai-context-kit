@@ -219,7 +219,7 @@ OPEN `#`<channel> `:` <file-open-string> `,` `EXTERNAL` `,`
 00160 FORM N 6, N 6.2, N 6.2, N 6.3
 00200 CLOSE #1:
 
-! Keyed lookup in INTERNAL file (most common pattern in QSMRP)
+! Keyed lookup in INTERNAL file (most common pattern in application code)
 00310 OPEN #2: "NAME=CUSTOMER.DAT, KFNAME=CUSTOMER.KEY", INTERNAL, INPUT, KEYED
 00320 DIM CUST_ID$*10, CUST_NAME$*30, CREDIT_LIMIT
 00330 READ #2, KEY=CUST_ID$: CUST_NAME$, CREDIT_LIMIT NOKEY 400
@@ -1196,7 +1196,7 @@ OPEN `#`<channel> `:` `"` `NAME=`<printer-spec> [`,` `RECL=`<n>] [`,` `EOL=`<eol
 **What it does:**
 1. **Evaluates expressions and outputs them** — to the screen (`#0`, default) or a specified file/printer channel
 2. **Supports options** — `BELL` (sound beep), `NEWPAGE` (clear screen or form-feed printer), `TAB(col)` (move cursor)
-3. **Redraws a window border and sets its caption** — `PRINT #<window>, BORDER [<spec>] [: <caption>]`, the run-time counterpart of `OPEN`'s `BORDER=` parameter. Written 215 times in the QSMRP corpus and documented until now only under [OPEN … window](#open--window-)
+3. **Redraws a window border and sets its caption** — `PRINT #<window>, BORDER [<spec>] [: <caption>]`, the run-time counterpart of `OPEN`'s `BORDER=` parameter. Written 215 times in the reference corpus and documented until now only under [OPEN … window](#open--window-)
 3. **Auto-wraps** — Text beyond the screen width or printer width wraps to the next line
 4. **Handles multiple types** — Numbers, strings, arrays (in row order)
 
@@ -3424,7 +3424,7 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 - **`PAGEOFLOW`** — commonly `ON PAGEOFLOW GOSUB` to emit a footer/header, then `CONTINUE`
 - **`ON FKEY <n>`** — traps function keys during RUN (F1–F10 default to `IGNORE`); during `INPUT`, function keys instead set `CMDKEY` rather than trapping
 - **`ON FNKEY <n>` is the same statement under a second spelling**, and it is switched on and off by a config directive rather than always available: `config.cpp` case **58** calls `setConfigAllowFnkeySyntax`, which rewrites the `FNKEY` entry of `table4xCompiling` to point at `FKEY` when the option is off (`tblopr.cpp`, and BR's own comment there reads "FNKEY has been disabled by changing to FKEY"). `STATUS` reports its state under key `58`. The directive itself is undocumented in the reference
-- **`ON ATTN`** — traps the Attention key; written 59 times in the QSMRP corpus and previously absent from the condition list above
+- **`ON ATTN`** — traps the Attention key; written 59 times in the reference corpus and previously absent from the condition list above
 - **`ON FKEY`/`ON FNKEY` branch to exactly one target, never a comma list** — `FKEY`/`FNKEY` are also
   plain callable functions, so with no `<n>` or an operator where it belongs (`ON FKEY-89 GOTO A,B`,
   `ON FKEY GOTO A,B`), the whole line is the *other* `ON` statement, [ON … GOTO / GOSUB — Computed

@@ -7,8 +7,9 @@ reading, writing, and designing BR application code. It is application-agnostic:
 tooling at whatever BR codebase you're on. There are three published parts:
 
 - **`dev\`** — the task-oriented coding kit: a router (`topics.json`), distilled statement
-  semantics, the system-function and standard-library catalogs, an error reference, and
-  schema-extraction tooling.
+  semantics, the system-function and standard-library catalogs, an error reference,
+  schema-extraction tooling, and `brls.exe` — a fast BR syntax/sema checker
+  (`tools\brls.exe -check <file>`) that needs no BR license or runtime.
 - **`br_tree\`** — the authoritative BR language reference tree (syntax, data types, file
   and screen I\O, printing, libraries, error codes), the ultimate backstop that `dev\` links into
   for depth.

@@ -13,13 +13,28 @@ never hand-edited.
 | **`brconfig.sys`** | `$BR_CONFIG` | Existing app startup config |
 | **`brconfig.ai_util`** | `$BR_AI_UTIL` | AI Utility — headless (`UNATTENDED`) |
 | **`brconfig.ai_user`** | `$BR_AI_USER` | AI User — interactive, for testing user interfaces |
+| **`brls.exe`** | `$BRLS_EXE` | Standalone syntax pre-check (optional semantic pass via `-check -sema`) — does **not** invoke BR (§6.1) |
 
 ```powershell
-$env:BR_EXE     = "context\dev\tools\brserver-433-Win32-Debug.exe"
+$env:BR_EXE     = "context\dev\tools\brserver-433a-Win32-Debug-2026-08-12.exe"
 $env:BR_CONFIG  = "context\dev\tools\brconfig.sys"
 $env:BR_AI_UTIL = "context\dev\tools\brconfig.ai_util"
 $env:BR_AI_USER = "context\dev\tools\brconfig.ai_user"
+$env:BRLS_EXE   = "context\dev\tools\brls.exe"
 ```
+
+```bash
+export BR_EXE="context/dev/tools/brserver-433a-Win32-Debug-2026-08-12.exe"
+export BR_CONFIG="context/dev/tools/brconfig.sys"
+export BR_AI_UTIL="context/dev/tools/brconfig.ai_util"
+export BR_AI_USER="context/dev/tools/brconfig.ai_user"
+export BRLS_EXE="context/dev/tools/brls.exe"
+```
+
+**All paths above, and every invocation in this file and in §6.1, are relative to the kit root**
+(the directory containing `context/` — Run from there, or resolve these paths against it first; 
+`brls.exe` takes no config file and needs none of `$BR_CONFIG`/
+`$BR_AI_UTIL`/`$BR_AI_USER` — it never launches BR.
 
 ## AI Canonical invocations
 

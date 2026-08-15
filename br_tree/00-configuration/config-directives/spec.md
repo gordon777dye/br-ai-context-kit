@@ -86,7 +86,7 @@ Linux/MAC files be addressed with Windows-style names).
 
   So whenever a `DRIVE` defines a startup `<subdir>` (or a `CD` has since run), `X:name` and `X:\name`
   point to **different** places — they coincide only when no subdir/CD is in effect. With
-  `DRIVE M:,C:\ads,,\qsmrp`: `M:rpt\x` → `C:\ads\qsmrp\rpt\x`, but `M:\rpt\x` → `C:\ads\rpt\x`
+  `DRIVE M:,C:\ads,,\app`: `M:rpt\x` → `C:\ads\app\rpt\x`, but `M:\rpt\x` → `C:\ads\rpt\x`
   (a frequent source of "file not found" / error 4203 when a leading `\` is added out of habit).
 - Undefined drives are assumed to be the root of that letter, but get **no record/file locking** and
   are not reported by `STATUS`; `PROTECT RESERVE` only works on DRIVE-defined drives.

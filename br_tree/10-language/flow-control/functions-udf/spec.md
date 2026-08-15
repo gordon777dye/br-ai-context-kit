@@ -15,8 +15,8 @@ corrections:
     handling, which parsed `END DEF` as a plain `END` with a bogus return-code identifier until
     this was ported."
   - "§Scope & local variables: \"it's own\" -> \"its own\"."
-  - "Single-line DEF's syntax line carried no error-condition clause, though the QSMRP and a second
-    corpus both write one routinely — `DEF FNVAL(PC$*80)=VAL(PC$) CONV Ignore`, over a dozen distinct
+  - "Single-line DEF's syntax line carried no error-condition clause, though two reference
+    corpora both write one routinely — `DEF FNVAL(PC$*80)=VAL(PC$) CONV Ignore`, over a dozen distinct
     call sites. It is the same statement-level clause list documented in error-handling#conditions —
     any statement may take `[<error-condition> <line-ref>]*` from the 17-word statement/EXIT roster,
     not a DEF-specific one — so every condition in that roster (`CONV`, `IOERR`, `EOF`, `TIMEOUT`, …)
