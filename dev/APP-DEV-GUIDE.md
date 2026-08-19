@@ -177,40 +177,44 @@ reference under [`../br_tree/50-libraries/fileio/`](../br_tree/50-libraries/file
 
 ## 6. Running BR (headless, via procedures)
 
-### 6.1 Syntax pre-check (`brls.exe`, self-standing)
+### 6.1 Syntax pre-check (`brls.exe`, standalone)
 
-[`$BRLS_EXE`](tools/brls.exe) (defined in [`BR_launch.md`](BR_launch.md)) is a standalone BR **syntax**
-checker — it does not invoke BR at all, so it has none of the operational hazards in §6.3 (no splash
-delay, no WSID slot, no stolen keyboard focus), needs no config file, and no BR license to run.
+[`$BRLS_EXE`](tools/brls.exe) (defined in [`BR_launch.md`](BR_launch.md)) is a standalone BR
+**syntax checker**. It does not invoke BR, so it avoids the operational hazards in §6.3 (no splash
+delay, no WSID slot, no keyboard-focus theft), needs no config file, and requires no BR license.
 
-**Scope boundary, stated once:** `-check` alone runs syntax only (undefined names, argument counts,
-unresolved references, reserved names used as parameters, … are not checked). brls's real semantic
-pass — the same one that powers the diagnostics in its LSP/editor mode — is also reachable from the
-CLI now, as `-check -sema` (6.1.1); [`INTERFACE.md`](INTERFACE.md) finding 1 is why that used to
-require standing up an LSP client and no longer does. It is still not the full picture: `-sema` on
-the bare CLI analyses **one file in isolation**, with no workspace to resolve a `LIBRARY` link
-against, so a cross-file finding (a link to a function another file doesn't define) can only surface
-inside the LSP server, which indexes the whole project. A clean `-check -sema` is therefore stronger
-than a clean `-check` but still not a substitute for the checklist's authoritative closing step: real
-BR's `LOAD <prog>.brs source` followed by `SAVE` or `REPLACE` (§7, step 6).
+Currently brls.exe is early release. So, whicle it has been thoroughly lab tested, 
+there is nothing like real world testing. So please report (in context\ERRORS.md) any 
+failures that it doesn't detect along with any false positives.
 
-**Default AI workflow:** edit → `$BRLS_EXE -check -sema` → fix → repeat until exit `0` → the real-BR
-`LOAD … source` / `SAVE`/`REPLACE` step above. Each flag's own "Agent use" note below is one sentence;
-this paragraph is the only place the full loop is spelled out.
+**Scope boundary (read once):**
+1. `-check` runs syntax only. It does **not** check undefined names, argument counts, unresolved links,
+  or reserved-name misuse.
+2. `-check -sema` this performs a semantic (linkage) validation.
+3. `-sema` on bare CLI is still single-file analysis. Without workspace indexing, cross-file `LIBRARY`
+  links cannot resolve.
+4. Therefore, clean `-check -sema` is stronger than clean `-check`, but the authoritative gate is still
+  real BR: `LOAD <prog>.brs source`, then `SAVE` or `REPLACE` (§7, step 6).
 
-All examples assume the kit-root working directory `BR_launch.md` establishes for `$BR_EXE` and
-friends — `$BRLS_EXE` is set the same way and needs none of `$BR_CONFIG`/`$BR_AI_UTIL`/`$BR_AI_USER`.
-`brls.exe` ships as a compiled binary only; its source (`context/lsp/`) is a separate, proprietary
-project excluded from this kit.
+**Default AI loop:**
+1. Edit file using `-next` as needed.
+2. Run `$BRLS_EXE -check -sema`.
+3. Fix findings.
+4. Repeat until exit code `0`.
+5. Close with real BR `LOAD ... source` plus `SAVE` or `REPLACE`.
+
+All examples assume the kit-root working directory that [`BR_launch.md`](BR_launch.md) establishes for
+`$BR_EXE` and related tools. `$BRLS_EXE` is set the same way and needs none of
+`$BR_CONFIG`/`$BR_AI_UTIL`/`$BR_AI_USER`. 
 
 #### 6.1.0 Command capability matrix
 
 | Mode | Purpose | Input | Output shape | Exit code (verified) | Automation notes |
 |---|---|---|---|---|---|
-| `-check <file\|->` | Parse BR syntax, report line diagnostics | one or more file paths (any may be `-` for stdin) — the `-check` value plus every further plain argument | one `file:line:col: message` block per file, each bad line with a `see:` pointer | `0` all files clean, `1` any file has a parse error | Primary automation flag. Every positional argument is checked, in order — batch support closed [`INTERFACE.md`](INTERFACE.md) finding 2 |
+| `-check <file|->` | Parse BR syntax, report line diagnostics | one or more file paths (any may be `-` for stdin) — the `-check` value plus every further plain argument | one `file:line:col: message` block per file, each bad line with a `see:` pointer | `0` all files clean, `1` any file has a parse error | Primary automation flag. Every positional argument is checked, in order — batch support closed [`INTERFACE.md`](INTERFACE.md) finding 2 |
 | `-sema` (modifier of `-check`) | Also run brls's semantic pass (undefined names, argument counts, …) over each file `-check` is given | — | adds severity-prefixed findings (`error`/`warning`) to `-check`'s per-file block | folds into `-check`'s own exit code — a `SeverityWarn` finding (e.g. `duplicate-parameter`) does not flip it, only a `SeverityError` one does | Single-file only — no workspace, so a cross-file link cannot resolve; see the scope-boundary note above. Errors (exit `1`) if given without `-check` |
 | `-json` (modifier of `-check` or `-keyword`) | Structured output instead of text | — | `-check -json`: a JSON array, one object per file (`file`, `clean`, `diagnostics[]`). `-keyword -json`: a JSON array, one object per class hit | same as the underlying mode | Field shapes are in `cmd/brls/check.go` / `cmd/brls/main.go`; not yet declared stable across builds the way the exit code is. Errors (exit `1`) if given with any other mode |
-| `-next '<partial line>'` | Legal continuations at end of a partial statement | one line of text (embedded `\n` is fine) | statement/complete/head flags + admissible keyword list | always `0` — any string is valid input, an empty keyword list is itself a real answer | Safe to call speculatively; never signals failure |
+| `-next '<partial line>'` | Legal continuations at end of a partial statement | one line of text (embedded `\n` is fine) | `statement`/`complete`/`head` flags + admissible keyword list (with a spec pointer for each) | always `0` — any string is valid input, an empty keyword list is itself a real answer | Safe to call speculatively; never signals failure. `keywords: (none — nothing else is valid here)` prints whenever no keyword fits, whether or not BR still owes a non-keyword operand — this build reports no separate hint for that case, so use `complete:`/`head` to judge whether more input is required |
 | `-statement <NAME>` | Full syntax tree for one statement | statement keyword | table-rendered tree | `0` found, `1` unknown name (stderr: `brls: no statement "…" in the syntax table`) | |
 | `-keyword <NAME>` | Keyword metadata + doc pointers | keyword | class/subscript/abbreviation/spec/topic | `0` found, `1` unknown name (stderr: `brls: "…" is not a keyword in any of BR's tables`) | |
 | `-stats` | Embedded language-pack summary | none | counts and table breakdowns | `0` (only `1` on an internal pack-load failure — not seen in practice) | |
@@ -229,15 +233,14 @@ project excluded from this kit.
 
 Rule: place a mode-selecting flag (`-check`, `-next`, `-keyword`, `-statement`, `-stats`, `-version`) before the first positional file/path argument.
 
-**Output stability:** the prose in each mode's output (table alignment, wording, field order) is
-human-oriented and may change between builds — the tool makes no formatting promise beyond what's
-verified in this table. Automate against the **exit code**, the `file:line:col:` prefix shape of
-`-check` diagnostics, and the `brls: ` stderr prefix on hard errors; don't regex the rest. `-json`'s
-field names (`file`, `clean`, `diagnostics[]`, `line`, `col`, `severity`, `rule`, `message`, `see`) are
-a firmer contract than the text prose — parse those rather than the human-readable form when a result
-needs to be consumed by anything other than a person — but the exit code is still the authority on
-clean vs. not-clean, since a rule can carry `SeverityWarn` and be reported inside a `clean: true`
-result.
+**Output stability:**
+1. Treat prose output as human-oriented and non-stable (alignment, wording, and field order may change
+  between builds).
+2. For automation, rely on exit code first, plus stable textual anchors only:
+  `file:line:col:` for `-check` diagnostics and `brls: ` on hard stderr errors.
+3. Prefer `-json` for machine consumption. Its field names (`file`, `clean`, `diagnostics[]`, `line`,
+  `col`, `severity`, `rule`, `message`, `see`) are a stronger contract than prose. Exit code still
+  decides clean vs. not-clean because `SeverityWarn` may appear with `clean: true`.
 
 #### 6.1.1 `-check <file|->` — syntax errors, one per bad line
 
@@ -315,9 +318,9 @@ $ "$BRLS_EXE" -check cnp/compare.br.brs cnp/color.br.brs -json
 works too. The one hard ordering rule is that a mode flag has to appear before the first positional
 file/path argument.
 
-**Agent use:** the closing step of writing or editing a `.brs` file — run `-check -sema` on the file
-(or pipe the in-progress buffer through `-check - -sema`) immediately after each edit, fix what it
-reports, and loop until it exits `0`, before ever spending a real-BR `LOAD … source` cycle on it.
+**Agent use:** the closing step of writing or editing a `.brs` file — run `-check -sema` on the file,
+or pipe the in-progress buffer through `-check - -sema` immediately after each edit, fix what it
+reports, and loop until it exits `0`, before ever spending a real BR `LOAD ... source` cycle on it.
 Checking several files already on disk at once (e.g. every file a refactor touched) is one
 invocation — `-check a.brs b.brs c.brs` — not a loop of single-file calls; use `-json` when the
 result needs to be parsed rather than read.
@@ -340,14 +343,43 @@ keywords:
   OUTIN      clause of OPEN               br_tree/30-io-file/statements/spec.md
 ```
 
-An empty `keywords:` list is a real, meaningful answer (e.g. after `CLOSE #1: ` nothing but a file
-reference is admissible) — it means brls has an opinion and the opinion is "nothing else fits here",
-not that it has no opinion.
+An empty `keywords:` list does **not** mean the statement is finished — it only means no single
+keyword can extend the line at this position. BR frequently still owes a non-keyword operand (an
+expression, a file reference, a required `:`), and this build of `brls` gives no separate signal for
+that case: the list prints the fixed placeholder `(none — nothing else is valid here)` whether or not
+something is still required.
+
+```
+$ "$BRLS_EXE" -next 'LINPUT #10:'
+statement: LINPUT
+complete:  false
+head:      false
+keywords:  (none — nothing else is valid here)
+```
+
+Here BR still owes a string variable to read the line into (`LINPUT #10: A$` is what completes it) —
+`keywords:` alone looks identical whether one more thing is required or nothing is. `complete:false`
+is the only signal that more input belongs here; there is currently no field that says *what*.
+
+```
+$ "$BRLS_EXE" -next 'READ #1,KEY="X",RESERVE '
+statement: READ
+complete:  false
+head:      false
+keywords:  (none — nothing else is valid here)
+```
+
+Same pattern — BR still owes a `:` here, but `-next` reports it the same way it would report a
+position where nothing further is legal. Rely on `complete:`/`head` for the finished/unfinished
+question, and treat an empty `keywords:` list as "no keyword fits here," not as "done."
 
 **Agent use:** while composing a statement clause-by-clause, especially one with several mutually
 exclusive branches (`OPEN`, `CLOSE`, `PRINT USING`), quote the line built so far and ask `-next` what
 is legal at the end of it rather than guessing from memory or recalling the BNF from `br_tree/` by
-hand — this is the rule-1 "search the context first" step applied to syntax specifically.
+hand — this is the rule-1 "search the context first" step applied to syntax specifically. An empty
+`keywords:` list with `complete:false` means BR still owes something that isn't a keyword (an
+expression, a file reference, a required `:`); check the statement's syntax tree (`-statement`) or the
+relevant `br_tree/` spec to see what, since `-next` does not currently say.
 
 #### 6.1.3 `-statement <NAME>` — one statement's syntax tree, as BR stores it
 
