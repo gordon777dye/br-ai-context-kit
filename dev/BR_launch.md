@@ -16,7 +16,7 @@ never hand-edited.
 | **`brls.exe`** | `$BRLS_EXE` | Standalone syntax pre-check (optional semantic pass via `-check -sema`) — does **not** invoke BR (§6.1) |
 
 ```powershell
-$env:BR_EXE     = "context\dev\tools\brserver-433a-Win32-Debug-2026-08-12.exe"
+$env:BR_EXE     = "context\dev\tools\brserver-433b-Win32-Debug-2026-08-20.exe"
 $env:BR_CONFIG  = "context\dev\tools\brconfig.sys"
 $env:BR_AI_UTIL = "context\dev\tools\brconfig.ai_util"
 $env:BR_AI_USER = "context\dev\tools\brconfig.ai_user"
@@ -24,7 +24,7 @@ $env:BRLS_EXE   = "context\dev\tools\brls.exe"
 ```
 
 ```bash
-export BR_EXE="context/dev/tools/brserver-433a-Win32-Debug-2026-08-12.exe"
+export BR_EXE="context/dev/tools/brserver-433b-Win32-Debug-2026-08-20.exe"
 export BR_CONFIG="context/dev/tools/brconfig.sys"
 export BR_AI_UTIL="context/dev/tools/brconfig.ai_util"
 export BR_AI_USER="context/dev/tools/brconfig.ai_user"

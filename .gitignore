@@ -18,6 +18,7 @@
 /app/br-load-save*
 /app/corpignore*
 /app/startlog.txt
+/app/*_test.md
 .claude*
 
 # --- forward-looking hygiene for clones that onboard/compile a real app ---

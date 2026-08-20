@@ -58,6 +58,8 @@ context\app\
   exemplars\            # STEP 5 — ~10–20 blessed real programs, annotated
   conventions.md        # STEP 6 — house style, derived from the app's own source
   architecture.md       # STEP 7 — module map + core data flows
+  BR_test.md            # STEP 9 — real-BR LOAD/SAVE survey of this app's tree
+  BRLS_test.md          # STEP 9 — brls's own parse/sema survey of the same tree
 ```
 
 `context\dev\BR_launch.md` (referenced by STEP 1 — BR launch env, canonical invocations, run/build commands) is a
@@ -85,7 +87,7 @@ Create 2 of the 4 files to be used by AI for application development.
 
 | Role | Path |
 |---|---|
-| BR executable | `dev\tools\brserver-433a-Win32-Debug-2026-08-12.exe` |
+| BR executable | `dev\tools\brserver-433b-Win32-Debug-2026-08-20.exe` |
 | Existing app startup config | `dev\tools\brconfig.sys` |
 | AI Utility config (headless) | `dev\tools\brconfig.ai_util` |
 | AI User config (interactive) | `dev\tools\brconfig.ai_user` |
@@ -238,6 +240,66 @@ The two routers stay single-responsibility: `topics.json` = "what does this BR s
    in it. *(Optional: a single pointer to `data-model.md` if you want schema reachable from the router,
    but the per-file index belongs in `data-model.md`'s own contents, not the keyword index.)*
 
+### STEP 9 — Survey brls vs real BR ⏱ typically long-running (30–60 minutes)
+
+brls's own diagnostic rejections (which findings mean "BR will actually reject this") are calibrated
+against BR itself, not asserted — but that calibration was checked against the programs brls was
+developed on, not necessarily against *your* application's source. We need to check each app-specific 
+construct BR happens to tolerate, or reject, to be sure our language server handles all code patterns. 
+STEP 9 checks that calibration for your app specifically. 
+
+`context\dev\tools\loadsave.exe` and `context\dev\tools\lscheck.exe` are two independent survey
+programs, prebuilt and deployed the same way `brls.exe` is (`context\lsp\brls\build.ps1`) — nothing to
+build on-site, run them directly, the same as `extract-schema.exe`/`gen_datamodel_index.exe` in STEP 3.
+
+**Run both from the app root** — the directory the kit (`context\`) was installed into, one level above
+`context\` itself — **not from inside `context\dev\tools\`.**
+
+`-root` is the only location flag either tool takes: the directory to recursively scan for `.brs`
+program source (where the suite of BR programs live), which both tools also assume `context\` is
+installed directly inside of — it's how each locates the BR executable/`brconfig.ai_util` (`loadsave`
+only) and how every file path in the report gets made relative. `-root .` means "the app root is the
+current directory," which is exactly why these must be run from there.
+
+**Run `lscheck` first** — fast, pure brls, no real BR involved; gives an immediate baseline:
+
+```
+context\dev\tools\lscheck.exe -root . -out context\app\BRLS_test.md
+```
+
+**Then run `loadsave`** — drives the real BR executable one process per batch of files, whole-file
+`LOAD`/`SAVE`. This is the long-running half: **budget 30–60 minutes** for an application-sized tree
+(QSMRP's ~1,100 files took ~24 minutes; scale roughly linearly, and confirm with the user before
+running against a much larger tree — see `context\app\second-corpus-load-validation.md` for why a
+flat multi-thousand-file harvest needs a different, sampled approach instead of this whole-file sweep).
+
+```
+context\dev\tools\loadsave.exe -root . -out context\app\BR_test.md
+```
+
+**Compare the two reports' Summary tables.** `BR_test.md`'s "Load and save clean" count should match
+(or come very close to) `BRLS_test.md`'s "Clean + advisory only" count — the two are meant to describe
+the same thing, real BR's own opinion and brls's opinion of the identical file set. See
+`context\app\br-load-save-validation.md` for a worked example of a clean match and how it was verified
+file-for-file, not just by comparing the two totals.
+
+**If the two counts disagree, do not silently accept it and do not try to fix brls's rules yourself as
+part of onboarding** — a miscalibrated brls rule is a `brls` repo change, not an app-code change, and
+fixing it requires the same real-BR confirmation discipline `br-load-save-validation.md` Instead, 
+**append a discrepancy report to `context\ERRORS.md`**, covering:
+
+- The two summary counts (BR's "Load and save clean" vs brls's "Clean + advisory only") and the gap.
+- The file-level diff between the two reports' failing-file lists: which files brls flags that BR
+  loads/saves clean (candidate brls false positives), and which files BR fails that brls calls
+  clean/advisory (candidate brls blind spots) — group by the rule/error each side cites, the same
+  grouping both reports already carry.
+- For each group, a first-pass guess at cause: a genuine brls miscalibration worth reporting upstream,
+  or app-specific noise (non-production scratch files, dev tools, misfiled non-BR text) that belongs in
+  this app's own excluded-files list instead — see `br-load-save-validation.md`'s "Excluded —
+  non-production files" section for the shape of that judgment call.
+
+If the counts already match, no `ERRORS.md` entry is needed for this step.
+
 ---
 
 ## Done criteria
@@ -255,6 +317,9 @@ The two routers stay single-responsibility: `topics.json` = "what does this BR s
 - [ ] `APP-DEV-GUIDE.md` has terse pointer rows to every app doc (conventions/BR_launch marked
       always-load; data-model/exemplars/architecture on-demand); `topics.json` left as the language router.
 - [ ] `br_tree\` and `dev\` (except the `APP-DEV-GUIDE.md` pointer rows) are **unchanged**.
+- [ ] STEP 9 ran to completion: `app\BR_test.md` and `app\BRLS_test.md` both exist; their summary
+      counts were compared, and any discrepancy is recorded in `context\ERRORS.md` (not silently
+      fixed or ignored).
 
 ## The feedback loop (why this works)
 With STEP 3 (real schema) plus a compile pass in BR itself (`.brs` → `.br`), generated code is
