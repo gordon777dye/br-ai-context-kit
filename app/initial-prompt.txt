@@ -1,0 +1,5 @@
+Initial AI Prompt:
+
+Clear - start a new conversation
+
+Read context/README.md and do wahat it says before I tell you what needs to be done.
