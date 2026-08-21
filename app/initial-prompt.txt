@@ -1,5 +1,12 @@
-Initial AI Prompt:
+Necessary AI Prompt:
 
 Clear - start a new conversation
 
 Read context/README.md and do wahat it says before I tell you what needs to be done.
+
+
+Then after the session:
+
+Is there anything in the way of documentation that could have better prepared you for this assignment?
+
+Please record your observations in ERROR.md for forwarding to ADS.

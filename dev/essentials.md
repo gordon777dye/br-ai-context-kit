@@ -251,7 +251,11 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
   it to a LET statement (e.g. `LET 4520: !`); use a descriptive text label (`DONE:`, `SKIPBT:`) 
   for every `GOTO` target**. 
 - **No CONTINUE statement** Only GOTO. However EXIT DO is supported.
-- ****No recursive globbing** or directory walking.
+- **`DIR` only wildcards its *last* path segment — never a middle one, and there is no recursive
+  form.** `DIR` is `FindFirstFile`-based, so a pattern like `DIR br_tree\*\spec.md` (wildcard
+  directory, literal file after it) fails outright. To walk a multi-level tree,
+  descend one real, known directory name at a time; see 
+  [program-management](../br_tree/70-commands/program-management/spec.md#command-vs-statement)).
 
 ---
 

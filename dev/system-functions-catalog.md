@@ -255,7 +255,7 @@ already carried by the keyword pack. The "2-D control" gloss was wrong as well a
 | `SUM(MAT arr)` | num | sum of all elements |
 | `SRCH(MAT arr, arg, [start])` | num | row of a match (0/-1 if none; `^`-prefix = case-insensitive) |
 | `AIDX(array-name)` / `DIDX(array-name)` | mat num | ascending / descending **index** array (source unchanged). Only as a `MAT =` right-hand side, and the argument takes **no `MAT` keyword**: `MAT X = AIDX(Y)` compiles, `MAT X = AIDX(MAT Y)` does not |
-| `STR2MAT(s$, MAT a$ (out), [[MAT]sep$], [flags$])` | num | split string → array (dynamically redims `a$`); returns the count. `sep$` is a user delimiter (default = any `\n`/`\r` run; `""` = per-char); `flags$` = quote type `Q`/`'`/`"` + `:TRIM`/`:LTRM`/`:RTRM` |
+| `STR2MAT(s$, MAT a$ (out), [[MAT]sep$], [flags$])` | num | split string → array (dynamically redims `a$`); returns the count. `sep$` is a user delimiter (default = any `\n`/`\r` run; `""` = per-char); `flags$` = quote type `Q`/`'`/`"` [ `:` `TRIM`/`LTRM`/`RTRM` ] | `TRIM`/`LTRM`/`RTRM`
 | `MAT2STR(MAT a$, s$ (out), [[MAT]sep$], [flags$])` | num | join array → string; returns the count. `sep$` default = `CRLF`/`CR`, placed after every element incl. the last; `""` concatenates |
 
 ## File / drive query

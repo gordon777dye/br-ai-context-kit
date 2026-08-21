@@ -520,7 +520,20 @@ command (e.g. `PROC <procname>`) unattended; [`BR_launch.md`](BR_launch.md) cove
 config from the normal app `brconfig.sys`.  When BR runs unattended, it exits as soon as it stops. 
 Then check the log file to what caused BR to stop. This may take a little investigation to 
 understand how to efficiently interrogate the log file. Tip- grep based on date and time after you see
-how it is formatted. Therror 
+how it is formatted.
+
+**Reading the log — don't regard "failed"/"error" text as final:** at `LOGGING` level ≥8 BR traces
+routine internal retries that contain those words on operations that still *succeed* — e.g. an
+`OPEN … REPLACE`/`USE` logs `"...failed during CreateFile...system error 2"` for an
+open-existing-first probe even when the file is then created fine. Grepping for `error`/`failed`
+alone over-reports. Instead:
+- Confirm the **actual outcome** — did the file end up with the expected content, did the program
+  reach its own final `STOP`/`PRINT`/log marker — not just the presence of alarming-looking text.
+- The unambiguous fatal signal in `UNATTENDED` mode is **`"Unattended processing terminated by
+  error <n> while processing..."`**, which names the real error number and the line it happened at.
+  `"Input attempted in unattended mode"` is usually a symptom arriving *after* an earlier untrapped
+  error (see [`essentials.md`](essentials.md) §2) — trace backward from it, don't treat it as the
+  root cause line.
 
 | Task | How (BR, headless) |
 |---|---|
