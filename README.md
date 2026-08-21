@@ -17,9 +17,21 @@ tooling at whatever BR codebase you're on. There are three published parts:
 
 ## AI Model Rules
 
-Do not invent, guess, or infer commands, file paths, syntax, or facts. 
-Do not or fill gaps with plausible-sounding guesses. If you don't know something: 
-(a) search thIS context first, (b) flag it as unknown, (c) ask the user. **NEVER GUESS** 
+- Do not invent, guess, or infer commands, file paths, syntax, or facts. 
+  Do not or fill gaps with plausible-sounding guesses. If you don't know something: 
+  (a) search thIS context first, (b) flag it as unknown, (c) ask the user. **NEVER GUESS** 
+
+- Read the following documents throroughly and tell me (the user) what they are about before 
+  being given the actual current assignment:
+- **`dev\APP-DEV-GUIDE.md`** — this will save you many headaches and much time.
+- **`dev\BR_launch.md`** — this is needed to compile and test.
+- **`essentials.md`** — this is exactly what it is named.
+
+- Get familiar with the tools in context, especially `brls.exe` (decribed in 
+  `APP-DEV-GUIDE.md`) before attempting to code. Use this tool to check your work 
+  as you go. 
+
+- Don't be in a hurry to deliver. Look at the context documentation before you code. 
 
 ## Installation
 

@@ -1,8 +1,8 @@
 {
-  "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.py.",
-  "generated": "2026-08-07",
+  "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
+  "generated": "2026-08-20",
   "source": "br_tree/",
-  "source_sha256": "78682d4aabd5f120bc8fa5cab88eea9c3ef3666791ee79aec1d50e84ac6cfe55",
+  "source_sha256": "6014ab507fbd42a3ec51f5bb1ed96cdd1a11cfed1340d4867f8d38bdbf57a659",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -141,7 +141,8 @@
       "10-language/flow-control/error-handling"
     ],
     "CONV": [
-      "10-language/flow-control/error-handling"
+      "10-language/flow-control/error-handling",
+      "10-language/flow-control/functions-udf"
     ],
     "COPIES": [
       "40-io-printing/statements"
@@ -337,6 +338,7 @@
       "10-language/flow-control/other-flow"
     ],
     "GOTO": [
+      "10-language/data-manipulation/conditionals",
       "10-language/flow-control/other-flow"
     ],
     "GRID": [
@@ -1218,7 +1220,8 @@
         "expressions",
         "declaration",
         "data-types",
-        "system-functions"
+        "system-functions",
+        "error-handling"
       ],
       "anchors": [
         "syntax",
@@ -1244,7 +1247,8 @@
       "keywords": [
         "IF",
         "THEN",
-        "ELSE"
+        "ELSE",
+        "GOTO"
       ],
       "related": [
         "expressions",
@@ -1485,12 +1489,14 @@
         "DEF",
         "FNEND",
         "FN",
-        "LIBRARY"
+        "LIBRARY",
+        "CONV"
       ],
       "related": [
         "other-flow",
         "syntax",
-        "system-functions"
+        "system-functions",
+        "error-handling"
       ],
       "anchors": [
         "syntax",
