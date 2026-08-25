@@ -19,7 +19,7 @@ corrections:
     failure corpus: both forms were rejected outright (parser gaps, since fixed), not merely
     undocumented."
 related: [expressions, declaration, data-types, system-functions, error-handling]
-keywords: [LET, MAT, DATA, READ, RESTORE, ":="]
+keywords: [LET, MAT, DATA, READ, RESTORE, ":=", AIDX, DIDX]
 ---
 
 # Assignment & data movement

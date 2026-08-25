@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-08-20",
+  "generated": "2026-08-24",
   "source": "br_tree/",
-  "source_sha256": "6014ab507fbd42a3ec51f5bb1ed96cdd1a11cfed1340d4867f8d38bdbf57a659",
+  "source_sha256": "48c7b913a2772beb31062a37c7332817025c7369289b5e4967a0051dd195759e",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -11,6 +11,10 @@
     ":=": [
       "10-language/data-manipulation/assignment",
       "10-language/data-manipulation/expressions"
+    ],
+    "AIDX": [
+      "10-language/data-manipulation/assignment",
+      "10-language/data-manipulation/system-functions"
     ],
     "ALERT": [
       "70-commands/program-management"
@@ -195,6 +199,10 @@
     ],
     "DH": [
       "30-io-file/form-spec"
+    ],
+    "DIDX": [
+      "10-language/data-manipulation/assignment",
+      "10-language/data-manipulation/system-functions"
     ],
     "DIM": [
       "10-language/data-manipulation/declaration"
@@ -475,6 +483,9 @@
     "MAT": [
       "10-language/data-manipulation/assignment",
       "10-language/data-manipulation/declaration"
+    ],
+    "MAT2STR": [
+      "10-language/data-manipulation/system-functions"
     ],
     "MAX": [
       "10-language/data-manipulation/system-functions"
@@ -797,6 +808,9 @@
     "SQL": [
       "30-io-file/database"
     ],
+    "SRCH": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "STACKS": [
       "00-configuration/config-directives"
     ],
@@ -817,6 +831,9 @@
       "30-io-file/serial-comm"
     ],
     "STR$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "STR2MAT": [
       "10-language/data-manipulation/system-functions"
     ],
     "STYLE": [
@@ -867,6 +884,9 @@
     ],
     "TYPE": [
       "70-commands/file-directory"
+    ],
+    "UDIM": [
+      "10-language/data-manipulation/system-functions"
     ],
     "UNTIL": [
       "10-language/flow-control/other-flow"
@@ -1214,7 +1234,9 @@
         "DATA",
         "READ",
         "RESTORE",
-        ":="
+        ":=",
+        "AIDX",
+        "DIDX"
       ],
       "related": [
         "expressions",
@@ -1396,7 +1418,13 @@
         "MIN",
         "SUM",
         "MSGBOX",
-        "KSTAT$"
+        "KSTAT$",
+        "AIDX",
+        "DIDX",
+        "UDIM",
+        "SRCH",
+        "STR2MAT",
+        "MAT2STR"
       ],
       "related": [
         "expressions",

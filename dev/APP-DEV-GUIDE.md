@@ -183,18 +183,17 @@ reference under [`../br_tree/50-libraries/fileio/`](../br_tree/50-libraries/file
 **syntax checker**. It does not invoke BR, so it avoids the operational hazards in §6.3 (no splash
 delay, no WSID slot, no keyboard-focus theft), needs no config file, and requires no BR license.
 
-Currently brls.exe is early release. So, whicle it has been thoroughly lab tested, 
-there is nothing like real world testing. So please report (in context\ERRORS.md) any 
+Currently brls.exe is early release. So, while it has been thoroughly lab tested, 
+there is nothing like real world testing. So please report (in context\ERRORS.md) any br syntax 
 failures that it doesn't detect along with any false positives.
 
 **Scope boundary (read once):**
 1. `-check` runs syntax only. It does **not** check undefined names, argument counts, unresolved links,
   or reserved-name misuse.
 2. `-check -sema` this performs a semantic (linkage) validation.
-3. `-sema` on bare CLI is still single-file analysis. Without workspace indexing, cross-file `LIBRARY`
-  links cannot resolve.
+3. `-sema` single-file analysis of label and line number references.
 4. Therefore, clean `-check -sema` is stronger than clean `-check`, but the authoritative gate is still
-  real BR: `LOAD <prog>.brs source`, then `SAVE` or `REPLACE` (§7, step 6).
+  real BR: `LOAD <prog>.brs source`, then `SAVE` or `REPLACE` (see §7, step 6).
 
 **Required AI Coding loop:**
 1. Edit file using `-next` as needed.
@@ -203,21 +202,20 @@ failures that it doesn't detect along with any false positives.
 4. Repeat until brls reports "no syntax errors"
 5. Loop to code the next program statement.
 6. After each subroutine or function is coded:
-    `$BRLS_EXE -check <program.brs>`
+    `$BRLS_EXE -check -sema <program.brs>`
 7. Fix findings.
 8. Close with real BR `LOAD ... source` plus `SAVE` or `REPLACE`.
 
-All examples assume the kit-root working directory that [`BR_launch.md`](BR_launch.md) establishes for
-`$BR_EXE` and related tools. `$BRLS_EXE` is set the same way and needs none of
-`$BR_CONFIG`/`$BR_AI_UTIL`/`$BR_AI_USER`. 
+All examples assume the application working directory that [`BR_launch.md`](BR_launch.md) expects for
+`$BR_EXE` and related tools. `$BRLS_EXE` is set the same way. 
 
 #### 6.1.0 Command capability matrix
 
 | Mode | Purpose | Exit code | Notes |
 |---|---|---|---|
-| `-check <file\|-> [more files]` | Parse BR syntax; one `file:line:col: message` block per file, each bad line with a `see:` pointer into `br_tree/` | `0` all clean, `1` any parse error | Primary automation flag. `-` reads stdin. Every positional argument is checked in one invocation — batch, don't loop |
-| `-sema` (modifier of `-check`) | Adds brls's semantic findings (undefined names, argument counts, …), prefixed `error:`/`warning:` | folds into `-check`'s code — only an `error:` finding flips `0`→`1` | Single-file only; a cross-file `LIBRARY` link cannot resolve. Exit `1` if used without `-check` |
-| `-json` (modifier of `-check`/`-keyword`) | Structured output: array of `{file, clean, diagnostics[]}` (`line`, `col`, `severity`, `rule`, `message`, `see`) | same as underlying mode | Exit code, not `clean`, decides pass/fail (`clean: true` can accompany a warning). Exit `1` if combined with any other mode |
+| `-check <file> [more files]` | Parse BR syntax; one `file:line:col: message` block per file, each bad line with a `see:` pointer into `br_tree/` | `0` all clean, `1` any parse error | Primary automation flag. `-` reads stdin. Every positional argument is checked in one invocation — batch, don't loop |
+| `-sema`  | Adds brls's semantic findings (undefined names, argument counts, …), prefixed `error:`/`warning:` | folds into `-check`'s code — only an `error:` finding flips `0`→`1` | Single-file only; NA to cross-file `LIBRARY` links. Exit `1` if error detected |
+| `-json` - Structured json output: array of `{file, clean, diagnostics[]}` (`line`, `col`, `severity`, `rule`, `message`) | same as underlying mode | Exit code 1 if not `clean`, decides pass/fail - (`clean: true` can accompany a warning). Exit `1` if combined with any other mode failure |
 | `-next '<partial line>'` | Legal continuations at the end of a partial statement | always `0` | Safe to call speculatively; never signals failure |
 | `-statement <NAME>` | Full syntax tree for one statement, in BR's table order | `0` found, `1` unknown | |
 | `-keyword <NAME>` | Class, token subscript, abbreviation, spec/topic pointers | `0` found, `1` unknown | One block per class for a spelling in several tables (e.g. `DISPLAY`) |
