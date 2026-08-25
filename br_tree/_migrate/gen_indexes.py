@@ -26,7 +26,7 @@ PURPOSE={
 "10-language/flow-control":"Directing execution: loops and jumps, user-defined functions, and error trapping.",
 "10-language/data-manipulation":"Working with values in memory: declaration, assignment, expressions, conditionals, data types and the intrinsic functions.",
 "10-language/flow-control/functions-udf":"User-defined functions: DEF / FN / FNEND / END DEF, local variables, paragraph labels.",
-"10-language/flow-control/other-flow":"Loops and jumps: DO/LOOP, FOR/NEXT, GOTO, ON GOTO, EXIT, END/STOP, PAUSE.",
+"10-language/flow-control/other-flow":"Loops and jumps: DO/LOOP, FOR/NEXT, GOTO, ON GOTO, EXIT, END/STOP, PAUSE, CHAIN.",
 "10-language/flow-control/error-handling":"Trapping & recovery: statement conditions, EXIT groups, ON <cond>/ON ERROR, RETRY/CONTINUE, execution modes.",
 "10-language/data-manipulation/declaration":"Variable & array declaration: DIM, arrays, MAT dimensioning, OPTION BASE.",
 "10-language/data-manipulation/assignment":"Data movement & change: LET, MAT assignment, DATA/RESTORE, string operations.",

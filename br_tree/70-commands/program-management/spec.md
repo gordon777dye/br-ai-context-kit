@@ -11,6 +11,13 @@ related: [file-directory, information, editing]
 keywords: [RUN, LOAD, SAVE, REPLACE, MERGE, CLEAR, GO, EXECUTE, CHAIN, PROC, SYSTEM, SUBPROC, PROCERR, ALERT, FILES, ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP, NOTRACE]
 corrections:
   - "Eleven keywords added to the frontmatter: the CHAIN clause FILES, the commands SUBPROC, PROCERR and ALERT, and the qualifiers ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP and NOTRACE. Every one is documented in this page's BNF or semantics and none was declared, so BR's own spelling of each reached nothing. Found in brls phase 13."
+  - "CHAIN's backing/deep-reference page carried `kind: command` and lived under this
+    70-commands subtree, but CHAIN is a **statement** (line-numbered, runs at RUN; every
+    other 70-commands backing page is `kind: command`, and CHAIN was the one outlier). Moved
+    the backing page to 10-language/flow-control/other-flow/CHAIN.md, alongside the other
+    program-termination statements, and corrected its `kind:`. The CHAIN coverage on this
+    page (BNF, semantics, examples) is unaffected and remains the authoritative summary —
+    only the deep-reference link and the file's physical location changed."
 ---
 
 # Program management & procedures
@@ -165,7 +172,9 @@ extension rules as `LOAD` (`.BR`→`.BRO`, `CHAINDFLT`). `"PROC=…"` ends the p
 procedure (closing the lowest active proc first); `"SUBPROC=…"` starts a **nested** procedure
 without disturbing the running one — both keep the terminated program in memory so its variables
 stay available to the procedure. `CHAIN "PROC=XYZ"` is like `EXECUTE "PROC XYZ"` except `CHAIN`
-ends the program. (Deep reference, incl. the 13 technical notes: [CHAIN](CHAIN.md).)
+ends the program. (Deep reference, incl. the 11 technical notes:
+[CHAIN](../../10-language/flow-control/other-flow/CHAIN.md) — filed alongside the other
+program-termination statements since CHAIN is a statement, not a command.)
 
 <a id="procedures"></a>
 ## Procedure files
@@ -233,7 +242,11 @@ RUN MENU
 - [information](../information/spec.md) — `RUN STEP/TRACE`, `DISPLAY`, `BREAK` debugging
 - [50-libraries/library-facility](../../50-libraries/library-facility/spec.md) — `LIBRARY` (vs `CHAIN`)
 - [information](../information/spec.md#break) — `BREAK` breakpoints (folded there)
-- Backing keyword pages retained (deep reference): [CHAIN](CHAIN.md) (13 technical notes),
+- [other-flow](../../10-language/flow-control/other-flow/spec.md#termination) — `STOP`/`END`/`PAUSE`,
+  `CHAIN`'s sibling program-termination statements
+- Backing keyword pages retained (deep reference):
+  [CHAIN](../../10-language/flow-control/other-flow/CHAIN.md) (11 technical notes; relocated there
+  because CHAIN is a statement, not a command — see that page's `corrections:` note),
   [Procedure_files](Procedure_files.md) (the full procedure-system reference)
 
 *(Backing pages `LOAD`, `MERGE`, `GO`, `Go_End`, `CLEAR`, `EXECUTE`, `PROC`, `Procedure_Commands`,

@@ -5,7 +5,7 @@ source: §Control Structures (Loops, Branching)
 category: 10-language
 subcategory: 10-language/flow-control/other-flow
 kind: spec
-status: 2b           # reference base + br_tree enrichment (STOP/END/PAUSE termination); no conflicts
+status: 2b           # reference base + br_tree enrichment (STOP/END/PAUSE/CHAIN termination); no conflicts
 recovered-fold: GOSUB, ON_GOSUB, RANDOMIZE (3 redirect-collision pages folded from re-fetched source — added RANDOMIZE, GOSUB error-1011 immediate restriction, ON-GOSUB NONE-is-a-GOSUB-branch; verbatim retained on the BR wiki)
 corrections:
   - "TRACE added as a statement. BR has a syn.txt tree for it — `TRACE` with three branches, PRINT, OFF and an optional ON — and a primary operation to execute it (TRACE_PRI, primop0.cpp), but the reference documented TRACE only as an option of the RUN and GO *commands*, so the statement form was missing from the tree entirely. It was the one genuinely undocumented statement left in gendata's coverage report. Semantics read from BR's source: primop0.cpp switches on the secondary opcode, where OFF_SEC (0x05) clears RUN_TRACE|RUN_TRACE_PRINT, ON_SEC (0x04) sets RUN_TRACE, and PRINT_SEC (0x06) sets RUN_TRACE_PRINT — the three constants are defined together in basoprcmn.h under the comment `/* trace */`. run.cpp gates the per-line output on RUN_TRACE and picks FILENBR_MAIN_PRINTER (255) over FILENBR_MAINWINDOW (0) on RUN_TRACE_PRINT, printing the line number with L_05ld (`%05i`). That gating is why TRACE PRINT alone traces nothing, and command9.cpp shows the console form guarding the same bit differently. A bare TRACE is left marked unverified rather than assumed equivalent to TRACE ON: command4.cpp stores no operand byte when an optional keyword is absent, so primop0 reads whatever follows the primary op. Added in brls phase 5."
@@ -14,8 +14,13 @@ corrections:
     GOTO A,B`) is this form and not error-handling's `ON FKEY <n> …` condition — the full rule and its
     sourcing are on that page, since it is the condition form's grammar (one target, no repeat) that
     forces the general form to be the only reading whenever a second target follows."
+  - "CHAIN added to §Program termination & interruption, and its deep-reference backing page
+    (CHAIN.md, 11 technical notes) moved onto this page from 70-commands/program-management,
+    which had misclassified it `kind: command` and filed it under the commands subtree. CHAIN
+    is a statement, so it belongs with its termination siblings STOP/END/PAUSE here; the full
+    BNF/semantics summary stays in program-management, which is where it's coded and used."
 related: [conditionals, syntax, functions-udf]
-keywords: [FOR, NEXT, DO, LOOP, WHILE, UNTIL, GOTO, GOSUB, RETURN, ON GOTO, ON GOSUB, EXIT, RANDOMIZE, STOP, END, PAUSE, TRACE, STEP, TO, ON, OFF, PRINT]
+keywords: [FOR, NEXT, DO, LOOP, WHILE, UNTIL, GOTO, GOSUB, RETURN, ON GOTO, ON GOSUB, EXIT, RANDOMIZE, STOP, END, PAUSE, CHAIN, TRACE, STEP, TO, ON, OFF, PRINT]
 ---
 
 # Loops & branching
@@ -116,6 +121,10 @@ e.g. `INT(RND*100+1)` for 1–100.)
   `CODE`=0.
 - **`PAUSE`** interrupts execution so the operator can enter commands / inspect variables; `GO`
   resumes and restores the screen (a handy debugging breakpoint).
+- **`CHAIN`** also ends the program, but — unlike `STOP`/`END`/`PAUSE` — hands off to another
+  program or procedure instead of stopping. It's documented in full in
+  [program-management](../../../70-commands/program-management/spec.md#chain) (where it's used
+  from), with its deep-reference page retained on this page as [CHAIN](CHAIN.md).
 
 <a id="trace"></a>
 ### TRACE
@@ -196,4 +205,6 @@ Two things to know before relying on it:
 - [functions-udf](../functions-udf/spec.md) — `DEF`/`FN` (the function alternative to `GOSUB`)
 - (Backing keyword pages folded into this spec and pruned. The 2b
   redirect-collision pages `GoSub`, `On_GoSub` and `Randomize` were folded here and pruned; verbatim
-  wikitext remains on the BR wiki.)
+  wikitext remains on the BR wiki. [CHAIN](CHAIN.md) — 11 technical notes on the CHAIN statement —
+  was relocated here from 70-commands/program-management, which had misfiled it as a command; see
+  that page's `corrections:` note.)

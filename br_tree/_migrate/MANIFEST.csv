@@ -1165,7 +1165,7 @@ flow_and_branching/ON_GOTO.md,10-language/flow-control/other-flow/spec.md,ON_GOT
 flow_and_branching/PAUSE.md,10-language/flow-control/other-flow/spec.md,PAUSE,10-language,10-language/flow-control/other-flow,statement,pruned-2b,high
 libraries-procedures/.$$$.md,30-io-file/file-model/spec.md,.$$$,30-io-file,30-io-file/file-model,statement,pruned-2b,high
 libraries-procedures/Alert.md,70-commands/program-management/Alert.md,Alert,70-commands,70-commands/program-management,statement,pruned-2b,high
-libraries-procedures/CHAIN.md,70-commands/program-management/CHAIN.md,CHAIN,70-commands,70-commands/program-management,command,ok,high
+libraries-procedures/CHAIN.md,10-language/flow-control/other-flow/CHAIN.md,CHAIN,10-language,10-language/flow-control/other-flow,statement,moved-2b,high
 libraries-procedures/CHDIR.md,70-commands/file-directory/CHDIR.md,CHDIR,70-commands,70-commands/file-directory,command,pruned-2b,high
 libraries-procedures/CLEAR.md,70-commands/program-management/CLEAR.md,CLEAR,70-commands,70-commands/program-management,command,pruned-2b,high
 libraries-procedures/Color.exe.md,00-configuration/installation-tooling/spec.md,Color.exe,00-configuration,00-configuration/installation-tooling,config-directive,pruned-2b,high
