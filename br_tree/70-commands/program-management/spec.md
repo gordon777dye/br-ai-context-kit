@@ -18,6 +18,17 @@ corrections:
     program-termination statements, and corrected its `kind:`. The CHAIN coverage on this
     page (BNF, semantics, examples) is unaffected and remains the authoritative summary —
     only the deep-reference link and the file's physical location changed."
+  - "The CHAIN BNF ordered `FILES` ahead of the `MAT <array>`/`<var>` list, as
+    `[, FILES] [, MAT <array>]… [, <var>]…`. BR does not enforce that position:
+    `00010 chain A$, XXX, FILES` LOADs clean, confirmed directly. Rewritten as one
+    repeating alternation, `[, { FILES | MAT <array> | <var> }]…`, so the clause may
+    stand at any of the comma-separated positions. BR's own syntax table orders the
+    units the same way the old BNF did, which is why the error stayed invisible: past
+    the FILES unit, the repeating operand read the word as an ordinary variable *named*
+    FILES, so a misplaced FILES was accepted for the wrong reason and anything reading
+    the parse got a variable that does not exist. Whether BR accepts `FILES` more than
+    once in one CHAIN was not tested, so the alternation neither permits nor forbids it
+    deliberately. Found and fixed in brls (internal/parse/walk.go, matchUnit)."
 ---
 
 # Program management & procedures
@@ -161,14 +172,16 @@ subject of another `EXECUTE`.
 <a id="chain"></a>
 ## CHAIN — end this program, start another
 ```bnf
-CHAIN { "<program>" | "PROC=<name>" | "SUBPROC=<name>" } [, FILES] [, MAT <array>]… [, <var>]…
+CHAIN { "<program>" | "PROC=<name>" | "SUBPROC=<name>" } [, { FILES | MAT <array> | <var> }]…
 ```
 `CHAIN` (a statement) ends the current program and loads/runs another program, or starts a
 procedure. By default it **closes all files** (except procedure files) and resets the new program's
 variables; **`FILES`** keeps files open at their current positions (pointers are *not* moved — use
 `RESTORE` to reposition), and trailing `MAT array`/`var` names carry those values into the chained
-program (dimensions needn't match; the caller's win). The program name follows the same default
-extension rules as `LOAD` (`.BR`→`.BRO`, `CHAINDFLT`). `"PROC=…"` ends the program and starts a
+program (dimensions needn't match; the caller's win). `FILES` may stand at any of those
+comma-separated positions, not only the first — `chain A$, XXX, FILES` is accepted. The
+program name follows the same default extension rules as `LOAD` (`.BR`→`.BRO`, `CHAINDFLT`).
+`"PROC=…"` ends the program and starts a
 procedure (closing the lowest active proc first); `"SUBPROC=…"` starts a **nested** procedure
 without disturbing the running one — both keep the terminated program in memory so its variables
 stay available to the procedure. `CHAIN "PROC=XYZ"` is like `EXECUTE "PROC XYZ"` except `CHAIN`

@@ -9,11 +9,14 @@ Please document any errors in ERRORS.md. This includes any inaccuracies *or ambi
 
 ---
 
-## Prerequisite
+## Prerequisite - The only thing YOU have to do
 
 **The user should place a copy** of the application's `brconfig.sys` into `dev\tools\`. The resulting 
-file should be named `context\dev\tools\brconfig.sys`. No need for a license file. Onboardiong STEP 1 
-derives everything else from this one file. The remainder of this procedure is best done by an AI model.
+file should be named `context\dev\tools\brconfig.sys`. Be sure to adjust any include linkage that could 
+be needed for AI processing. User specific statements are not needed for this application. Also remove 
+any SUBSTITUTE statements in include files (if need be copy the include files to dev\tools.) 
+No need for a license file. Onboardiong STEP 1 derives everything else from this one file. The remainder 
+of this procedure is best done by an AI model.
 
 ---
 
@@ -95,8 +98,9 @@ Create 2 of the 4 files to be used by AI for application development.
 **Generate `dev\tools\brconfig.ai_user`** from `dev\tools\brconfig.sys`:
 1. Copy `brconfig.sys`. If `dev\tools\brconfig.sys` doesn't exist, request the user
    to place it there. Don't proceed without it.
-2. Remove every line that is an `EXECUTE` statement — matched on the line's leading token
-   (case-insensitive, ignoring leading whitespace); don't touch commented-out (`REM`/`!`) lines.
+2. Remove every line that is an `EXECUTE` or `SUBSTITUTE` statement — matched on the 
+    line's leading token (case-insensitive, ignoring leading whitespace); don't touch 
+    commented-out (`REM`/`!`) lines.
 3. Remove every line that is a `LOGGING` statement, matched the same way.
 4. Prepend, as the new first line of the file:
    ```
@@ -190,7 +194,11 @@ Decompiling: After identifying a missing or stale .brs file refresh it by runnin
 `LIST < <path\program-name> > <path\program-name.br.brs> : EXECUTE "system"` 
 
 Or put the LIST commands into a procedure (batch) file and execute it with "PROC <batch-file-pathname>". 
-If you go this route then end the proc with `EXECUTE "system"`
+
+Typically AI models have trouble with this one because they don't understand how BR DRIVE statements work. 
+Get familiar witht the DRIVE statement, examine the first drive statement and thereby learn what 
+folder is current (present working directory) when BT starts. Note, BR uses backslashes like Windows 
+Command Prompts, and forward slashes mean something legacy - so don't use them. 
 
 ### STEP 5 — Blessed exemplars ◆ the real way style is learned
 An LLM learns style far better from a few gold-standard *real programs* than from prose about style.
