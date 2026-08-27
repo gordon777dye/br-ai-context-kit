@@ -1,0 +1,8 @@
+gen_brtree_index.br.brs  start 2026-08-26
+mode=generate
+specs discovered=38
+pairs=383  unique keywords=327
+sha256=5145e7f34c9eb983184c2ea4ff9d0a1ec244e40e7010db527fbcc010bd7288bf
+wrote context\dev\brtree-index.br.json  bytes=63381
+specs: 38 | keywords: 327 (47 multi-spec) | source hash 5145e7f34c9e...
+exit rc=0

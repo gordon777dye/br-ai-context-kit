@@ -21,11 +21,10 @@ tooling at whatever BR codebase you're on. There are three published parts:
   Do not or fill gaps with plausible-sounding guesses. If you don't know something: 
   (a) search thIS context first, (b) flag it as unknown, (c) ask the user. **NEVER GUESS** 
 
-- Read the following documents throroughly and tell me (the user) what they are about before 
-  being given the actual current assignment:
-- **`dev\APP-DEV-GUIDE.md`** — this will save you many headaches and much time.
-- **`dev\BR_launch.md`** — this is needed to compile and test.
-- **`essentials.md`** — this is exactly what it is named.
+- The following documents are required reading and are therefore @ included below:
+- **`dev/APP-DEV-GUIDE.md`** — this will save you many headaches and much time.
+- **`dev/BR_launch.md`** — this is needed to compile and test.
+- **`dev/essentials.md`** — this is exactly what it is named.
 
 - Get familiar with the tools in context, especially `brls.exe` (decribed in 
   `APP-DEV-GUIDE.md`) before attempting to code. Use this tool to check your work 
@@ -43,9 +42,10 @@ The rest is done by AI.
 
 ## Start here
 
+onboarding has been completed
 **→ [`app\ONBOARDING.md`](app\ONBOARDING.md)** - Onboarding instructions - do this first. 
 All of this should be done by AI at your direction. Just tell your AI agent (one step at a time)
- to execute the instructions.
+ to execute the instructions. 
 
 **→ [`dev\APP-DEV-GUIDE.md`](dev\APP-DEV-GUIDE.md)** — After completing the onboarding, this
 becomes your AI task entry point. Its *"Start here — by task type"* preamble routes your 
@@ -54,3 +54,16 @@ agent by what you desire to accomplish (interpret\debug · code · design · tes
 ## Errors
 
 If you encounter any context kit errors, please log them in ERRORS.md
+
+---
+
+Now including **`dev/APP-DEV-GUIDE.md`**
+@dev/APP-DEV-GUIDE.md
+
+Now including **`dev/BR_launch.md`**
+@dev/BR_launch.md
+
+Now including **`dev/essentials.md`**
+@dev/essentials.md
+
+---

@@ -7,7 +7,7 @@ context. Each section says **where the authoritative detail lives** so this stay
 a duplicate. It is application-agnostic: point the tooling at whatever BR app you're working
 on.
 
-Please document any errors in dev\ERRORS.md. This includes any inaccuracies *or ambiguities* found (within the context folder) while using this kit. Let the user know when you post something to ERRORS.md so users can forward the report to ADS. 
+Please document any errors in context\ERRORS.md. This includes any inaccuracies *or ambiguities* found (within the context folder) while using this kit. Let the user know when you post something to ERRORS.md so users can forward the report to ADS. 
 
 ---
 

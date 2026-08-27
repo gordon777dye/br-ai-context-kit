@@ -83,7 +83,7 @@ comes first so the source used to create those exemplars is current. STEP 2 gate
 `extract-schema.exe` only parses `filelay\`, so STEP 3 has nothing to read until STEP 2 confirms or
 creates it.
 
-### STEP 1 — BR launch entries (fully automated)
+### STEP 1 — BR launch entries (fully automated) and AI init root
 Create 2 of the 4 files to be used by AI for application development.
 
 **Fixed locations:** - files used to compile and test BR programs
@@ -118,6 +118,9 @@ The UNATTENDED keyword lets AI run BR in a headless (no user prompts) mode.
 
 Both are regenerated whenever `brconfig.sys` changes — generated, never hand-edited (same
 convention as `data-model.md`/`topics.json`).
+
+If you haven't done so already, go to ../context and run the /init command to be sure either 
+a CLAUDE.md or AGENTS.md is file is placed in the app root.
 
 ### STEP 2 — Locate or create `filelay\` ◆ prerequisite for STEP 3
 STEP 3 does **not** inspect the app's actual data files to learn their layout. `extract-schema.exe`
@@ -177,6 +180,11 @@ path STEP 2 found or created.
 - **Re-run both** whenever `filelay\` changes — they are generated, never hand-edited.
 
 ### STEP 4 — Audit source currency (`.brs` vs `.br`) ◆ automated; no user decision
+Typically AI models have trouble with this one because they don't understand how BR DRIVE statements work. 
+Get familiar witht the DRIVE statement, examine the first drive statement and thereby learn what 
+folder is current (present working directory) when BR starts. Note, BR uses backslashes like Windows 
+Command Prompts, and forward slashes mean something legacy - so don't use them. 
+
 STEPS 5–6 learn the house style by reading the app's **`.brs` source**. Because BR can edit a program
 while it is compiled (*incremental compilation*), the `.brs` on disk may be **stale or absent**. A
 timestamp audit settles this mechanically — no need to ask which copy is authoritative:
@@ -194,11 +202,6 @@ Decompiling: After identifying a missing or stale .brs file refresh it by runnin
 `LIST < <path\program-name> > <path\program-name.br.brs> : EXECUTE "system"` 
 
 Or put the LIST commands into a procedure (batch) file and execute it with "PROC <batch-file-pathname>". 
-
-Typically AI models have trouble with this one because they don't understand how BR DRIVE statements work. 
-Get familiar witht the DRIVE statement, examine the first drive statement and thereby learn what 
-folder is current (present working directory) when BT starts. Note, BR uses backslashes like Windows 
-Command Prompts, and forward slashes mean something legacy - so don't use them. 
 
 ### STEP 5 — Blessed exemplars ◆ the real way style is learned
 An LLM learns style far better from a few gold-standard *real programs* than from prose about style.
@@ -231,9 +234,9 @@ apply them to code it hasn't seen.
 ### STEP 7 — Architecture map
 `app\architecture.md` — the directory taxonomy, entry points, and 2–3 **core data flows**
 (e.g. order → allocation → ship → EDI). Make them short, like a module table in 
-your AI agent's memory file (`CLAUDE.md`).
+your AI agent's memory file (`CLAUDE.md` or `AGENTS.md`).
 
-### STEP 8 — Wire the app layer into the entry point
+### STEP 8 — Wire the app layer into the entry point and update either CLAUDE.md or AGENTS.md
 Make the app layer **discoverable** — through `APP-DEV-GUIDE.md`, not by overloading the keyword router.
 The two routers stay single-responsibility: `topics.json` = "what does this BR statement mean";
 `APP-DEV-GUIDE.md` = "how to build this app."
@@ -247,6 +250,10 @@ The two routers stay single-responsibility: `topics.json` = "what does this BR s
    BR lexemes, so app conventions/architecture — which aren't keyword-addressable — do **not** belong
    in it. *(Optional: a single pointer to `data-model.md` if you want schema reachable from the router,
    but the per-file index belongs in `data-model.md`'s own contents, not the keyword index.)*
+
+3. Insert `@context\README.md` at the end of either CLAUDE.md or AGENTS.md in the app root folder (..\context).
+4. Modify context\README.md as follows: - State "onboarding has been completed" just ahead of 
+  the onboarding paragraph.
 
 ### STEP 9 — Survey brls vs real BR ⏱ typically long-running (30–60 minutes)
 
