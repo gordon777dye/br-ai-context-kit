@@ -6,14 +6,14 @@ This is a model- and developer- facing context for working in **Business Rules! 
 reading, writing, and designing BR application code. It is application-agnostic: point the 
 tooling at whatever BR codebase you're on. There are three published parts:
 
-- **`dev\`** — the task-oriented coding kit: a router (`topics.json`), distilled statement
+- **`dev/`** — the task-oriented coding kit: a router (`topics.json`), distilled statement
   semantics, the system-function and standard-library catalogs, an error reference,
   schema-extraction tooling, and `brls.exe` — a fast BR syntax/sema checker
-  (`tools\brls.exe -check <file>`) that needs no BR license or runtime.
-- **`br_tree\`** — the authoritative BR language reference tree (syntax, data types, file
-  and screen I\O, printing, libraries, error codes), the ultimate backstop that `dev\` links into
+  (`tools/brls.exe -check <file>`) that needs no BR license or runtime.
+- **`br_tree/`** — the authoritative BR language reference tree (syntax, data types, file
+  and screen I/O, printing, libraries, error codes), the ultimate backstop that `dev/` links into
   for depth.
-- **`app\`** — where your toolset information and application programming style will reside.
+- **`app/`** — where your toolset information and application programming style will reside.
 
 ## AI Model Rules
 
@@ -32,24 +32,27 @@ tooling at whatever BR codebase you're on. There are three published parts:
 
 - Don't be in a hurry to deliver. Look at the context documentation before you code. 
 
+- The master copies of programs are stored in ___________ form. (completed later) 
+  If the program masters are stored in source format decompiling (REPLACE SOURCE) 
+  is prohibited. 
+
 ## Installation
 
 Note: This context kit itegrates with any BR app. 
 
 **Copy this folder with it's sub-folders into the main folder of your application**. 
-Rename it to "context\". Then copy your brconfig.sys fileto dev\tools.
+Rename it to "context/". Then copy your brconfig.sys fileto dev/tools.
 The rest is done by AI. 
 
 ## Start here
 
-onboarding has been completed
-**→ [`app\ONBOARDING.md`](app\ONBOARDING.md)** - Onboarding instructions - do this first. 
+**→ [`app/ONBOARDING.md`](app/ONBOARDING.md)** - Onboarding instructions - do this first. 
 All of this should be done by AI at your direction. Just tell your AI agent (one step at a time)
  to execute the instructions. 
 
-**→ [`dev\APP-DEV-GUIDE.md`](dev\APP-DEV-GUIDE.md)** — After completing the onboarding, this
+**→ [`dev/APP-DEV-GUIDE.md`](dev/APP-DEV-GUIDE.md)** — After completing the onboarding, this
 becomes your AI task entry point. Its *"Start here — by task type"* preamble routes your 
-agent by what you desire to accomplish (interpret\debug · code · design · test).
+agent by what you desire to accomplish (interpret/debug · code · design · test).
 
 ## Errors
 

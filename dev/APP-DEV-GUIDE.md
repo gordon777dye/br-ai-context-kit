@@ -7,7 +7,7 @@ context. Each section says **where the authoritative detail lives** so this stay
 a duplicate. It is application-agnostic: point the tooling at whatever BR app you're working
 on.
 
-Please document any errors in context\ERRORS.md. This includes any inaccuracies *or ambiguities* found (within the context folder) while using this kit. Let the user know when you post something to ERRORS.md so users can forward the report to ADS. 
+Please document any errors in context/ERRORS.md. This includes any inaccuracies *or ambiguities* found (within the context folder) while using this kit. Let the user know when you post something to ERRORS.md so users can forward the report to ADS. 
 
 ---
 
@@ -184,7 +184,7 @@ reference under [`../br_tree/50-libraries/fileio/`](../br_tree/50-libraries/file
 delay, no WSID slot, no keyboard-focus theft), needs no config file, and requires no BR license.
 
 Currently brls.exe is early release. So, while it has been thoroughly lab tested, 
-there is nothing like real world testing. So please report (in context\ERRORS.md) any br syntax 
+there is nothing like real world testing. So please report (in context/ERRORS.md) any br syntax 
 failures that it doesn't detect along with any false positives.
 
 **Scope boundary (read once):**
