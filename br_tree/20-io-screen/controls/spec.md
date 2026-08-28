@@ -8,7 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment
 recovered-fold: 2D_Controls, CELL_RANGE, COLCNT, Combo_Boxes, Display_Buttons, RANGE folded+pruned; Grid_and_List retained (deep grid/list reference). 7 redirect-collision pages re-fetched; verbatim retained on the BR wiki
 related: [input-output, fields-attributes, windows-cursor]
-keywords: [GRID, LIST, TEXT, COMBO, RADIO, CHECK, MENU, FIELDS, BUTTON, BUTTONS]
+keywords: [GRID, LIST, TEXT, COMBO, RADIO, CHECK, MENU, FIELDS, BUTTON, BUTTONS, BUTTONROWS]
 corrections:
   - "BUTTONS added to the frontmatter keywords. The list held `BUTTON`, singular, which is not a spelling any of BR's keyword tables carries: table4k's entry is `BUTTONS`, and this page documents it as `DISPLAY BUTTONS MAT X$: MAT Y$`. Routing is an exact match, so the declaration missed by one letter and the keyword reached nothing. `BUTTON` is kept — it is the control's name in the page's own prose. Found in brls phase 13."
 ---
@@ -66,14 +66,18 @@ selection; `INPUT FIELDS` shows the box (no label — pair with a separate `PRIN
 `RINPUT FIELDS` shows both and allows selection. Each may carry its own `fkey` (fires on/off);
 `NOWAIT` = the `G` attribute (return control immediately). Commonly looped until a Done button.
 
-<a id="buttons"></a>**Buttons** — two kinds: **Display Buttons** sit on the button bar (top/bottom
-row) — `DISPLAY BUTTONS MAT X$: MAT Y$`, where each `X$` is `"row,col,caption-form-spec,attributes,
-fkey-or-hex-scancode"` and `Y$` is the caption; `P` in the attributes disables/greys a button. A click
-returns the given FKEY and raises an FKEY interrupt; instead of a numeric FKEY you may give a two-digit
-**hex scancode** (`X02`) for `KSTAT$` consistency (so a clicked button and its key yield the same
-scancode — e.g. `X02` = Ctrl-B = PgUp = FKEY 90). **Print-Fields Buttons** (`CC <cols>,,B<fkey>`, 4.2+)
-can go *anywhere* and set `FKEY` to the given number; the program tests `FKEY` to dispatch
-(Done/OK/Cancel). The window `BUTTONROWS=nn` parameter sizes the button bar (`0` supported 4.20+;
+<a id="buttons"></a>**Buttons** — two kinds: **Display Buttons** print into the button panel at the
+**bottom** of the window that `BUTTONROWS=<n>` reserves (see
+[windows-cursor §semantics](../windows-cursor/spec.md#semantics)) — `DISPLAY BUTTONS MAT X$: MAT Y$`,
+where each `X$` uses the **same field spec as `PRINT FIELDS`** —
+`"row,col,caption-form-spec,attributes,fkey-or-hex-scancode"` — **except the `B` prefix is not needed
+in the fkey field** (a Display Button is already a button, so the fkey value stands alone). `Y$` is the
+caption; `P` in the attributes disables/greys a button. A click returns the given FKEY and raises an
+FKEY interrupt; instead of a numeric FKEY you may give a two-digit **hex scancode** (`X02`) for
+`KSTAT$` consistency (so a clicked button and its key yield the same scancode — e.g. `X02` = Ctrl-B =
+PgUp = FKEY 90). **Print-Fields Buttons** (`CC <cols>,,B<fkey>`, 4.2+) can go *anywhere* and set
+`FKEY` to the given number; the program tests `FKEY` to dispatch (Done/OK/Cancel). The window open
+string `BUTTONROWS=nn` parameter sizes the button panel (`0` supported 4.20+; the default is also
 settable via `SCREEN OPENDFLT`).
 
 <a id="text"></a>**Multi-line text box** — `TEXT <rows>/<cols>/<maxchar>` via `INPUT/RINPUT FIELDS`;

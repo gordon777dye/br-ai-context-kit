@@ -8,12 +8,13 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (CMDKEY/FKEY/CURFLD, cursor shape, GUIMODE, borders); no conflicts
 recovered-fold: CURFLD, CURWINDOW, EROW, FNKEY, GUI_Console, GUI_Mode, Parent=None folded+pruned; FKEY retained (scancode tables). 8 redirect-collision pages re-fetched; verbatim retained on the BR wiki
 related: [input-output, fields-attributes, controls]
-keywords: [OPEN WINDOW, WINDOW, BORDER, NEWPAGE, CAPTION, cursor, PARENT, HELP]
+keywords: [OPEN WINDOW, WINDOW, BORDER, BUTTONROWS, NEWPAGE, CAPTION, cursor, PARENT, HELP]
 canonical: window-open   # canonical home for the window OPEN spec (printing guide links here)
 corrections:
   - "CURWINDOW's argument is optional: numfunct.cpp passes `parms` through to the client and sends 0 when there are none, and ck_num_sysfn groups it under \"optional 1 numeric\". The signature required it."
   - "CURROW/CURCOL are accepted with one argument by BR's compiler and ignore it at run time; noted where they are introduced. Found in brls phase 5."
   - "HELP added to the frontmatter keywords. This page documents both senses of the spelling — the field-help clause on INPUT/RINPUT, and the console HELP command reached from READY mode — and declared neither. Found in brls phase 13; see error-handling's note for why the clause had been left undeclared everywhere."
+  - "BUTTONROWS= added to the OPEN WINDOW syntax BNF, Semantics, and frontmatter keywords. The wiki documents this window parameter only under SCREEN OPENDFLT and omitted it from the OPEN WINDOW page entirely."
 ---
 
 # Windows & cursor
@@ -34,6 +35,7 @@ the printing guide links here rather than redefining it.
       [ ',' 'ABSOLUTE' | ',' 'RELATIVE' ]
       [ ',' 'CAPTION=' ['<'|'>'] <title> ]
       [ ',' 'BORDER=' <border-spec> ]
+      [ ',' 'BUTTONROWS=' <int> ]
       [ ',' 'N=' <display-attr> ] [ ',' 'FKEY=' <int> ]
       [ ',' 'FONT[.TEXT|.LABELS|.BUTTONS]=' <font> ] [ ',' 'FONTSIZE=' <int>'x'<int> ] '"'
     | <string-expression>
@@ -54,6 +56,11 @@ PRINT '#'<window> ',' BORDER [<border-spec>] [ ':' <caption> ]
   (negatives allowed, placing the window above/left of the parent); `ABSOLUTE` — from the
   screen's top-left. When a `BORDER` is specified, `EROW`/`ECOL` must be **one short** of the desired
   edge to leave room for the one-cell border, and the end values may not precede the start values.
+- **Button panel**: `BUTTONROWS=<n>` reserves an `n`-row panel **at the bottom of the window** (not
+  the top) onto which `DISPLAY BUTTONS` prints its buttons — see
+  [controls §buttons](../controls/spec.md#buttons). `0` is supported 4.20+ (suppresses the panel); the
+  default is also settable via `SCREEN OPENDFLT`, which is the only place the BR wiki documents this
+  parameter.
 - **Hot windows**: `FKEY=<n>` in an OPEN WINDOW string (4.2+) makes the *whole window* hot — clicking
   anywhere in it fires that FKEY interrupt (typically to switch focus). The value is inherited by child
   windows (but **not** independent ones) unless a child sets its own `FKEY=` (or `-1`).
