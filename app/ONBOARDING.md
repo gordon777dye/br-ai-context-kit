@@ -90,7 +90,7 @@ Create 2 of the 4 files to be used by AI for application development.
 
 | Role | Path |
 |---|---|
-| BR executable | `dev/tools/brserver-433b-Win32-Debug-2026-08-20.exe` |
+| BR executable | `dev/tools/brserver-433c-Win32-Debug-2026-08-27.exe` |
 | Existing app startup config | `dev/tools/brconfig.sys` |
 | AI Utility config (headless) | `dev/tools/brconfig.ai_util` |
 | AI User config (interactive) | `dev/tools/brconfig.ai_user` |
@@ -194,8 +194,8 @@ Before proceeding with this step, ask the user whether the program masters are k
 compiled form. Record the answer in cntext/README.md at the end of the Rules section. If the 
 program masters are stored in source format decompiling is prohibited. 
 
-> **Audit every compiled `.br`/`.wb`: confirm a corresponding source file (e.g. `prog.br.brs` for
-> `prog.br`) exists whose modification date-time is the *same as or later than* the compiled file.**
+> **Audit every compiled `.br`/`.wb`: confirm a corresponding source file (e.g. `prog.br.brs` or 
+`prog.brs` for `prog.br`) exists whose modification date-time is the *same as or later than* the compiled file.**
 
 - **Pass** (source exists and is ≥ its `.br`) → that source is current; nothing to do.
 - **Fail** (source missing, or older than its `.br`) → the compiled file was changed more recently, so
@@ -235,29 +235,22 @@ apply them to code it hasn't seen.
 > library function names into a "standard API" list — that manufactures a surface the model will
 > call incorrectly. Teach usage by whole-file exemplar instead.
 
-### STEP 7 — Architecture map
+### STEP 7 — Architecture map/res
 `app/architecture.md` — the directory taxonomy, entry points, and 2–3 **core data flows**
 (e.g. order → allocation → ship → EDI). Make them short, like a module table in 
 your AI agent's memory file (`CLAUDE.md` or `AGENTS.md`).
 
 ### STEP 8 — Wire the app layer into the entry point and update either CLAUDE.md or AGENTS.md
-Make the app layer **discoverable** — through `APP-DEV-GUIDE.md`, not by overloading the keyword router.
-The two routers stay single-responsibility: `topics.json` = "what does this BR statement mean";
-`APP-DEV-GUIDE.md` = "how to build this app."
 
-1. In `dev/APP-DEV-GUIDE.md` (the app development entry point) add a terse pointer row for each app 
-   doc — in the "Start here" table and the §2 reference map. Mark **`conventions.md` and `BR_launch.md` 
-   as always-load** when writing app code; **`data-model.md` (by file), `exemplars/` (by archetype), and
-   `architecture.md` as on-demand** lookups. Full detail stays in the `app/` docs (progressive
-   restatement).
-2. Leave `dev/topics.json` as the **language** keyword→`statement-semantics.md` router. It is keyed by
-   BR lexemes, so app conventions/architecture — which aren't keyword-addressable — do **not** belong
-   in it. *(Optional: a single pointer to `data-model.md` if you want schema reachable from the router,
-   but the per-file index belongs in `data-model.md`'s own contents, not the keyword index.)*
-
-3. Insert `@context/README.md` at the end of either CLAUDE.md or AGENTS.md in the app root folder (../context).
-4. Modify context/README.md as follows: - State "onboarding has been completed" just ahead of 
+1. Insert `@context/README.md` at the end of CLAUDE.md and AGENTS.md in the app root folder 
+  (../context) if those files exist.
+2. Modify context/README.md as follows: - State "onboarding has been completed" just ahead of 
   the onboarding paragraph.
+3. If you are operating in vscode: - Create a `.github/` folder in the app root folder and copy 
+  context/app/onboard/copilot-instructions.md to that new .github/ folder.
+4. If you are operating in cursor: - Follow the instructions in context/app/onboarding/context-kit-always-load.md. This will create necessary initialization rules for this repo. 
+5. Advise the user that the first prompt after onboarding and restarting should be: 
+  "Which documents did you read in full during initialization?"
 
 ### STEP 9 — Survey brls vs real BR ⏱ typically long-running (30–60 minutes)
 

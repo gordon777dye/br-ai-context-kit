@@ -1,3 +1,7 @@
+---
+alwaysApply: true
+---
+
 # Business Rules — application development guide
 
 This is the capstone for this context kit. It stitches the language reference, the built-in function
@@ -209,7 +213,7 @@ failures that it doesn't detect along with any false positives.
 All examples assume the application working directory that [`BR_launch.md`](BR_launch.md) expects for
 `$BR_EXE` and related tools. `$BRLS_EXE` is set the same way. 
 
-#### 6.1.0 Command capability matrix
+#### 6.1.0 `$BRLS_EXE` Command capability matrix
 
 | Mode | Purpose | Exit code | Notes |
 |---|---|---|---|
@@ -217,7 +221,6 @@ All examples assume the application working directory that [`BR_launch.md`](BR_l
 | `-sema`  | Adds brls's semantic findings (undefined names, argument counts, …), prefixed `error:`/`warning:` | folds into `-check`'s code — only an `error:` finding flips `0`→`1` | Single-file only; NA to cross-file `LIBRARY` links. Exit `1` if error detected |
 | `-json` - Structured json output: array of `{file, clean, diagnostics[]}` (`line`, `col`, `severity`, `rule`, `message`) | same as underlying mode | Exit code 1 if not `clean`, decides pass/fail - (`clean: true` can accompany a warning). Exit `1` if combined with any other mode failure |
 | `-next '<partial line>'` | Legal continuations at the end of a partial statement | always `0` | Safe to call speculatively; never signals failure |
-| `-statement <NAME>` | Full syntax tree for one statement, in BR's table order | `0` found, `1` unknown | |
 | `-keyword <NAME>` | Class, token subscript, abbreviation, spec/topic pointers | `0` found, `1` unknown | One block per class for a spelling in several tables (e.g. `DISPLAY`) |
 | `-stats` | Embedded language-pack summary (statement/keyword/function/error-code counts) | `0` | Sanity check after picking up a new build |
 | `-version` | Print build version | always `0` | Quote in any brls defect report |
@@ -262,14 +265,10 @@ keywords:
 $ "$BRLS_EXE" -keyword CLOSE
 CLOSE  (statement, table3k[3])
   abbreviates to   CL  (in a table lookup; any prefix where a syntax tree expects it)
-  syntax tree      yes — brls -statement CLOSE
   spec             br_tree/30-io-file/statements/spec.md
   topic            close
   documented as    CLOSE — Finalize file
 ```
-
-`-statement CLOSE` prints that statement's whole tree (required/optional operands, branches, exit
-clauses) in BR's own table order — the same tree `-next` walks, read all at once.
 
 #### 6.1.2 Reading the results
 
@@ -279,7 +278,7 @@ clauses) in BR's own table order — the same tree `-next` walks, read all at on
   prints whenever no *keyword* fits, even when BR still owes a non-keyword operand (`LINPUT #10:`
   still needs a string variable; `READ #1,KEY="X",RESERVE ` still needs a `:`). `complete:false` is
   the only signal that more input belongs there, and no field says *what* — fall back to
-  `-statement` or the `br_tree/` spec.
+  the `br_tree/` spec.
 3. **Confirm abbreviations with `-keyword`**, don't infer them from source or assume the shortest
   intuitive prefix — BR's abbreviation minimums are table-driven.
 

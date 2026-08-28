@@ -1,3 +1,7 @@
+---
+alwaysApply: true
+---
+
 # BR context kit
 
 To properly view markdown files such as this one, open it with the mdreader provided herein.
@@ -25,6 +29,7 @@ tooling at whatever BR codebase you're on. There are three published parts:
 - **`dev/APP-DEV-GUIDE.md`** — this will save you many headaches and much time.
 - **`dev/BR_launch.md`** — this is needed to compile and test.
 - **`dev/essentials.md`** — this is exactly what it is named.
+- **`app/conventions.md`** — this identifies the program style of this app.
 
 - Get familiar with the tools in context, especially `brls.exe` (decribed in 
   `APP-DEV-GUIDE.md`) before attempting to code. Use this tool to check your work 
@@ -68,5 +73,8 @@ Now including **`dev/BR_launch.md`**
 
 Now including **`dev/essentials.md`**
 @dev/essentials.md
+
+Now including **`app/conventions.md`**
+@app/conventions.md
 
 ---

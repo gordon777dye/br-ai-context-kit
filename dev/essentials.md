@@ -2,7 +2,7 @@
 title: BR Language Essentials
 file: essentials.md
 category: dev
-kind: reference
+alwaysApply: true
 status: 1a
 description: The language rules that bite newcomers (and LLMs trained on other BASICs), plus runtime gotchas confirmed empirically while building and RUN-testing a real BR program end to end.
 ---

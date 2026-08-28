@@ -5,21 +5,16 @@
 
 # --- internal planning (not part of the published kit) ---
 /DEV_PLAN.md
+.claude*
 
 # --- LSP internal build artifacts (whole folder excluded) ---
 /lsp/
 
 # --- per-app onboarding output: generated & confidential, never commit ---
-/app/architecture.md
-/app/data-model*
-/app/conventions.md
-/app/exemplars/
-/app/bin/
-/app/br-load-save*
-/app/corpignore*
-/app/startlog.txt
-/app/*_test.md
-.claude*
+/app/*
+!/app/ONBOARDING.md
+!/app/onboarding/
+!/app/onboarding/*
 
 # --- forward-looking hygiene for clones that onboard/compile a real app ---
 # (not part of the diff; safe to trim. compiled BR objects + node deps)
@@ -33,9 +28,19 @@ node_modules/
 # --- BR ports of the Python generators: kit-testing instruments, never published ---
 # The .brs ports themselves are covered by *.brs above. These are what a test RUN drops
 # into the tree: a sandbox index (never the canonical brtree-index.json) and DIR scratch.
-dev/tools/mdpreview/
-dev/tools/wsids
-dev/tools/brconfig*
-dev/src/
-*.brtest.json
-dev/temp_specs.txt
+/dev/*
+!/dev/*.md
+!/dev/*.json
+# allow access to the folder
+!/dev/tools/
+# but block unspecified content
+/dev/tools/*
+!/dev/tools/br*
+/dev/tools/brconfig*
+!/dev/tools/*.gif
+!/dev/tools/*.bmp
+!/dev/tools/*.exe
+!/dev/tools/*.dll
+!/dev/tools/printer.sys
+!/dev/tools/*.md
+!/dev/tools/*.json
