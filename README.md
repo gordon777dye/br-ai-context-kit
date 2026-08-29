@@ -30,6 +30,7 @@ tooling at whatever BR codebase you're on. There are three published parts:
 - **`dev/BR_launch.md`** — this is needed to compile and test.
 - **`dev/essentials.md`** — this is exactly what it is named.
 - **`app/conventions.md`** — this identifies the program style of this app.
+- Note- `app/conventions.md` is created during onboarding, so it won't exist initially.
 
 - Get familiar with the tools in context, especially `brls.exe` (decribed in 
   `APP-DEV-GUIDE.md`) before attempting to code. Use this tool to check your work 

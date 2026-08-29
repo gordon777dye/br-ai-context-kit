@@ -12,11 +12,13 @@ Please document any errors in ERRORS.md. This includes any inaccuracies *or ambi
 ## Prerequisite - The only thing YOU have to do
 
 **The user should place a copy** of the application's `brconfig.sys` into `dev/tools/`. The resulting 
-file should be named `context/dev/tools/brconfig.sys`. Be sure to adjust any include linkage that could 
-be needed for AI processing. User specific statements are not needed for this application. Also remove 
-any SUBSTITUTE statements in include files (if need be copy the include files to dev/tools.) 
-No need for a license file. Onboardiong STEP 1 derives everything else from this one file. The remainder 
-of this procedure is best done by an AI model.
+file should be named `context/dev/tools/brconfig.sys`. It is best to copy any include files along with 
+it that could be needed for AI processing. User specific statements are not needed for AI processing. 
+Also remove any SUBSTITUTE and EXECUTE statements in include files. If SUBSTITUTES are fundamental 
+to the app (it won't run without them) then keep those in. There is no need for a license file. 
+
+Onboardiong STEP 1 derives everything else from this one file. The remainder of this procedure is 
+best done by an AI model.
 
 ---
 
@@ -119,9 +121,6 @@ The UNATTENDED keyword lets AI run BR in a headless (no user prompts) mode.
 Both are regenerated whenever `brconfig.sys` changes — generated, never hand-edited (same
 convention as `data-model.md`/`topics.json`).
 
-If you haven't done so already, go to ../context and run the /init command to be sure either 
-a CLAUDE.md or AGENTS.md is file is placed in the app root.
-
 ### STEP 2 — Locate or create `filelay/` ◆ prerequisite for STEP 3
 STEP 3 does **not** inspect the app's actual data files to learn their layout. `extract-schema.exe`
 only parses the plain-text **`filelay/`** directory (described in Appendix A): one 
@@ -173,7 +172,7 @@ path STEP 2 found or created.
 - **Produces:** `app/data-model.md` (readable) — per file: data path, record length, key indexes
   **with their composing fields in order**, and every field's FORM type/position. Each file section
   carries an `<a id="…">` anchor.
-- **Index:** `gen_datamodel_index.py` then builds `app/data-model-index.json` — a per-file map to
+- **Index:** `gen_datamodel_index.exe` then builds `app/data-model-index.json` — a per-file map to
   1-based inclusive line ranges (like `dev/topics.json` for statement-semantics). Load one file's
   slice instead of the whole (large) `data-model.md`.
 - **Verify:** the extractor prints `layouts: N, total fields: M`; the indexer prints `files: N …`.
@@ -191,7 +190,7 @@ while it is compiled (*incremental compilation*), the `.brs` on disk may be **st
 timestamp audit settles this mechanically — no need to ask which copy is authoritative:
 
 Before proceeding with this step, ask the user whether the program masters are kept in source or
-compiled form. Record the answer in cntext/README.md at the end of the Rules section. If the 
+compiled form. Record the answer in context/README.md at the end of the Rules section. If the 
 program masters are stored in source format decompiling is prohibited. 
 
 > **Audit every compiled `.br`/`.wb`: confirm a corresponding source file (e.g. `prog.br.brs` or 
@@ -242,14 +241,16 @@ your AI agent's memory file (`CLAUDE.md` or `AGENTS.md`).
 
 ### STEP 8 — Wire the app layer into the entry point and update either CLAUDE.md or AGENTS.md
 
-1. Insert `@context/README.md` at the end of CLAUDE.md and AGENTS.md in the app root folder 
-  (../context) if those files exist.
-2. Modify context/README.md as follows: - State "onboarding has been completed" just ahead of 
+1. If you haven't done so already, go to the app root and run the /init command to be sure either 
+  a CLAUDE.md or AGENTS.md file is placed in the app root.
+2. Insert `@context/README.md` at the end of any CLAUDE.md or AGENTS.md files in the app root folder. 
+3. Modify context/README.md as follows: - State "onboarding has been completed" just ahead of 
   the onboarding paragraph.
-3. If you are operating in vscode: - Create a `.github/` folder in the app root folder and copy 
-  context/app/onboard/copilot-instructions.md to that new .github/ folder.
-4. If you are operating in cursor: - Follow the instructions in context/app/onboarding/context-kit-always-load.md. This will create necessary initialization rules for this repo. 
-5. Advise the user that the first prompt after onboarding and restarting should be: 
+4. If you are operating in vscode: - Create a `.github/` folder in the app root folder and copy 
+  context/app/onboarding/copilot-instructions.md to that new .github/ folder.
+5. If you are operating in cursor: - Follow the instructions in context/app/onboarding/context-kit-always-load.md. 
+  This will create necessary initialization rules for this repo. 
+6. Advise the user that the first prompt after onboarding and restarting should be: 
   "Which documents did you read in full during initialization?"
 
 ### STEP 9 — Survey brls vs real BR ⏱ typically long-running (30–60 minutes)

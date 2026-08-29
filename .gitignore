@@ -9,6 +9,7 @@
 
 # --- LSP internal build artifacts (whole folder excluded) ---
 /lsp/
+/scratch/*
 
 # --- per-app onboarding output: generated & confidential, never commit ---
 /app/*
@@ -28,6 +29,7 @@ node_modules/
 # --- BR ports of the Python generators: kit-testing instruments, never published ---
 # The .brs ports themselves are covered by *.brs above. These are what a test RUN drops
 # into the tree: a sandbox index (never the canonical brtree-index.json) and DIR scratch.
+
 /dev/*
 !/dev/*.md
 !/dev/*.json
