@@ -39,6 +39,7 @@ node_modules/
 /dev/tools/*
 !/dev/tools/br*
 /dev/tools/brconfig*
+/dev/tools/*.go
 !/dev/tools/*.gif
 !/dev/tools/*.bmp
 !/dev/tools/*.exe

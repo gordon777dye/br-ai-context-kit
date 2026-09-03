@@ -1,6 +1,6 @@
 {
   "$comment": "Topic index + lexicon over statement-semantics.md and tools/lexicon.json. Router for the interpret/code bundles (see APP-DEV-GUIDE.md). 'lines' are 1-based inclusive ranges for cheap section loading; regenerate with tools/gen_topics.exe.",
-  "generated": "2026-08-27",
+  "generated": "2026-08-31",
   "source": "statement-semantics.md",
   "source_sha256": "a4ffa254a8e3e0e04a2c887a53b7f881980dcc96a62c3c4bdf258f178903ed13",
   "count": 49,

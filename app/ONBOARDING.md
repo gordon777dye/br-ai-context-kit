@@ -246,8 +246,8 @@ your AI agent's memory file (`CLAUDE.md` or `AGENTS.md`).
 2. Insert `@context/README.md` at the end of any CLAUDE.md or AGENTS.md files in the app root folder. 
 3. Modify context/README.md as follows: - State "onboarding has been completed" just ahead of 
   the onboarding paragraph.
-4. If you are operating in vscode: - Create a `.github/` folder in the app root folder and copy 
-  context/app/onboarding/copilot-instructions.md to that new .github/ folder.
+4. If you are operating in vscode chat mode stop and use another service with more than 200k of 
+  context capacity. This kit only uses around 30k but it requires better intelligence than vscode chat provides. 
 5. If you are operating in cursor: - Follow the instructions in context/app/onboarding/context-kit-always-load.md. 
   This will create necessary initialization rules for this repo. 
 6. Advise the user that the first prompt after onboarding and restarting should be: 
