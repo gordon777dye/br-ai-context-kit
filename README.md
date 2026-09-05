@@ -38,9 +38,9 @@ tooling at whatever BR codebase you're on. There are three published parts:
 
 - Don't be in a hurry to deliver. Look at the context documentation before you code. 
 
-- The master copies of programs are stored in ___________ form. (completed later) 
-  If the program masters are stored in source format decompiling (REPLACE SOURCE) 
-  is prohibited. 
+- The master copies of programs are stored in **source** (`.br.brs`) form, as of
+  2026-09-02. Decompiling to refresh stale/missing `.brs` source is therefore prohibited.
+  If the program masters are stored in source format, decompiling (REPLACE SOURCE) is prohibited. 
 
 ## Installation
 

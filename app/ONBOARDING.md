@@ -14,8 +14,12 @@ Please document any errors in ERRORS.md. This includes any inaccuracies *or ambi
 **The user should place a copy** of the application's `brconfig.sys` into `dev/tools/`. The resulting 
 file should be named `context/dev/tools/brconfig.sys`. It is best to copy any include files along with 
 it that could be needed for AI processing. User specific statements are not needed for AI processing. 
-Also remove any SUBSTITUTE and EXECUTE statements in include files. If SUBSTITUTES are fundamental 
-to the app (it won't run without them) then keep those in. There is no need for a license file. 
+Also remove any SUBSTITUTE and EXECUTE statements in include files, except SUBSTITUTEs with PRN:. 
+If SUBSTITUTES are fundamental to the app (it won't run without them) then keep those in. 
+There is no need for a license file. 
+
+CAUTION: If you are running with a low end model such as Haiku or github copilot stop now 
+and switch to a model that has more than a 200k context (e.g. Sonnet or better)
 
 Onboardiong STEP 1 derives everything else from this one file. The remainder of this procedure is 
 best done by an AI model.
@@ -85,7 +89,7 @@ comes first so the source used to create those exemplars is current. STEP 2 gate
 `extract-schema.exe` only parses `filelay/`, so STEP 3 has nothing to read until STEP 2 confirms or
 creates it.
 
-### STEP 1 — BR launch entries (fully automated) and AI init root
+### STEP 1 — BR launch entries (fully automated)
 Create 2 of the 4 files to be used by AI for application development.
 
 **Fixed locations:** - files used to compile and test BR programs
@@ -100,11 +104,12 @@ Create 2 of the 4 files to be used by AI for application development.
 **Generate `dev/tools/brconfig.ai_user`** from `dev/tools/brconfig.sys`:
 1. Copy `brconfig.sys`. If `dev/tools/brconfig.sys` doesn't exist, request the user
    to place it there. Don't proceed without it.
-2. Remove every line that is an `EXECUTE` or `SUBSTITUTE` statement — matched on the 
-    line's leading token (case-insensitive, ignoring leading whitespace); don't touch 
-    commented-out (`REM`/`!`) lines.
+2. Remove every line that is an `EXECUTE` statement 
+  — matched on the line's leading token (case-insensitive, ignoring leading whitespace); 
+    don't touch commented-out (`REM`/`!`) lines.
 3. Remove every line that is a `LOGGING` statement, matched the same way.
-4. Prepend, as the new first line of the file:
+4. Remove every line that is a `SUBSTITUTE` statement except for those with PRN: or prn:.
+5. Prepend, as the new first line of the file:
    ```
    LOGGING 10, context\app\startlog.txt
    ```
@@ -241,7 +246,7 @@ your AI agent's memory file (`CLAUDE.md` or `AGENTS.md`).
 
 ### STEP 8 — Wire the app layer into the entry point and update either CLAUDE.md or AGENTS.md
 
-1. If you haven't done so already, go to the app root and run the /init command to be sure either 
+1. Go to the app root and run the /init command to be sure either 
   a CLAUDE.md or AGENTS.md file is placed in the app root.
 2. Insert `@context/README.md` at the end of any CLAUDE.md or AGENTS.md files in the app root folder. 
 3. Modify context/README.md as follows: - State "onboarding has been completed" just ahead of 
@@ -249,7 +254,7 @@ your AI agent's memory file (`CLAUDE.md` or `AGENTS.md`).
 4. If you are operating in vscode chat mode stop and use another service with more than 200k of 
   context capacity. This kit only uses around 30k but it requires better intelligence than vscode chat provides. 
 5. If you are operating in cursor: - Follow the instructions in context/app/onboarding/context-kit-always-load.md. 
-  This will create necessary initialization rules for this repo. 
+  This will create necessary initialization rules for this repo under cursor. 
 6. Advise the user that the first prompt after onboarding and restarting should be: 
   "Which documents did you read in full during initialization?"
 

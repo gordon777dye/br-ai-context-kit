@@ -256,6 +256,8 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
   directory, literal file after it) fails outright. To walk a multi-level tree,
   descend one real, known directory name at a time; see 
   [program-management](../br_tree/70-commands/program-management/spec.md#command-vs-statement)).
+- **No empty parens** — call a no-parameter function as `FNGET$`, not `FNGET$()`; invoke for 
+  side effects with a bare `LET FNFOO`
 
 ---
 
