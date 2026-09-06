@@ -10,6 +10,19 @@ recovered-fold: LINPUT, OPEN_DISPLAY, OPEN_external, READ(disambig), REREAD, RES
 related: [file-model, form-spec, keys-indexes, serial-comm]
 keywords: [OPEN, CLOSE, READ, WRITE, REWRITE, DELETE, RESTORE, REREAD, REC, KEY, "LINK=", KEYONLY, FIRST, LAST, PRIOR, NEXT, SAME, EOF, NOKEY, NOREC, OUTIN, SEQUENTIAL, OUTPUT, WAIT, DROP, FREE]
 corrections:
+  - "The eight positioning keywords matched through command5.cpp's sec_kw[] array - PRIOR, LAST,
+    KEYONLY, FIRST, NEXT, END, SAME and LINK= - take no abbreviation, and nothing here said so.
+    The page documented two of syntaxfn's rules for KEYONLY (READ only; the colon must follow) and
+    missed the third, which is not KEYONLY's at all but the array's: syntaxfn matches with
+    `memcmp(sp, sec_kw[xx], strlen(sec_kw[xx]))`, the whole keyword's length, so an abbreviation
+    diverges at its own terminator and never matches. Because every other clause keyword takes any
+    non-empty prefix (command4.cpp), the omission read as though these did too. Reported from real
+    BR: `10 read #1,keyo: x` fails to LOAD with error 1024, 'missing colon' - syntaxfn failing the
+    KEYONLY arm and falling into a branch that then wants a colon, so the error names neither the
+    keyword nor the abbreviation. Added as its own #no-abbreviation bullet, scoped to the four
+    statements whose syntaxfn cases reach that array, and stating explicitly that the table4k
+    keywords beside them (USING, KEY=, SEARCH=, POS=, REC=, WAIT=, RESERVE, RELEASE) do abbreviate.
+    Found and fixed in brls (internal/parse/walk.go, matchKeyword)."
   - "The exit clauses were enumerated per statement and are one repeatable production. Section io gave READ `[EOF] [NOKEY] [NOREC] [ERROR]` and REWRITE `[NOKEY] [NOREC]`, which reads as the admissible set for each statement and is not: BR matches an exit clause by a table lookup (`getExit`, command4.cpp) rather than against an expected keyword, so any of the 17 error conditions is admissible wherever a statement's syntax tree admits exits, and they repeat with a space rather than a comma. Replaced with an `<exits>` production pointing at the roster in 10-language/flow-control/error-handling, keeping the per-statement note about which conditions can actually fire - that part was the useful content and is a semantic claim, not a grammatical one. DELETE and RESTORE already used `[ <error-condition> ]`, a third notation for the same thing, and now use `<exits>` too. This spec's enumeration is where brls transcribed a 14-name roster from, which is how the error was found; see lsp/brls/LSP_PLAN.md finding 33. Sources are level 1: BR's `synexits`/`table4v`/`table4k` and the READ/REWRITE trees in `lsp/syn.txt`. Added in brls phase 7."
   - "`USING` was given as taking a `<line-ref>` only, on all four record-I/O statements. BR's syntax tree gives each of READ, REREAD, WRITE and REWRITE a **two-way branch** there — a line reference or an alpha expression — exactly as PRINT has, so `READ #1, USING \"FORM C 20,N 6.2\": A$, B` and `USING F$` are as legal as naming a FORM line, and the inline string is not a PRINT-only convenience. A `<form-ref>` production added, with a note that the two forms differ in *when* the layout is compiled and so in what a mistake in it costs. Source is level 1: the USING nodes in all five statements' trees in `lsp/syn.txt`. The printing spec already had this right. Added in brls phase 10."
   - "KEYONLY documented on READ. It reads the key and relative record number from the index instead of the master record, and the kit already described that behaviour on keys-indexes; what was missing was the statement side - READ's own production did not admit it, so the one page that documented it did not say which statement takes it, the same misfiling LINK= had. Two rules come from command5.cpp's syntaxfn: it is accepted on READ alone (the routine tests `table3v[opsub] != READ_PRI` and abandons the match otherwise) and the colon must follow it (it skips spaces past the word and requires `:`, else backing out to try KEY= - BR's own comment is `/* may be KEY=, etc. */`). KEYONLY is in none of BR's six keyword tables, which is why no keyword list here carries it: positioning keywords behind a special-syntax branch are matched against command5's private sec_kw[] array, not table4k, so syn.txt renders that operand by a lookup BR never performs and prints KEYED. Removed in the same pass, from the REWRITE production: `[ ',' 'WAIT=' <integer> ]` with the note \"WAIT= only with REC=/KEY=\". BR's rewrite[] array in synbc.cpp carries USING, POS=, KEY=, LINK=, REC=, the positional five, RESERVE and RELEASE and no wait keyword in either spelling, and the form is written 0 times in the reference corpus. dev/statement-semantics.md carried the same claim and lost it too - correcting one and not the other is the defect finding 40 is about. Found in brls phase 15; see lsp/brls/LSP_PLAN.md finding 41."
@@ -196,6 +209,22 @@ that matter on a `READ`, `NOKEY` and `NOREC` on a `REWRITE`.
   reference and why `syn.txt` prints `KEYED` in its place. Positioning keywords reached through a
   special-syntax branch are matched against `command5`'s own `sec_kw[]` array rather than the clause
   table, so `table4k` never needed an entry. See lsp/brls/LSP_PLAN.md finding 41.
+- <a id="no-abbreviation"></a>**The eight `sec_kw[]` keywords take no abbreviation** — `PRIOR`, `LAST`,
+  `KEYONLY`, `FIRST`, `NEXT`, `END`, `SAME` and `LINK=`, on `READ`, `RESTORE`, `DELETE` and `REWRITE`.
+  Every other clause keyword matches on **any non-empty prefix** (`command4.cpp`; `READ #1,K="X":` and
+  `RESTORE #1,US 200:` are legal), but these are not matched by that routine at all. `syntaxfn` compares
+  them itself, over the length of the *keyword*:
+
+  ```c
+  if (!memcmp(sp, sec_kw[xx], strlen(sec_kw[xx])))
+  ```
+
+  so a token shorter than the keyword diverges at its own terminator and never matches. Confirmed in
+  real BR: `10 read #1,keyo: x` fails to LOAD with **error 1024**, "missing colon" — `syntaxfn` fails
+  the `KEYONLY` arm, falls out of the loop, and finds no colon where the branch it falls into needs
+  one. The abbreviation you may be reaching for does not exist, and the error names something else.
+  The ordinary keywords on these same statements — `USING`, `POS=`, `KEY=`, `KEY>=`, `SEARCH=`,
+  `SEARCH>=`, `REC=`, `WAIT=`, `RESERVE`, `RELEASE` — are `table4k` entries and abbreviate normally.
 - <a id="close"></a>**CLOSE** options (both require the file opened `NOSHR`): **`DROP`** empties the
   file's *contents* — the file remains (internal files keep only the header record, all space freed);
   **`FREE`** *erases* the file from the system. A trailing **`,RELEASE`** also releases the file's

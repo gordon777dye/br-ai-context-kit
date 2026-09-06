@@ -13,7 +13,11 @@ tooling at whatever BR codebase you're on. There are three published parts:
 - **`dev/`** — the task-oriented coding kit: a router (`topics.json`), distilled statement
   semantics, the system-function and standard-library catalogs, an error reference,
   schema-extraction tooling, and `brls.exe` — a fast BR syntax/sema checker
-  (`tools/brls.exe -check <file>`) that needs no BR license or runtime.
+  (`tools/brls.exe -check -sema <file>`) that needs no BR license or runtime. `-check` reads
+  one line at a time, but takes whole files — or several, or stdin. `-sema` adds a whole-file
+  pass on top of it (it does nothing on its own): block pairing, which catches a `FOR`, `DO`,
+  block `IF` or `DEF` that never closes — real BR rejects those at LOAD — plus the name
+  checks: undefined names, argument counts.
 - **`br_tree/`** — the authoritative BR language reference tree (syntax, data types, file
   and screen I/O, printing, libraries, error codes), the ultimate backstop that `dev/` links into
   for depth.
@@ -38,9 +42,9 @@ tooling at whatever BR codebase you're on. There are three published parts:
 
 - Don't be in a hurry to deliver. Look at the context documentation before you code. 
 
-- The master copies of programs are stored in **source** (`.br.brs`) form, as of
-  2026-09-02. Decompiling to refresh stale/missing `.brs` source is therefore prohibited.
-  If the program masters are stored in source format, decompiling (REPLACE SOURCE) is prohibited. 
+- The master copies of programs are stored in ___________ form. (completed later) 
+  If the program masters are stored in source format decompiling (REPLACE SOURCE) 
+  is prohibited. 
 
 ## Installation
 

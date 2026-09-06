@@ -42,7 +42,7 @@ The language axis has **two parallel keyword indexes** — use whichever fits th
 | Task | Start with | Then pull in |
 |---|---|---|
 | **Interpret / debug** — read existing BR | `topics.json` → `statement-semantics.md` | [`system-functions-catalog.md`](system-functions-catalog.md), [`error-reference.md`](error-reference.md), the app data-model (§4) |
-| **Coding** — write correct, idiomatic BR | `topics.json` → `statement-semantics.md` | the two catalogs + data-model, closed by a fast **`brls -check`** pass (§6) then the authoritative **`LOAD … source`** syntax check in BR (write→check→fix; §6) |
+| **Coding** — write correct, idiomatic BR | `topics.json` → `statement-semantics.md` | the two catalogs + data-model, closed by a fast **`brls -check -sema`** pass (§6 — `-check` alone is per-line and will not tell you a block is still open) then the authoritative **`LOAD … source`** syntax check in BR (write→check→fix; §6) |
 | **App design** — architecture, data model, modules | [`../app/architecture.md`](../app/architecture.md) + generated **data-model** (§4) + [`../app/conventions.md`](../app/conventions.md) | br_tree concept leaves — [`file-model`](../br_tree/30-io-file/file-model/spec.md), [`library-facility`](../br_tree/50-libraries/library-facility/spec.md), [`screenio`](../br_tree/50-libraries/screenio/spec.md) |
 | **Testing** — validate behaviour | headless BR (§6) | syntax-check via `LOAD "<prog>.brs" source`; run programs and procs headlessly through the BR invocation |
 
@@ -193,21 +193,30 @@ there is nothing like real world testing. So please report (in context/ERRORS.md
 failures that it doesn't detect along with any false positives.
 
 **Scope boundary (read once):**
-1. `-check` runs syntax only. It does **not** check undefined names, argument counts, unresolved links,
-  or reserved-name misuse.
-2. `-check -sema` this performs a semantic (linkage) validation.
-3. `-sema` single-file analysis of label and line number references.
-4. Therefore, clean `-check -sema` is stronger than clean `-check`, but the authoritative gate is still
-  real BR: `LOAD <prog>.brs source`, then `SAVE` or `REPLACE` (see §7, step 6).
+1. `-check` reads **one line at a time**. It catches everything that makes a single line bad BR, and
+  nothing that takes a second line to see.
+2. What it therefore misses is **not only names**: block pairing spans lines, so a `FOR` with no
+  `NEXT`, a `DO` with no `LOOP`, a block `IF` with no `END IF`, a `DEF` with no `FNEND`, and a
+  closer with nothing open are all invisible to a bare `-check` — even though real BR refuses to
+  LOAD every one of them. `-check`'s own clean sentence says as much.
+3. `-check -sema` adds that whole-file pass: block pairing, plus undefined names, argument counts,
+  unresolved `LIBRARY` links and reserved-name misuse. Single-file — cross-file linkage needs the
+  editor's workspace.
+4. Therefore clean `-check` means "no bad lines", clean `-check -sema` means "no bad lines and no bad
+  file", and the authoritative gate is still real BR: `LOAD <prog>.brs source`, then `SAVE` or
+  `REPLACE` (see §7, step 6).
 
 **Required AI Coding loop:**
 1. Edit file using `-next` as needed.
 2. Run cat <program-line> | `$BRLS_EXE -check -`
 3. Fix findings.
-4. Repeat until brls reports "no syntax errors"
+4. Repeat until brls reports "no line-level syntax errors" — a per-line verdict, which is all a
+  single piped line can be given.
 5. Loop to code the next program statement.
 6. After each subroutine or function is coded:
     `$BRLS_EXE -check -sema <program.brs>`
+   This is the step that closes the blocks: step 2 cannot tell you that a `FOR`, `DO`, block `IF`
+   or `DEF` you opened is still open, so never read a clean step 4 as a clean program.
 7. Fix findings.
 8. Close with real BR `LOAD ... source` plus `SAVE` or `REPLACE`.
 
@@ -224,8 +233,8 @@ All examples assume the application working directory that [`BR_launch.md`](BR_l
 
 | Mode | Purpose | Exit code | Notes |
 |---|---|---|---|
-| `-check <file> [more files]` | Parse BR syntax; one `file:line:col: message` block per file, each bad line with a `see:` pointer into `br_tree/` | `0` all clean, `1` any parse error | Primary automation flag. `-` reads stdin. Every positional argument is checked in one invocation — batch, don't loop |
-| `-sema`  | Adds brls's semantic findings (undefined names, argument counts, …), prefixed `error:`/`warning:` | folds into `-check`'s code — only an `error:` finding flips `0`→`1` | Single-file only; NA to cross-file `LIBRARY` links. Exit `1` if error detected |
+| `-check <file> [more files]` | Parse BR syntax **one line at a time**; one `file:line:col: message` block per file, each bad line with a `see:` pointer into `br_tree/` | `0` all lines clean, `1` any parse error | Primary automation flag. `-` reads stdin. Every positional argument is checked in one invocation — batch, don't loop. Blind to anything spanning lines: see the `-sema` row |
+| `-sema`  | Adds brls's whole-file findings, prefixed `error:`/`warning:` — **block pairing** (`FOR`/`NEXT`, `DO`/`LOOP`, block `IF`/`END IF`, `DEF`/`FNEND`, and closers with nothing open) as well as undefined names, argument counts, … | folds into `-check`'s code — only an `error:` finding flips `0`→`1` | Single-file only; NA to cross-file `LIBRARY` links. Exit `1` if error detected. Block pairing is error-severity and fails LOAD in real BR, so this is not an optional extra on a program you intend to run |
 | `-json` - Structured json output: array of `{file, clean, diagnostics[]}` (`line`, `col`, `severity`, `rule`, `message`) | same as underlying mode | Exit code 1 if not `clean`, decides pass/fail - (`clean: true` can accompany a warning). Exit `1` if combined with any other mode failure |
 | `-next '<partial line>'` | Legal continuations at the end of a partial statement | always `0` | Safe to call speculatively; never signals failure |
 | `-keyword <NAME>` | Class, token subscript, abbreviation, spec/topic pointers | `0` found, `1` unknown | One block per class for a spelling in several tables (e.g. `DISPLAY`) |
@@ -241,8 +250,8 @@ All examples assume the application working directory that [`BR_launch.md`](BR_l
 #### 6.1.1 Examples
 
 ```bash
-$ "$BRLS_EXE" -check cnp/compare.br.brs            # clean file
-cnp/compare.br.brs: no syntax errors (semantic checks — undefined names, argument counts — are not run by -check)
+$ "$BRLS_EXE" -check cnp/compare.br.brs            # every line clean
+cnp/compare.br.brs: no line-level syntax errors (-check reads one line at a time; block pairing — a FOR, DO, block IF or DEF that never closes — and the name checks need -sema)
 $ echo $?
 0
 
@@ -263,11 +272,24 @@ somefile.brs:4:11: error: FNFOO is not defined in this file and no LIBRARY state
 $ "$BRLS_EXE" -next 'OPEN #1: "NAME=X", EXTERNAL '
 statement: OPEN
 complete:  false
-head:      false
 keywords:
-  INPUT      clause of OPEN               br_tree/30-io-file/file-model/spec.md
-  OUTPUT     clause of OPEN               br_tree/30-io-file/statements/spec.md
-  OUTIN      clause of OPEN               br_tree/30-io-file/statements/spec.md
+  , INPUT    clause of OPEN               br_tree/30-io-file/file-model/spec.md
+  , OUTPUT   clause of OPEN               br_tree/30-io-file/statements/spec.md
+  , OUTIN    clause of OPEN               br_tree/30-io-file/statements/spec.md
+operands:  (none)
+
+$ "$BRLS_EXE" -next 'OPEN #1: "NAME=X", EXT'
+statement: OPEN
+complete:  false
+keywords:  (narrowed to those "EXT" can still become)
+  EXTERNAL   clause of OPEN               br_tree/30-io-file/file-model/spec.md
+operands:  (none)
+as typed:  Left as it stands, BR reads "EXT" as the EXTERNAL clause — this
+           keyword takes any non-empty abbreviation. What may follow
+           EXTERNAL:
+  , INPUT    clause of OPEN               br_tree/30-io-file/file-model/spec.md
+  , OUTPUT   clause of OPEN               br_tree/30-io-file/statements/spec.md
+  , OUTIN    clause of OPEN               br_tree/30-io-file/statements/spec.md
 
 $ "$BRLS_EXE" -keyword CLOSE
 CLOSE  (statement, table3k[3])
@@ -279,14 +301,38 @@ CLOSE  (statement, table3k[3])
 
 #### 6.1.2 Reading the results
 
-1. **`-check` exit code is the verdict**, not the presence of output. Plain `-check` says so on a
-  clean file precisely so its result is not over-read as a semantic pass; add `-sema` for that.
+1. **`-check` exit code is the verdict**, not the presence of output — and it is a verdict on the
+  *lines*. Plain `-check` spells that out on a clean file precisely so its result is not over-read
+  as a verdict on the program: an unclosed `FOR`, `DO`, block `IF` or `DEF` will not LOAD in real
+  BR and does not show up here. Add `-sema` for those and for the name checks.
 2. **An empty `-next` keyword list is not "done."** `keywords: (none — nothing else is valid here)`
   prints whenever no *keyword* fits, even when BR still owes a non-keyword operand (`LINPUT #10:`
   still needs a string variable; `READ #1,KEY="X",RESERVE ` still needs a `:`). `complete:false` is
   the only signal that more input belongs there, and no field says *what* — fall back to
   the `br_tree/` spec.
-3. **Confirm abbreviations with `-keyword`**, don't infer them from source or assume the shortest
+3. **A `-next` line ending mid-word gets two answers, and both are true.** `keywords:` is
+  narrowed to what the typed prefix can still *become* — BR matches a clause keyword on any
+  non-empty prefix — and the header says so. A prefix that can reach nothing is reported as
+  *ruled out*, not as absent, and names what the position would otherwise admit: `(none — no
+  clause of CLOSE begins with "xr"; without it: WAIT=, FREE, DROP, RELEASE)`. Operands are never
+  narrowed: a half-typed word may still be becoming a variable name, so `operands:` stays the
+  answer to "what kind of thing goes here".
+  Below them, `as typed:` is the other true answer: what may follow that word taken as
+  **finished**, because BR needs no more of it. It names the reading first — `Left as it stands,
+  BR reads "fr" as the FREE clause`, or `"f" is a complete name here, not a clause keyword` —
+  since the list under it is true only of that reading. So `close #1, fr` may grow into FREE *and*
+  is already FREE, and `, RELEASE` and the closing `:` may equally be typed next; `00020 close
+  #1,fr:` LOADs. `complete:` answers for this reading, which is why `chain A$,xxx,f` is complete:
+  `f` is a variable name. Where the word could still become something else, the sentence says
+  which — `rewrite #1, r` is read as RESERVE and notes that REC= and RELEASE continue
+  differently.
+  **The section appears only where the abbreviation is real.** Most clause keywords match on any
+  non-empty prefix, but the eight positioning keywords — `PRIOR`, `LAST`, `KEYONLY`, `FIRST`,
+  `NEXT`, `END`, `SAME`, `LINK=` on `READ`/`RESTORE`/`DELETE`/`REWRITE` — must be spelled in full
+  (see [statements](../br_tree/30-io-file/statements/spec.md#no-abbreviation)). `read #1, keyo`
+  therefore offers KEYONLY under `keywords:` and prints no `as typed:` section, because as it
+  stands the line does not LOAD — real BR gives error 1024, "missing colon".
+4. **Confirm abbreviations with `-keyword`**, don't infer them from source or assume the shortest
   intuitive prefix — BR's abbreviation minimums are table-driven.
 
 ### 6.2 How to Execute BR
