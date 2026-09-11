@@ -3717,7 +3717,7 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 - **Skipped in normal flow** — a `DEF…FNEND` block is not executed by falling into it; the runtime skips over the definition during ordinary top-to-bottom/`GOTO` flow the same way it skips a `FORM` line. No `STOP`/`GOTO` guard before a function definition is needed to keep execution from entering it with unset parameters — a function only runs when called
 
 **Writing functions — gotchas:**
-- **Return name is write-only** — inside the body, `FN<name>` in an expression is a recursive **call**, not the value-so-far; assign it freely (last write wins), but build an incremental result in a scratch variable, never by reading `FN<name>` back
+- **Return name is write-only - never a "value so far".** A bare `FN<name>` in the body of the function is always another call. BR keeps no readable slot for the pending return value. So `IF NOT FNRESOLVE` or `LET FOUND = FNRESOLVE` re-invokes `FNRESOLVE` (producing runaway recursion). It does not test what you last assigned. Assign `FN<name>` as often as you like (last write wins); just never read it back and track state in a scratch variable.
 - **One exit** — a function has a single `FNEND` and no early return (`RETURN` belongs to `GOSUB`); to bail out, `GOTO` a label just before `FNEND`
 - **No empty parens** — call a no-parameter function as `FNGET$`, not `FNGET$()`; invoke for side effects with a bare `LET FNFOO`
 - **No array dims in the signature** — a parameter may size a string (`NAME$*20`) but not dimension an array (`ROW(1)*255` is illegal); arrays enter as `MAT name` and are dimensioned by the caller or a `DIM` — declare array locals with their own `DIM`

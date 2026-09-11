@@ -25,6 +25,13 @@ corrections:
     call is what fails there — but the grammar does not narrow it to that one condition. Added to the
     syntax line and semantics. Found harvesting brls's failure corpus: the clause was rejected outright
     (parser gap, since fixed), not merely undocumented."
+  - "Return-name-is-write-only bullet reworded. It stated the rule (\"`FN<name>` in an expression is
+    a recursive call\") but not the symptom or where it bites. A reader on this codebase wrote
+    `IF NOT FNRESOLVE_ORDER` inside `FNRESOLVE_ORDER`'s own body — a boolean test that reads as
+    ordinary, and 'expression' did not obviously cover an `IF` condition. Reworded to name the two
+    concrete forms (`IF NOT FN...`, `LET x = FN...`), the outcome (runaway recursion), and the fix
+    (scratch variable). No semantic change. Kept in sync with `dev/statement-semantics.md` and
+    `dev/essentials.md`."
 related: [other-flow, syntax, system-functions, error-handling]
 keywords: [DEF, FNEND, FN, LIBRARY, CONV]
 ---
@@ -93,10 +100,11 @@ not `FNGETNAME$()` (empty `()` is a syntax error). Call a function for its side 
   to their own name: `LET FN<name> = <expression>` (if never assigned, they return 0 / null). Only
   multi-line functions can do file I/O, change by-reference params, and **recurse** (a fresh local
   copy of each by-value parameter is created per call).
-- **The return name is write-only.** Inside the body, `FN<name>` used in an **expression** is a
-  **recursive call**, not a readable "value so far". You may assign `FN<name>` as often as you like
-  (the last write wins), but build an incremental result in an ordinary scratch variable — never by
-  reading `FN<name>` back.
+- **Return name is write-only - never a "value so far".** A bare `FN<name>` in the body of the
+  function is always another call. BR keeps no readable slot for the pending return value. So
+  `IF NOT FNRESOLVE` or `LET FOUND = FNRESOLVE` re-invokes `FNRESOLVE` (producing runaway
+  recursion). It does not test what you last assigned. Assign `FN<name>` as often as you like
+  (last write wins); just never read it back and track state in a scratch variable.
 - **One exit per function.** A function has exactly one `FNEND` and no early-return statement
   (`RETURN` belongs to `GOSUB`). To leave early, `GOTO` a label placed just before `FNEND`.
   **`END DEF` is accepted as a synonym for `FNEND`** — BR's compiler recognizes the word after

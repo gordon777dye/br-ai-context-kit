@@ -38,14 +38,16 @@ shipped function packs are in [fnsnap](../fnsnap/spec.md).
   with `DEF LIBRARY`. **The `<library-program>` file reference is optional**, which selects between two
   linkage methods:
   - **Named linkage** (reference given, `LIBRARY "PRESLIB": FNX`) links each function **directly** to
-    that library — the most efficient and unambiguous method.
+    that library.
   - **Unnamed linkage** (reference omitted, `LIBRARY : FNX`) leaves BR to determine which loaded
     library each function links to, resolved by the **search order** below (see the "Linkage" and
     "Named/Unnamed" discussion in `Library_Facility.md`). An **unnamed** statement is **required** to
-    call back into the main program, and takes noticeably longer to resolve than named linkage.
+    call back into the main program.If a program names itself in a LIBRARY statement a second copy of 
+    itself is loaded and linked. 
 - **`RELEASE`** clears a function's workspace variables after it returns; **`NOFILES`**
   keeps the library's channels separate from the caller's. Both require an explicit
-  `<library-program>`. `OPTION RETAIN` in a RESIDENT library preserves its variables across the
+  `<library-program>` be specified in the LIBRARY statement. `OPTION RETAIN` in a RESIDENT library 
+  preserves its variables across the
   main program's `CHAIN`s. A **`NOFILES`** library also gets its **own console** (window #0, sized
   from the initiator's, shown only when it awaits operator input); a passed-files library shares the
   caller's window hierarchy. A library can't be both passed-files and NOFILES at once; `NOCLOSE` files
@@ -65,7 +67,7 @@ shipped function packs are in [fnsnap](../fnsnap/spec.md).
   order** (last-loaded, first-searched); BR links to the **first** library where the function is
   defined, and that linkage persists until reassigned. As-needed (`RELEASE`) libraries are **not**
   searched (they aren't resident in memory).
-- **Communication**: a library can't see the main program's globals — pass **parameters**, use the
+ - **Communication**: a library can't see the main program's globals — pass **parameters**, use the 
   **return value**, or call **init functions**. An untrapped error in a library function is reported to
   the caller with `LINE` = the erroneous statement line, `ERR` = the error number, and `CNT` set
   based on the number of values successfully processed (typically via a FORM statement). `STATUS LIBRARY` lists active linkages.

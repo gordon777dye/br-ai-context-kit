@@ -26,7 +26,15 @@ Two kinds of content, both load-bearing:
 
 ## 1. Core language rules
 
-- **Every line is numbered**; labels go right after the number (`00050 LOOP1: …`).
+- **Every line is numbered**; labels go right after the number (`00050 LOOP1: …`). A physical
+  line with **no** line number is only legal as a continuation of the previous logical line, and
+  BR only treats it as one when that previous line **ended with `!:`**. An un-numbered line that
+  is *not* a continuation (the line above it did not end `!:`) is **silently discarded by
+  `LOAD` — no error, the object just loads without it.** This bites multi-line `!` comment
+  blocks written without a trailing `!:` on each line: BR keeps the first comment line and drops
+  every following un-numbered line, *including any real statement* below the comment. `brls`
+  parses the whole run and does not flag it. Put `!:` at the end of every comment line that is
+  followed by an un-numbered line.
 - **`=` is context-sensitive.** Inside `IF`/`WHILE`/`UNTIL` it means *compare*; elsewhere it
   *assigns*. Use **`:=`** to force assignment inside a condition (must be parenthesized).
 - **Operators aren't C/Python.** `&` is **string concatenation**, not bitwise-AND. Exponentiation is
@@ -106,10 +114,12 @@ Two kinds of content, both load-bearing:
   never passes are fresh 0/null scratch locals each call; an unpassed by-reference optional
   defaults an array to dim 1 and a string to length 18 — the 18-char default again, see §2), and
   by-reference parameters marked `&`. A function name is capped at **30 characters including the
-  `FN` prefix**. Two traps: `FN<name>` in a mid-body expression is a
-  *recursive call*, not the value-so-far — build an incremental result in a scratch variable, never
-  by reading `FN<name>` back (you *may* assign it more than once — last write wins — just never
-  read it back); and a function has **one exit** — no early return, `GOTO` a label before `FNEND`.
+  `FN` prefix**. Two traps. **Return name is write-only - never a "value so far".** A bare
+  `FN<name>` in the body of the function is always another call. BR keeps no readable slot for the
+  pending return value. So `IF NOT FNRESOLVE` or `LET FOUND = FNRESOLVE` re-invokes `FNRESOLVE`
+  (producing runaway recursion). It does not test what you last assigned. Assign `FN<name>` as
+  often as you like (last write wins); just never read it back and track state in a scratch
+  variable. Second: a function has **one exit** — no early return, `GOTO` a label before `FNEND`.
   **`END DEF` is accepted as a synonym for `FNEND`** — BR's compiler checks the word after `END`
   and rewrites `END DEF` to behave exactly like `FNEND` on the spot (verified against BR's own
   source, `command5.cpp`'s `END_PRI` case), so a function closed either way is closed correctly.

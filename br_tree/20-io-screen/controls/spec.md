@@ -78,7 +78,10 @@ FKEY interrupt; instead of a numeric FKEY you may give a two-digit **hex scancod
 PgUp = FKEY 90). **Print-Fields Buttons** (`CC <cols>,,B<fkey>`, 4.2+) can go *anywhere* and set
 `FKEY` to the given number; the program tests `FKEY` to dispatch (Done/OK/Cancel). The window open
 string `BUTTONROWS=nn` parameter sizes the button panel (`0` supported 4.20+; the default is also
-settable via `SCREEN OPENDFLT`).
+settable via `SCREEN OPENDFLT`) — see
+[windows-cursor §semantics](../windows-cursor/spec.md#semantics) for two easy-to-miss constraints:
+`BUTTONROWS=` must be set *before* the first `DISPLAY BUTTONS`, and the panel belongs to window #0 as
+a whole, not to whichever window issues the statement.
 
 <a id="text"></a>**Multi-line text box** — `TEXT <rows>/<cols>/<maxchar>` via `INPUT/RINPUT FIELDS`;
 dimension the variable to at least `<maxchar>` (e.g. `DIM Buff$*2048`).

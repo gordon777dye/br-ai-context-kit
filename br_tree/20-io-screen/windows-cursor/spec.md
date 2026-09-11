@@ -15,6 +15,7 @@ corrections:
   - "CURROW/CURCOL are accepted with one argument by BR's compiler and ignore it at run time; noted where they are introduced. Found in brls phase 5."
   - "HELP added to the frontmatter keywords. This page documents both senses of the spelling — the field-help clause on INPUT/RINPUT, and the console HELP command reached from READY mode — and declared neither. Found in brls phase 13; see error-handling's note for why the clause had been left undeclared everywhere."
   - "BUTTONROWS= added to the OPEN WINDOW syntax BNF, Semantics, and frontmatter keywords. The wiki documents this window parameter only under SCREEN OPENDFLT and omitted it from the OPEN WINDOW page entirely."
+  - "Button panel semantics extended with two facts neither the wiki nor this page previously stated, confirmed empirically against a live interactive BR session (two throwaway probes, run via the console and screenshotted). First: `BUTTONROWS=` must be set on window #0's `OPEN` (directly, or inherited via `SCREEN OPENDFLT`/`CONFIG SCREEN OPENDFLT`) *before* `DISPLAY BUTTONS` has a panel to draw into — reversed, `DISPLAY BUTTONS` silently draws nothing, no error. Second: the button bar is a single panel belonging to the top-level frame (window #0), not a per-window control — a non-#0 child window setting `BUTTONROWS=` directly in its own `OPEN` string fails outright with error 854 (\"illegal row specification\"), even for a `row` value well within the requested `BUTTONROWS`; inheriting `BUTTONROWS=` instead via `CONFIG SCREEN OPENDFLT` lets that same child window's `OPEN` succeed, but the button then renders detached at the outer application window's own corner, nowhere near the child window's on-screen box. A program cannot give two concurrently-open child/dialog windows two independently positioned button bars."
 ---
 
 # Windows & cursor
@@ -61,6 +62,21 @@ PRINT '#'<window> ',' BORDER [<border-spec>] [ ':' <caption> ]
   [controls §buttons](../controls/spec.md#buttons). `0` is supported 4.20+ (suppresses the panel); the
   default is also settable via `SCREEN OPENDFLT`, which is the only place the BR wiki documents this
   parameter.
+  - **Ordering matters**: `BUTTONROWS=` must be in effect on window #0's `OPEN` *before* `DISPLAY
+    BUTTONS` is issued, or the statement silently draws nothing — no error, no button. Reopening
+    window #0 (e.g. after changing `OPTION 76`, which resizes the panel's own row height) is what
+    makes a new `BUTTONROWS=`/`OPTION 76` value take effect on the next draw; neither resizes a panel
+    that is already on screen.
+  - **A single panel on the outer frame, not a per-window control.** The button bar belongs to the
+    top-level BR frame (window #0) as a whole, never to whichever window's channel issues `DISPLAY
+    BUTTONS`. Setting `BUTTONROWS=` directly in a **non-#0 child window's own** `OPEN` string fails
+    that `OPEN` outright — `DISPLAY BUTTONS` on the resulting channel raises error 854 ("illegal row
+    specification"), even for a `row` well inside the requested `BUTTONROWS`. Setting it instead as an
+    *inherited default* via `CONFIG SCREEN OPENDFLT BUTTONROWS=<n>` lets that same child window's
+    `OPEN` succeed and its own `DISPLAY BUTTONS` draw without error — but the button renders **detached
+    at the outer application window's own corner**, not anywhere near the child window's on-screen box.
+    A program cannot give two different concurrently-open child/dialog windows two independently
+    positioned button bars.
 - **Hot windows**: `FKEY=<n>` in an OPEN WINDOW string (4.2+) makes the *whole window* hot — clicking
   anywhere in it fires that FKEY interrupt (typically to switch focus). The value is inherited by child
   windows (but **not** independent ones) unless a child sets its own `FKEY=` (or `-1`).

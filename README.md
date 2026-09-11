@@ -17,7 +17,7 @@ tooling at whatever BR codebase you're on. There are three published parts:
   one line at a time, but takes whole files — or several, or stdin. `-sema` adds a whole-file
   pass on top of it (it does nothing on its own): block pairing, which catches a `FOR`, `DO`,
   block `IF` or `DEF` that never closes — real BR rejects those at LOAD — plus the name
-  checks: undefined names, argument counts.
+  checks: undefined names, argument counts, unresolved `LIBRARY` links.
 - **`br_tree/`** — the authoritative BR language reference tree (syntax, data types, file
   and screen I/O, printing, libraries, error codes), the ultimate backstop that `dev/` links into
   for depth.
