@@ -8,12 +8,17 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (CMDKEY/FKEY/CURFLD, cursor shape, GUIMODE, borders); no conflicts
 recovered-fold: CURFLD, CURWINDOW, EROW, FNKEY, GUI_Console, GUI_Mode, Parent=None folded+pruned; FKEY retained (scancode tables). 8 redirect-collision pages re-fetched; verbatim retained on the BR wiki
 related: [input-output, fields-attributes, controls]
-keywords: [OPEN WINDOW, WINDOW, BORDER, BUTTONROWS, NEWPAGE, CAPTION, cursor, PARENT, HELP]
+keywords: [OPEN WINDOW, WINDOW, BORDER, BUTTONROWS, NEWPAGE, CAPTION, cursor, PARENT, HELP, CMDKEY, CURFLD, CURROW, CURCOL, CURWINDOW]
 canonical: window-open   # canonical home for the window OPEN spec (printing guide links here)
 corrections:
   - "CURWINDOW's argument is optional: numfunct.cpp passes `parms` through to the client and sends 0 when there are none, and ck_num_sysfn groups it under \"optional 1 numeric\". The signature required it."
   - "CURROW/CURCOL are accepted with one argument by BR's compiler and ignore it at run time; noted where they are introduced. Found in brls phase 5."
   - "HELP added to the frontmatter keywords. This page documents both senses of the spelling — the field-help clause on INPUT/RINPUT, and the console HELP command reached from READY mode — and declared neither. Found in brls phase 13; see error-handling's note for why the clause had been left undeclared everywhere."
+  - "CMDKEY, CURFLD, CURROW, CURCOL and CURWINDOW added to the frontmatter keywords. All five are
+    fully documented in this page's body (the CMDKEY/FKEY, CURFLD, and cursor-query sections) and
+    were routing nowhere — `gendata`'s function-routing check found them unrouted even though the
+    prose already covers them. Found 2026-09-11 while auditing `go run ./cmd/gendata`'s unrouted
+    list against actual br_tree content."
   - "BUTTONROWS= added to the OPEN WINDOW syntax BNF, Semantics, and frontmatter keywords. The wiki documents this window parameter only under SCREEN OPENDFLT and omitted it from the OPEN WINDOW page entirely."
   - "Button panel semantics extended with two facts neither the wiki nor this page previously stated, confirmed empirically against a live interactive BR session (two throwaway probes, run via the console and screenshotted). First: `BUTTONROWS=` must be set on window #0's `OPEN` (directly, or inherited via `SCREEN OPENDFLT`/`CONFIG SCREEN OPENDFLT`) *before* `DISPLAY BUTTONS` has a panel to draw into — reversed, `DISPLAY BUTTONS` silently draws nothing, no error. Second: the button bar is a single panel belonging to the top-level frame (window #0), not a per-window control — a non-#0 child window setting `BUTTONROWS=` directly in its own `OPEN` string fails outright with error 854 (\"illegal row specification\"), even for a `row` value well within the requested `BUTTONROWS`; inheriting `BUTTONROWS=` instead via `CONFIG SCREEN OPENDFLT` lets that same child window's `OPEN` succeed, but the button then renders detached at the outer application window's own corner, nowhere near the child window's on-screen box. A program cannot give two concurrently-open child/dialog windows two independently positioned button bars."
 ---

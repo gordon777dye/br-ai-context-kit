@@ -8,7 +8,12 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (PAGEOFLOW); misfiled command/config pages relocated; no conflicts
 recovered-fold: 'PRINT_USING, PRN, REMOTE_PRINTING (3 redirect-collision pages folded from re-fetched source — RUN >/>>/>CON: redirect, string-FORM recompile, PRN:/10 pass-through, DIRECT:/ vs SPOOLCMD, PRINTER_LIST(), CS OPTION 30/@ routing; verbatim retained on the BR wiki)'
 related: [pcl-pdf, sort]
-keywords: [PRINT, OPEN, PAGEOFLOW, NEWPAGE, BELL, TAB, HEADING, USING, PIC, COPIES]
+keywords: [PRINT, OPEN, PAGEOFLOW, NEWPAGE, BELL, TAB, HEADING, USING, PIC, COPIES, PRINTER_LIST]
+corrections:
+  - "PRINTER_LIST added to the frontmatter keywords. `PRINTER_LIST(MAT a$)` is documented on this
+    page (populates an array with local printer names/ports) and was routing nowhere. Found
+    2026-09-11 auditing `go run ./cmd/gendata`'s unrouted-function list against actual br_tree
+    content."
 ---
 
 # Printing statements

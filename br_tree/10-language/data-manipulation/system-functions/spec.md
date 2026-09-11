@@ -15,8 +15,18 @@ corrections:
   - "DATE$ and DATE were given as `DATE$(days,\"mask\")` and `DATE(days,\"mask\")`, both arguments required. BR accepts none, one or two of them: ck_alph_sysfn (command2.cpp) reads `case DATE_: // 0-2 with 1 either, numeric, alpha` and ck_num_sysfn (command3.cpp) `case DATE_FN: // 0-2 parameters (1 numeric and 1 string both optional)`. The one-argument forms were never lost from the tree — the DATE$ backing page beside this spec is full of them (`PRINT DATE$(\"mm-dd-yy\")`, `PRINT DATE$(1)`, `DATE(\"m\")`) — it was the summary table here that dropped them, and the dev catalog generated from that table inherited the loss. Bare numeric `DATE` added to the no-parentheses list for the same reason. 1,216 lines of the reference corpus use a form this table called impossible. Found in brls phase 5."
   - "Nine signatures corrected against BR's own arity checkers (ck_alph_sysfn in command2.cpp, ck_num_sysfn in command3.cpp) and their implementations in strfunct.cpp/numfunct.cpp: TRIM$ takes the same optional strip character as LTRM$/RTRM$; BRERR$ and SYSERR$ take their code optionally, bare meaning the last error; FILE$ takes a second keyword argument querying the open file; SQL_DATE$/BR_DATE$ take the format optionally; HELP$ takes two arguments at most and the second is numeric, not the third string this table listed; LOGIN_NAME$ with an argument sets the name rather than being an atom. Separately, TIME$/CURROW/CURCOL/PROCIN are accepted with one argument by the compiler and ignore it at run time, which is now marked ‡ and explained rather than documented as an optional parameter. Found in brls phase 5 by diffing every arity in the two checkers against the generated pack — 15 of 119 disagreed."
   - "NXTFLD was given as `NXTFLD[(…)]`, \"4 syntax forms\", and the retained NXTFLD.md backing page documented a parameterised setter at length. NXTFLD takes no arguments and is not assignable. ck_num_sysfn (command3.cpp) lists it under `// 0 parameters` with NXTROW/NXTCOL/CURPOS/TIMER and returns -1 for any subcount; both the bare form (command3.cpp:524) and any parenthesised form (:653) reach that same checker, and the one escape from it, NOT_FN_REF, is guarded by EXTENDED_USER_FUNCTION and so is reachable only by FN… names. numfunct.cpp reads fieldsdata.tnxtFld without popping an argument. The parameterised behaviour described on that page is CURFLD's: ck_num_sysfn reads `case CURFLD: // 0-3 parameters if 2 or more numeric, string, numeric` and numfunct.cpp implements it as `// curfld(pos,attr$,firstkey)` — the page's own prose gives it away, explaining its `LET NXTFLD(NXTFLD,FKEY)` example with the sentence \"The CURFLD function in line 40 is then used to…\". Corroborated by the reference corpus: 696 files call CURFLD with 1-3 arguments and not one of 1,107 files writes NXTFLD with any. NXTFLD added to the no-parentheses list above for the same reason. Determined by the maintainer, who states NXTFLD never supported parameters; found in brls phase 5."
+  - "This page documented the workstation-ID function as bare `WSID` (no-parentheses atom list, the
+    System/information table row, and the `SESSION$` description). There is no numeric `WSID`
+    function — confirmed against `table6k.txt`, BR's own runtime function-name table, which lists
+    `WSID$` and nothing named `WSID` bare; `dev/system-functions-catalog.md`'s roster (built from
+    that same table) already carried the correction note ('there is no numeric WSID; the curated
+    spec's WSID is a typo for WSID$') that this page never picked up. All three mentions corrected
+    to `WSID$`. (The unrelated `WSID` **config directive** — `@user WSID <n>`, `OPTION 74` — is a
+    different keyword class entirely and is unaffected; see
+    [00-configuration/config-directives](../../../00-configuration/config-directives/spec.md).)
+    Found while auditing this page's `keywords:` frontmatter against its own body, 2026-09-11."
 related: [expressions, assignment, declaration, data-types]
-keywords: [CNVRT$, POS, LEN, TRIM$, UPRC$, LWRC$, STR$, VAL, DATE$, TIME$, RND, MAX, MIN, SUM, MSGBOX, KSTAT$, AIDX, DIDX, UDIM, SRCH, STR2MAT, MAT2STR]
+keywords: [CNVRT$, POS, LEN, TRIM$, UPRC$, LWRC$, STR$, VAL, DATE$, TIME$, RND, MAX, MIN, SUM, MSGBOX, KSTAT$, AIDX, DIDX, UDIM, SRCH, STR2MAT, MAT2STR, CHR$, ORD, LTRM$, RTRM$, LPAD$, RPAD$, RPT$, SREP$, XLATE$, LOGIN_NAME$, CFORM$, HEX$, UNHEX$, PIC$, INT, IP, FP, CEIL, ROUND, TRUNC, ABS, SGN, SQR, MOD, MAX$, MIN$, SIN, COS, TAN, ATN, DEG, RAD, LOG, EXP, PI, DAYS, SQL_DATE$, BR_DATE$, FILE, FILE$, FILENUM, FREESP, EXISTS, BR_FILENAME$, OS_FILENAME$, KPS, LREC, RLN, VERSION, LINESTATUS$, LINES, LINESPP, NXTFLD, NXTROW, NXTCOL, CURPOS, CURTAB, SCR_FREEZE, SCR_THAW, CNT, BRERR$, ENV$, CODE, PROCIN, WSID$, USERID$, SESSION$, PROCLVL, TIMER, VARIABLE$, WBVERSION$, WBPLATFORM$, SYSERR, SYSERR$, SHIFT, MSG$, MSG, SLEEP, HELP$, GET$, SET$, INVOKE$, CALL, ENCRYPT$, DECRYPT$]
 ---
 
 # System (built-in) functions
@@ -30,7 +40,7 @@ BR's intrinsic functions — they return a value and are used inside
 ## Syntax
 
 Most take the form `NAME(args)`. A few system values take **no parentheses**: `DATE$`, `DATE`, `TIME$`,
-`ERR`, `LINE`, `CNT`, `CODE`, `PROCIN`, `FILENUM`, `INF`, `PI`, `USERID$`, `LOGIN_NAME$`, `WSID`,
+`ERR`, `LINE`, `CNT`, `CODE`, `PROCIN`, `FILENUM`, `INF`, `PI`, `USERID$`, `LOGIN_NAME$`, `WSID$`,
 `SERIAL`, `SESSION$`, `PROCLVL`, `TIMER`, `VARIABLE$`, `WBVERSION$`, `WBPLATFORM$`, `SYSERR`,
 `SYSERR$`, `BRERR$`, `MENU$`, `CURPOS`, `NXTFLD`, `RND` (and `PIC$`, whose parentheses are optional). All yield a value usable
 anywhere an expression is allowed.
@@ -220,10 +230,10 @@ but there is **no `DLM$` function**) — or, as of **4.3**, a `MAT` of delimiter
 | `ENV$(status[,MAT cfg$[,arg]])` | environment / status interrogation (4.30+) — see [environment](../../../00-configuration/environment/spec.md#env-read) |
 | `CODE` | numeric return value of the most recent procedure (set by `EXIT n`) |
 | `PROCIN` ‡ | non-zero while a procedure is feeding input (0 = keyboard) |
-| `WSID` | this session's workstation ID |
+| `WSID$` | this session's workstation ID |
 | `USERID$` | BR licensee name |
 | `SERIAL` | serial number of this BR software copy |
-| `SESSION$` | this session's ID — `WSID` (3–4 digits) followed by a 1-digit session number `1`–`9` (e.g. `011`, `012`) |
+| `SESSION$` | this session's ID — `WSID$` (3–4 digits) followed by a 1-digit session number `1`–`9` (e.g. `011`, `012`) |
 | `PROCLVL` | current procedure nesting level (`0` = keyboard / not in a procedure) |
 | `TIMER` | seconds since the Unix epoch (1970-01-01 UTC) as a 5-decimal real; use two readings to time a section (accuracy follows the OS clock) |
 | `SETENV(name$[,value$])` | set a **BR session** environment variable (read back with `ENV$`; function form of `CONFIG SETENV`). **2 args** = `name$`,`value$`; **1 arg** = a single `NAME=VALUE` directive string |
@@ -299,7 +309,7 @@ line).
 - [declaration](../declaration/spec.md) — `UDIM`/`LEN` for array & string sizes
 - [30-io-file/statements](../../../30-io-file/statements/spec.md#io) — `FILE`/`FREESP`/`EXISTS`/`KPS`/`LREC`/`REC` in I/O context
 - [20-io-screen/windows-cursor](../../../20-io-screen/windows-cursor/spec.md) — `KSTAT$`/`NXTFLD`/`NXTROW`/`CURTAB` cursor & keyboard
-- [00-configuration/environment](../../../00-configuration/environment/spec.md#env-read) — `ENV$`/`LOGIN_NAME$`/`WSID`
+- [00-configuration/environment](../../../00-configuration/environment/spec.md#env-read) — `ENV$`/`LOGIN_NAME$`/`WSID$`
 - [70-commands/program-management](../../../70-commands/program-management/spec.md) — `CODE`/`PROCIN` and procedures
 - [30-io-file/form-spec](../../../30-io-file/form-spec/spec.md#syntax) — the format codes used by `CNVRT$`/`CFORM$`
 - Backing keyword pages (deep detail retained): [ENV$](ENV$.md), [Encryption](Encryption.md),

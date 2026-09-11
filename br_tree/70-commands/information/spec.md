@@ -8,9 +8,14 @@ kind: spec
 status: 2b           # reference base + br_tree fold (BREAK detail, DISPLAY -p/MAT, STATUS/VERIFY, DEBUG_STR, LIST search); PROCIN/PROGRAM$ home resolved; no conflicts
 recovered-fold: NOSTEP (redirect-collision page re-fetched; NOSTEP/NOTRACE already covered by the GO bnf in program-management — pruned; verbatim retained on the BR wiki)
 related: [program-management, editing]
-keywords: [STATUS, LIST, TRACE, DISPLAY, LOGGING, STEP, BREAK, TIME, ALL, FONTS, NORESTORE]
+keywords: [STATUS, LIST, TRACE, DISPLAY, LOGGING, STEP, BREAK, TIME, ALL, FONTS, NORESTORE, DEBUG_STR, PROGRAM$]
 corrections:
   - "BREAK, TIME, ALL, FONTS and NORESTORE added to the frontmatter keywords. All five are in this page's BNF — BREAK has an anchor of its own — and none was declared. Found in brls phase 13."
+  - "DEBUG_STR and PROGRAM$ added to the frontmatter keywords. Both are documented in this page's
+    body (`DEBUG_STR(level, str$)` has its own anchor; `PROGRAM$` is described alongside `PROCIN`)
+    and were routing nowhere despite the status line above already noting their 'home resolved'.
+    Found 2026-09-11 auditing `go run ./cmd/gendata`'s unrouted-function list against actual
+    br_tree content."
 ---
 
 # Information & debugging commands

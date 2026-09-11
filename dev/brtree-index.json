@@ -2,7 +2,7 @@
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
   "generated": "2026-09-11",
   "source": "br_tree/",
-  "source_sha256": "a44f46691dd4885cccb83770bc4a64c23779cbdfce86fa32f2fe9de6f96bc57e",
+  "source_sha256": "f1e52d8fe7439ebd51ddb9193b1e0730b26fd2fbe329581abff8826d2fc0a83a",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -11,6 +11,9 @@
     ":=": [
       "10-language/data-manipulation/assignment",
       "10-language/data-manipulation/expressions"
+    ],
+    "ABS": [
+      "10-language/data-manipulation/system-functions"
     ],
     "AIDX": [
       "10-language/data-manipulation/assignment",
@@ -27,6 +30,9 @@
     ],
     "AND": [
       "10-language/data-manipulation/expressions"
+    ],
+    "ATN": [
+      "10-language/data-manipulation/system-functions"
     ],
     "ATTN": [
       "10-language/flow-control/error-handling"
@@ -67,6 +73,9 @@
     "BREAK": [
       "70-commands/information"
     ],
+    "BRERR$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "BRLIBS": [
       "50-libraries/library-facility"
     ],
@@ -75,6 +84,12 @@
     ],
     "BR_DATA": [
       "00-configuration/environment"
+    ],
+    "BR_DATE$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "BR_FILENAME$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "BR_FUNC": [
       "60-integration/web"
@@ -95,11 +110,20 @@
     "C": [
       "30-io-file/form-spec"
     ],
+    "CALL": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "CAPTION": [
       "20-io-screen/windows-cursor"
     ],
     "CC": [
       "30-io-file/form-spec"
+    ],
+    "CEIL": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "CFORM$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "CHAIN": [
       "10-language/flow-control/other-flow",
@@ -110,6 +134,9 @@
     ],
     "CHECK": [
       "20-io-screen/controls"
+    ],
+    "CHR$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "CL": [
       "20-io-screen/fields-attributes"
@@ -123,7 +150,16 @@
     "CLOSE": [
       "30-io-file/statements"
     ],
+    "CMDKEY": [
+      "20-io-screen/windows-cursor"
+    ],
+    "CNT": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "CNVRT$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "CODE": [
       "10-language/data-manipulation/system-functions"
     ],
     "COLLATE": [
@@ -159,11 +195,32 @@
     "COPY": [
       "70-commands/file-directory"
     ],
+    "COS": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "CR": [
       "30-io-file/form-spec"
     ],
     "CU": [
       "20-io-screen/fields-attributes"
+    ],
+    "CURCOL": [
+      "20-io-screen/windows-cursor"
+    ],
+    "CURFLD": [
+      "20-io-screen/windows-cursor"
+    ],
+    "CURPOS": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "CURROW": [
+      "20-io-screen/windows-cursor"
+    ],
+    "CURTAB": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "CURWINDOW": [
+      "20-io-screen/windows-cursor"
     ],
     "D": [
       "30-io-file/form-spec"
@@ -187,14 +244,26 @@
     "DATE$": [
       "10-language/data-manipulation/system-functions"
     ],
+    "DAYS": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "DEBUG": [
       "00-configuration/installation-tooling"
+    ],
+    "DEBUG_STR": [
+      "70-commands/information"
+    ],
+    "DECRYPT$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "DEF": [
       "10-language/flow-control/functions-udf"
     ],
     "DEF LIBRARY": [
       "50-libraries/library-facility"
+    ],
+    "DEG": [
+      "10-language/data-manipulation/system-functions"
     ],
     "DEL": [
       "70-commands/editing"
@@ -256,11 +325,17 @@
     "ELSE": [
       "10-language/data-manipulation/conditionals"
     ],
+    "ENCRYPT$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "END": [
       "10-language/flow-control/other-flow"
     ],
     "ENV": [
       "00-configuration/environment"
+    ],
+    "ENV$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "EOF": [
       "10-language/flow-control/error-handling",
@@ -278,15 +353,30 @@
     "EXECUTE": [
       "70-commands/program-management"
     ],
+    "EXISTS": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "EXIT": [
       "10-language/flow-control/error-handling",
       "10-language/flow-control/other-flow"
+    ],
+    "EXP": [
+      "10-language/data-manipulation/system-functions"
     ],
     "EXTERNAL": [
       "30-io-file/file-model"
     ],
     "FIELDS": [
       "20-io-screen/controls"
+    ],
+    "FILE": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "FILE$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "FILENUM": [
+      "10-language/data-manipulation/system-functions"
     ],
     "FILES": [
       "70-commands/program-management"
@@ -325,9 +415,15 @@
     "FORM": [
       "30-io-file/form-spec"
     ],
+    "FP": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "FREE": [
       "30-io-file/statements",
       "70-commands/file-directory"
+    ],
+    "FREESP": [
+      "10-language/data-manipulation/system-functions"
     ],
     "FileIO": [
       "50-libraries/fileio"
@@ -337,6 +433,9 @@
     ],
     "G": [
       "30-io-file/form-spec"
+    ],
+    "GET$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "GF": [
       "30-io-file/form-spec"
@@ -371,6 +470,12 @@
       "20-io-screen/input-output",
       "20-io-screen/windows-cursor"
     ],
+    "HELP$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "HEX$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "HTTP": [
       "60-integration/web"
     ],
@@ -396,14 +501,23 @@
     "INPUT SELECT": [
       "20-io-screen/input-output"
     ],
+    "INT": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "INTERNAL": [
       "30-io-file/file-model"
+    ],
+    "INVOKE$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "INVP": [
       "10-language/data-manipulation/declaration"
     ],
     "IOERR": [
       "10-language/flow-control/error-handling"
+    ],
+    "IP": [
+      "10-language/data-manipulation/system-functions"
     ],
     "JSON": [
       "60-integration/json-datastore"
@@ -422,6 +536,15 @@
     "KEYONLY": [
       "30-io-file/keys-indexes",
       "30-io-file/statements"
+    ],
+    "KLN": [
+      "30-io-file/keys-indexes"
+    ],
+    "KPS": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "KREC": [
+      "30-io-file/keys-indexes"
     ],
     "KSTAT$": [
       "10-language/data-manipulation/system-functions"
@@ -448,6 +571,15 @@
     "LINE": [
       "10-language/flow-control/error-handling"
     ],
+    "LINES": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "LINESPP": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "LINESTATUS$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "LINK=": [
       "30-io-file/statements"
     ],
@@ -469,6 +601,9 @@
     "LOCKED": [
       "10-language/flow-control/error-handling"
     ],
+    "LOG": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "LOGGING": [
       "00-configuration/config-directives",
       "70-commands/information"
@@ -476,8 +611,20 @@
     "LOGIN_NAME": [
       "00-configuration/environment"
     ],
+    "LOGIN_NAME$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "LOOP": [
       "10-language/flow-control/other-flow"
+    ],
+    "LPAD$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "LREC": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "LTRM$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "LWRC$": [
       "10-language/data-manipulation/system-functions"
@@ -495,7 +642,13 @@
     "MAX": [
       "10-language/data-manipulation/system-functions"
     ],
+    "MAX$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "MENU": [
+      "20-io-screen/controls"
+    ],
+    "MENU$": [
       "20-io-screen/controls"
     ],
     "MERGE": [
@@ -504,8 +657,20 @@
     "MIN": [
       "10-language/data-manipulation/system-functions"
     ],
+    "MIN$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "MKDIR": [
       "70-commands/file-directory"
+    ],
+    "MOD": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "MSG": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "MSG$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "MSGBOX": [
       "10-language/data-manipulation/system-functions"
@@ -555,6 +720,15 @@
     ],
     "NWP": [
       "40-io-printing/pcl-pdf"
+    ],
+    "NXTCOL": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "NXTFLD": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "NXTROW": [
+      "10-language/data-manipulation/system-functions"
     ],
     "NZ": [
       "30-io-file/form-spec"
@@ -607,6 +781,12 @@
     "OR": [
       "10-language/data-manipulation/expressions"
     ],
+    "ORD": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "OS_FILENAME$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "OUTIN": [
       "30-io-file/statements"
     ],
@@ -639,10 +819,16 @@
     "PEM": [
       "00-configuration/installation-tooling"
     ],
+    "PI": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "PIC": [
       "20-io-screen/fields-attributes",
       "30-io-file/form-spec",
       "40-io-printing/statements"
+    ],
+    "PIC$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "POS": [
       "10-language/data-manipulation/system-functions",
@@ -661,6 +847,9 @@
     "PRINTER": [
       "00-configuration/config-directives"
     ],
+    "PRINTER_LIST": [
+      "40-io-printing/statements"
+    ],
     "PRIOR": [
       "30-io-file/statements"
     ],
@@ -670,14 +859,26 @@
     "PROCERR": [
       "70-commands/program-management"
     ],
+    "PROCIN": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "PROCLVL": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "PROFILE": [
       "00-configuration/installation-tooling"
+    ],
+    "PROGRAM$": [
+      "70-commands/information"
     ],
     "PROTECT": [
       "70-commands/file-directory"
     ],
     "PRTZO": [
       "10-language/data-manipulation/declaration"
+    ],
+    "RAD": [
+      "10-language/data-manipulation/system-functions"
     ],
     "RADIO": [
       "20-io-screen/controls"
@@ -751,10 +952,25 @@
     "RINPUT SELECT": [
       "20-io-screen/input-output"
     ],
+    "RLN": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "RMDIR": [
       "70-commands/file-directory"
     ],
     "RND": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "ROUND": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "RPAD$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "RPT$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "RTRM$": [
       "10-language/data-manipulation/system-functions"
     ],
     "RUN": [
@@ -772,6 +988,12 @@
     "SCREEN": [
       "00-configuration/config-directives"
     ],
+    "SCR_FREEZE": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "SCR_THAW": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "SEARCH": [
       "30-io-file/keys-indexes"
     ],
@@ -784,6 +1006,12 @@
     "SERVER": [
       "00-configuration/client-server"
     ],
+    "SESSION$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "SET$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "SETENV": [
       "00-configuration/config-directives",
       "00-configuration/environment"
@@ -791,11 +1019,23 @@
     "SETFONT": [
       "40-io-printing/pcl-pdf"
     ],
+    "SGN": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "SHIFT": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "SHR": [
       "30-io-file/file-model"
     ],
+    "SIN": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "SKIP": [
       "30-io-file/form-spec"
+    ],
+    "SLEEP": [
+      "10-language/data-manipulation/system-functions"
     ],
     "SOFLOW": [
       "10-language/flow-control/error-handling"
@@ -813,7 +1053,16 @@
     "SQL": [
       "30-io-file/database"
     ],
+    "SQL_DATE$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "SQR": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "SRCH": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "SREP$": [
       "10-language/data-manipulation/system-functions"
     ],
     "STACKS": [
@@ -853,6 +1102,12 @@
     "SUM": [
       "10-language/data-manipulation/system-functions"
     ],
+    "SYSERR": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "SYSERR$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "SYSTEM": [
       "70-commands/program-management"
     ],
@@ -861,6 +1116,9 @@
     ],
     "TAB": [
       "40-io-printing/statements"
+    ],
+    "TAN": [
+      "10-language/data-manipulation/system-functions"
     ],
     "TEXT": [
       "20-io-screen/controls"
@@ -877,6 +1135,9 @@
     "TIMEOUT": [
       "10-language/flow-control/error-handling"
     ],
+    "TIMER": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "TO": [
       "10-language/flow-control/other-flow"
     ],
@@ -887,16 +1148,25 @@
     "TRIM$": [
       "10-language/data-manipulation/system-functions"
     ],
+    "TRUNC": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "TYPE": [
       "70-commands/file-directory"
     ],
     "UDIM": [
       "10-language/data-manipulation/system-functions"
     ],
+    "UNHEX$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "UNTIL": [
       "10-language/flow-control/other-flow"
     ],
     "UPRC$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "USERID$": [
       "10-language/data-manipulation/system-functions"
     ],
     "USING": [
@@ -909,8 +1179,14 @@
     "VAL": [
       "10-language/data-manipulation/system-functions"
     ],
+    "VARIABLE$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "VERIFY": [
       "30-io-file/keys-indexes"
+    ],
+    "VERSION": [
+      "10-language/data-manipulation/system-functions"
     ],
     "VL": [
       "20-io-screen/fields-attributes"
@@ -920,6 +1196,12 @@
     ],
     "WAIT": [
       "30-io-file/statements"
+    ],
+    "WBPLATFORM$": [
+      "10-language/data-manipulation/system-functions"
+    ],
+    "WBVERSION$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "WEB_SERVER12": [
       "60-integration/web"
@@ -941,11 +1223,17 @@
       "00-configuration/platform",
       "30-io-file/file-model"
     ],
+    "WSID$": [
+      "10-language/data-manipulation/system-functions"
+    ],
     "WebForm": [
       "60-integration/web"
     ],
     "X": [
       "30-io-file/form-spec"
+    ],
+    "XLATE$": [
+      "10-language/data-manipulation/system-functions"
     ],
     "ZD": [
       "30-io-file/form-spec"
@@ -1429,7 +1717,92 @@
         "UDIM",
         "SRCH",
         "STR2MAT",
-        "MAT2STR"
+        "MAT2STR",
+        "CHR$",
+        "ORD",
+        "LTRM$",
+        "RTRM$",
+        "LPAD$",
+        "RPAD$",
+        "RPT$",
+        "SREP$",
+        "XLATE$",
+        "LOGIN_NAME$",
+        "CFORM$",
+        "HEX$",
+        "UNHEX$",
+        "PIC$",
+        "INT",
+        "IP",
+        "FP",
+        "CEIL",
+        "ROUND",
+        "TRUNC",
+        "ABS",
+        "SGN",
+        "SQR",
+        "MOD",
+        "MAX$",
+        "MIN$",
+        "SIN",
+        "COS",
+        "TAN",
+        "ATN",
+        "DEG",
+        "RAD",
+        "LOG",
+        "EXP",
+        "PI",
+        "DAYS",
+        "SQL_DATE$",
+        "BR_DATE$",
+        "FILE",
+        "FILE$",
+        "FILENUM",
+        "FREESP",
+        "EXISTS",
+        "BR_FILENAME$",
+        "OS_FILENAME$",
+        "KPS",
+        "LREC",
+        "RLN",
+        "VERSION",
+        "LINESTATUS$",
+        "LINES",
+        "LINESPP",
+        "NXTFLD",
+        "NXTROW",
+        "NXTCOL",
+        "CURPOS",
+        "CURTAB",
+        "SCR_FREEZE",
+        "SCR_THAW",
+        "CNT",
+        "BRERR$",
+        "ENV$",
+        "CODE",
+        "PROCIN",
+        "WSID$",
+        "USERID$",
+        "SESSION$",
+        "PROCLVL",
+        "TIMER",
+        "VARIABLE$",
+        "WBVERSION$",
+        "WBPLATFORM$",
+        "SYSERR",
+        "SYSERR$",
+        "SHIFT",
+        "MSG$",
+        "MSG",
+        "SLEEP",
+        "HELP$",
+        "GET$",
+        "SET$",
+        "INVOKE$",
+        "CALL",
+        "ENCRYPT$",
+        "DECRYPT$"
       ],
       "related": [
         "expressions",
@@ -1657,7 +2030,8 @@
         "FIELDS",
         "BUTTON",
         "BUTTONS",
-        "BUTTONROWS"
+        "BUTTONROWS",
+        "MENU$"
       ],
       "related": [
         "input-output",
@@ -1777,7 +2151,12 @@
         "CAPTION",
         "cursor",
         "PARENT",
-        "HELP"
+        "HELP",
+        "CMDKEY",
+        "CURFLD",
+        "CURROW",
+        "CURCOL",
+        "CURWINDOW"
       ],
       "related": [
         "input-output",
@@ -1957,7 +2336,9 @@
         "KEYONLY",
         "REORG",
         "VERIFY",
-        "BTREE_VERIFY"
+        "BTREE_VERIFY",
+        "KLN",
+        "KREC"
       ],
       "related": [
         "statements",
@@ -2148,7 +2529,8 @@
         "HEADING",
         "USING",
         "PIC",
-        "COPIES"
+        "COPIES",
+        "PRINTER_LIST"
       ],
       "related": [
         "pcl-pdf",
@@ -2426,7 +2808,9 @@
         "TIME",
         "ALL",
         "FONTS",
-        "NORESTORE"
+        "NORESTORE",
+        "DEBUG_STR",
+        "PROGRAM$"
       ],
       "related": [
         "program-management",
