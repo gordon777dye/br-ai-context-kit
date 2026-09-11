@@ -47,3 +47,4 @@ node_modules/
 !/dev/tools/printer.sys
 !/dev/tools/*.md
 !/dev/tools/*.json
+!/dev/tools/*.ps1

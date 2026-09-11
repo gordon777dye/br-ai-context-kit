@@ -206,6 +206,15 @@ failures that it doesn't detect along with any false positives.
   file", and the authoritative gate is still real BR: `LOAD <prog>.brs source`, then `SAVE` or
   `REPLACE` (see §7, step 6).
 
+**Before trusting a `brls`/`LOAD ... source` failure, check whether this app uses Lexi** — a
+preprocessor some BR shops write source for (`/* */` comments, `X$&=`, `#Select#/#Case#`, and
+more). Neither `brls` nor base BR understands Lexi syntax, so a file using it will show false
+syntax errors in both. Check `../app/conventions.md` (once onboarded) for whether *this* app uses
+it; if it does, use
+[`BR_launch.md`](BR_launch.md#the-lexi-aware-development-loop)'s **Lexi-aware development loop**
+(built on `dev/tools/lexi-compile.ps1`) instead of running `brls -check` on the raw source — the
+loop below assumes plain BR and needs adapting for a Lexi-using app.
+
 **Required AI Coding loop:**
 1. Edit file using `-next` as needed.
 2. Run cat <program-line> | `$BRLS_EXE -check -`
@@ -462,4 +471,11 @@ editing `statement-semantics.md`), [`tools/gen_datamodel_index.exe`](tools/gen_d
 (rebuild `brtree-index.json` from br_tree spec frontmatter). The three generators take
 **`--verify`** — a non-writing drift check (source hash + range/structure validation +
 regenerate-and-compare, exit 1 on drift) for catching a stale index after the source was edited but
-not regenerated. **Everything else is done by BR itself, driven headlessly**
+not regenerated. **Everything else is done by BR itself, driven headlessly** — with one exception:
+[`tools/lexi-compile.ps1`](tools/lexi-compile.ps1) (PowerShell, see
+[`BR_launch.md`](BR_launch.md#the-lexi-aware-development-loop)), which drives the **Lexi**
+preprocessor for apps that use it. Unlike the four helpers above, it isn't a self-contained
+binary — it depends on the "BR Language Server" VS Code extension (`crs-dev.vslang-br`) being
+installed on the machine it runs on (or explicit `-LexiPath`/`-BrExe`/`-WbConfig` pointing
+somewhere else that has a Lexi library + BR runtime + config), since that's where the bundled
+Lexi engine and runtime it drives normally live.

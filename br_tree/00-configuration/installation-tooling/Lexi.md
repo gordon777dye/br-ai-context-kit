@@ -4,365 +4,459 @@ file: Lexi.md
 category: 00-configuration
 subcategory: 00-configuration/installation-tooling
 kind: reference
-related: [BR, third party editor, MyEdit, BR Programs, line numbers, brserial.dat]
+related: [BR, third party editor, MyEdit, BR Programs, line numbers, brserial.dat, fnApplyLexi, fnUndoLexi, BR Language Server, crs-dev.vslang-br, lexi-compile.ps1, RENUM]
+corrections:
+  - "Added the underlying mechanism this page never described: Lexi is itself a BR **library
+    program** (`lexi.br`/`lexi.brs`), exposing `fnApplyLexi(InFile$, OutFile$, Mode,
+    SourceMapFile$)` and `fnUndoLexi(InFile$, OutFile$)` — confirmed by reading the bundled
+    library source directly, not inferred. Added a second real, confirmed distribution beyond the
+    classic SageAX/MyEdit zip: the \"BR Language Server\" VS Code extension (`crs-dev.vslang-br`)
+    bundles the identical engine under its own `Lexi/` folder and runs it automatically on save;
+    its invocation mechanism (temp-file copy, a generated proc that types `Infile$`/`Outfile$` as
+    new numbered lines into the loaded driver program, then `run`/`save`/`replace`) was
+    reverse-engineered from the extension's own bundled `dist/extension.js` and the translation
+    step re-verified by actually running it outside VS Code. Added two real Lexi conversions this
+    page never documented at all — `/* ... */` multi-line comments (→ `!` comments) and
+    `X$&=\"...\"` compound append (→ the safe `X$(INF:0)=\"...\"` idiom, not naive
+    self-concatenation) — confirmed by running the real `fnApplyLexi` engine against test input."
+  - "Clarified the ambiguous ***SELECT CASE*** section (below, unchanged in substance from the
+    original wikitext, whose code example already showed `#SELECT#`/`#CASE#`/`#End Select#`) —
+    the heading and lead-in sentence read as if bare `SELECT CASE ... END SELECT` were valid
+    syntax. It is not, in Lexi or in base BR: confirmed by running `fnApplyLexi` (both `Mode 0`
+    and `Mode 1`) against a file containing bare `select case`/`case`/`end select` — Lexi left it
+    completely untouched in both modes, and the untouched result then failed to `LOAD` in real BR.
+    The `#` signs on `#Select#`/`#Case#`/`#End Select#` are required; the *feature* is informally
+    called \"Select Case\" (matching this library's own header comment), but that is not its
+    spelling. A downstream doc (this kit's `dev/essentials.md`) briefly repeated the bare-spelling
+    reading before this was caught; see that file's `context/ERRORS.md` entry, 2026-09-11."
 ---
-**Lexi**, the **BR! Lexical Preprocessor** is a system for integrating `BR` with your favorite `third party editor`. Initially Lexi only supported only `MyEdit`, but it is also being used successfully with `Notepad++` and is very likely to work with any text editor that supports customizable user tools.
-
-If you use Lexi, you can edit your `BR Programs` `#No Line Numbers|Without Line Numbers`. This frees you up to copy and paste code, rearrange code, and add and edit code without having to worry about or manually change any line numbers.  Lexi adds and changes and manages your `line numbers` for you automatically, when you "compile" your programs into .BR files.
-
-But Lexi also does a lot more.  By preprocessing your `source code|code` before it is passed on to BR, Lexi gives you, the programmer, access to many useful features not normally found in BR.
-
-Lexi also gives you access to the `#SELECT CASE|SELECT CASE` statement and the `#DEFINE` statement, common in other languages.
-
-==Installation==
-===MyEdit (BR Edition)===
-Lexi can be used to automatically convert between BRS and BR files from within MyEdit. This can make your Editing life much easier. Lexi works with ALL versions of BR. However it requires a version of MyEdit dated `October 20`, `2006` or later.
-
-The latest version of Lexi can be found at [http://www.sageax.com/downloads/Lexi.zip SageAX]
-
-====Instructions====
-
-To install Lexi, follow the following steps.
-
-=====Automatic Installation=====
-
-*The Automatic Installation process requires a version of MyEdit dated `March 5`, `2010` or later.
-
-#) Unzip Lexi.zip into "C:\Lexi". You must use this directory in order for the automatic installation to work.
-#) Copy your personal `brserial.dat` file into this directory (C:\Lexi).
-#) Launch MyEdit.
-#) Select Tools / Configure User Tools / Import Tools. Select the "Lexi.mut" file that came in Lexi.zip.
-
-That's all there is to it.
-
-=====Manual Installation=====
-
-#) Unzip Lexi.zip into its own directory.
-#) Copy your personal BRSerial.dat file into this directory.
-#) Launch MyEdit.
-#) Go to the Tools Menu, and then select "Configure User Tools".
-#) Select "Add"
-#) Enter the following information (Replace C:\Lexi\ with the appropriate folder), and Click OK to add the "Compile" tool.
-
-  Menu Item Name: Compile BR Program
-  Application/Command: C:\Lexi\ConvStoO.cmd
-  Working Folder: C:\Lexi\
-  Command Line Parameters: %%np_name %%npne_name "%%name" "%%folder"
-
-There are six other Tools you can add to the MyEdit user tools menu that give you additional abilities for working with BR Source code. To add additional tools, repeat steps 5 and 6 above substituting information from the "Available Functions" table below.
-
-That's all there is to it. Now, if you load a .BR file in MyEdit, you can select the "Extract Source" tool.
-The file will be converted to a .BRS file and the new one will be loaded in MyEdit. If you
-load a .BRS file, you can select the "Compile" tool, and the file will automatically be
-"compiled" into a .BR file for you. Then simply load BR and test your new program.
-
-This works with all versions of BR.
-
-====Available Functions====
-
-{| border=0
-!Menu Item
-!Application
-!Parameters
-|-
-|Compile BR Program
-|ConvStoO.cmd
-|%%np_name %%npne_name "%%name" "%%folder"
-|-
-|Extract Source Code
-|ConvOtoS.cmd
-|%%np_name %%npne_name "%%name" "%%folder"
-|-
-|Debug BR Program*
-|DebugBR.cmd
-|%%np_name %%npne_name "%%name" "%%folder"
-|-
-|Extract Source Code and Strip Line Numbers
-|ConvOSNL.cmd
-|%%np_name %%npne_name "%%name" "%%folder"
-|-
-|Add Line Numbers
-|AddLN.cmd
-|%%np_name %%npne_name "%%name" "%%folder"
-|-
-|Strip Line Numbers
-|StripLN.cmd
-|%%np_name %%npne_name "%%name" "%%folder"
-|-
-|Run BR Program
-|RunBR.cmd
-|%%np_name %%npne_name "%%name" "%%folder"
-|-
-|}
-
-* Debug BR Program requires that you have a copy of `brnative.exe` in the appropriate version sitting in your application folder. This may not be possible in all situations. Use Compile BR Program in situations where you cannot use Debug BR Program.
-
-===Notepad++===
-Users such as `User:Bowman` are currently using Lexi from within `Notepad++`.  However he has not yet been kind enough to share his setup process.  If you implement Lexi into your Notepad++ installation please add some instructions here.  If you can't figure it out I'd suggest contacting `User:Bowman` for assistance.
-
-====Instructions====
-These instructions assume Lexi 
-
-=====Automatic Installation=====
-Probably the easiest way to install Lexi tools into Notepad++ is to add the following lines to your shortcuts.xml (generally located in <nowiki>%appdata%\Roaming\Notepad++</nowiki>) file.
-
-<nowiki>
-<Command name="BR!s - Compile" Ctrl="yes" Alt="yes" Shift="yes" Key="73">C:\Lexi\ConvStoO.cmd &quot;$(FULL_CURRENT_PATH)&quot;</Command>
-</nowiki>
-
-<nowiki>
-<Command name="BR!s - Stip line numbers" Ctrl="yes" Alt="yes" Shift="yes" Key="73">C:\Lexi\StripLN.cmd &quot;$(FULL_CURRENT_PATH)&quot;</Command>
-</nowiki>
-
-<nowiki>
-<Command name="BR!s - Add line numbers" Ctrl="yes" Alt="yes" Shift="yes" Key="73">C:\Lexi\AddLN.cmd &quot;$(FULL_CURRENT_PATH)&quot;</Command>
-</nowiki>
-
-=====Manual Installation=====
-
-Add three user controls by choosing Run>Run... (enter the first line) and click Save, then select the remaining two lines.  Do these steps for each of the Lexi utilities listed here.
-
- BRS - Line numbers - Remove
- C:\Lexi\StripLN.cmd "$(FULL_CURRENT_PATH)"
- Alt+8
-
- BRS - Line numbers - Add
- C:\Lexi\AddLN.cmd "$(FULL_CURRENT_PATH)"
- Alt+Shift+8
-
- BR!s - Compile
- C:\Lexi\ConvStoO.cmd "$(FULL_CURRENT_PATH)"
-
-====Available Functions====
-{| border=0
-!Menu Item
-!The Program To Run
-|-
-|BRS - Compile
-|C:\Lexi\ConvStoO.cmd "$(FULL_CURRENT_PATH)"
-|-
-|BRS - Line numbers - Add
-|C:\Lexi\AddLN.cmd "$(FULL_CURRENT_PATH)"
-|-
-|BRS - Line numbers - Remove
-|C:\Lexi\StripLN.cmd "$(FULL_CURRENT_PATH)"
-|-
-|}
-
-Potentially other functions could be made available but have not yet been enhanced to work with the single full path parameter.  The enhanced batch files (listed above) could serve as an example of how this is done - If you're feeling spunky.
-
-* These installation instructions assumes the enhancement of 1 parameter passing (as opposed to 4) was included in your distribution.
-
-===Sublime Text===
-
-===All Third Party Editors===
-
-====Tips====
-*Inside the \Lexi\ folder you will find a copy of BR renamed to brnative.exe. It works better if this brnative.exe is the same version of BR that you are using in your programs. So copy your BR to this folder and replace brnative.exe with it.
-*If you are having some trouble "Extracting Source" and you installed MyEdit to a custom location you will need to modify the file ConvOtoS.cmd to point to the proper location of MyEdit.exe. Load it in a text editor and you'll see what I mean.
-*There is an additional tool called DebugBR.cmd. This only works if there is a working BR file called brnative.exe in the same folder as your program files. You add it to the list the same way as you did the other tools above.
-
-== Function Reference ==
-
-Lexi gives you access to a number of different abilities from other programs, designed to make your source code editing life easier. When you send a source file to BR using Lexi, Lexi preprocesses your source code, adding line numbers, and interpreting other "precompiler directives"
-
-=== No Line Numbers ===
-
-Working with No `Line Numbers` is easy, when you have Lexi to help.
-
-You load your files using MyEdit, and you work with them as Source Code files. If you are editing a file in MyEdit that has line numbers in it, you can save the document and select the "Strip Line Numbers" user tool. This will launch BR, use it to strip out the line numbers, and reload your program in MyEdit. You make the changes you want while the line numbers are gone, and when you choose the "Compile" user tool or the "Add Line Numbers" user tool, the line numbers are added back to your program. If you choose the "Compile" tool, the line numbers are added, and your source code file is saved as a .BR file.
-
-  43900  ! #Autonumber# 43900,10
-  43910  DoesLayoutExist: ! Return true if layout exists in the layouts folder
-  43920        def library FnDoesLayoutExist(layout$;LayoutPath$*255)
-  43930           let Fnsettings(Layoutpath$) !:
-                  fnDoesLayoutExist = exists(LayoutPath$&Filename$)
-  43940        fnend
-
-The above code gets turned into the following code when line numbers are stripped. When they are added back in, it gets turned back into the code above again.
-
-  ! #Autonumber# 43900,10
-  DoesLayoutExist: ! Return true if layout exists in the layouts folder
-        def library FnDoesLayoutExist(layout$;LayoutPath$*255)
-           let Fnsettings(Layoutpath$) !:
-           fnDoesLayoutExist = exists(LayoutPath$&Filename$)
-        fnend
-
-=== AutoNumber ===
-
-The #AutoNumber# precompiler directive directs the Line Number Add routine to use certian line numbers in your code.
-
-Without the #AutoNumber# precompiler directive, Lexi adds line numbers starting with line number 00001 and counting by 1s.
-
-  ! This Example Is Quite Simple:
-     let Fnupdatefiledropdown ! We Run This No Matter What Happens. It Builds The Combo Box Dropdown List
-  !
-     if Trim$(_Post$(1))="" then ! If The User Did Not Select A File Layout From The List Then
-        let Fnreadlayoutfolder ! Display The File Layout List In A Table
-     else
-        let Fnreadfileio(Trim$(_Post$(1))) ! But If They Did Select A File, Then Show It
-     end if
-     stop
-
-becomes
-
-  00001 ! This Example Is Quite Simple:
-  00002    let Fnupdatefiledropdown ! We Run This No Matter What Happens. It Builds The Combo Box Dropdown List
-  00003 !
-  00004    if Trim$(_Post$(1))="" then ! If The User Did Not Select A File Layout From The List Then
-  00005       let Fnreadlayoutfolder ! Display The File Layout List In A Table
-  00006    else
-  00007       let Fnreadfileio(Trim$(_Post$(1))) ! But If They Did Select A File, Then Show It
-  00008    end if
-  00009    stop
-
-The idea is that you maintain your programs in source files, and so it doesn't matter what your line numbers are.
-
-However, most BR Vendors do not maintain their programs as source files. They maintain them as .BR or .WB files, and the line numbers are important.
-
-To use the #AutoNumber# precompiler directive, all you have to do is place simple comments in your code that say:
-
-  ! #AutoNumber# LineNum,Increment
-
-Then, when Lexi is adding line numbers, and it finds one of these lines, Lexi tries to set the line number of the current line to the line number you specified. Thereafter, until it reaches the next #AutoNumber# statement, it counts by the Increment you gave it.
-
-In this way, its easy to give your functions each their own line number space, and still retain the ability to edit without having to worry about line numbers.
-
-With the #AutoNumber# statement,
-
-  ! #Autonumber# 16000,10
-  DefineModes: ! Define the input spec modes
-  def fnDefineInputModes
-     dim InputAttributesMode
-     dim InputFieldlistMode
-     dim InputEditorMode
-     dim InputEditorMoveMode
-     dim InputDebugMode
-  
-     let InputAttributesMode=1
-     let InputFieldlistMode=2
-     let InputEditorMode=3
-     let InputEditorMoveMode=4
-     let InputDebugMode=5
-  fnend
-
-becomes
-
-  16000 ! #Autonumber# 16000,10
-  16010 DefineModes: ! Define the input spec modes
-  16020 def fnDefineInputModes
-  16030    dim InputAttributesMode
-  16040    dim InputFieldlistMode
-  16050    dim InputEditorMode
-  16060    dim InputEditorMoveMode
-  16070    dim InputDebugMode
-  16080 !
-  16090    let InputAttributesMode=1
-  16100    let InputFieldlistMode=2
-  16110    let InputEditorMode=3
-  16120    let InputEditorMoveMode=4
-  16130    let InputDebugMode=5
-  16140 fnend
-
-For this reason, when you are removing line numbers from your programs, it is sometimes a good idea to populate them with #AutoNumber# comments first, to preserve your original line number structure as much as possible.
-
-If the line numbers program detects that your #AutoNumber# comments are not in numerical order, or if there is not enough numbers between them to accomodate all your lines, it will generate an error and stop processing your program. At that time you should type clear, and then system to return to your editor, and fix the #AutoNumber# statements there. After you fix the problem, Save your source code again, and compile.
-
-=== DEFINE ===
-
-The #DEFINE# Precompiler Directive will tell The Line Number generation system that you have made a constant.
-
-  !. "#Define# <nowiki>`ScreenControls`</nowiki> = "mat ControlName$, mat FieldName$, mat Description$, mat VPosition, mat HPosition, mat FieldType$"
-
-The above example will set up a precompiler Constant called <nowiki>`ScreenControls`</nowiki>. Now, everywhere in your program that you use the text <nowiki>`ScreenControls`</nowiki> will be replaced by "mat ControlName$, mat FieldName$, mat Description$, mat VPosition, mat HPosition, mat FieldType$".
-
-The "." will force BR to not change the capitalization of your comments.
-
-   ! #AutoNumber# 14000,10
-   EditScreen: ! Main Screen Designer
-   def fnEditScreen(fScreenIO, fScreenFld, ScreenName$, mat ScreenIO$, mat ScreenIO,<nowiki>`ScreenControls`</nowiki>)
-
-This function definition changes to contain the full list of arrays that are responsible for Screen Control information in the ScreenIO library, each time the program is compiled.
-
-When the source code is pulled back out and the line numbers are stripped, the substitute statements revert back to their original values.
-
-=== SELECT CASE ===
-
-We have implemented SELECT CASE as a precompiler directive. This means, when editing your programs with no line numbers, you can write SELECT CASE (SWITCH in C/C++) statements using the following syntax, and it will automatically be turned into IF THEN ELSEIF statements when it gets to BR.
-
-  ! #Autonumber# 16000,10
-  PreformInput: ! Preform main input operation
-  def fnPreformInput(&Mode,Control,mat ScreenIO$,mat ScreenIO;___,Window)
-     #SELECT# Mode #CASE# InputAttributesMode
-        let Window=fnGetAttributesWindow
-        let fnGetAttributeSpec(mat InputSpec$,mat InputData$,mat InputSubs)
-        rinput #Window, fields mat InputSpec$ : mat InputData$
-  
-     #CASE# InputFieldlistMode
-        let Window=fnGetFieldsWindow
-        let fnGetFieldsSpec(InputSpec$)
-        rinput #Window, fields InputSpec$ : InputData
-  
-     #CASE# InputDebugMode
-        let Window=fnGetDebugWindow
-        let fnGetFieldsSpec(InputSpec$)
-        rinput #Window, fields InputSpec$ : InputData
-  
-     #End Select#
-  fnend
-
-Gets translated into this:
-
-  16000  ! #Autonumber# 16000,10
-  16010  PreformInput: ! Preform main input operation
-  16020  def fnPreformInput(&Mode,Control,mat ScreenIO$,mat ScreenIO;___,Window)
-  16030     IF  Mode  =  InputAttributesMode THEN  ! #SELECT# Mode #CASE# InputAttributesMode
-  16040        let Window=fnGetAttributesWindow
-  16050        let fnGetAttributeSpec(mat InputSpec$,mat InputData$,mat InputSubs)
-  16060        rinput #Window, fields mat InputSpec$ : mat InputData$
-  16070  !
-  16080     ELSE IF  Mode  =  InputFieldlistMode THEN  ! #CASE# InputFieldlistMode
-  16090        let Window=fnGetFieldsWindow
-  16100        let fnGetFieldsSpec(InputSpec$)
-  16110        rinput #Window, fields InputSpec$ : InputData
-  16120  !
-  16130     ELSE IF  Mode  =  InputDebugMode THEN  ! #CASE# InputDebugMode
-  16140        let Window=fnGetDebugWindow
-  16150        let fnGetFieldsSpec(InputSpec$)
-  16160        rinput #Window, fields InputSpec$ : InputData
-  16170  !
-  16180     END IF  ! #End Select#
-  16190  fnend
-
-You may notice the comments that appear at the end of your IF THEN statements. The comments are created automatically by the "Add Line Numbers" routine when it translates the SELECT CASE statement into IF THEN ELSEIF statements. The purpose of the comments is so that the "Strip Line Numbers" routine can change them back into a SELECT CASE statement so that your code appears correct on the editor/line-number-free side.
-
-=== Spacing ===
-
-As you can see from the above examples, any blank spaces you insert into your programs are turned automatically into blank comment lines. This is to preserve the spacing and look and feel of your program on the editor/line-number-free side.
-
-== Considerations ==
-
-=== L##### labels ===
-Because Lexi strips the line numbers before you edit your document, it would easily cause a problem if you had any hard coded line number references, because your line numbers change all the time and those references aren't automatically updated. Therefore, before it strips line numbers from any BR program, Lexi loads the program in BR and executes the `RENUM` LABELS_ONLY command. This command replaces all your hard coded goto references with labels that are L##### where ##### is the line number.
-
-That way you are free to edit your document without worrying about the line numbers, and later, when you add in new line numbers, your program still works.
-
-If you have accidentally placed L##### labels in your code and you need them removed, contact `mailto:gabriel.bakker@gmail.com Gabriel`.  He has written a program to remove them.
-
-The L##### labels do not harm your code - it will work exactly as before. However, I understand sometimes it can be confusing if something like this happens to your code and there is a tool to change them back.
-
-One other note about L##### labels: If the "Add Line Numbers" routine detects any of these labels in your code, it will use them as clues as to what your original line numbers were, and it will match the new line numbers as closely as possible to the old one. This is done for your comfort as you edit your programs, just in case you still edit them in BR and use the line numbers. I wanted your programs to remain as unchanged by the linkage as possible.
-
-=== Save Source Code ===
-It is of vital importance that you save your source code before executing any of the user tools. If you fail to save your source code before using a user tool, the tool will operate on the old version of the file that it finds on the disk, and when the conversion is complete and the new file is reloaded in MyEdit, all your changes will be lost. You can't undo it because MyEdit thinks you have loaded a whole new file.
-
-Please be careful when using this.
-
-=== PROC NOECHO ===
-For anyone who has used Lexi in the past, it used to scroll through the contents of your program as it was adding or removing line numbers, due to the process of converting your source file into a compiled BR program. Depending on the size of the program and the speed of your system, this process may have taken a long time.
-
-The latest version of Lexi has been updated with PROC NOECHO to disable this printout and greatly improve the speed of compiling your programs. As a result of PROC NOECHO, if there are any compile time errors in your code, you will not be able to see the line that caused the problem, until you press F2. Just remember, if you run into a problem compiling your screen, press F2 to see the offending line.
-
-==Disclaimer==
-
-`User:Gabriel|Gabriel Bakker` and `Sage AX` are not responsible for anything that happens to your BR programs or data as a result of using this or any other tool we create.
+**Lexi**, the **BR! Lexical Preprocessor**, rewrites a handful of extra constructs — plus, in its
+best-known feature, an entire program's **line numbers** — into plain, correctly line-numbered BR
+text before real BR ever compiles it. It was originally built to integrate `BR` with a `third
+party editor` (`MyEdit` first, then `Notepad++`, and it will work with any editor that supports
+customizable user tools), and that editor-integration story is still how most people meet it — but
+Lexi itself is not an editor plugin. It's a **BR program**, runnable headlessly with no editor
+involved at all (see [Headless / scripted invocation](#headless)).
+
+If you use Lexi, you can edit your `BR Programs` **without line numbers**. This frees you up to
+copy and paste code, rearrange code, and add and edit code without having to worry about or
+manually change any line numbers — Lexi adds and changes and manages your `line numbers` for you
+automatically when you "compile" your program. By preprocessing your `source code|code` before
+it's passed to BR, Lexi also gives you access to a handful of extra constructs BR doesn't have on
+its own: the `#Select#`/`#Case#` construct (informally called "Select Case") and the `#Define#`
+substitution directive documented under [Directive reference](#directives) below, plus `/* ... */`
+comments and the `X$&=` compound-append shorthand.
+
+<a id="mechanism"></a>
+## What Lexi actually is
+
+Lexi is a **BR library program**, not a separate compiler binary:
+
+- **`lexi.br`/`lexi.brs`** is the library itself, exposing two functions:
+  - **`fnApplyLexi(InFile$, OutFile$, Mode, SourceMapFile$)`** — translates Lexi-only syntax to
+    plain BR and writes the result to `OutFile$`. The `Mode` argument controls line numbering:
+    `1` translates syntax only, keeping whatever line numbers `InFile$` already has; `0` assigns
+    line numbers **and** translates syntax in one pass — the mode a file written with
+    `#AutoNumber#` (no baked-in numbers of its own — the normal shape of hand-authored,
+    number-free source) needs.
+  - **`fnUndoLexi(InFile$, OutFile$)`** — the reverse: strips line numbers back out of a numbered
+    program, restoring the number-free editing shape (see [No Line Numbers](#no-line-numbers)).
+- Every distribution of Lexi — the classic SageAX zip and the VS Code extension bundle described
+  next — ships the same `fnApplyLexi`/`fnUndoLexi` engine; only the surrounding driver scripts and
+  packaging differ.
+
+<a id="distributions"></a>
+## Where Lexi comes from
+
+Two confirmed real distributions (there may be others):
+
+### Classic distribution — the SageAX zip
+
+The traditional path: download `Lexi.zip` from SageAX, unzip to a fixed local folder, and wire it
+into an editor's user-tools menu. This is the distribution [Installing the classic
+distribution](#installation) below walks through, and the one the rest of BR's ecosystem has
+historically meant by "Lexi."
+
+### Bundled distribution — the "BR Language Server" VS Code extension
+
+The VS Code extension **`crs-dev.vslang-br`** ("BR Language Server") bundles the identical Lexi
+engine under `<extension-install-dir>/Lexi/`:
+
+| File | Role |
+|---|---|
+| `lexi.br` / `lexi.brs` | The Lexi library itself (see [above](#mechanism)) |
+| `lexionly.brs` | Thin driver: `fnApplyLexi(InFile$, OutFile$, 1, SourceMapFile$)` — translate only, numbers already present |
+| `linenum.brs` | Thin driver: `fnApplyLexi(InFile$, OutFile$, 0, SourceMapFile$)` — assign numbers and translate |
+| `strip.brs` | Thin driver: `fnUndoLexi(InFile$, OutFile$)` |
+| `brnative.exe` / `brnative.42.exe` / `brlinux` | Bundled BR runtimes (4.3 / 4.2 / Linux 4.3) used to actually run the above |
+| `wbconfig.sys` | A config used only for this compile step — separate from any app's own `brconfig.sys` |
+
+The extension's own README states its user-facing behavior plainly: **"Compile `.brs`/`.wbs` to
+`.br`/`.wb` via the Lexi preprocessor"**, triggerable by `Ctrl+Shift+B` or automatically **on
+save** (a per-file status-bar toggle). "Saving a `.brs` file in VS Code produces the matching
+`.br`" is not the editor compiling anything itself — it's the extension shelling out to run this
+same Lexi library through its bundled BR runtime. Some apps also keep their own root-level copy of
+`lexi.brs` (e.g. because a screen-compile step invokes it directly) — check that app's own
+conventions doc if so; a byte-for-byte diff against one such app-root copy, done during a prior
+onboarding, found it identical to the extension's bundled copy aside from CRLF-vs-LF line endings,
+but confirm byte-identity again rather than assuming it for a given app.
+
+<a id="vscode-mechanism"></a>
+### How the VS Code extension invokes Lexi
+
+Reverse-engineered by reading the extension's own bundled `dist/extension.js` (not officially
+documented) — the *translation* step has since been verified independently by actually running it
+outside VS Code; the surrounding copy-in/compile-to-`.br`/copy-out steps are still as-read from the
+code, not personally re-run end-to-end:
+
+1. Copy the current source into a temp file the extension manages (under a `tmp/` folder next to
+   the source).
+2. Generate a small BR **proc** that:
+   - `subproc lexionly.brs` or `subproc linenum.brs`, picked by whether the source already has
+     line numbers;
+   - **types two more numbered lines directly into the proc** — `Infile$="tmp\..."` /
+     `Outfile$="tmp\..."` (and `SourceMapFile$=...`, if a source map was requested) — which BR
+     inserts into the `lexionly.brs`/`linenum.brs` program now sitting in memory, between its
+     existing `dim` and `library`/`fnApplyLexi` lines, exactly as if a human had typed new lines
+     at the keyboard. This is how `Infile$`/`Outfile$` actually get set — not a command-line
+     argument or an environment variable;
+   - `run` (executes the now-patched Lexi driver against those files);
+   - `clear`;
+   - `subproc <the-now-translated-temp-file>` (loads the plain-BR result as the program to
+     compile);
+   - `skip PROGRAM_REPLACE if exists(...)` / `save "<target>.br"` **or** `replace "<target>.br"`
+     (fresh compile vs. recompile over an existing object);
+   - `system` (exit).
+3. Run that proc through the bundled runtime with the bundled `wbconfig.sys` (a
+   `"<brnative.exe>" "PROC <path>" -<wbconfig>` invocation — the same shape as any BR
+   [startup command line](../platform/spec.md)), and watch stdout for BR's own error patterns to
+   report a compile failure back in the editor.
+
+<a id="headless"></a>
+### Headless / scripted invocation
+
+The mechanism above can be reproduced directly, with no editor involved. Verified live against
+the VS Code extension's bundled `Lexi/brnative.exe` + `Lexi/wbconfig.sys`, run under `UNATTENDED`
+logging so a bad input aborts fast instead of hanging:
+
+```
+proc noecho
+subproc linenum.brs
+00025 Infile$=":C:\full\path\to\source.brs"
+00026 Outfile$=":C:\full\path\to\translated-output.brs"
+run
+clear
+system
+```
+
+Run from inside the `Lexi/` folder (so the bare `subproc linenum.brs` resolves), e.g.
+`Lexi\brnative.exe "proc :C:\full\path\to\this.prc" -Lexi\wbconfig.sys`. The leading `:` on each
+absolute path is required — without it BR applies its own `DRIVE`-letter substitution to `C:` and
+resolves the path wrong; a bare `:` marks a literal OS path (see [platform — startup command
+line](../platform/spec.md)).
+
+This kit ships a maintained wrapper around exactly this proc —
+**[`dev/tools/lexi-compile.ps1`](../../../dev/tools/lexi-compile.ps1)** (PowerShell) — that
+auto-detects the VS Code extension's bundled Lexi install, builds the proc, and runs it under
+unattended logging with proper quoting/timeout handling:
+
+```powershell
+# Translate only — produces <source>.lexiout.brs next to the source
+dev\tools\lexi-compile.ps1 -Source path\to\file.brs
+
+# Translate AND compile to a real .br object
+dev\tools\lexi-compile.ps1 -Source path\to\file.brs -Compile
+```
+
+See [`dev/BR_launch.md`](../../../dev/BR_launch.md#the-lexi-preprocessor-if-this-app-uses-one) for
+the full parameter list and the "Lexi-aware development loop" this feeds into (translate → `brls
+-check`/`-sema` the translated file → fix the original → recompile).
+
+<a id="installation"></a>
+## Installing the classic distribution
+
+Lexi can be used to automatically convert between BRS and BR files from within MyEdit. This can
+make your editing life much easier. Lexi works with **all versions of BR**; the classic
+zip-and-user-tools installation below requires a version of MyEdit dated `October 20`, `2006` or
+later. (If you're onboarding an app that's built around the VS Code extension instead, see
+[Bundled distribution](#distributions) and [Headless / scripted invocation](#headless) — none of
+the MyEdit-specific steps below apply to that path.)
+
+The latest version of Lexi can be found at `http://www.sageax.com/downloads/Lexi.zip` (SageAX).
+
+### Automatic installation (MyEdit)
+
+Requires a version of MyEdit dated `March 5`, `2010` or later.
+
+1. Unzip `Lexi.zip` into `C:\Lexi`. You must use this directory for the automatic installation to
+   work.
+2. Copy your personal `brserial.dat` file into this directory (`C:\Lexi`).
+3. Launch MyEdit.
+4. Select *Tools → Configure User Tools → Import Tools*. Select the `Lexi.mut` file that came in
+   `Lexi.zip`.
+
+### Manual installation (MyEdit)
+
+1. Unzip `Lexi.zip` into its own directory.
+2. Copy your personal `BRSerial.dat` file into this directory.
+3. Launch MyEdit.
+4. Go to the Tools menu, then select *Configure User Tools*.
+5. Select *Add*.
+6. Enter the following (replacing `C:\Lexi\` with the appropriate folder) and click OK to add the
+   "Compile" tool:
+
+   | Field | Value |
+   |---|---|
+   | Menu Item Name | Compile BR Program |
+   | Application/Command | `C:\Lexi\ConvStoO.cmd` |
+   | Working Folder | `C:\Lexi\` |
+   | Command Line Parameters | `%%np_name %%npne_name "%%name" "%%folder"` |
+
+   There are six other tools you can add the same way, substituting from the table below.
+
+Once installed: loading a `.BR` file in MyEdit and selecting "Extract Source" converts it to
+`.BRS` and reloads it; loading a `.BRS` file and selecting "Compile" automatically compiles it back
+into a `.BR` file. This works with all versions of BR.
+
+#### Available functions (MyEdit user tools)
+
+| Menu Item | Application | Parameters |
+|---|---|---|
+| Compile BR Program | `ConvStoO.cmd` | `%%np_name %%npne_name "%%name" "%%folder"` |
+| Extract Source Code | `ConvOtoS.cmd` | `%%np_name %%npne_name "%%name" "%%folder"` |
+| Debug BR Program* | `DebugBR.cmd` | `%%np_name %%npne_name "%%name" "%%folder"` |
+| Extract Source Code and Strip Line Numbers | `ConvOSNL.cmd` | `%%np_name %%npne_name "%%name" "%%folder"` |
+| Add Line Numbers | `AddLN.cmd` | `%%np_name %%npne_name "%%name" "%%folder"` |
+| Strip Line Numbers | `StripLN.cmd` | `%%np_name %%npne_name "%%name" "%%folder"` |
+| Run BR Program | `RunBR.cmd` | `%%np_name %%npne_name "%%name" "%%folder"` |
+
+\* Debug BR Program requires a copy of `brnative.exe` (the matching version) sitting in the
+application folder — not always possible. Use Compile BR Program where Debug BR Program can't be
+used.
+
+### Notepad++
+
+Lexi can also be driven from Notepad++ by adding user commands to `shortcuts.xml` (typically
+`%appdata%\Roaming\Notepad++`) or via *Run → Run...* saved as user commands, e.g.:
+
+```
+BR!s - Compile
+C:\Lexi\ConvStoO.cmd "$(FULL_CURRENT_PATH)"
+
+BRS - Line numbers - Add
+C:\Lexi\AddLN.cmd "$(FULL_CURRENT_PATH)"
+Alt+Shift+8
+
+BRS - Line numbers - Remove
+C:\Lexi\StripLN.cmd "$(FULL_CURRENT_PATH)"
+Alt+8
+```
+
+Only these three functions (compile, add line numbers, strip line numbers) are documented for
+Notepad++ — the other MyEdit tools (debug, extract-source) have not been ported to a Notepad++
+command by any documented setup.
+
+### Sublime Text
+
+No documented setup exists for Sublime Text specifically; the general "any editor with
+customizable user tools" approach (wire a command to `ConvStoO.cmd`/`StripLN.cmd`/`AddLN.cmd`, same
+parameter shape as the Notepad++ commands above) is the only known path.
+
+### Tips (all third-party editors)
+
+- Inside the `\Lexi\` folder is a copy of BR renamed to `brnative.exe`. It works better if this is
+  the same BR version you use in your programs — copy your BR over it if not.
+- If "Extract Source" fails and MyEdit was installed to a custom location, edit `ConvOtoS.cmd` to
+  point at the correct `MyEdit.exe` path.
+- `DebugBR.cmd` only works if a working `brnative.exe` sits in the same folder as your program
+  files.
+
+<a id="directives"></a>
+## Directive reference
+
+Lexi preprocesses source code before passing it to BR, adding line numbers and interpreting the
+following directives/constructs. (The first two below — multi-line comments and compound append —
+were confirmed by running the real `fnApplyLexi` engine against test input; they were never
+documented in this reference before.)
+
+### `/* ... */` — multi-line comments
+
+A C-style block comment, rewritten to ordinary `!` comments. A comment spanning multiple source
+lines collapses on translation — the closing fragment attaches to the *next* line as a trailing
+`!` comment rather than getting its own numbered line, so don't expect a strict
+1:1 source-line-to-output-line mapping.
+
+### `X$&="..."` — compound append
+
+Shorthand for appending to a string variable. Lexi does **not** rewrite this to naive
+self-concatenation (`X$=X$&"..."`, which silently corrupts past ~120,000 cumulative bytes — see
+[`dev/essentials.md`](../../../dev/essentials.md), §4's self-concatenation gotcha).
+It emits the corruption-safe append idiom directly: `X$(INF:0)="..."`.
+
+<a id="no-line-numbers"></a>
+### No line numbers
+
+Working without `Line Numbers` is the feature Lexi is best known for. Load a file in MyEdit as
+source code; if it has line numbers, select "Strip Line Numbers" to launch BR, strip them, and
+reload the number-free program. Edit freely, then choose "Compile" or "Add Line Numbers" to put
+numbers back — "Compile" also saves the result as a `.BR` file.
+
+```
+43900  ! #Autonumber# 43900,10
+43910  DoesLayoutExist: ! Return true if layout exists in the layouts folder
+43920        def library FnDoesLayoutExist(layout$;LayoutPath$*255)
+43930           let Fnsettings(Layoutpath$) !:
+                fnDoesLayoutExist = exists(LayoutPath$&Filename$)
+43940        fnend
+```
+
+becomes, with line numbers stripped (and back again, identically, when re-added):
+
+```
+! #Autonumber# 43900,10
+DoesLayoutExist: ! Return true if layout exists in the layouts folder
+      def library FnDoesLayoutExist(layout$;LayoutPath$*255)
+         let Fnsettings(Layoutpath$) !:
+         fnDoesLayoutExist = exists(LayoutPath$&Filename$)
+      fnend
+```
+
+### `#Autonumber# <line>,<increment>`
+
+Directs the line-number-add routine to use specific numbers from this point on. Without it, Lexi
+starts at `00001` and counts by 1. Placed as a comment:
+
+```
+! #Autonumber# 16000,10
+DefineModes: ! Define the input spec modes
+def fnDefineInputModes
+   dim InputAttributesMode
+   ...
+```
+
+becomes:
+
+```
+16000 ! #Autonumber# 16000,10
+16010 DefineModes: ! Define the input spec modes
+16020 def fnDefineInputModes
+16030    dim InputAttributesMode
+...
+```
+
+Numbers between successive `#Autonumber#` directives must stay ascending with enough room for the
+intervening lines — if it detects the directives out of order, or not enough room, Lexi raises an
+error and stops; `clear` then `system` returns to the editor to fix the directives before saving
+and recompiling again. Placing `#Autonumber#` comments before stripping line numbers preserves the
+original numbering structure as closely as possible when numbers are re-added.
+
+### `#Define# `name` = text`
+
+A precompiler text-substitution constant. Wherever `` `name` `` appears afterward in the program,
+Lexi substitutes the defined text at preprocess time; a leading `.` on the `#Define#` comment line
+stops BR from re-casing it:
+
+```
+!. "#Define# `ScreenControls` = "mat ControlName$, mat FieldName$, mat Description$, mat VPosition, mat HPosition, mat FieldType$"
+```
+
+lets a function signature reference `` `ScreenControls` `` and have Lexi expand it to the full
+argument list every time the program is compiled. When line numbers are stripped back out, the
+substitution reverts to `` `name` `` — the expansion is a preprocess-time artifact, not a
+permanent rewrite of the source.
+
+<a id="select-case"></a>
+### `#Select# expr #Case# value ... #End Select#` (informally "Select Case")
+
+Lexi's case/switch-style branch. **The `#` signs are required** — this is the actual spelling, not
+the bare `SELECT CASE ... END SELECT` its informal name might suggest (see the correction note in
+this page's frontmatter). It translates line-for-line into an `IF`/`ELSE IF` chain, with each
+original directive line kept as a trailing `!` comment on its replacement:
+
+```
+#SELECT# Mode #CASE# InputAttributesMode
+   let Window=fnGetAttributesWindow
+   ...
+#CASE# InputFieldlistMode
+   let Window=fnGetFieldsWindow
+   ...
+#End Select#
+```
+
+becomes:
+
+```
+   IF  Mode  =  InputAttributesMode THEN  ! #SELECT# Mode #CASE# InputAttributesMode
+      let Window=fnGetAttributesWindow
+      ...
+   ELSE IF  Mode  =  InputFieldlistMode THEN  ! #CASE# InputFieldlistMode
+      let Window=fnGetFieldsWindow
+      ...
+   END IF  ! #End Select#
+```
+
+The trailing comments are what let "Strip Line Numbers" turn the `IF`/`ELSE IF` chain back into
+`#Select#`/`#Case#` form on the editor/number-free side. **A bare `SELECT CASE ... END SELECT`
+(no `#` signs) is not valid syntax at all** — confirmed live: Lexi leaves it completely untouched
+in both `Mode 0` and `Mode 1`, and the untouched result then fails to `LOAD` in real BR. It was
+never valid Lexi syntax, and it isn't valid base BR either (BR's `SELECT CASE`/`END SELECT` support
+requires the Lexi preprocessing step or an equivalent one — there is no built-in runtime construct
+by that bare name).
+
+### Spacing
+
+Blank lines in the number-free source are turned into blank comment lines when numbers are added,
+preserving the program's visual spacing and layout.
+
+<a id="considerations"></a>
+## Considerations
+
+### `L#####` labels
+
+Because Lexi strips line numbers before you edit, a hard-coded `GOTO`/`GOSUB` line-number
+reference would break the moment numbers change. So before stripping numbers from any program,
+Lexi loads it in BR and runs **`RENUM LABELS_ONLY`**, which replaces every hard-coded line-number
+reference with a label of the form `L#####` (`#####` = the original line number). You're then free
+to edit without line numbers, and the program still works once numbers are re-added.
+
+`L#####` labels don't harm your code — it runs exactly as before. If you need them removed (e.g.
+because they read as clutter), that's a separate cleanup step, not something Lexi does
+automatically. When line numbers are re-added, any `L#####` labels present are used as hints to
+match the new numbers back to the original numbering as closely as possible.
+
+### Save source code before running a tool
+
+Any Lexi user tool operates on the on-disk copy of the file, not what's currently in the editor
+buffer. Save before invoking a Lexi tool, or the tool compiles/strips/adds numbers to stale
+content — and because the tool reloads its *output* into the editor afterward, there's no undo:
+the editor now believes the reloaded file is what you had, and unsaved changes are simply gone.
+
+### `PROC NOECHO`
+
+Older Lexi versions scrolled through the program's contents on screen while adding/removing line
+numbers, which could be slow for large programs. Current versions compile under `PROC NOECHO` to
+suppress that scroll and speed up compilation. The tradeoff: if a compile-time error occurs, you
+won't see the offending line printed — press **F2** to see it.
+
+## Disclaimer
+
+Gabriel Bakker and Sage AX are not responsible for anything that happens to your BR programs or
+data as a result of using this or any other tool they create.
+
+<a id="see-also"></a>
+## See also
+
+- [Installation & tooling — Lexi preprocessor](spec.md#lexi) — the folded category summary this
+  page backs.
+- [`dev/BR_launch.md` — The Lexi preprocessor](../../../dev/BR_launch.md#the-lexi-preprocessor-if-this-app-uses-one) —
+  task-oriented walkthrough: detection, the headless loop, and `lexi-compile.ps1` usage.
+- [`dev/essentials.md` §1](../../../dev/essentials.md#1-core-language-rules) — Lexi's syntax
+  summarized alongside BR's other core-language gotchas.
+- [`dev/tools/lexi-compile.ps1`](../../../dev/tools/lexi-compile.ps1) — the maintained headless
+  wrapper around [Headless / scripted invocation](#headless).
+- [MyEdit_(BR_Edition)](MyEdit_(BR_Edition).md) — the editor Lexi's classic distribution targets
+  first.
+- [50-libraries/screenio](../../50-libraries/screenio/spec.md) — Lexi also supports ScreenIO
+  development (a screen's compiled Helper Library can be built from Lexi-preprocessed pieces).
+- [platform — startup command line](../platform/spec.md) — the `"<exe>" "PROC <path>" -<config>`
+  invocation shape Lexi's own headless proc runs through.

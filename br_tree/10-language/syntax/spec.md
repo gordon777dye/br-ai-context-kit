@@ -246,6 +246,11 @@ in angle brackets is a default keyed to the Defaults list; **insertable** sub-di
 - [system-functions](../data-manipulation/system-functions/spec.md) — the intrinsics whose arity
   drives [name resolution](#name-resolution); which names are reserved
 - [expressions](../data-manipulation/expressions/spec.md) — where call-vs-subscript is parsed
+- [installation-tooling — Lexi preprocessor](../../00-configuration/installation-tooling/spec.md#lexi) —
+  `/* ... */` comments, `X$&=` compound append, and `#Select#`/`#Case#`/`#Define#`/`#AutoNumber#`
+  directives are not base-BR syntax at all; they're rewritten to plain BR *before* this spec's
+  grammar ever sees them. Encountering one of these in real source is a sign the app preprocesses
+  with Lexi, not a gap in this page.
 - Backing keyword page retained (deep reference — full command/statement abbreviation appendix):
   [Keyword_Abbreviation](Keyword_Abbreviation.md)
 - (Other backing pages folded into this spec and pruned. The 2b

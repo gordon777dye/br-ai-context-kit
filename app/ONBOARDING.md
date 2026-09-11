@@ -126,6 +126,17 @@ The UNATTENDED keyword lets AI run BR in a headless (no user prompts) mode.
 Both are regenerated whenever `brconfig.sys` changes — generated, never hand-edited (same
 convention as `data-model.md`/`topics.json`).
 
+**While here, check whether this app is written for Lexi** (a preprocessor some BR shops use —
+see [`dev/BR_launch.md`](../dev/BR_launch.md#the-lexi-preprocessor-if-this-app-uses-one) for what
+it is and [`dev/essentials.md`](../dev/essentials.md#1-core-language-rules) for its syntax). A
+quick signal: grep the app's `.brs` source for `/* `, `&=`, or `#Select#` (a bare `SELECT CASE`
+with no `#` is **not** a useful signal — it isn't valid syntax in Lexi or base BR either, see
+`essentials.md`). If any show up outside `br_tree`/comments, ask the app owner to confirm — don't
+just infer it from a grep hit alone. This matters for STEP 4 (a Lexi-based app's `.br` is produced
+by Lexi, typically via the "BR Language Server" VS Code extension compiling on save — not by
+`LOAD ... source`/`SAVE` directly, though the mtime relationship the audit checks still holds
+either way) and STEP 6 below (record it in `conventions.md` if confirmed).
+
 ### STEP 2 — Locate or create `filelay/` ◆ prerequisite for STEP 3
 STEP 3 does **not** inspect the app's actual data files to learn their layout. `extract-schema.exe`
 only parses the plain-text **`filelay/`** directory (described in Appendix A): one 

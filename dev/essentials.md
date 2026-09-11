@@ -127,10 +127,57 @@ Two kinds of content, both load-bearing:
   BASICs, you do **not** need a `STOP`/`GOTO` guard before a function definition to keep execution
   from falling into it with unset parameters. **See §2 for two more `DEF FN` traps not in the
   written spec at all.**
-- **`SELECT CASE … END SELECT` is Lexi-preprocessor syntax, not base BR.** If your program is
-  plain `.brs` (not run through the Lexi preprocessor), `SELECT CASE` won't compile — this isn't a
-  bug, it's simply unsupported outside Lexi. Use `ON expr GOTO`/`ON expr GOSUB` or chained
-  `IF`/`ELSE IF` instead.
+- **Some shops write BR source for `Lexi`, a preprocessor that adds constructs base BR (and
+  `brls.exe`) cannot parse on their own.** Lexi is a real, freestanding BR preprocessor — not a
+  hypothetical or deprecated tool — built as a BR **library program** (`lexi.br`/`lexi.brs`,
+  exposing `fnApplyLexi`/`fnUndoLexi`) that rewrites Lexi-only syntax into plain, correctly
+  line-numbered BR text before real BR ever sees it. Confirmed by running the real
+  `fnApplyLexi` engine against test input (not inferred from a comment) — Lexi syntax includes:
+  - `/* ... */` — multi-line comment, rewritten to ordinary `!` comments.
+  - `X$&="..."` — rewritten to `X$(INF:0)="..."` (**not** `X$=X$&"..."` — Lexi emits the
+    corruption-safe append idiom directly; see §4's self-concatenation gotcha for why that
+    matters).
+  - **`#Select# expr #Case# value ... #Case# value2 ... #End Select#`** — the `#` signs are
+    **required**; this is Lexi's real syntax for a case/switch-style branch, confirmed to
+    translate line-for-line into `IF expr = value THEN ... ELSE IF expr = value2 THEN ... END
+    IF` (each original `#Select#`/`#Case#`/`#End Select#` line is kept as a trailing `!` comment
+    on its replacement). **Bare `SELECT CASE ... END SELECT` (no `#` signs) is not valid syntax
+    at all** — not base BR, and not Lexi either; Lexi leaves it completely untouched and it then
+    fails to `LOAD` in real BR. (A previous version of this note called plain `SELECT CASE`
+    Lexi syntax — that was wrong, most likely from reading Lexi's own header comment, which
+    describes the *feature* colloquially as "Select Case" while the actual required spelling
+    uses `#Select#`/`#Case#`. Corrected 2026-09-11 after live-testing both forms; see
+    `context/ERRORS.md`.)
+  - **`#Autonumber# <line>,<increment>`** — a comment-line directive controlling the numbers Lexi
+    assigns from that point on (default: start at `00001`, count by 1 with none present). Numbers
+    between successive directives must stay ascending with room for the lines between them, or
+    Lexi raises an error and stops rather than silently mis-numbering.
+  - **`` #Define# `name` = text ``** — a preprocess-time text-substitution constant: every
+    occurrence of `` `name` `` afterward expands to `text` when Lexi compiles, and reverts to
+    `` `name` `` when line numbers are stripped back out. Not a runtime BR construct at all — the
+    expansion exists only in the compiled `.br`, not in the number-free source you edit.
+  - **`L#####` labels** are Lexi's own doing, not something you write: before stripping line
+    numbers from a program, Lexi runs `RENUM LABELS_ONLY` so every hard-coded `GOTO`/`GOSUB` line
+    target becomes a stable `L#####` label first — otherwise a renumber-free edit would silently
+    break every hard-coded line reference. Seeing `L#####` labels in Lexi-managed source is normal;
+    they don't affect behavior and are reused as numbering hints when line numbers are re-added.
+  - Blank lines in number-free source round-trip as blank `!` comment lines once numbers are
+    added, and Lexi compiles under `PROC NOECHO` for speed (press **F2** to see a compile-error
+    line if a compile fails — `NOECHO` suppresses the line that would otherwise print it).
+  - There are more "modern programming statement" conveniences than this list covers — treat it as
+    a growing list, not exhaustive, the same as the rest of this file. Full directive reference,
+    both known Lexi distributions (classic SageAX zip vs. the VS Code extension bundle), and the
+    headless invocation mechanism:
+    [`br_tree/00-configuration/installation-tooling/Lexi.md`](../br_tree/00-configuration/installation-tooling/Lexi.md).
+
+  **If a program won't compile in base BR (or `brls` rejects it) and it uses any of the above
+  `#`-prefixed or `&=`/`/* */` syntax, the fix is not to remove the construct — check whether the
+  app is meant to be run through Lexi first.** A common, real deployment of Lexi is bundled inside
+  the "BR Language Server" VS Code extension (`crs-dev.vslang-br`), which runs Lexi automatically
+  on save; see [`BR_launch.md`](BR_launch.md#the-lexi-preprocessor-if-this-app-uses-one) for how
+  that pipeline actually works, including a verified (not guessed) description of how it invokes
+  Lexi and compiles the result. If a program has none of this syntax, it's likely plain BR and
+  none of this applies — Lexi is opt-in per shop, not universal.
 - **Plain `INPUT` takes NO prompt argument.** `INPUT "X", A$` does not compile — emit the prompt
   with a separate `PRINT "X"` first, then `INPUT A$` on its own. A lesser-known third form, **plain
   `RINPUT <var>`** (a single variable, not a list, no `FIELDS`), *is* valid: it prints the

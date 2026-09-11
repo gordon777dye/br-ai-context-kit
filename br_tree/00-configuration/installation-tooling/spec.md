@@ -11,6 +11,16 @@ related: [config-directives, platform]
 keywords: [ODBC, PDF, Lexi, DLL, PEM, AutoIt, DEBUG, PROFILE]
 corrections:
   - "DEBUG and PROFILE added to the frontmatter keywords. This page documents `DEBUG PROFILE SAMPLED <file>` and its siblings and declared neither word. Found in brls phase 13."
+  - "The Lexi preprocessor summary below said plain \"SELECT CASE — preprocessor switch construct,\"
+    which reads as if the bare `SELECT CASE ... END SELECT` spelling were valid. It isn't, in Lexi
+    or in base BR — confirmed by running Lexi's own `fnApplyLexi` engine against a file containing
+    that bare spelling: it passed through completely untouched in both of Lexi's numbering modes,
+    and the untouched result then failed to `LOAD` in real BR. The real, required spelling is
+    `#Select# expr #Case# value ... #End Select#` (the `#` signs are mandatory); \"Select Case\" is
+    only Lexi's own informal name for the feature. Also added: Lexi is itself a BR **library
+    program** (`fnApplyLexi`/`fnUndoLexi` in `lexi.br`/`lexi.brs`), and a second confirmed
+    distribution — the \"BR Language Server\" VS Code extension (`crs-dev.vslang-br`) bundles the
+    identical engine and runs it on save. Full detail moved to [Lexi](Lexi.md#mechanism)."
 ---
 
 # Installation & tooling
@@ -47,23 +57,30 @@ on close.
 ## Lexi preprocessor
 
 **Lexi** lets you edit `.BRS` source **without line numbers**, managing numbering automatically on
-compile, and adds preprocessor directives:
+compile, and adds a handful of extra constructs: `/* ... */` comments, `X$&="..."` compound
+append, and preprocessor directives:
 - **`#AutoNumber# <start>,<incr>`** — controls regenerated line numbers per program section (must be
   ascending, with room for the lines between directives).
 - **`#Define# [[name]] = text`** — text-substitution constants expanded at preprocess time.
-- **SELECT CASE** — preprocessor switch construct.
+- **`#Select# expr #Case# value ... #End Select#`** (informally "Select Case") — a case/switch
+  branch, translated to an `IF`/`ELSE IF` chain. **The `#` signs are required** — a bare `SELECT
+  CASE ... END SELECT` is not valid syntax in Lexi *or* in base BR (confirmed live: Lexi passes it
+  through untouched, and it then fails to `LOAD`).
 
 Before stripping numbers Lexi runs **`RENUM LABELS_ONLY`** so hard-coded `GOTO`/`GOSUB` line targets
 become `L#####` labels (safe to edit number-free; re-added numbers reuse them as hints). It runs the
 compile under `PROC NOECHO` for speed (press **F2** to see a compile-error line), and **you must save
 the source before invoking a Lexi tool** or it operates on the stale on-disk copy.
 
-Install (into MyEditBR): download Lexi from SageAX, unzip to **`C:\Lexi`** (the path is required for
-auto-install), copy your `brserial.dat` there, then in MyEditBR use *Tools → Configure User Tools →
-Import Tools* and select `Lexi.mut` (it adds Compile/Extract-Source/Add-or-Strip-Line-Numbers/Run/
-Debug tools — `DebugBR` needs a matching `brnative.exe`). Lexi also integrates with Notepad++ and
-Sublime, and supports [ScreenIO](../../50-libraries/screenio/spec.md) development. Full tool tables
-and directive examples: [Lexi](Lexi.md).
+Lexi is itself a BR **library program** (`fnApplyLexi`/`fnUndoLexi` in `lexi.br`/`lexi.brs`), not a
+separate compiler. Two confirmed distributions: the classic SageAX zip — download, unzip to
+**`C:\Lexi`** (the path is required for auto-install), copy your `brserial.dat` there, then in
+MyEditBR use *Tools → Configure User Tools → Import Tools* and select `Lexi.mut` (it adds
+Compile/Extract-Source/Add-or-Strip-Line-Numbers/Run/Debug tools — `DebugBR` needs a matching
+`brnative.exe`); and the "BR Language Server" VS Code extension (`crs-dev.vslang-br`), which bundles
+the identical engine and runs it automatically on save. Lexi also integrates with Notepad++, and
+supports [ScreenIO](../../50-libraries/screenio/spec.md) development. Full mechanism, both
+distributions, headless/scripted invocation, and directive examples: [Lexi](Lexi.md).
 
 <a id="catalog"></a>
 ## Tool & DLL catalog
