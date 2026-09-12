@@ -208,12 +208,12 @@ failures that it doesn't detect along with any false positives.
 
 **Before trusting a `brls`/`LOAD ... source` failure, check whether this app uses Lexi** — a
 preprocessor some BR shops write source for (`/* */` comments, `X$&=`, `#Select#/#Case#`, and
-more). Neither `brls` nor base BR understands Lexi syntax, so a file using it will show false
-syntax errors in both. Check `../app/conventions.md` (once onboarded) for whether *this* app uses
-it; if it does, use
-[`BR_launch.md`](BR_launch.md#the-lexi-aware-development-loop)'s **Lexi-aware development loop**
-(built on `dev/tools/lexi-compile.ps1`) instead of running `brls -check` on the raw source — the
-loop below assumes plain BR and needs adapting for a Lexi-using app.
+more — full syntax in [`essentials.md`](essentials.md#1-core-language-rules)). Neither `brls` nor
+base BR understands Lexi syntax, so a file using it will show false syntax errors in both — that's
+not a bug in the source. Check `../app/conventions.md` (once onboarded) for whether *this* app
+uses it; if it does, use the **Lexi-aware coding loop** below instead of running `brls -check` on
+the raw source — the loop immediately below assumes plain BR and needs that substitution for a
+Lexi-using app.
 
 **Required AI Coding loop:**
 1. Edit file using `-next` as needed.
@@ -228,6 +228,30 @@ loop below assumes plain BR and needs adapting for a Lexi-using app.
    or `DEF` you opened is still open, so never read a clean step 4 as a clean program.
 7. Fix findings.
 8. Close with real BR `LOAD ... source` plus `SAVE` or `REPLACE`.
+
+#### Lexi-aware coding loop
+
+For a file confirmed to use Lexi, substitute this loop for the one above — translate before every
+syntax check, and never run `brls`/`LOAD ... source` against the Lexi-flavored source directly,
+only against its translated output:
+
+1. Edit the `.brs` file (Lexi syntax is fine — that's what it's written for).
+2. Translate it headlessly: `dev\tools\lexi-compile.ps1 -Source <file.brs> -OutFile
+   <tmp-translated.brs>` (parameters in [`BR_launch.md`](BR_launch.md#the-lexi-preprocessor)). A
+   translation failure here (the script throws) means Lexi itself rejected something — e.g. a
+   `#Select#` with no matching `#End Select#` — fix that before going further.
+3. Run `brls -check` (and `-sema`) against the **translated** file, not the original — this is now
+   plain BR, so `brls`'s diagnostics are meaningful again. Fix findings in the *original* `.brs`,
+   then repeat from step 2 (translation is cheap; don't hand-edit the translated temp file, it'll
+   just be regenerated).
+4. Once clean, either let `-Compile` finish the job (`lexi-compile.ps1 -Source <file.brs>
+   -Compile`), or save the file in VS Code with the "BR Language Server" extension installed —
+   both run the identical underlying Lexi engine, so either is a legitimate way to produce the
+   final `.br` (mechanism:
+   [`br_tree` — Lexi](../br_tree/00-configuration/installation-tooling/Lexi.md#mechanism)).
+5. Close with real BR's own gate regardless: `LOAD <the-compiled-or-translated-file> source` (or
+   trust step 4's `-Compile`, which already does this) — same discipline as any other BR program,
+   per §7.
 
 **Editing existing BR source — CP437 safety:** `*.br.brs` / `*.wbs` source is stored as
 **CP437**; some files carry high-bit window-frame `data` tables that `Edit` / `Write` / `MultiEdit`
@@ -406,6 +430,12 @@ These bite the *runner*, not the program, and each one masquerades as something 
   mysteriously dies at the assign-WSID stage, suspect a leaked slot from an earlier force-kill before
   you suspect your code.** Letting every run reach its own `EXECUTE "system"` exit avoids this;
   `UNATTENDED` logging (below) is what makes that achievable, since it turns hangs into fast aborts.
+  **Exit code 99 is BR's generic exit code after *any* unattended-mode fatal error, not a dedicated
+  WSID signal** — confirm a leaked WSID slot by checking the LOGGING file's own `"Unattended
+  processing terminated by error <n> while ..."` line (the same authoritative signal §6.2 already
+  documents) before assuming a leaked slot. A bad file path handed to `PROC` (e.g. a POSIX-style path
+  from Git Bash instead of PowerShell/cmd) produces the identical exit code via a different real cause
+  (BR error 4215, "invalid drive reference") — no leaked WSID or force-kill involved.
 - **`LIST` regenerates source through the config's `style` directive, so a decompile *restyles* it.**
   Keywords, label case, indentation and comment alignment are normalized to the config (e.g.
   `style indent 3 45 keywords lower labels mixed expressions upper`). A program whose stored source
@@ -472,8 +502,9 @@ editing `statement-semantics.md`), [`tools/gen_datamodel_index.exe`](tools/gen_d
 **`--verify`** — a non-writing drift check (source hash + range/structure validation +
 regenerate-and-compare, exit 1 on drift) for catching a stale index after the source was edited but
 not regenerated. **Everything else is done by BR itself, driven headlessly** — with one exception:
-[`tools/lexi-compile.ps1`](tools/lexi-compile.ps1) (PowerShell, see
-[`BR_launch.md`](BR_launch.md#the-lexi-aware-development-loop)), which drives the **Lexi**
+[`tools/lexi-compile.ps1`](tools/lexi-compile.ps1) (PowerShell — parameters in
+[`BR_launch.md`](BR_launch.md#the-lexi-preprocessor), used as part of the
+[Lexi-aware coding loop](#lexi-aware-coding-loop) above), which drives the **Lexi**
 preprocessor for apps that use it. Unlike the four helpers above, it isn't a self-contained
 binary — it depends on the "BR Language Server" VS Code extension (`crs-dev.vslang-br`) being
 installed on the machine it runs on (or explicit `-LexiPath`/`-BrExe`/`-WbConfig` pointing

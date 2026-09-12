@@ -127,7 +127,7 @@ Both are regenerated whenever `brconfig.sys` changes — generated, never hand-e
 convention as `data-model.md`/`topics.json`).
 
 **While here, check whether this app is written for Lexi** (a preprocessor some BR shops use —
-see [`dev/BR_launch.md`](../dev/BR_launch.md#the-lexi-preprocessor-if-this-app-uses-one) for what
+see [`dev/BR_launch.md`](../dev/BR_launch.md#the-lexi-preprocessor) for what
 it is and [`dev/essentials.md`](../dev/essentials.md#1-core-language-rules) for its syntax). A
 quick signal: grep the app's `.brs` source for `/* `, `&=`, or `#Select#` (a bare `SELECT CASE`
 with no `#` is **not** a useful signal — it isn't valid syntax in Lexi or base BR either, see

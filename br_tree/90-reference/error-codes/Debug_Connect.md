@@ -6,7 +6,7 @@ subcategory: 90-reference/error-codes
 kind: error-code
 related: [command, debugger]
 ---
-The **debug connect** `command` is used to connect a `debugger` for the `editor|editor's` debugging purposes.
+The **debug connect** `command` is used to connect a `debugger` for an editor's debugging purposes.
 
 * debug connect localhost
 * debug connect 127.0.0.1

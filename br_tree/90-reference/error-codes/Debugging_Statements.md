@@ -6,8 +6,8 @@ subcategory: 90-reference/error-codes
 kind: error-code
 related: [Pause, Go, Break]
 ---
-;`Pause` (PAU)
+;`Pause statement` (PAU)
 Interrupts program execution and allows the operator to enter system commands, print variables, change variables, and edit program lines, then resume execution from the same line or a different line. (Type any form of the `Go` command to restart execution.)
 
-;`Break` 
+;`Break command` (not a statement but can be EXECUTEd)
 Causes the program to go into Step mode when a variable value changes, or the specified line number is encountered.

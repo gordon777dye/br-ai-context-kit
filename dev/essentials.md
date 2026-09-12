@@ -174,10 +174,11 @@ Two kinds of content, both load-bearing:
   `#`-prefixed or `&=`/`/* */` syntax, the fix is not to remove the construct — check whether the
   app is meant to be run through Lexi first.** A common, real deployment of Lexi is bundled inside
   the "BR Language Server" VS Code extension (`crs-dev.vslang-br`), which runs Lexi automatically
-  on save; see [`BR_launch.md`](BR_launch.md#the-lexi-preprocessor-if-this-app-uses-one) for how
-  that pipeline actually works, including a verified (not guessed) description of how it invokes
-  Lexi and compiles the result. If a program has none of this syntax, it's likely plain BR and
-  none of this applies — Lexi is opt-in per shop, not universal.
+  on save; see [`br_tree` — Lexi](../br_tree/00-configuration/installation-tooling/Lexi.md) for a
+  verified (not guessed) description of how that pipeline actually invokes Lexi and compiles the
+  result, and [`BR_launch.md`](BR_launch.md#the-lexi-preprocessor) for running the same thing
+  headlessly. If a program has none of this syntax, it's likely plain BR and none of this
+  applies — Lexi is opt-in per shop, not universal.
 - **Plain `INPUT` takes NO prompt argument.** `INPUT "X", A$` does not compile — emit the prompt
   with a separate `PRINT "X"` first, then `INPUT A$` on its own. A lesser-known third form, **plain
   `RINPUT <var>`** (a single variable, not a list, no `FIELDS`), *is* valid: it prints the

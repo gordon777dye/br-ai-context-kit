@@ -168,9 +168,10 @@ dev\tools\lexi-compile.ps1 -Source path\to\file.brs
 dev\tools\lexi-compile.ps1 -Source path\to\file.brs -Compile
 ```
 
-See [`dev/BR_launch.md`](../../../dev/BR_launch.md#the-lexi-preprocessor-if-this-app-uses-one) for
-the full parameter list and the "Lexi-aware development loop" this feeds into (translate → `brls
--check`/`-sema` the translated file → fix the original → recompile).
+See [`dev/BR_launch.md`](../../../dev/BR_launch.md#the-lexi-preprocessor) for the full parameter
+list, and [`dev/APP-DEV-GUIDE.md`](../../../dev/APP-DEV-GUIDE.md#lexi-aware-coding-loop) for the
+"Lexi-aware coding loop" this feeds into (translate → `brls -check`/`-sema` the translated file →
+fix the original → recompile).
 
 <a id="installation"></a>
 ## Installing the classic distribution
@@ -448,8 +449,10 @@ data as a result of using this or any other tool they create.
 
 - [Installation & tooling — Lexi preprocessor](spec.md#lexi) — the folded category summary this
   page backs.
-- [`dev/BR_launch.md` — The Lexi preprocessor](../../../dev/BR_launch.md#the-lexi-preprocessor-if-this-app-uses-one) —
-  task-oriented walkthrough: detection, the headless loop, and `lexi-compile.ps1` usage.
+- [`dev/BR_launch.md` — The Lexi preprocessor](../../../dev/BR_launch.md#the-lexi-preprocessor) —
+  invoking `lexi-compile.ps1` headlessly, with its full parameter list.
+- [`dev/APP-DEV-GUIDE.md` — Lexi-aware coding loop](../../../dev/APP-DEV-GUIDE.md#lexi-aware-coding-loop) —
+  the detection check and the full translate/check/fix/compile loop this feeds into.
 - [`dev/essentials.md` §1](../../../dev/essentials.md#1-core-language-rules) — Lexi's syntax
   summarized alongside BR's other core-language gotchas.
 - [`dev/tools/lexi-compile.ps1`](../../../dev/tools/lexi-compile.ps1) — the maintained headless
