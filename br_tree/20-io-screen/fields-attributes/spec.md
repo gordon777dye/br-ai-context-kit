@@ -23,7 +23,7 @@ attribute/font names defined in BRConfig.sys live under
 ## Tables — format specifications
 
 ```bnf
-<format-spec> ::= <string-format>[<length>] | <numeric-format> <length>[.<dec>]
+<format-spec> ::= <string-format>[<length>[/<capacity>]] | <numeric-format> <length>[.<dec>][/<capacity>]
                 | PIC(<picture>) | FMT(<identifiers>) | DATE(<mask>)
                 | TEXT <rows>/<cols>[/<capacity>] | FILTER
 ```
@@ -34,15 +34,15 @@ attribute/font names defined in BRConfig.sys live under
 | `V n` / `VU` / `VL` | Variable (trims trailing spaces): normal / upper / lower |
 | `N n[.d]` / `NZ` / `NL` | Numeric right-aligned / zero-suppressed / leading-sign |
 | `G n` / `GZ` | General (char or numeric) / zero-suppressed |
-| `B n` / `L n` | Binary / Long (binary storage) |
+| `B n` / `L n` | Binary / Long (binary storage - FORM only) |
 | `PIC(picture)` | Picture format with insertion chars (numeric-oriented) |
 | `FMT(identifiers)` | Validated/formatted field (string-oriented; see below) |
 | `DATE(mask)` | Display as date, stored numerically (day-of-century) — enables numeric sort |
 | `TEXT rows/cols[/cap]` | Multi-line text box (`^ENTER_LF` default, `^ENTER_CRLF`, `^NOWRAP`; Ctrl+ENTER returns) |
 | `FILTER` | Search/filter field for LIST/GRID controls |
 
-**Display-width override** (4.17+): `displayed-length/field-spec` shows fewer columns than the
-field's capacity — e.g. `"5,10,7/N 10.2"`, `"9,10,20/C 25"`. Full format×context usage matrix
+**Field capacity override**: `displayed-length/capacity` shows fewer columns than the
+field's capacity — e.g. `"5,10,N 10.2/7"`, `"9,10,C 20/25"`. Full format×context usage matrix
 (which codes are legal for READ/WRITE/PRINT/INPUT FIELDS): [Format_Specifications](Format_Specifications.md).
 
 <a id="fmt"></a>
@@ -69,9 +69,71 @@ Example: `INPUT FIELDS "10,10,FMT(RAAA-#999),AE":X$` → 4 alpha (uppercased) + 
 <a id="attributes"></a>
 ## Semantics — attributes
 
+#### Screen Attributes
+
+Attributes control appearance and behavior of fields. They consist of three optional components:
+
 ```bnf
-<attributes> ::= [<control-attrs>][<display-attrs>][ '/' <color-attrs> ]
+<attributes> ::= [<control-attrs>][<display-attrs>][/<color-attrs>]
 ```
+
+##### Display Attributes
+Legacy monochrome attributes (still supported):
+- `B` - Blink (deprecated)
+- `H` - Highlight (brighter text, deprecated) 
+- `U` - Underline (deprecated)
+- `R` - Reverse video (dark on light)
+- `N` - Normal (reset to default)
+- `I` - Invisible/Password field (4.17+: displays as asterisks or dots)
+- `S` - Sunken/3D appearance (PRINT FIELDS only)
+
+##### Color Attributes
+```bnf
+/<foreground>[:<background>]
+```
+
+**Basic Colors:**
+- `R` - Red
+- `G` - Green  
+- `B` - Blue
+- `H` - Grey
+- `W` - Windows default (black on grey)
+- `T` - Transparent (default black foreground)
+
+**Color Combinations:**
+- `BG` - Light blue (Blue + Green = Cyan)
+- `RB` - Purple/Magenta (Red + Blue)
+- `RG` - Olive/Yellow (Red + Green)
+- `BGR` - White (all colors)
+
+**Hexadecimal Colors:**
+```bnf
+/#RRGGBB[:#RRGGBB]
+```
+Example: `/#228B22:#CC99FF` (forest green on light purple)
+
+**Color Priority (4.17+):**
+When multiple color specs are present, priority is:
+1. #RRGGBB style values (highest)
+2. W (Windows system colors)
+3. HRGB values (lowest)
+
+This allows specifying fallback colors for different display types.
+
+##### Control Attributes
+Control field input behavior:
+
+- `A` - Auto-advance to next field when current field filled
+- `E` - Enter (submit all fields) when exited with changes
+- `AE` - Auto-enter when field filled (A+E combined)
+- `C` - Cursor starts here (multiple field processing only)
+- `T` - Tab to next field when filled
+- `P` - Protect (read-only)
+- `L` - Lowercase only
+- `^` - Uppercase only
+- `X` - Return control on any key press
+- `Q` - Enable dropdown for combo box
+
 
 <a id="display-attributes"></a>
 ### Display attributes

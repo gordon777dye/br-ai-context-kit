@@ -116,7 +116,7 @@ context\dev\tools\lexi-compile.ps1 -Source path\to\file.brs -OutFile path\to\tra
 | `-OutFile` | `<Source>.lexiout.brs` | Where the translated, plain-BR output goes. |
 | `-Compile` | off (switch) | Also compile the translated output to a `.br` object (`LOAD`/`SAVE` or `REPLACE`, whichever applies), via the same bundled runtime. |
 | `-OutObject` | `<Source>` with its extension replaced by `.br` | Where the compiled `.br` goes, when `-Compile` is given. |
-| `-LexiPath` | auto-detected under `$env:USERPROFILE\.vscode\extensions\crs-dev.vslang-br-*\Lexi` | The Lexi install folder (`lexi.brs`, `lexionly.brs`, `linenum.brs`, `brnative.exe`, `wbconfig.sys`). Pass explicitly if that extension isn't installed, or to compile through a different Lexi install (e.g. this app's own root-level `lexi.brs`, if it has one — confirm byte-identity with the extension's copy before assuming they're the same engine; see `../app/conventions.md`). |
+| `-LexiPath` | auto-detected under `$env:USERPROFILE\.vscode\extensions\crs-dev.vslang-br-*\Lexi` | The Lexi install folder (`lexi.brs`, `lexionly.brs`, `linenum.brs`, `brnative.exe`, `wbconfig.sys`). Pass explicitly if that extension isn't installed, or to compile through a different Lexi install. |
 | `-BrExe` | `<LexiPath>\brnative.exe` | The BR executable to run Lexi with. |
 | `-WbConfig` | `<LexiPath>\wbconfig.sys` | The config to run Lexi with (Lexi's own — separate from this app's `brconfig.sys`). |
 | `-KeepTemp` | off (switch) | Keep the generated proc/config/log temp files afterward — useful for debugging a failure. |
