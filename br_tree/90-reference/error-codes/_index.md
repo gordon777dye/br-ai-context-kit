@@ -2,7 +2,7 @@
 
 Every BR numeric error code, one file each. See the table below for fast lookup.
 
-_772 entries._
+_761 entries._
 
 | Code | Description |
 |---|---|
@@ -736,8 +736,6 @@ _772 entries._
 | [9998](9998.md) | Corrupt DIM source |
 | [9999](9999.md) | Signal an ATTN state |
 | [Assertion_Failed](Assertion_Failed.md) | Assertion Failed |
-| [Begin](Begin.md) | BEGIN is an optional parameter for the BREAK command, which will cause it to break and enter step mode upon entry. |
-| [BR32.exe_Debug](BR32.exe_Debug.md) | The Debug version of BR32.exe is used by beta testers and developers of the Bussiness Rules! language. |
 | [BR_StartService_failed](BR_StartService_failed.md) | A messagebox with a title of BR StartService failed and a message stating The service did not respond to the start or control request in a… |
 | [Chapter_18](Chapter_18.md) | The theme of this chapter concerns some very good news in the face of some unavoidable bad news. |
 | [Chapter_3](Chapter_3.md) | Now that you've learned the basics about running, saving, loading and editing programs, you're ready to learn more about writing programs… |
@@ -745,20 +743,12 @@ _772 entries._
 | [CONTINUE](CONTINUE.md) | The Continue (CO) statement transfers control to the first executable statement following the one causing the most recent error. |
 | [Couldn't_'lock_in_progress'](Couldn't_'lock_in_progress'.md) | '''Couldn't lock in progress''' |
 | [Couldn't_get_lock_offset](Couldn't_get_lock_offset.md) | When launching Business Rules! a '''Couldn't get lock offset. messagebox with a caption of Error''' is displayed. |
-| [DEBUG](DEBUG.md) | see also: BR32.exe Debug |
-| [Debug_Connect](Debug_Connect.md) | The debug connect command is used to connect a debugger for the editor|editor's debugging purposes. |
-| [DEBUG_PROFILE](DEBUG_PROFILE.md) | Use PROFILER.EXE to translate the BR Profiler output file into readable text. |
-| [Debug_Release](Debug_Release.md) | A Debug Release is a release not meant for end users, but for developers doing Beta testing for BRC. |
-| [Debugger](Debugger.md) | A Debugger is an third party utility that communicates with BR32.exe to enhance your coding experience. |
-| [Debugging_Errors](Debugging_Errors.md) | Debugging Errors we're released with 4.18a |
-| [Debugging_Statements](Debugging_Statements.md) | ;Pause (PAU) Interrupts program execution and allows the operator to enter system commands, print variables, change variables, and edit… |
 | [Delayed_write_failed](Delayed_write_failed.md) | [http://www.ehow.com/info_12169268_8-common-causes-delayed-write-failed-errors.html 8 common causes]… |
 | [Error-Cond_Line-Ref](Error-Cond_Line-Ref.md) | The "error-cond line-ref" parameter is replaced with one or more pairs of specifications. |
 | [ERROR](ERROR.md) | Errors happen. They come in many different flavors. |
 | [Error_after](Error_after.md) | Part of the Client Server Reconnect configuration statement which generates a BR error and awaits for reconnection (default is 120 seconds). |
 | [ERROR_CODES](ERROR_CODES.md) | During your execution of your Business Rules! programs, if something goes wrong, you will probably receive an Error Code. |
 | [Error_Handling_Statements](Error_Handling_Statements.md) | ;Continue (CO) Used at the end of an error processing routine to transfer control to the first executable statement following the statement… |
-| [ERROR_mode](ERROR_mode.md) | When entering a program line or running a program without error handling statements (see :Category:Error Conditions and Error Handling… |
 | [EXIT](EXIT.md) | The Exit (EXI) statement provides a short-cut method for coding several repetitions of the "error-cond line-ref" parameter into a single… |
 | [EXIT_Error_Cond](EXIT_Error_Cond.md) | See also Exit(disambiguation) |
 | [FKey_Error_Cond](FKey_Error_Cond.md) | The FKEY error condition is available for use only with the ON error statement. |
@@ -775,6 +765,5 @@ _772 entries._
 | [ON_FKEY](ON_FKEY.md) | As of 4.20 On Fnkey was renamed to On FKey OPTION 58 restores recognition of FNKEY if needed. |
 | [PROCERR](PROCERR.md) | The ProcErr (PROCE) command tells BR how to respond when it finds an error in an active procedure file. |
 | [SOFLOW](SOFLOW.md) |  |
-| [STEP_mode](STEP_mode.md) |  |
 | [SYSERR$](SYSERR$.md) |  |
 | [SYSERR](SYSERR.md) |  |

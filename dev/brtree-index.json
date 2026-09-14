@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-09-11",
+  "generated": "2026-09-13",
   "source": "br_tree/",
-  "source_sha256": "f1e52d8fe7439ebd51ddb9193b1e0730b26fd2fbe329581abff8826d2fc0a83a",
+  "source_sha256": "812c43f6f4be0341179bd0668e51f10d68c48d65353e14b5776a6d5f83d2adb1",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -179,8 +179,14 @@
     "CONFIG DATABASE": [
       "30-io-file/database"
     ],
+    "CONNECT": [
+      "00-configuration/installation-tooling"
+    ],
     "CONNECTSTRING": [
       "30-io-file/database"
+    ],
+    "CONSOLE": [
+      "00-configuration/installation-tooling"
     ],
     "CONTINUE": [
       "10-language/flow-control/error-handling"
@@ -1464,7 +1470,9 @@
         "PEM",
         "AutoIt",
         "DEBUG",
-        "PROFILE"
+        "PROFILE",
+        "CONNECT",
+        "CONSOLE"
       ],
       "related": [
         "config-directives",

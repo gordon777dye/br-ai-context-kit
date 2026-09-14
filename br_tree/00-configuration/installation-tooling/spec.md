@@ -8,8 +8,13 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment
 recovered-fold: AutoIt, BRListenerInstaller.exe, BRSerial.dat (3 redirect-collision pages folded from re-fetched source — AutoIt automation note + EditNN/R99C999, installer service-register, brserial.dat license/UserID$/version-rename; verbatim retained on the BR wiki)
 related: [config-directives, platform]
-keywords: [ODBC, PDF, Lexi, DLL, PEM, AutoIt, DEBUG, PROFILE]
+keywords: [ODBC, PDF, Lexi, DLL, PEM, AutoIt, DEBUG, PROFILE, CONNECT, CONSOLE]
 corrections:
+  - "CONNECT and CONSOLE added to the frontmatter keywords: this page's Diagnostics section now
+    names `DEBUG CONNECT` and `DEBUG CONSOLE OFF` (added when Profiler.md and Debugger.md were
+    split out as their own backing pages under this folder, consolidated from several thin pages
+    that previously lived under 90-reference/error-codes/ — see those two files' own corrections
+    for the full provenance)."
   - "DEBUG and PROFILE added to the frontmatter keywords. This page documents `DEBUG PROFILE SAMPLED <file>` and its siblings and declared neither word. Found in brls phase 13."
   - "The Lexi preprocessor summary below said plain \"SELECT CASE — preprocessor switch construct,\"
     which reads as if the bare `SELECT CASE ... END SELECT` spelling were valid. It isn't, in Lexi
@@ -44,11 +49,11 @@ on close.
 
 - **MyEditBR** (MyEdit – BR Edition) — the BR-specific editor (4.18+): syntax highlighting, code
   completion, refactoring of variables/labels/named-forms, line renumbering, and a visual debugger
-  with watches and breakpoints. **Free** vs **Supported** licensed builds (one program; a support
-  license unlocks features such as direct `.BR`/`.WB` editing+compile, conditional breakpoints,
-  unlimited open files). `/forceportable` on the `EDITOR` line runs it from a USB install. Settings
-  live in `MyEditBR.*` files (`.actbindings`, `.broptions`, `.desktop`, …) — copy these to migrate
-  setups. Deep detail in [MyEdit_(BR_Edition)](MyEdit_(BR_Edition).md).
+  (see [Debugger](Debugger.md)) with watches and breakpoints. **Free** vs **Supported** licensed
+  builds (one program; a support license unlocks features such as direct `.BR`/`.WB` editing+compile,
+  conditional breakpoints, unlimited open files). `/forceportable` on the `EDITOR` line runs it from
+  a USB install. Settings live in `MyEditBR.*` files (`.actbindings`, `.broptions`, `.desktop`, …) —
+  copy these to migrate setups. Deep detail in [MyEdit_(BR_Edition)](MyEdit_(BR_Edition).md).
 - **Notepad++** — generic editor; usable for BR via a **User-Defined Language** file and a *run
   command* that searches the BR Wiki for the word at the cursor
   (`http://brwiki.ads.net/index.php?title=Special:Search&search=$(CURRENT_WORD)`). Also hosts Lexi.
@@ -93,7 +98,7 @@ distributions, headless/scripted invocation, and directive examples: [Lexi](Lexi
 | `PDFLIB.DLL` | DLL | required to create [PDFs](#pdf) (32-bit only — see below) |
 | `pemnet.dll`, `brconvert.dll`, `vcdlltest.exe` | DLL/util | [.NET / PEM controls](#dotnet) support (BR directory) |
 | `Dotnetfx20.exe`/`Dotnetfx35.exe`, `vcredist_x86.exe` | runtime installers | install/upgrade .NET (Win2000 / WinXP+) and VC++ libs for PEM |
-| **Profiler** | diagnostic | line/timing profiler (see [#diagnostics](#diagnostics)) |
+| **Profiler** | diagnostic | line/timing profiler (see [Profiler](Profiler.md), [#diagnostics](#diagnostics)) |
 | `Printlocks.exe` | diagnostic | dumps the lock area; requires a filename as 1st parameter |
 | **REGCLEAN** | diagnostic | fixes BR SDK / SQL Mod DCOM registration (see [#diagnostics](#diagnostics)) |
 | `CheckSerial.exe` | license util | reads the licence info in a `brserial.dat` (BRC utility) |
@@ -140,7 +145,10 @@ and `vcdlltest.exe` in its directory.
   (see [70-commands/information](../../70-commands/information/spec.md)), then render the log with
   `profiler.exe <file> [raw]`. The binary output format (network byte order; record types for
   module mapping, current line, time-in-line, backtrace, function name, GOSUB, …) is in
-  [Profiler_File_Layout](Profiler_File_Layout.md).
+  [Profiler_File_Layout](Profiler_File_Layout.md). Full capture/view workflow: [Profiler](Profiler.md).
+- **Debugger** — a third-party tool attaching over `DEBUG CONNECT`, plus the separate debug build of
+  BR32.exe used by BRC beta testers and the `DEBUG CONSOLE OFF`/`DEBUG CONNECT` command family. Full
+  detail: [Debugger](Debugger.md).
 - **REGCLEAN** (`regclean.exe`) — repairs BR SDK DCOM (311) errors, e.g. an unregistered SQL Mod.
   `regclean -q all` lists registered projects + paths; `regclean -d <project|all>` removes entries;
   re-register by running the project exe (`dcomkey`, `sql`). The `fix.cmd` batch
@@ -169,8 +177,9 @@ Its bundled Window Info utility shows what AutoIt "sees" on screen.
 - [40-io-printing/pcl-pdf](../../40-io-printing/pcl-pdf/spec.md) — where `PDFLIB.DLL` is used
 - [50-libraries/screenio](../../50-libraries/screenio/spec.md) — Lexi also supports ScreenIO development
 - Backing keyword pages (deep detail retained): [MyEdit_(BR_Edition)](MyEdit_(BR_Edition).md),
-  [ODBC](ODBC.md), [Profiler_File_Layout](Profiler_File_Layout.md), [Lexi](Lexi.md) (preprocessor
-  tool tables + directive examples — relocated here from 50-libraries/screenio)
+  [ODBC](ODBC.md), [Profiler](Profiler.md), [Profiler_File_Layout](Profiler_File_Layout.md),
+  [Debugger](Debugger.md), [Lexi](Lexi.md) (preprocessor tool tables + directive examples —
+  relocated here from 50-libraries/screenio)
 
 *(3 redirect-collision pages re-fetched in 2b — `AutoIt`, `BRListenerInstaller.exe`, `BRSerial.dat` —
 were folded into this spec and pruned; verbatim wikitext remains on the BR wiki.)*

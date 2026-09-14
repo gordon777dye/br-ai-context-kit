@@ -455,9 +455,7 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
   statements without a runtime error, but CNT will get reset by the system under a wide range 
   of conditions, thereby making it useless as a working variable.
   **check any small failing program for a variable named `CNT` first**; renaming it to anything else
-  (`FCOUNT`, `XCOUNT`, etc.) fixes it immediately, no other change needed. The project's VS Code BR
-  linter independently flags bare `CNT` assignment as a parse error, confirming this is a real
-  reserved-word collision, not an environment fluke.
+  (`FCOUNT`, `XCOUNT`, etc.) fixes it immediately, no other change needed.
 
 ---
 
