@@ -386,14 +386,17 @@ is cosmetic and ignored.
  price.ky4, DESCRIPTION-U/COST             ← key 4 (DESCRIPTION segment case-insensitive)
  recl=127                                  ← optional record length
  ===================================================   ← divider (ignored)
- FARM$,          Farm Code (or blank),        C    4
- ITEM$,          Item Code,                   C    4
- GRADE$,         Quality,                     C    4
- X,              Empty,                       X   37
- PRICE,          Default Price,               BH 3.2
+ FARM$,          Farm Code (or blank),        C 4,                 , 1 -   4, 1 $
+ ITEM$,          Item Code,                   C 4,                 , 5 -   8, 2 $
+ GRADE$,         Quality,                     C 4,                 , 9 -  12, 3 $
+ X,              Empty,                       X 37,                ,13 -  49
+ PRICE,          Default Price,               BH 3.2,              ,50 -  52, 1
+ (blank line after every 5th field row)
+
  ! comment lines start with ! and are ignored anywhere
- COST,           Default Cost,                BH 3.2
- DESCRIPTION$,   Description of Price Rule,   C   30
+ COST,           Default Cost,                BH 3.2,              ,53 -  55, 2
+ EFFDATE,        Effective Date,              BH 3,    Date(julian),56 -  58, 3
+ DESCRIPTION$,   Description of Price Rule,   C 30,                ,59 -  88, 4 $
  #eof#                                         ← optional; everything after is ignored
  additional comments...
 ```
@@ -429,7 +432,8 @@ readability.
 
 ## Field definition lines
 
-One line per field, in **on-disk order**. Comma-separated columns:
+One line per field, in **on-disk order**. Comma-separated columns.
+Note that only the first 3 columns are required.
 
 | Col | Meaning | Rules |
 |----:|---------|-------|
@@ -437,14 +441,38 @@ One line per field, in **on-disk order**. Comma-separated columns:
 | 2 | **Description** | Human label; also DataCrawler column heading and ScreenIO default caption. Keep ≤ ~80 chars. |
 | 3 | **FORM spec** | A BR FORM type + size, e.g. `C 4`, `BH 3.2`, `PD 5`, `N 6`. Type **`X`** = filler: the field is ignored except that its length still advances the disk position of later fields. Full FORM type list: `br_tree/30-io-file/form-spec/`. |
 | 4 | **Disk date format** *(optional)* | `DATE(Julian)`, `DATE(cymd)`, `DATE(ymd)`, `DATE(mdy)`, etc. — marks the field as a date in that storage format (enables DataCrawler/ScreenIO/CSV date handling; your program still unpacks it). **Any col-4 text that isn't `DATE(...)` is treated as a comment and ignored.** |
-| 5+ | **Comments** | Ignored. |
+| 5 | **Positions** *(recommended)* | `start - end`, the 1-based inclusive byte range of the field in the record, e.g. `13 - 49`. Documentation for humans and for cross-checking the FORM sizes; it is one of the "comments" columns the parser ignores. **Column 4 must be present (empty if the field is not a date) so this lands in column 5.** |
+| 6 | **Subscript** *(recommended)* | The subscript number FileIO assigns to the field on OPEN, followed by ` $` for a string field, e.g. `4 $` or `2` — see [Subscript numbers](#subscript-numbers). **Gap rows (`X`) have none.** Also documentation only. |
+| 7+ | **Comments** | Ignored. |
 
 ## Comments, blanks, and end-of-file
 
 - A line whose first non-space character is **`!`** is a comment — allowed anywhere, ignored.
-- **Blank lines** are ignored.
+- **Blank lines** are ignored. By convention the field rows are grouped in fives: **one blank line after every 5th field row** (counting `X` gap rows), restarting at the first row after the divider, and none after the last row. This is purely visual, for readability.
 - An optional **`#eof#`** line after the last field ends parsing; anything below it is ignored (free
   space for notes).
+
+## Subscript numbers
+
+Column 6 records the subscript number FileIO assigns each named field when the file is OPENed, so
+hard-coded field subscripts in existing code (`F$(7)`, `F(3)`) can be read back to field names, and
+migrated to the FileIO subscript names.
+
+- **Two independent sequences, each starting at 1.** String fields (name ends in `$`) are numbered
+  1, 2, 3… among the strings; numeric fields 1, 2, 3… among the numerics. The number is assigned in
+  the order the rows appear in the layout (FORM order), not by byte position.
+- **The ` $` suffix** follows the number on every string-field row (`6 $`) and is absent on numeric
+  rows (`6`). It tells you which array — `F$()` or `F()` — the number indexes.
+- **`X` rows take no subscript and are not counted.** A gap row's field name is exactly `X` (FORM type
+  `X`). A named filler such as `UNUSED` or `UNUSED2$` is a real field: it is numbered like any other.
+  Use `X` for a gap only where no subscript is wanted; where the original system numbered a filler,
+  keep it as a named field of its real type.
+- **Repeated fields are written out.** `4*C 30` becomes four rows (`SPEC1$`…`SPEC4$`), one per
+  subscript, so the numbers stay correct.
+- **Exception — layouts whose programs are wired to the original order.** For files loaded out of
+  order by legacy programs (in this app `invoiceh`, `invoicel`, `invcdelh`, `ihisth`, `ihistl`) the
+  column carries the subscript numbers the existing code uses, not the FileIO-assigned ones, because
+  its purpose is interpreting that code. Say so in such a file when you do this.
 
 ## Conversion checklist (other dictionary → filelay)
 
@@ -454,6 +482,10 @@ One line per field, in **on-disk order**. Comma-separated columns:
    case-insensitive segments; use the layout's subscript names, not raw positions.
 4. Add `recl=` if you know it (else let FileIO compute it).
 5. `====` divider.
-6. One field line per field **in disk order**: `NAME[$], description, FORM-type size [, DATE(...)]`.
-   Represent gaps/reserved bytes as `X <length>` so positions stay correct.
-7. Keep subscript names stable across versions forever.
+6. One field line per field **in disk order**: `NAME[$], description, FORM-type size, [DATE(...)],
+   start - end, subscript[ $]`. Column 4 stays present (empty) when there is no date format.
+   Represent gaps/reserved bytes as `X <length>` (name `X`, no subscript) so positions stay correct.
+7. Number subscripts per [Subscript numbers](#subscript-numbers): strings and numerics separately,
+   from 1, `X` rows skipped; put ` $` after each string number.
+8. Insert one blank line after every 5th field row.
+9. Keep subscript names stable across versions forever.
