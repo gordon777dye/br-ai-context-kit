@@ -117,18 +117,60 @@ screen and per control, a **BR statement string** (a function call you write); t
 | Merge | `MERGEFN$` | during ScreenIO AutoMerge, before the record is written |
 | Main Loop | `LOOPFN$` | every pass of the main `RINPUT FIELDS` statement |
 | Nokey | `NOKEYFN$` | when a keyed read finds no record |
-| Listview Prepopulate | `PRELISTVIEWFN$` | before a listview is filled (default `prelist.brs` if blank) |
-| Listview Postpopulate | `POSTLISTVIEWFN$` | after a listview is filled (default `postlist.brs` if blank) |
+| Listview Prepopulate | `PRELISTVIEWFN$` | before a listview is filled, **after** a `defaults\prelist.brs` if one exists — not a fallback pair, see the full ordering below |
+| Listview Postpopulate | `POSTLISTVIEWFN$` | after a listview is filled, **after** a `defaults\postlist.brs` if one exists — see the full ordering below |
 | Exit | `EXITFN$` | last, as the screen closes |
 
 **Control-level events** (the control's `FUNCTION$` field — see data model):
 - **Validate** — input controls (`c`, `search`, `check`, `combo`, `filter`): decide whether the entered
   value is acceptable; may modify or reject it.
 - **Click** — `button`, `caption`, `p` (picture): runs when the user clicks the control.
-- **Filter** — listviews: decide whether the current record is added to the list (and its row colour).
+- **Filter** — listviews: called once per record as the file is read. Return `0`/`""`/`"STOP"` to
+  suppress the record (`"STOP"` also halts reading the file — an early-exit optimization); return
+  `1`/`"1"`/any other non-blank string to include it. If that non-blank return value is itself a
+  valid BR color spec (`"/#123456:#124324"`, or a named macro from `BRConfig.sys`/an included file
+  like `color.sys`, e.g. `"[BLUE]"`), the record is included **and** rendered in that color — one
+  return value drives both inclusion and row color, not two separate mechanisms. Confirmed against
+  the engine source (`design.brs`'s listview-population loop) and by ScreenIO's author, 2026-09-13.
   Example in [spec.md](spec.md#examples).
 
-A `fnInit_…` / `fnFinal_…` function-name pair lets a control run initialization / finalization logic.
+A **`fnInit_<name>`** / **`fnFinal_<name>`** pair (`<name>` matching the Filter function's own name,
+truncated together with the `Init_`/`Final_` prefix to fit BR's identifier length limit — e.g.
+`fnFilterSubscriptionCharges` pairs with `fnInit_FilterSubscriptionCharg`/
+`fnFinal_FilterSubscriptionChar`) lets a **listview's Filter function** run one-time setup/teardown
+around the whole per-record loop, rather than on every record.
+
+**`fnInit_`/`fnFinal_` were added to ScreenIO later than `PRELISTVIEWFN$`/`POSTLISTVIEWFN$`**
+(confirmed by ScreenIO's author, 2026-09-13) — older screens built before that addition achieve
+the same one-time-setup/teardown effect using the screen-level Listview Prepopulate/Postpopulate
+events instead. All three mechanisms (the `function/defaults/prelist.brs`/`postlist.brs` files,
+the screen-level `PRELISTVIEWFN$`/`POSTLISTVIEWFN$`, and the Filter function's own `fnInit_`/
+`fnFinal_`) **are fully supported today, and none is a fallback for another** — each is checked
+and run independently, so a screen can have any combination of the six fire around one listview
+load. **Exact order, confirmed directly against the engine source** (`design.brs`'s
+`Fnpopulatealllistviews`, lines ~1730-1753 for the open side and ~1930-1944 for the close side —
+verify against current source if `design.brs` changes, this is not a documented contract
+elsewhere):
+
+1. `defaults\prelist.brs`, if that file exists (regardless of whether `PRELISTVIEWFN$` is also
+   set — checked independently, not "used only if blank").
+2. `PRELISTVIEWFN$` (screen-level Listview Prepopulate), if specified.
+3. `fnInit_<name>` (in the Filter function's own file), if a listview control's Filter function
+   exists on this screen.
+4. The listview loads: the Filter function runs once per record, until EOF or a `"STOP"` return.
+5. `defaults\postlist.brs`, if that file exists.
+6. `POSTLISTVIEWFN$` (screen-level Listview Postpopulate), if specified.
+7. `fnFinal_<name>`, if present — **last**, after both postlist calls, not before `POSTLISTVIEWFN$`
+   as an earlier draft of this note (and the author's own initial recollection) had it.
+
+Confirmed real-world purpose of the `fnInit_`/`fnFinal_` pair, 2026-09-13: `fnInit_...` commonly
+opens files the per-record Filter function will do a keyed read against on every row
+(opening/closing per-row instead would be wasteful for a large list) and/or computes a one-time
+value (e.g. a listview header caption); `fnFinal_...` then closes what `fnInit_
+...` opened. All three functions live in the **same** `function/<name>.brs` file, sharing
+module-level `DIM`s declared at the top of that file (that's how the open file numbers survive
+from `fnInit_...` through every call of the main Filter function to `fnFinal_...`). This pairing is
+optional — older Filter functions may have only the plain function, no `_Init`/`_Final`.
 
 <a id="context"></a>
 ### Handler runtime context
@@ -177,11 +219,21 @@ A handler ends the screen by setting `ExitMode`; the engine keeps looping while 
 <a id="function-types"></a>
 ### Valid custom-function types
 
-An event or control `FUNCTION$` field may hold any of:
-- a **library function** call (your own `DEF FN…`) or a **custom screen function**;
-- a **link to another screen** — the `[SCRNNAME]` form, optionally using `CurrentKey$` / `ThisParentKey$`;
-- a **`CHAIN`** statement;
-- **any single BR command**;
+An event or control `FUNCTION$` field may hold any of (dispatch logic confirmed from source,
+`Fnexecute`/`fnFS` in `screenio.brs`, 2026-09-13):
+- **`{name}`** — a custom function file, `function/name.brs`, imported and compiled into the
+  screen's Helper Library (see [spec.md](spec.md#how-it-works)).
+- **`#libname:call(...)`** — an inline library-function call needing no separate function file:
+  parsed as library name (up to the first `:`) and a call expression (after it); the compiler
+  generates `library "libname" : fnXxx` (`fnXxx` taken from the call expression) plus
+  `let ReturnValue[$] = call(...)` directly in the Helper Library's dispatcher. E.g.
+  `#run:fnRun('[CUSTEDIT]',F$(CU_CODE))` calls `fnRun` from `library "run"`.
+- a **link to another screen** — the `[SCRNNAME]` form, optionally `(row,col)` and/or a trailing
+  expression after `]` (assigning `CurrentKey$` / `ThisParentKey$`, `DISPLAYONLY=1`, etc.) —
+  evaluated via the same `{`/`#`/`*` rules as above.
+- **`%progname`** — `CHAIN`s to an entirely different program, ending the current screen stack.
+- **any single BR command/statement** — with none of the above prefixes, the field is passed
+  straight to `EXECUTE`.
 - (Conversion functions only) **any valid BR field spec**.
 
 <a id="coverage"></a>

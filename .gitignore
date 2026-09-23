@@ -17,6 +17,9 @@
 !/app/onboarding/
 !/app/onboarding/*
 
+# Already tracked null version - no need to keep updating it
+/ERRORS.md/
+
 # --- forward-looking hygiene for clones that onboard/compile a real app ---
 # (not part of the diff; safe to trim. compiled BR objects + node deps)
 *.br

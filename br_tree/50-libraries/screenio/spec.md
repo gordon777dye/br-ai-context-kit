@@ -85,6 +85,11 @@ FNEND
 - [30-io-file/statements](../../30-io-file/statements/spec.md) — the file I/O ScreenIO performs
 - [60-integration/web](../../60-integration/web/spec.md) — web integration; the PhpIO library deploys ScreenIO screens to the web
 - [00-configuration/installation-tooling](../../00-configuration/installation-tooling/spec.md) — **Lexi** (the no-line-numbers preprocessor, relocated there)
+- **`run.brs`** — a companion library **distributed with ScreenIO** (confirmed with ScreenIO's
+  author, 2026-09-13), not something an app writes for itself: `fnRunTabs`/`fnTabs`/`fnRunTab` load
+  several Screen Functions onto native BR tab-windows (one `OPEN ... "tab=<caption>"` per tab, the
+  `CURTAB` system function to detect a tab switch, `fnfm$` re-invoked per tab) so an app can build a
+  tabbed main-menu shell without reimplementing that plumbing itself.
 
 *(The **live** wiki ScreenIO Library
 page is a full ~206-section manual — only the *local* snapshots of it were empty stubs. The

@@ -419,7 +419,8 @@ is cosmetic and ignored.
   - A single field → simple key.
   - Multiple fields joined by **`/`** → composite key, concatenated in the given order. FileIO derives
     the BR `KPS=`/`KLN=` (position/length) from the fields' positions, so order matters.
-  - Suffix **`-U`** on a field name → that segment is **case-insensitive** (BR's `U` key modifier).
+  - Suffix **`-U` or `BY`** on a field name → that segment is **case-insensitive** (BR's `U` or `BY` key modifier).
+  - Subscript name may be followed by `(<start>:<end>)` to denote a BR substring.
 - As many keys as you like; parsing stops at the first non-key header line.
 
 **`recl=<n>`** (optional) — record length used when a file is created or upgraded. If omitted, it is
