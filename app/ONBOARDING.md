@@ -11,7 +11,7 @@ Please document any errors in ERRORS.md. This includes any inaccuracies *or ambi
 
 ## Prerequisite - The only thing YOU have to do
 
-**The user should place a copy** of the application's `brconfig.sys` into `dev/tools/`. The resulting 
+**The user should place a copy** of the application's `brconfig.sys` into context/`dev/tools/`. The resulting 
 file should be named `context/dev/tools/brconfig.sys`. It is best to copy any include files along with 
 it that could be needed for AI processing. User specific statements are not needed for AI processing. 
 Also remove any SUBSTITUTE and EXECUTE statements in include files, except SUBSTITUTEs with PRN:. 
@@ -44,7 +44,7 @@ Onboarding adds an **app axis** beside the existing **language axis**; keep them
   - `brtree-index.json` (any BR keyword — config, screen, printing, functions, commands) →
     `br_tree/<spec>#<anchor>` — a concept→spec router over *all* leaves; use it for non-statement
     tokens or to reach the authoritative spec directly. Complements `topics.json`, doesn't replace it.
-- **App axis** (new): `dev/APP-DEV-GUIDE.md` → always-load `conventions.md` + `BR_launch.md`; on-demand
+- **App axis** (new): `context/dev/APP-DEV-GUIDE.md` → always-load `conventions.md` + `BR_launch.md`; on-demand
   `data-model.md` (by file), `exemplars/` (by archetype), `architecture.md`.
 
 The app axis links *into* the language axis for statement detail — it does not live inside it.
@@ -52,7 +52,7 @@ The app axis links *into* the language axis for statement detail — it does not
 (they aren't keyword-addressable).
 
 As you add layer 3 keep the kit's **progressive restatement** discipline: state each app fact in full
-in the `app/` docs and as a terse pointer in `dev/APP-DEV-GUIDE.md` (the app entry point) — increasing
+in the `app/` docs and as a terse pointer in `context/dev/APP-DEV-GUIDE.md` (the app entry point) — increasing
 brevity as it ascends. (Language facts still ascend into `topics.json`; app facts do not.)
 
 ---
@@ -74,7 +74,7 @@ context/app/
 `context/dev/BR_launch.md` (referenced by STEP 1 — BR launch env, canonical invocations, run/build commands) is a
 static, application-agnostic kit file. 
 
-`dev/APP-DEV-GUIDE.md` holds pointers to the generated app docs (STEP 8); `topics.json` is the
+`context/dev/APP-DEV-GUIDE.md` holds pointers to the generated app docs (STEP 8); `topics.json` is the
 language keyword router. 
 
 ---
@@ -96,13 +96,13 @@ Create 2 of the 4 files to be used by AI for application development.
 
 | Role | Path |
 |---|---|
-| BR executable | `dev/tools/brserver-433c-Win32-Debug-2026-08-27.exe` |
-| Existing app startup config | `dev/tools/brconfig.sys` |
-| AI Utility config (headless) | `dev/tools/brconfig.ai_util` |
-| AI User config (interactive) | `dev/tools/brconfig.ai_user` |
+| BR executable | `context/dev/tools/brserver-433c-Win32-Debug-2026-08-27.exe` |
+| Existing app startup config | `context/dev/tools/brconfig.sys` |
+| AI Utility config (headless) | `context/dev/tools/brconfig.ai_util` |
+| AI User config (interactive) | `context/dev/tools/brconfig.ai_user` |
 
-**Generate `dev/tools/brconfig.ai_user`** from `dev/tools/brconfig.sys`:
-1. Copy `brconfig.sys`. If `dev/tools/brconfig.sys` doesn't exist, request the user
+**Generate `context/dev/tools/brconfig.ai_user`** from `context/dev/tools/brconfig.sys`:
+1. Copy `brconfig.sys`. If `context/dev/tools/brconfig.sys` doesn't exist, request the user
    to place it there. Don't proceed without it.
 2. Remove every line that is an `EXECUTE` statement 
   — matched on the line's leading token (case-insensitive, ignoring leading whitespace); 
@@ -114,7 +114,7 @@ Create 2 of the 4 files to be used by AI for application development.
    LOGGING 10, context\app\startlog.txt
    ```
 
-**Generate `dev/tools/brconfig.ai_util`** from the `brconfig.ai_user` just produced:
+**Generate `context/dev/tools/brconfig.ai_util`** from the `brconfig.ai_user` just produced:
 1. Copy `brconfig.ai_user`.
 2. Replace its `LOGGING` line with:
    ```
@@ -153,7 +153,7 @@ key composition of every field. If `filelay/`doesn't exist, STEP 3 has nothing t
    - **Best source: the app's own data dictionary**, if one exists. It need not be a text file — a
      dictionary can just as easily be stored as a BR `INTERNAL` (binary) file, since BR reads its
      own internal formats most conveniently. If it's in `INTERNAL` format, write a short BR program
-     to read it and export its contents into `app/filelay/` in the Appendix A format.
+     to read it and export its contents into `context/app/filelay/` in the Appendix A format.
    - If no dictionary — text or `INTERNAL` — can be located, ask the user where it lives and in
      what format, rather than guessing.
    - **Cross-check against the app's own BR source once a draft layout exists**: named `FORM`
@@ -164,10 +164,11 @@ key composition of every field. If `filelay/`doesn't exist, STEP 3 has nothing t
    - **Do not derive a field layout from the raw `.dat` bytes.** A record's field boundaries aren't
      recoverable from binary data without the FORM spec — reverse-engineering a plausible-looking
      layout that way is exactly the kind of guess [README.md's rule](../README.md) forbids.
-   - Write each confirmed layout into `app/filelay/`, in the exact format given in **Appendix A**:
+   - Write each confirmed layout into `context/app/filelay/`, in the exact format given in **Appendix A**:
      header line (data file, prefix, version `0`), key lines, optional `recl=`, `====` divider, then
      one field line per field in on-disk order. Appendix A's "Conversion checklist" is the
-     step-by-step for this. Note this path as `<filelay-path>` (`app/filelay/`) for STEP 3.
+     step-by-step for this. Note this path as `<filelay-path>` `context/app/filelay/` or 
+     `<app-root>/filelay`) for STEP 3.
 3. **Sanity-check before moving on:** every layout file has a header line, a divider, and at least
    one field line; if `recl=` is given, be sure it's consistent with the sum of field sizes. If not,
    stop and report the discrepancy to the user. A solid `filelay/` folder is required to proceed. If
@@ -178,17 +179,20 @@ The LLM cannot write valid `OPEN` / `READ…USING` / `KEY=` without the real fie
 composition. This step is deterministic.
 
 ```
-dev/tools/extract-schema.exe <filelay-path> context/app
-dev/tools/gen_datamodel_index.exe
+context/dev/tools/extract-schema.exe <filelay-path> context/app
+context/dev/tools/gen_datamodel_index.exe
 ```
+
+Run both from the app root (the directory containing `context/`), like every invocation in
+`context/dev/BR_launch.md`.
 
 `<filelay-path>` is the directory STEP 2 resolved — not necessarily `<app>/filelay`; use whatever
 path STEP 2 found or created.
 
-- **Produces:** `app/data-model.md` (readable) — per file: data path, record length, key indexes
+- **Produces:** `context/app/data-model.md` (readable) — per file: data path, record length, key indexes
   **with their composing fields in order**, and every field's FORM type/position. Each file section
   carries an `<a id="…">` anchor.
-- **Index:** `gen_datamodel_index.exe` then builds `app/data-model-index.json` — a per-file map to
+- **Index:** `gen_datamodel_index.exe` then builds `context/app/data-model-index.json` — a per-file map to
   1-based inclusive line ranges (like `dev/topics.json` for statement-semantics). Load one file's
   slice instead of the whole (large) `data-model.md`.
 - **Verify:** the extractor prints `layouts: N, total fields: M`; the indexer prints `files: N …`.
@@ -206,7 +210,7 @@ while it is compiled (*incremental compilation*), the `.brs` on disk may be **st
 timestamp audit settles this mechanically — no need to ask which copy is authoritative:
 
 Before proceeding with this step, ask the user whether the program masters are kept in source or
-compiled form. Record the answer in context/README.md at the end of the Rules section. If the 
+compiled form. Record the answer in `context/README.md` at the end of the Rules section. If the 
 program masters are stored in source format decompiling is prohibited. 
 
 > **Audit every compiled `.br`/`.wb`: confirm a corresponding source file (e.g. `prog.br.brs` or 
@@ -215,7 +219,7 @@ program masters are stored in source format decompiling is prohibited.
 - **Pass** (source exists and is ≥ its `.br`) → that source is current; nothing to do.
 - **Fail** (source missing, or older than its `.br`) → the compiled file was changed more recently, so
   the `.brs` is genuinely stale. **if program masters are stored in compiled form** decompile just 
-  those programs to refresh the source. Otherwise report the stale source in app/STALE_SOURCE.md.
+  those programs to refresh the source. Otherwise report the stale source in `context/app/STALE_SOURCE.md`.
 
 If decompiling: After identifying a missing or stale .brs file refresh it by running BR with the command: 
 > `LIST < <path\program-name> > <path\program-name.br.brs> : EXECUTE "system"` 
@@ -228,14 +232,14 @@ An LLM learns style far better from a few gold-standard *real programs* than fro
 1. Pick **one representative, correct program per task archetype** the app actually has — e.g. a
    file-maintenance form (`*fm`), a report (`*p`), a batch update, an EDI translate/load, a
    menu/dispatch, a keyed-read utility. Aim for **10–20** total.
-2. Copy each into `app/exemplars/` (or reference it) and add a short header comment:
+2. Copy each into `context/app/exemplars/` (or reference it) and add a short header comment:
    *"Blessed pattern for X. Note: the error-handling idiom, the naming convention, FileIO-vs-raw-OPEN
    choice, screen handling."*
 3. Choose files that are **minimal but complete** and genuinely typical — not the biggest or most
    clever. These are few-shot examples; their style is what the model will imitate.
 
 ### STEP 6 — Conventions sheet (derived, not guessed)
-A 1–2 page `app/conventions.md` that **names** the rules the exemplars embody, so the model can
+A 1–2 page `context/app/conventions.md` that **names** the rules the exemplars embody, so the model can
 apply them to code it hasn't seen.
 
 - Cover: naming (subscript constants, file prefixes), FileIO vs. raw `OPEN` preference, the house
@@ -251,7 +255,7 @@ apply them to code it hasn't seen.
 > call incorrectly. Teach usage by whole-file exemplar instead.
 
 ### STEP 7 — Architecture map/res
-`app/architecture.md` — the directory taxonomy, entry points, and 2–3 **core data flows**
+`context/app/architecture.md` — the directory taxonomy, entry points, and 2–3 **core data flows**
 (e.g. order → allocation → ship → EDI). Make them short, like a module table in 
 your AI agent's memory file (`CLAUDE.md` or `AGENTS.md`).
 
@@ -260,11 +264,11 @@ your AI agent's memory file (`CLAUDE.md` or `AGENTS.md`).
 1. Go to the app root and run the /init command to be sure either 
   a CLAUDE.md or AGENTS.md file is placed in the app root.
 2. Insert `@context/README.md` at the end of any CLAUDE.md or AGENTS.md files in the app root folder. 
-3. Modify context/README.md as follows: - State "onboarding has been completed" just ahead of 
+3. Modify `context/README.md` as follows: - State "onboarding has been completed" just ahead of 
   the onboarding paragraph.
 4. If you are operating in vscode chat mode stop and use another service with more than 200k of 
   context capacity. This kit only uses around 30k but it requires better intelligence than vscode chat provides. 
-5. If you are operating in cursor: - Follow the instructions in context/app/onboarding/context-kit-always-load.md. 
+5. If you are operating in cursor: - Follow the instructions in `context/app/onboarding/context-kit-always-load.md`. 
   This will create necessary initialization rules for this repo under cursor. 
 6. Advise the user that the first prompt after onboarding and restarting should be: 
   "Which documents did you read in full during initialization?"
@@ -336,17 +340,17 @@ If the counts already match, no `ERRORS.md` entry is needed for this step.
 - [ ] `filelay/` exists (found or synthesized per STEP 2), one layout file per data file, in
       Appendix A format — no guessed field layouts; any file without a locatable FORM/DIM source
       was flagged to the user instead.
-- [ ] `app/data-model.md` regenerates cleanly from `filelay/` (0 unparsed files).
+- [ ] `context/app/data-model.md` regenerates cleanly from `filelay/` (0 unparsed files).
 - [ ] Source currency audited (STEP 4): every `.br`/`.wb` has an as-new-or-newer source file; any
       stale `.brs` was refreshed before exemplars/conventions were derived.
-- [ ] `app/exemplars/` holds ≥10 annotated, representative programs across task archetypes.
-- [ ] `app/conventions.md` states each rule and points to an exemplar that shows it.
-- [ ] `dev/BR_launch.md` lets a newcomer build, run, test, and deploy without asking.
-- [ ] `app/architecture.md` names entry points and the core data flows.
+- [ ] `context/app/exemplars/` holds ≥10 annotated, representative programs across task archetypes.
+- [ ] `context/app/conventions.md` states each rule and points to an exemplar that shows it.
+- [ ] `context/dev/BR_launch.md` lets a newcomer build, run, test, and deploy without asking.
+- [ ] `context/app/architecture.md` names entry points and the core data flows.
 - [ ] `APP-DEV-GUIDE.md` has terse pointer rows to every app doc (conventions/BR_launch marked
       always-load; data-model/exemplars/architecture on-demand); `topics.json` left as the language router.
-- [ ] `br_tree/` and `dev/` (except the `APP-DEV-GUIDE.md` pointer rows) are **unchanged**.
-- [ ] STEP 9 ran to completion: `app/BR_test.md` and `app/BRLS_test.md` both exist; their summary
+- [ ] `context/br_tree/` and `context/dev/` (except the `APP-DEV-GUIDE.md` pointer rows) are **unchanged**.
+- [ ] STEP 9 ran to completion: `context/app/BR_test.md` and context/app/BRLS_test.md` both exist; their summary
       counts were compared, and any discrepancy is recorded in `context/ERRORS.md` (not silently
       fixed or ignored).
 
@@ -361,7 +365,7 @@ then includes "compiles against our data model," not just "looks right."
 - Re-run the STEP 4 audit after recompiling; decompile any program whose `.brs` is now older than its
   `.br` before you re-derive exemplars or conventions.
 - Refresh exemplars when the house pattern for an archetype changes.
-- Language corrections go to `br_tree/` and flow to **every** app — never fork them into `app/`.
+- Language corrections go to `context/br_tree/` and flow to **every** app — never fork them into `context/app/`.
 
 ---
 

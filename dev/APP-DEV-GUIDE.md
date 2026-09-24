@@ -133,9 +133,14 @@ composition before reading it. The app's `filelay/` (or equivalent) directory is
 dictionary. Turn it into a structured model with the bundled tool:
 
 ```
-tools/extract-schema.exe <path-to-app/filelay>
-tools/gen_datamodel_index.exe
+context/dev/tools/extract-schema.exe <path-to-app/filelay> context/app
+context/dev/tools/gen_datamodel_index.exe
 ```
+
+Run both from the app root, like every invocation in [`BR_launch.md`](BR_launch.md). The second
+argument to `extract-schema.exe` is where `data-model.md` is written — always pass `context/app`.
+Without it the file goes to `context/dev/`, and `gen_datamodel_index.exe` (which only looks in
+`context/app/`) will index an old copy or none at all.
 
 This produces `data-model.md` for *that* app: per file, the data path,
 record length, each key index **with its composing fields** (the order you concatenate to
