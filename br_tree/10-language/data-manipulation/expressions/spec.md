@@ -146,7 +146,8 @@ out anyone arriving from C, Python, SQL or Visual Basic, where `AND` binds tight
 Evaluation carries a running value and **stops the moment that value settles the outcome**:
 
 - a running value of **true** meeting `OR` → stop, the answer is true
-- a running value of **false** meeting `AND` → stop, the answer is false
+- a running value of **false** meeting `AND` → stop, **unless followed by OR**
+- This beacause the value has not been settled if an OR is encountered.
 
 Everything after the stopping point is never looked at.
 
@@ -155,6 +156,7 @@ PRINT 1 OR 0 AND 0      ! 1  — `1 OR` settles it; neither 0 is ever seen
 PRINT (1 OR 0) AND 0    ! 0  — the parentheses force the AND to be reached
 PRINT 0 OR 1 AND 0      ! 0  — 0 OR 1 -> 1, then 1 AND 0 -> 0
 PRINT 1 AND 0 OR 1      ! 1  — 1 AND 0 -> 0, then 0 OR 1 -> 1
+PRINT 0 AND 1 OR 1      ! 1  — 0 AND 1 -> 0, then 0 OR 1 -> 1
 ```
 
 Read left to right, each of those is obvious. Read with `AND` binding tighter, the first and the
