@@ -123,6 +123,9 @@ Create 2 of the 4 files to be used by AI for application development.
 
 The UNATTENDED keyword lets AI run BR in a headless (no user prompts) mode.
 
+Now make a backup copy of all 3 configuration files (plus any include files) in 
+`context/onboarding/`. These will be needed for applying future kit updates.
+
 Both are regenerated whenever `brconfig.sys` changes — generated, never hand-edited (same
 convention as `data-model.md`/`topics.json`).
 
@@ -423,7 +426,8 @@ is cosmetic and ignored.
   - A single field → simple key.
   - Multiple fields joined by **`/`** → composite key, concatenated in the given order. FileIO derives
     the BR `KPS=`/`KLN=` (position/length) from the fields' positions, so order matters.
-  - Suffix **`-U` or `BY`** on a field name → that segment is **case-insensitive** (BR's `U` or `BY` key modifier).
+  - Suffix **`-{U|B|P|Y}`** on a field name → that segment is **case-insensitive** (BR's `U` 
+    or `BY` key modifier). Example: VendorName(1:8)-U/FiscalYear-BY
   - Subscript name may be followed by `(<start>:<end>)` to denote a BR substring.
 - As many keys as you like; parsing stops at the first non-key header line.
 
