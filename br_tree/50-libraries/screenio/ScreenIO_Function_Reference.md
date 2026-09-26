@@ -252,3 +252,4 @@ This page documents **all 16** `DEF LIBRARY` exports in `screenio.brs`:
 - [ScreenIO_Data_Model.md](ScreenIO_Data_Model.md) — the `screenio.dat` / `screenfld.dat` schema events and controls live in
 - [fileio](../fileio/spec.md) — the FileIO library ScreenIO builds on
 - [library-facility](../library-facility/spec.md) — linking the library (the BR `LIBRARY` statement)
+- [ScreenIO internals guide](../../../dev/screenio-guide.md) — *(dev kit)* how the engine dispatches these events at run time; the Filter event's exact [return-value contract](../../../dev/screenio-guide.md#filter-contract)

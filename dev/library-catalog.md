@@ -23,7 +23,7 @@ NAME(req1, req2; opt1, opt2) → ret
 - **`MAT name`** = an array argument.
 - **Type by the `$` rule:** a `$` suffix = string, no suffix = numeric. A trailing **`$*n`** is the
   string length (on a parameter) or the function's **string-return length** (on the name).
-- **Return type** is the Returns column (`str` / `num`, with the documented return length where the
+- **Return type** is the Returns column (`str$` / `num`, with the documented return length where the
   source gives one). Names preserve the source's documented casing (BR is case-insensitive).
 - These are **functions** → full spelling, never abbreviated; call them only after a matching
   `LIBRARY "<file>": <fn>, …` declaration.
@@ -154,6 +154,9 @@ RAD screen engine built on FileIO. Its public surface is exactly **16 `DEF LIBRA
 ~425 internal engine/designer functions are private). Source-verified against `screenio.brs`. The
 event/context model and `ExitMode` constants are in
 [`../br_tree/50-libraries/screenio/`](../br_tree/50-libraries/screenio/ScreenIO_Function_Reference.md).
+How the engine works *underneath* these exports — the Helper Library compile pipeline, the runtime
+screen stack and event dispatch, the Filter return contract, and authoring/compiling a screen from
+code with no Designer UI — is in [`screenio-guide.md`](screenio-guide.md#contents).
 
 ### Screen invocation
 | Function | Returns | Purpose |
@@ -182,7 +185,8 @@ event/context model and `ExitMode` constants are in
 > designer stores a BR statement string per screen/control that the engine `EXECUTE`s. Handlers receive
 > a large fixed by-reference context (`MAT F$`/`MAT F`, `Key$`, `ExitMode`, `Window`, …). See the
 > reference page for the event table, the handler context, and `ExitMode` constants (0 run · 1 QuitOnly
-> · 2 SaveAndQuit · 3 SelectAndQuit · …).
+> · 2 SaveAndQuit · 3 SelectAndQuit · …). For how the engine actually dispatches into those handlers
+> at run time, see [`screenio-guide.md` §3–§6](screenio-guide.md#runtime-stack).
 
 ---
 

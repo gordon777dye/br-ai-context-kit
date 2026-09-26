@@ -20,6 +20,32 @@ and how the runtime dispatches into your code once it's running** — confirmed 
 reading ScreenIO's own engine source directly (walked through with the engine's original author),
 not inferred from behavior.
 
+<a id="contents"></a>
+## Contents
+
+- [1. Two halves, one library program](#two-halves)
+- [2. Compiling a screen: how a Helper Library actually gets built](#compiling)
+- [3. Runtime: the screen stack and library-linkage slots](#runtime-stack)
+  - [Hosting several screens as tabs (`run.brs`, distributed with ScreenIO)](#tabs)
+- [4. The real trick: subscript constants are generated at runtime via `EXECUTE`](#subscript-constants)
+- [5. Special internal function tokens](#internal-tokens)
+- [6. The Filter event's exact return-value contract](#filter-contract)
+  - [Performance pattern: `RESTORE` in `fnInit_` + `"STOP"` at the boundary](#filter-performance)
+- [7. Investigating a specific screen's structure directly](#investigating)
+- [8. Child screen controls (the `screen` field type)](#child-screens)
+- [9. Authoring a new screen programmatically (writing `screenio.dat`/`screenfld.dat` directly)](#authoring)
+  - [The technique is just an ordinary FileIO write, twice](#fileio-write)
+  - [Reasoning about control layout and position without the Designer's visual grid](#layout)
+  - [Field values to copy from a real minimal screen, not reconstruct from memory](#minimal-screen)
+  - [A second archetype: Add/Edit forms, and how they link back to a listview screen](#add-edit-forms)
+  - [A third archetype: writing a genuine custom Filter function, and passing `ParentKey$` between screens](#custom-filter)
+  - [A fourth technique: a free-floating lookup column, opened once via `fnInit_`/`fnFinal_`](#lookup-column)
+  - [Compiling is not optional — and no longer requires the Designer UI](#compiling-from-code)
+  - [`fnCheckScreenErrors` — the Designer's "To Do" validation, also callable from code](#check-screen-errors)
+  - [A general lesson: exposing an internal function via bare `LIBRARY` linkage skips *all* of the host program's own top-level setup](#bare-library-linkage)
+- [See also](#see-also)
+
+<a id="two-halves"></a>
 ## 1. Two halves, one library program
 
 ScreenIO ships as a single BR library program with two distinct halves:
@@ -38,6 +64,7 @@ different historical name).
 event/control points at all live as records in `screenio.dat`/`screenfld.dat`, edited entirely
 through the Designer half — see the Data Model reference above for that schema.
 
+<a id="compiling"></a>
 ## 2. Compiling a screen: how a Helper Library actually gets built
 
 Triggered by the Designer's Save-and-Compile (or "Recompile All Screens"). The compiler:
@@ -86,6 +113,7 @@ regenerated from scratch on every compile and any hand edit is silently lost.
 **This whole sequence is also callable from code, not just the Designer's Load/Save-and-Compile
 menu items** — see §9's `fnCompileScreen(ScreenCode$)`, added in ScreenIO v2.93.
 
+<a id="runtime-stack"></a>
 ## 3. Runtime: the screen stack and library-linkage slots
 
 `fnfm$`/`fnfm` (and the thin wrappers `Fndisplayscreen`, `Fncallscreen$`) all funnel into one
@@ -112,6 +140,7 @@ exit and hand the click back up, with no geometry/window-focus test involved. Th
 opened via an embedded `screen`-type control, a `[SCREENNAME]` button function, or
 `#run:fnRun(...)` — see §8 for the full mechanism and the exact source lines.
 
+<a id="tabs"></a>
 ### Hosting several screens as tabs (`run.brs`, distributed with ScreenIO)
 
 None of the 16 public `DEF LIBRARY` exports build a tabbed launcher directly — that's what
@@ -142,6 +171,7 @@ This is a genuinely reusable pattern for any ScreenIO app that wants a tabbed ma
 worth its own `app/`-tier note if a given app's tab-visibility logic is non-trivial enough to
 document separately.
 
+<a id="subscript-constants"></a>
 ## 4. The real trick: subscript constants are generated at runtime via `EXECUTE`
 
 This is the single most important "how does this even work" fact about writing ScreenIO event
@@ -189,6 +219,7 @@ at that moment. Don't expect them outside that context, and don't expect `brls`/
 about them — an undefined-name warning on one of these from `brls -sema` inside a `function/*.brs`
 file is very likely a false positive, not a real bug.
 
+<a id="internal-tokens"></a>
 ## 5. Special internal function tokens
 
 - `{{SetData}}` / `{{GetData}}` — double-braced markers the runtime uses internally to push/pop the
@@ -198,6 +229,7 @@ file is very likely a false positive, not a real bug.
 - An ordinary custom function reference is single-braced: `{functionname}`, resolving to
   `function/functionname.brs`.
 
+<a id="filter-contract"></a>
 ## 6. The Filter event's exact return-value contract
 
 `ScreenIO_Function_Reference.md#events` already documents that a listview's Filter function
@@ -243,6 +275,7 @@ When investigating a screen with a listview, check for all three pairs (the `def
 two screen-level event fields, and the two same-file Filter companions — six checks in total)
 before concluding you've found everything that runs around the list load.
 
+<a id="filter-performance"></a>
 ### Performance pattern: `RESTORE` in `fnInit_` + `"STOP"` at the boundary
 
 A listview bound to a large keyed file doesn't have to scan every record just to show a small,
@@ -279,6 +312,7 @@ def fnInit_FastFilterLineItems
 fnend
 ```
 
+<a id="investigating"></a>
 ## 7. Investigating a specific screen's structure directly
 
 `screenio.dat`/`screenfld.dat` are BR `INTERNAL` files — don't hex-dump them (same rule as any
@@ -326,6 +360,7 @@ FileIO's `fnCsvExport` and read the result as plain text.
    findings about the specific screen in `../app/` (an app's own `app/screens/<name>.md` is a
    reasonable place — this method itself is what belongs here in `dev/`).
 
+<a id="child-screens"></a>
 ## 8. Child screen controls (the `screen` field type)
 
 A control whose `FIELDTYPE` is `screen` embeds an *entire other compiled screen* live inside a
@@ -469,6 +504,7 @@ ordinary colors, shows whatever changed).
 Same `fnMaster$` engine as any other screen call throughout — a "screen" control is purely a
 *placement and activation* wrapper around it, not a different runtime path.
 
+<a id="authoring"></a>
 ## 9. Authoring a new screen programmatically (writing `screenio.dat`/`screenfld.dat` directly)
 
 **Confirmed end-to-end 2026-09-18**: a screen doesn't have to be built by hand in the Designer —
@@ -479,6 +515,7 @@ customer-equivalent file) entirely through a standalone FileIO program, then ope
 the Designer: every field — Notes, Caption, Rows/Cols, colors, File Layout, even the Field List —
 appeared exactly as written, with no indication the record hadn't been hand-built in the UI.
 
+<a id="fileio-write"></a>
 ### The technique is just an ordinary FileIO write, twice
 
 1. Open `screenio` and `screenfld` the normal way (`fnOpenFile`/an app's local `Fnopen` wrapper —
@@ -513,6 +550,7 @@ necessarily binds to one app's real data file) — confirmed both to syntax-chec
 Save-and-Compile into a genuinely working screen with no changes needed. Any app following this
 technique should keep its own worked exemplar the same way, under its own `app/examples/`.
 
+<a id="layout"></a>
 ### Reasoning about control layout and position without the Designer's visual grid
 
 The Designer shows control placement visually; writing records by hand means reasoning about the
@@ -559,6 +597,7 @@ itself is simple and worth stating plainly:
     `DESCRIPTION$` value copied into an un-DIM'd `Label$`) — the same 18-char default bites scalars
     too, and it's an easy one to miss since the failure only shows up on real, long-enough content.
 
+<a id="minimal-screen"></a>
 ### Field values to copy from a real minimal screen, not reconstruct from memory
 
 Don't hand-derive `FIELDTYPE$` spellings or the `PARENT$` wiring from this doc or from recollection
@@ -588,6 +627,7 @@ before you read that dump, so the raw CSV makes sense on sight:
   actually determines the columns' left-to-right order on screen. Write your `LISTCHLD` records in
   the exact order you want the columns to appear.
 
+<a id="add-edit-forms"></a>
 ### A second archetype: Add/Edit forms, and how they link back to a listview screen
 
 The technique above covers a read-only listview; an Add/Edit form (bound input fields, Save/Cancel)
@@ -627,6 +667,7 @@ form (~40 fields) — for a real worked comparison:
     variant of the same idea; `Key$=CurrentKey$` is the more general form and the one used in the
     worked exemplar.)
 
+<a id="custom-filter"></a>
 ### A third archetype: writing a genuine custom Filter function, and passing `ParentKey$` between screens
 
 Both archetypes above use either no custom functions at all, or ones copied verbatim from a real
@@ -695,6 +736,7 @@ logic needs to be anything more than "open this screen with this value" (a condi
 first, a value to compute, logging, etc.); option 1 is simpler when a literal bracket expression
 is genuinely all that's needed.
 
+<a id="lookup-column"></a>
 ### A fourth technique: a free-floating lookup column, opened once via `fnInit_`/`fnFinal_`
 
 A natural next question once a listview shows a foreign-key code (a customer's `PROJECT$`, an
@@ -753,6 +795,7 @@ documented separately into one worked example:
    `fnFinal_TimelogFilter` — confirmed correct by checking the compiled Helper Library's own
    generated dispatcher, which calls exactly those two names.
 
+<a id="compiling-from-code"></a>
 ### Compiling is not optional — and no longer requires the Designer UI
 
 Writing the records is necessary but **not sufficient** to make a screen runnable. Two independent
@@ -822,6 +865,7 @@ COMPILESCREEN: ! Compiles One Screen's Helper Library By Screen Code (Callable F
    fnend
 ```
 
+<a id="check-screen-errors"></a>
 ### `fnCheckScreenErrors` — the Designer's "To Do" validation, also callable from code
 
 Added right alongside `fnCompileScreen` (v2.94, same release), for the other half of what the
@@ -879,6 +923,7 @@ as a real error, not a silent one, illustrating both ends of the same lesson: st
 some naming mistakes outright, but a wrong-but-not-crashing value needs an actual inspected test
 run to catch.
 
+<a id="bare-library-linkage"></a>
 ### A general lesson: exposing an internal function via bare `LIBRARY` linkage skips *all* of the host program's own top-level setup
 
 This cost two real, confirmed bugs while building `fnCompileScreen` — both worth knowing before
@@ -919,6 +964,7 @@ Lexi-translated output (§7's CSV-dump method's sibling technique — `lexi-comp
 numbers** — the crash log's line number can only be matched up against the *translated* output
 with real sequential numbers, not the original source's physical line count.
 
+<a id="see-also"></a>
 ## See also
 
 - [`../br_tree/50-libraries/screenio/spec.md`](../br_tree/50-libraries/screenio/spec.md) / [`ScreenIO_Function_Reference.md`](../br_tree/50-libraries/screenio/ScreenIO_Function_Reference.md) / [`ScreenIO_Data_Model.md`](../br_tree/50-libraries/screenio/ScreenIO_Data_Model.md) — the authoritative calling convention, event list, `ExitMode` constants, and handler parameter list.

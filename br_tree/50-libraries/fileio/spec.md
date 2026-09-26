@@ -12,7 +12,7 @@ keywords: [FileIO, fnOpen, fnRead, LIBRARY]
 
 # FileIO library
 
-**FileIO** (a Sage AX library) is the standard **file-access abstraction** in this codebase: you describe
+**FileIO** is the standard **file-access abstraction** in this codebase: you describe
 each data file once in an ASCII **layout file**, and FileIO OPENs it, builds the `FORM`, sizes your record
 arrays, and defines `FILE_FIELD` subscript constants — so programs reference fields **by name** and never
 hard-code positions. Change a layout and FileIO **migrates the data file on the fly**; no program needs

@@ -54,7 +54,9 @@ The library exports **16 functions**; `fndisplayscreen` (read-only view) and `fn
   compiled **into** that per-screen helper library at screen-compile time, an edit takes effect only
   when the **screen** is recompiled — not by compiling the event source on its own, and never by
   editing the compiled `screenio.dat`/helper output directly. (Apps commonly keep these event
-  snippets in a dedicated source directory that is never compiled standalone.)
+  snippets in a dedicated source directory that is never compiled standalone.) The compile pipeline
+  itself — and how to run it from code, without the Designer — is in the kit's
+  [ScreenIO internals guide](../../../dev/screenio-guide.md#compiling).
 - **Runtime lifecycle** (one `fnfm`/`fnfm$` call): load the layout → if the screen has a file layout, open it; with a `key$`, read the record and fire **Read**, otherwise fire **Initialize** → map fields onto controls and display → run the input loop (firing **Main Loop**, **Wait**, validations, clicks) until **ExitMode** is set — by an event, or **ESC** (Cancel) / **ENTER** (Select) → compute the return value and save / add / drop / ignore the record, firing **Write** then **Exit**. The exit codes are the [ExitMode constants](ScreenIO_Function_Reference.md#exitmode).
 - **One data file per screen.** A Screen Function binds to a single file. To maintain a parent/child pair (e.g. an invoice header + line items) you tie **four** screens together: a header listview → a header add/edit (which embeds the detail listview `DISPLAYONLY` in its Enter event) → a detail listview
   (filtered to the parent via `parentkey$`) → a detail add/edit (whose Initialize event stamps the parent
@@ -80,6 +82,7 @@ FNEND
 - [ScreenIO_Function_Reference](ScreenIO_Function_Reference.md) — the 16 `DEF LIBRARY` exports and the event-callback contract (from `screenio.brs`)
 - [ScreenIO_Data_Model](ScreenIO_Data_Model.md) — the `screenio.dat`/`screenfld.dat` screen & control schema (from `filelay/`)
 - [ScreenIO_Library](ScreenIO_Library.md) — the full ~206-section Sage AX wiki manual, captured locally (prose/tutorial reference)
+- [ScreenIO internals guide](../../../dev/screenio-guide.md) — *(dev kit)* how a screen compiles into its Helper Library, the runtime screen stack and event dispatch, the Filter return contract, and authoring/compiling screens programmatically
 - [library-facility](../library-facility/spec.md) — linking `screenio` and its functions
 - [20-io-screen/controls](../../20-io-screen/controls/spec.md) — the controls ScreenIO renders
 - [30-io-file/statements](../../30-io-file/statements/spec.md) — the file I/O ScreenIO performs
