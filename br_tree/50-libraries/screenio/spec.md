@@ -24,7 +24,7 @@ LIBRARY "screenio": fnfm$, fnfm
 fnfm$(scrnname$ [; key$] [, row] [, col] [, parentkey$] [, parentwindow] [, displayonly] …)  -- returns record key (or "")
 fnfm (scrnname$ [; key$] [, row] [, col] …)                                       -- returns 1 ok / 0 cancelled
 ```
-The library exports **16 functions**; `fndisplayscreen` (read-only view) and `fncallscreen$` (the programmatic `[SCRNNAME]` call) are the other two invocation entry points. Full signatures and the rest
+The library exports **21 functions** (ScreenIO v2.95; 16 in earlier builds); `fndisplayscreen` (read-only view) and `fncallscreen$` (the programmatic `[SCRNNAME]` call) are the other two invocation entry points. Full signatures and the rest
 (helpers, wait-animation, version flags) are in
 [ScreenIO_Function_Reference](ScreenIO_Function_Reference.md).
 
@@ -79,7 +79,7 @@ FNEND
 <a id="see-also"></a>
 ## See also
 
-- [ScreenIO_Function_Reference](ScreenIO_Function_Reference.md) — the 16 `DEF LIBRARY` exports and the event-callback contract (from `screenio.brs`)
+- [ScreenIO_Function_Reference](ScreenIO_Function_Reference.md) — the 21 `DEF LIBRARY` exports (v2.95) and the event-callback contract, including the Designer/compile entry points `fnDesignScreen`, `fnMakeScreen`, `fnCompileScreen`, `fnCheckScreenErrors`
 - [ScreenIO_Data_Model](ScreenIO_Data_Model.md) — the `screenio.dat`/`screenfld.dat` screen & control schema (from `filelay/`)
 - [ScreenIO_Library](ScreenIO_Library.md) — the full ~206-section Sage AX wiki manual, captured locally (prose/tutorial reference)
 - [ScreenIO internals guide](../../../dev/screenio-guide.md) — *(dev kit)* how a screen compiles into its Helper Library, the runtime screen stack and event dispatch, the Filter return contract, and authoring/compiling screens programmatically

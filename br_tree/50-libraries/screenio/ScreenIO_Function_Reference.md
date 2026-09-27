@@ -1,7 +1,7 @@
 ---
 title: ScreenIO Function Reference
 file: ScreenIO_Function_Reference.md
-source: screenio.brs (shipping library source) — signatures verified against every DEF LIBRARY export
+source: screenio.brs (shipping library source, earlier 16-export build) + screenio.br.brs (listing of ScreenIO v2.95) — signatures verified against every visible DEF LIBRARY export
 category: 50-libraries
 subcategory: 50-libraries/screenio
 kind: reference
@@ -11,10 +11,12 @@ related: [screenio, library-facility, fnsnap]
 
 # ScreenIO Function Reference
 
-The library's **public surface is exactly 16 `DEF LIBRARY` functions** (the rest of `screenio.brs`'s
-~425 functions are internal to the engine and the designer). Every signature below is taken verbatim
-from the shipping `screenio.brs` source, not the wiki (the ScreenIO wiki page is empty). Parameters
-after the `;` are optional; `&` marks pass-by-reference; `Mat` marks array parameters.
+The library's **public surface is 21 `DEF LIBRARY` functions** as of **ScreenIO v2.95**
+(`FNVERSION=2.95`). The rest of its ~425 functions are internal to the engine and the Designer.
+Every signature below is taken verbatim from the shipping source, not the wiki (the ScreenIO wiki page
+is empty). Parameters after the `;` are optional; `&` marks pass-by-reference; `Mat` marks array
+parameters. See [Coverage check](#coverage) for the full list of 21 and how v2.95 differs from the
+earlier 16-export build (a 2020 source with no version number recorded).
 
 All the screen-invocation calls are thin wrappers over one internal engine, `Fnmasterfm$` — so they
 share the same parameter set and semantics.
@@ -25,7 +27,7 @@ share the same parameter set and semantics.
 ```business-rules
 Fnfm$ (Screenname$; Keyval$, Srow, Scol, Parent_Key$, Parent_Window, Display_Only,
        Dontredolistview, Recordval, Mat Passeddata$, Usemyf, Mat Myf$, Mat Myf,
-       Path$, Selecting)                                   -- returns chosen/edited record key$ ("" if cancelled)
+       Path$, Selecting, SaveDontAsk)                      -- returns chosen/edited record key$ ("" if cancelled)
 
 Fnfm  (Screenname$; …same params…, ___, Returnvalue)       -- returns 1 ok / 0 cancelled (or the screen's return value)
 
@@ -59,6 +61,7 @@ Fncallscreen$ (Screen$; Keyval$, Parent_Key$, Display_Only, Parent_Window,
 | `Usemyf` + `Mat Myf$`, `Mat Myf` | Supply your **own** open file record arrays instead of letting ScreenIO open the file. |
 | `Path$` | Override the data-file path. |
 | `Selecting` | Listview is being used as a **picker** (return a selection rather than just browse). |
+| `SaveDontAsk` | **`Fnfm$` only; added after the 2020 build, present in v2.95.** On a screen with **no** listview, exiting by ESC (`fkey 99`), `fkey 93`, or a click on a parent screen sets `ExitMode` to **SaveAndQuit** instead of **AskSaveAndQuit**, so edits are kept without a "save changes?" prompt. It is meant for a caller that asks once for several screens itself: `run.brs`'s `fnRunTabs` passes its `AskSaveTogether` here. Listview screens are unaffected. `Fncallscreen$` does not take it. |
 
 <a id="designer"></a>
 ## B. Event / designer support
@@ -83,6 +86,7 @@ a screen/control event to a `DEF FN…` (see [Event-callback contract](#events))
 | `fnFunctionBase` | *(no args)* | Base **FKEY** number for the current screen nesting level — `1500 + 200 × loaded-screen-count`. ScreenIO assigns each screen's buttons/controls function keys above this base, so nested screens never collide. |
 | `fnBR42` | *(no args)* | `1` if running **BR ≥ 4.2** (feature detection on `WBVERSION$`). |
 | `fnBR43` | *(no args)* | `1` if running **BR ≥ 4.3**. |
+| `fnListSpec$` | `(SpecIn$*255)` → `*255` | *(export in v2.95, not in the 2020 build)* Returns `SpecIn$` **cut before its third comma**, i.e. the `row,col,LIST rows/cols` head of a listview `FIELDS` spec with everything after it dropped. It is a one-line `DEF` expression: `SpecIn$(1:POS(SpecIn$,",",POS(SpecIn$,",",POS(SpecIn$,",")+1)+1)-1)`. With fewer than three commas it does not error: it returns `""` (zero or two commas) or just the first field (one comma). ScreenIO's compiler links it into every generated helper library, so event code can call it with no `LIBRARY` statement of its own. |
 
 <a id="animation"></a>
 ## D. Wait animation
@@ -94,6 +98,28 @@ A small "please wait" animation for long operations.
 | `fnPrepareAnimation` | *(no args)* | Initialise the animation (timing, speed defaults via `fnSettings`). |
 | `fnAnimate` | `(; Text$*60)` | Render one animation frame, with an optional caption. Call repeatedly during the long task. |
 | `fnCloseAnimation` | *(no args)* | Tear down the animation window. |
+
+<a id="build"></a>
+## E. Designing, generating and compiling screens *(exports in v2.95, not in the 2020 build)*
+
+```business-rules
+fnDesignScreen (; ScreenName$)                                   -- open the Designer
+fnMakeScreen (; Layout$, LaunchScreen)                           -- run the Screen Generator wizard
+fnCompileScreen (ScreenCode$*18; WaitForComplete)                -- rebuild one screen's helper library
+fnCheckScreenErrors (ScreenCode$*18, Mat ErrObject, Mat ErrField,
+                     Mat ErrMessage$, Mat ErrType)               -- run the Designer's "To Do" validation
+```
+
+Two of these (`fnDesignScreen`, `fnMakeScreen`) are **interactive**. The other two work headless,
+which lets a program build or check a screen with no Designer UI. The
+[ScreenIO internals guide](../../../dev/screenio-guide.md#compiling-from-code) covers that workflow.
+
+| Function | Returns | Behaviour (from the v2.95 source) |
+|---|---|---|
+| `fnDesignScreen` | — | Opens the Designer, loading `ScreenName$` if given. Needs GUI mode: if `ENV$("guimode")` is blank it only prints *"Please use a New GUI version of BR to design your screens."* If GUI is `OFF` it turns it on for the session and back off afterwards. Restores the console's original rows/cols on exit. |
+| `fnMakeScreen` | — | Opens the **Screen Generator** wizard for a FileIO layout (`Layout$` pre-fills it). It is interactive: you pick which screens to build and which fields go on each. It can write up to three screens, named from the first 13–14 characters of the layout: **`<layout>LIST`** (listview with columns, a filter box on BR ≥ 4.3 or a search box otherwise, and exit buttons), **`<layout>EDIT`** (add/edit form), and **`<layout>COMBO`** (listview + edit fields on one screen). Each is written to `screenio.dat`/`screenfld.dat`. `LaunchScreen` non-zero then opens **every** generated screen in the Designer, each in its own BR process (`execute "system -C -M …"`). `LaunchScreen` zero (the default) opens none. It checks an internal `FNWARNMESSAGE` first and does `execute "system"` if that returns true. That function's source is not visible in the v2.95 listing, so the condition it tests is unknown. |
+| `fnCompileScreen` | `1` = screen found, compile launched; `0` = no such screen | Reads the screen by code (upper-cased and trimmed) and generates its helper library, as the Designer's compile does. **The compile itself runs in a separate BR process** (`execute "system -C -M <br> -<config> proc <file>"`). A return of `1` therefore does **not** mean the compile succeeded. With `WaitForComplete` non-zero it waits for that process's output file before returning. Otherwise it returns immediately. |
+| `fnCheckScreenErrors` | `1` = screen found and validated; `0` = no such screen | Runs the same field validation as the Designer's "To Do" debug listview, with no window. It resizes the four arrays to one element per finding: `ErrObject` = the Designer mode/panel the finding belongs to, `ErrField` = the `SI_…` field subscript or control index, `ErrMessage$` = the text (e.g. *"File layout not found."*), `ErrType` = **`1` warning / `2` error**. Zero findings leaves them dimensioned to 0. A return of `1` does not mean "no errors": check `UDIM(Mat ErrType)`. |
 
 <a id="events"></a>
 ## Event-callback contract (how your code runs)
@@ -239,12 +265,31 @@ An event or control `FUNCTION$` field may hold any of (dispatch logic confirmed 
 <a id="coverage"></a>
 ## Coverage check
 
-This page documents **all 16** `DEF LIBRARY` exports in `screenio.brs`:
-`fnPrepareAnimation`, `fnAnimate`, `fnCloseAnimation`, `fnBR42`, `fnBR43`, `Fnselectevent$`,
-`Fndisplayscreen`, `Fnfm`, `Fnfm$`, `fnFunctionBase`, `fnGetUniqueName$`, `fnIsOutputSpec`,
-`fnIsInputSpec`, `fnDays`, `Fncallscreen$`, `Fnfindsubscript`.
+This page documents **all 21** `DEF LIBRARY` exports of ScreenIO **v2.95**:
 
-*(To regenerate the inventory: `grep -niE "^\s*def\s+library\s+fn" screenio.brs`.)*
+- **The original 16** (all present in the 2020 build this page was first written from):
+  `fnPrepareAnimation`, `fnAnimate`, `fnCloseAnimation`, `fnBR42`, `fnBR43`, `Fnselectevent$`,
+  `Fndisplayscreen`, `Fnfm`, `Fnfm$`, `fnFunctionBase`, `fnGetUniqueName$`, `fnIsOutputSpec`,
+  `fnIsInputSpec`, `fnDays`, `Fncallscreen$`, `Fnfindsubscript`.
+- **Added since the 2020 build (5):** `fnDesignScreen`, `fnMakeScreen`, `fnCompileScreen`,
+  `fnCheckScreenErrors` ([§E](#build)), and `fnListSpec$` ([§C](#helpers)). The
+  [internals guide](../../../dev/screenio-guide.md#compiling-from-code) dates `fnCompileScreen` to
+  v2.93 and `fnCheckScreenErrors` to v2.94. When the other three became exports is not recorded.
+  `fnDesignScreen` already existed in the 2020 build, but as a private `DEF`.
+- **Changed since the 2020 build:** `Fnfm$` takes a 16th parameter, `SaveDontAsk`
+  ([shared parameters](#invocation)).
+
+**Two of the 21 are not visible in the v2.95 source listing.** `Fnfm` and `Fndisplayscreen` do not
+appear in a `LIST` of the shipped `screenio.br`, but both names are in the compiled program, and
+ScreenIO's own compiler writes them into the `LIBRARY` line of every helper library it generates.
+The likely reason is that the shipped `screenio.br` has line ranges removed from its source with
+`DEL … source`, which hides them from `LIST` without removing the compiled code. That is not confirmed for these two functions. Their signatures above are therefore from the
+earlier, fully listed build and are not re-verified against v2.95.
+
+*(To regenerate the inventory: `grep -niE "^[0-9]*\s*def\s+library\s+fn" <listing>`, then drop the
+`fnFunctionSwitch*`/`fnShow…`/`fnCheckStringFunction` hits, which are text inside `FNPRINTLINE`/`FNGC`
+calls that ScreenIO writes into generated helper libraries, not its own exports. A decompiled
+listing is not a complete inventory, for the reason above.)*
 
 ## See also
 

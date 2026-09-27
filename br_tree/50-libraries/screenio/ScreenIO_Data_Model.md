@@ -103,7 +103,7 @@ One record per control on a screen.
 
 ## See also
 
-- [ScreenIO_Function_Reference.md](ScreenIO_Function_Reference.md) — the 16 exports and the event contract these fields feed
+- [ScreenIO_Function_Reference.md](ScreenIO_Function_Reference.md) — the 21 exports (v2.95) and the event contract these fields feed
 - [spec.md](spec.md) — concepts and screen-function types
 - [ScreenIO internals guide](../../../dev/screenio-guide.md#authoring) — *(dev kit)* writing these two files directly to author a screen without the Designer, then compiling it
 - [20-io-screen/controls](../../20-io-screen/controls/spec.md) — the underlying BR controls ScreenIO renders (grid/list, picture, combo…)

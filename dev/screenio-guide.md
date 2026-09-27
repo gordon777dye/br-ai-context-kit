@@ -8,7 +8,7 @@ description: The compile-time Helper Library generation pipeline and the runtime
 # ScreenIO internals
 
 `context/br_tree/50-libraries/screenio/` already has an excellent, source-verified reference for
-ScreenIO's **calling convention**: the 16 `DEF LIBRARY` exports
+ScreenIO's **calling convention**: the 21 `DEF LIBRARY` exports of v2.95
 ([Function Reference](../br_tree/50-libraries/screenio/ScreenIO_Function_Reference.md)), the
 screen/control data schema
 ([Data Model](../br_tree/50-libraries/screenio/ScreenIO_Data_Model.md)), the full event list with
@@ -143,7 +143,7 @@ opened via an embedded `screen`-type control, a `[SCREENNAME]` button function, 
 <a id="tabs"></a>
 ### Hosting several screens as tabs (`run.brs`, distributed with ScreenIO)
 
-None of the 16 public `DEF LIBRARY` exports build a tabbed launcher directly — that's what
+None of ScreenIO's public `DEF LIBRARY` exports build a tabbed launcher directly — that's what
 **`run.brs`** is for: a companion library **distributed alongside ScreenIO itself** (not something
 one app wrote for its own use) specifically so any ScreenIO app can load screens onto tabs via
 `fnRunTabs`/`fnTabs`/`fnRunTab` without reimplementing the mechanism. Confirmed by reading it
@@ -515,6 +515,13 @@ customer-equivalent file) entirely through a standalone FileIO program, then ope
 the Designer: every field — Notes, Caption, Rows/Cols, colors, File Layout, even the Field List —
 appeared exactly as written, with no indication the record hadn't been hand-built in the UI.
 
+If a person is at the keyboard, ScreenIO v2.95's own **`fnMakeScreen(; Layout$, LaunchScreen)`**
+may be enough. It is an interactive wizard that generates a `<layout>LIST` listview,
+a `<layout>EDIT` add/edit form and/or a `<layout>COMBO` screen from a FileIO layout
+([Function Reference §E](../br_tree/50-libraries/screenio/ScreenIO_Function_Reference.md#build)).
+It prompts for every choice, so it can't run unattended. The technique below is for unattended
+generation, or for layouts the wizard doesn't produce.
+
 <a id="fileio-write"></a>
 ### The technique is just an ordinary FileIO write, twice
 
@@ -816,7 +823,7 @@ library function, added specifically to close this loop for programmatic screen 
 
 ```
 library "screenio" : fnCompileScreen
-let Success=fnCompileScreen(ScreenCode$,WaitForComplete)   ! ScreenCode$*18; returns 1 if found and compiled, 0 if not found
+let Success=fnCompileScreen(ScreenCode$,WaitForComplete)   ! ScreenCode$*18; 1 = found and compile launched, 0 = not found
 ```
 
 **Pass `WaitForComplete=1` whenever more than one compile happens in the same process, or
@@ -845,9 +852,10 @@ This makes the programmatic-write technique useful for genuinely unattended scre
 just scaffolding to be finished by hand in the Designer) — e.g. generating many similar screens
 from a template, one per data file, entirely from a script.
 
-**`fnCompileScreen` originated as one app's own addition (v2.93) and is being released upstream
-into ScreenIO proper** — other ScreenIO installations should pick it up once they update, rather
-than needing the same patch applied by hand. `design.brs` (confirmed: not a separate
+**`fnCompileScreen` originated as one app's own addition (v2.93) and has since been released
+upstream:** it (and `fnCheckScreenErrors`) are standard `DEF LIBRARY` exports in ScreenIO v2.95, so
+an installation on v2.95 or later needs no hand-applied patch. Signatures for all 21 exports are in the
+[Function Reference](../br_tree/50-libraries/screenio/ScreenIO_Function_Reference.md#build). `design.brs` (confirmed: not a separate
 `screenio.brs` — that's its *compiled, source-stripped* deployment artifact; see an app's own
 `app/conventions.md` for its ScreenIO-modification specifics, if it keeps any) remains
 the real source. Its home, right after `Fncompilehelperlibrary` (~line 5474), as of v2.93:

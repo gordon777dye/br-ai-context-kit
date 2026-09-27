@@ -2,7 +2,7 @@
 
 The FileIO library (Sage AX): layout-driven file access, automatic versioning, DataCrawler, and the Audit BR add-on.
 
-**📄 Guide → [spec.md](spec.md)** _(status: 2b)_ — FileIO (a Sage AX library) is the standard file-access abstraction in this codebase: you describe each data file once in an ASCII layout…
+**📄 Guide → [spec.md](spec.md)** _(status: 2b)_ — FileIO is the standard file-access abstraction in this codebase: you describe each data file once in an ASCII layout file, and FileIO OPENs…
 
 <!-- keep -->
 Deep-reference pages:

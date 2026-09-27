@@ -548,14 +548,18 @@ dispatch), **`fnIsOutputSpec` / `fnIsInputSpec`** (classify a field-type code), 
 (collision-free control name), **`fnFindSubscript`** (index of a value/subscript in an array).
 *For your own programs:* **Animations** (`fnPrepareAnimation`/`fnAnimate`/`fnCloseAnimation`),
 **`fnDays`** (days between dates / relative arithmetic), **`fnBr42` / `fnBr43`** (BR ≥ 4.2 / ≥ 4.3
-detection), **`fnListSpec$`** (build a listview column spec from width/justification/type).
+detection), **`fnListSpec$`** (the manual's description is "build a listview column spec from
+width/justification/type"; the v2.95 source does something narrower: see the note below).
 *To interact with the Designer:* **`fnDesignScreen`** (launch the Designer, optional screen to load),
 **`fnSelectEvent$`** (dialog to select/create an event handler; returns the function name).
 
 > Authoritative signatures for the exported helpers are in
-> [ScreenIO_Function_Reference.md](ScreenIO_Function_Reference.md). (Note: `fnListSpec$` and
-> `fnDesignScreen` appear in the manual but are **not** among the 16 `DEF LIBRARY` exports of this
-> `screenio.brs` build.)
+> [ScreenIO_Function_Reference.md](ScreenIO_Function_Reference.md). `fnListSpec$` and
+> `fnDesignScreen` were missing from the earlier 16-export build, but **are** `DEF LIBRARY` exports in
+> ScreenIO v2.95 (21 exports). In v2.95 `fnListSpec$(SpecIn$)` only returns its argument cut before the
+> third comma (the `row,col,LIST rows/cols` head of a listview spec). It does not build a spec from
+> width, justification and type, as the manual says. Trust the
+> [Function Reference](ScreenIO_Function_Reference.md#helpers) over the manual here.
 
 ### Update Process / Future Changes
 

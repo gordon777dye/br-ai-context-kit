@@ -150,8 +150,9 @@ name**. Source-verified against `fileio.brs` (80 `DEF LIBRARY` exports). Full pr
 
 ## 2. ScreenIO  — `LIBRARY "screenio.br": …`
 
-RAD screen engine built on FileIO. Its public surface is exactly **16 `DEF LIBRARY` exports** (the
-~425 internal engine/designer functions are private). Source-verified against `screenio.brs`. The
+RAD screen engine built on FileIO. Its public surface is **21 `DEF LIBRARY` exports** as of
+ScreenIO v2.95 (the 2020 build had 16; the ~425 internal engine/designer functions are private).
+Source-verified against the shipping source. The
 event/context model and `ExitMode` constants are in
 [`../br_tree/50-libraries/screenio/`](../br_tree/50-libraries/screenio/ScreenIO_Function_Reference.md).
 How the engine works *underneath* these exports — the Helper Library compile pipeline, the runtime
@@ -161,7 +162,7 @@ code with no Designer UI — is in [`screenio-guide.md`](screenio-guide.md#conte
 ### Screen invocation
 | Function | Returns | Purpose |
 |---|---|---|
-| `Fnfm$(Screenname$; Keyval$, Srow, Scol, Parent_Key$, Parent_Window, Display_Only, Dontredolistview, Recordval, MAT Passeddata$, Usemyf, MAT Myf$, MAT Myf, Path$, Selecting)` | str | **Workhorse** — run/edit a screen; returns the chosen/edited record key (`""` if cancelled). Blank `Keyval$` = add a new record. |
+| `Fnfm$(Screenname$; Keyval$, Srow, Scol, Parent_Key$, Parent_Window, Display_Only, Dontredolistview, Recordval, MAT Passeddata$, Usemyf, MAT Myf$, MAT Myf, Path$, Selecting, SaveDontAsk)` | str | **Workhorse** — run/edit a screen; returns the chosen/edited record key (`""` if cancelled). Blank `Keyval$` = add a new record. |
 | `Fnfm(Screenname$; …same params…)` | num | Same, returning `1` ok / `0` cancelled (or the screen's numeric return). |
 | `Fndisplayscreen(Screenname$; Keyval$, Srow, Scol, Parent_Key$, Parent_Window, Recordval, Path$, Selecting)` | num | Read-only display of a screen (forces `Display_Only`). |
 | `Fncallscreen$(Screen$; Keyval$, Parent_Key$, Display_Only, Parent_Window, Dontredolistview, Recordval, MAT Passeddata$, Usemyf, MAT Myf$, MAT Myf, Path$, Selecting)` | str | Programmatic form of the in-screen `[SCRNNAME]` call (wraps the name in `[ ]` if absent). |
@@ -180,13 +181,24 @@ code with no Designer UI — is in [`screenio-guide.md`](screenio-guide.md#conte
 | `fnPrepareAnimation` | num | Initialise the "please wait" animation (no args). |
 | `fnAnimate(; Text$*60)` | num | Render one animation frame, optional caption — call repeatedly during a long task. |
 | `fnCloseAnimation` | num | Tear down the animation window (no args). |
+| `fnListSpec$(SpecIn$*255)` | str | *(v2.95)* `SpecIn$` cut before its third comma: the `row,col,LIST rows/cols` head of a listview spec. Linked into every generated helper library. |
+
+### Designing, generating and compiling screens *(exports in v2.95)*
+| Function | Returns | Purpose |
+|---|---|---|
+| `fnDesignScreen(; ScreenName$)` | — | Open the Designer (GUI mode required), loading `ScreenName$` if given. |
+| `fnMakeScreen(; Layout$, LaunchScreen)` | — | **Interactive** Screen Generator wizard for a FileIO layout; writes `<layout>LIST` / `EDIT` / `COMBO` screens. `LaunchScreen` opens each in the Designer. |
+| `fnCompileScreen(ScreenCode$*18; WaitForComplete)` | num | Headless: rebuild one screen's helper library. `1` = found and compile **launched** (it runs in a separate BR process); pass `WaitForComplete=1` to wait for it. `0` = no such screen. |
+| `fnCheckScreenErrors(ScreenCode$*18, MAT ErrObject, MAT ErrField, MAT ErrMessage$, MAT ErrType)` | num | Headless: the Designer's "To Do" validation. Arrays are resized to one row per finding; `ErrType` `1` warning / `2` error. `1` = screen found (check `UDIM` for findings), `0` = not found. |
 
 > **Event model:** ScreenIO is event-driven, but events are **not** fixed-signature callbacks — the
 > designer stores a BR statement string per screen/control that the engine `EXECUTE`s. Handlers receive
 > a large fixed by-reference context (`MAT F$`/`MAT F`, `Key$`, `ExitMode`, `Window`, …). See the
 > reference page for the event table, the handler context, and `ExitMode` constants (0 run · 1 QuitOnly
 > · 2 SaveAndQuit · 3 SelectAndQuit · …). For how the engine actually dispatches into those handlers
-> at run time, see [`screenio-guide.md` §3–§6](screenio-guide.md#runtime-stack).
+> at run time, see [`screenio-guide.md` §3–§6](screenio-guide.md#runtime-stack). `Fnfm$`'s
+> `SaveDontAsk` (v2.95) turns a non-listview screen's "save changes?" exit prompt into a silent save,
+> for callers such as `run.brs` that ask once for several screens.
 
 ---
 
