@@ -5,10 +5,22 @@ applyTo: **
 alwaysApply: true
 ---
 
-# Repository Instructions
+# Co-Pilot Instructions
 
-Before analyzing, editing, or generating code in this repository:
+During initialization, read these instructions in their entirety:
+- .github/context/README.md
+- .github/context/dev/APP-DEV-GUIDE.md
+- .github/context/dev/BR_launch.md
+- .github/context/dev/essentials.md
+- .github/context/app/conventions.md
 
-1. Read `context/README.md`.
-2. Follow the instructions it contains, including required linked documents.
-3. Be sure to assimilate the 4 documents referenced in the README.
+
+# Onboarding Instructions
+
+Copy the following files into .github/context/
+- context/app/onboarding/copilot-instructions.md - This file
+- context/README.md 
+- context/dev/APP-DEV-GUIDE.md
+- context/dev/BR_launch.md
+- context/dev/essentials.md
+- context/app/conventions.md
