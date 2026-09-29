@@ -10,6 +10,7 @@ recovered-fold: REPLACE (folded+pruned — source-vs-object/.BRS/.BRO rules, .BA
 related: [file-directory, information, editing]
 keywords: [RUN, LOAD, SAVE, REPLACE, MERGE, CLEAR, GO, EXECUTE, CHAIN, PROC, SYSTEM, SUBPROC, PROCERR, ALERT, FILES, ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP, NOTRACE]
 corrections:
+  - "RUN syntax now shows the program name and the PROC option: `RUN [<program>] [PROC] [STEP|TRACE]`. Added a run-proc subsection giving the literal forms (`RUN <program> PROC`, or `LOAD <program>` then `RUN PROC`) and saying they work only inside a procedure. The page had described RUN PROC's effect and never its syntax. From BR 4.4 source: command9.cpp PROC_TYPE sets RUN_PROCIN and raises BREPROCPARAMETER (2103) when no proc is active. commandc.cpp RUN reads a first word that is an option (PROC among them) as that option, not a file name. Confirmed on brserver 4.33c with a probe: both forms gave PROCIN=1 and fed the LINPUT; plain RUN gave PROCIN=0; the startup argument `RUN <prog> PROC` gave 2103. Reported in context/lsp/ERRORS.md 2026-09-09."
   - "Eleven keywords added to the frontmatter: the CHAIN clause FILES, the commands SUBPROC, PROCERR and ALERT, and the qualifiers ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP and NOTRACE. Every one is documented in this page's BNF or semantics and none was declared, so BR's own spelling of each reached nothing. Found in brls phase 13."
   - "CHAIN's backing/deep-reference page carried `kind: command` and lived under this
     70-commands subtree, but CHAIN is a **statement** (line-numbered, runs at RUN; every
@@ -94,7 +95,7 @@ SYSTEM [<flags>] "<os-command>"                      -- run an OS shell command,
 | `LOAD f [SOURCE\|OBJECT]` (LO) | clear memory, load `f`; see [loading](#loading) for modes & extensions |
 | `SAVE f [SOURCE]` (SA) | save to a **new** file (error 4150 if exists) |
 | `REPLACE [f]` (REP) | overwrite an existing file (keeps a `.bak`) |
-| `RUN [STEP\|TRACE]` (RU) | execute from the lowest line (resets vars); STEP/TRACE → [information](../information/spec.md) |
+| `RUN [<program>] [PROC] [STEP\|TRACE]` (RU) | execute from the lowest line (resets vars); with `<program>`, load it first. `PROC` takes input from the running procedure (see [run-proc](#run-proc)); STEP/TRACE → [information](../information/spec.md) |
 | `MERGE f [-<from>] [-<to>] [<first>\|ADD]` (ME) | merge program lines from a file (see [merge](#merge)) |
 | `CLEAR [PROC\|RESIDENT\|ALL]` (CL) | clear program/vars/procedures/libraries (see [clear](#clear)) |
 | `GO [RUN][STEP][TRACE][.<line>]` | resume / step a halted program (see [go](#go)); `GO END` terminates it |
@@ -200,6 +201,29 @@ NOECHO hides lines). `SUBPROC file` runs a **nested** procedure (up to 9 deep) t
 From code: `CHAIN "PROC=…"` / `CHAIN "SUBPROC=…"` (ends program) or `EXECUTE "PROC …"` (keeps
 program running). `RUN PROC` feeds procedure lines to a program's `INPUT`/`LINPUT`.
 
+<a id="run-proc"></a>**`RUN … PROC`** — `PROC` is an **option of `RUN`**, not a command. It is not
+followed by a file name: the lines fed to the program are the ones that follow the `RUN` line in
+the procedure that is *already running*. Two forms work, both only as lines **inside a procedure**:
+
+```
+RUN <program> PROC           ! load <program>, then run it with proc-fed input
+LOAD <program>               ! or: load first ...
+RUN PROC                     ! ... then run what is in memory with proc-fed input
+```
+
+- **Outside a procedure** (typed at READY, or as the startup command-line argument)
+  `RUN … PROC` fails with error [2103](../../90-reference/error-codes/2103.md), "illegal PROC
+  parameter".
+- **`RUN PROC <file>` does not name a proc file.** `RUN`'s first word is checked against its
+  options before being read as a program name, so `PROC` is taken as the option and no program is
+  loaded. `<file>` never becomes a program name. With nothing in memory, BR reports error 2104
+  (no active lines).
+- **A plain `RUN` inside a procedure does not feed it.** `PROCIN` stays 0 and the program reads
+  the keyboard; under `UNATTENDED` logging it aborts at its first input statement.
+- **How the lines are used.** Each input statement consumes the next proc line. When the program
+  ends, the following proc lines are commands again. Confirmed on 4.33c.
+- **The `RUN … PROC` line must not be the proc's last line.** See [look-ahead](#look-ahead).
+
 **Flow & errors**: `SKIP n|:label [IF <cond>]` branches; `PROCERR STOP` (default) halts on error,
 `PROCERR RETURN` continues (sets `ERR`); `ALERT msg` pauses for the operator (`GO` resumes; under
 `PROC NOECHO` the message shows but the operator must press F2/F3 to see the *command* — bracket
@@ -231,6 +255,17 @@ chart) is retained in [Procedure_files](Procedure_files.md).
 04200 EXECUTE "PROC DAILY"            ! start a procedure, program keeps running
 99000 EXECUTE "INDEX ACCT.INT ACCT.KEY 1 4 REPLACE"
 00900 CHAIN "proc=MONTHEND"           ! end program, run procedure
+```
+
+A procedure that runs a program with its input supplied (`PROCIN` returns 1). Start it with
+`PROC nightly.prc`. The program's first input statement reads `FIRST-ANSWER` and its second
+`SECOND-ANSWER`. When the program ends, `SYSTEM` runs as an ordinary command:
+
+```
+RUN myprog PROC
+FIRST-ANSWER
+SECOND-ANSWER
+SYSTEM
 ```
 ```text
 ! procedure: purge deleted records safely (multi-user)

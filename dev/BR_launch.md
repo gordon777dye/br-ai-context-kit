@@ -77,6 +77,38 @@ will not infer source from the extension ([LOAD](../br_tree/70-commands/program-
 ```
 "$BR_EXE" "RUN cop\xlate850" -"$BR_AI_USER"
 ```
+
+### Run a program with proc-fed input
+
+Use this to run an interactive program headlessly. The program's `INPUT`/`LINPUT`/`RINPUT`
+statements read the lines of a procedure file instead of the keyboard, and `PROCIN` returns 1.
+Put the program and its answers in a proc, then start BR with `PROC` on that file:
+
+```
+! tmp\run_it.prc
+RUN custom\myprog PROC
+first answer
+second answer
+SYSTEM
+```
+
+```
+"$BR_EXE" "PROC tmp\run_it.prc" -"$BR_AI_UTIL"
+```
+
+- **`PROC` is an option of `RUN` here, not a file name.** `LOAD custom\myprog` followed by
+  `RUN PROC` is equivalent.
+- **These spellings fail** (confirmed on the kit's 4.33c executable):
+  - `"RUN custom\myprog PROC"` as the startup argument → error 2103, because no procedure is
+    running yet.
+  - `RUN PROC tmp\x.prc` → error 2104, because nothing is loaded and `tmp\x.prc` is never read
+    as a name.
+  - A plain `RUN custom\myprog` inside the proc → `PROCIN` stays 0, and the run aborts at the
+    first input statement.
+- **One proc line is read per input statement.** Lines after the last one the program reads run
+  as commands once it ends, so finish with `SYSTEM`.
+- **The `RUN` line must not be the proc's last line.**
+- Full rules: [`br_tree` — RUN … PROC](../br_tree/70-commands/program-management/spec.md#run-proc).
 ---
 
 ## The Lexi preprocessor

@@ -5,6 +5,10 @@ category: 00-configuration
 subcategory: 00-configuration/config-directives
 kind: config-directive
 related: [config, BRConfig.sys, commands, BR program, PRINT, TRACE, DISPLAY, 4.3, GUI, MyEditBR]
+corrections:
+  - "Level table rewritten from BR 4.4 logger.h:16-40, which defines levels 0-3, 5, 6 and 8-15. The page had misnamed levels 3, 4, 5, 8 and 9, and left out 10, 14 and 15. It also said level 11 logs console PRINT output. No such feature exists: level 11 is TRACING_FLOW, used only in sock.cpp and ssl.cpp (socket and TLS internals) and wbs.cpp (entry traces for the ODBC routines WBReadContextFile and WBLinkExternalRecords). Measured: runs at levels 10 and 11, GUI on and off, logged none of a program's PRINT markers. Reported in context/ERRORS.md 2026-09-28."
+  - "What level 11 actually adds is the reverse: debug.cpp:561 echoes DEBUG_STR messages to the GUI console when the log level is >= AUTOLOG_CONSOLE (11) or +CONSOLE is set. +CONSOLE had been described as sending all logging messages to the console. g_logToConsole is read only on that DEBUG_STR path, and the client (term.cpp clientMessageLog) sends its log messages to the server's log file, not to the console."
+  - "Level 8 row now cites command.cpp:1422 (`Command entered %s` at MINOR_EVENT) in place of the unsupported \"COPY plus shell calls\" wording. The DEBUG_STR clamp is stated from numfunct.cpp:955 (MAKE_BETWEEN(0, 10, level))."
 ---
 As of 4.3, the debug versions of BR now expect you to use a LOGGING configuration statement. This enables BR to post exit messages during unexpected terminations.
 
@@ -25,50 +29,58 @@ The **Logging** `config` statement is provided for logging configuration errors,
 |1
 |NOTABLE_ERROR
 |unexpected error likely to cause problems
-System generated warning messages such as OS failures and abnormal exits.
 |-
 |2
 |MINOR_ERROR
-||unexpected error that can be ignored
-System generated warning messages such as OS failures and abnormal exits.
+|unexpected error that can be ignored
 |-
 |3
-|MAJOR_EVENT
-|starting program, exiting, shelling ...
-System generated warning messages such as OS failures and abnormal exits.
+|MINOR_IO_ERROR
+|input-output error that can be ignored (e.g. an `EXTERNAL` file that cannot be opened)
 |-
 |4
-|SECURITY_EVENT
-|logons, logon attempts etc
+|
+|not used — no level-4 constant is defined
 |-
 |5
-|MINOR_EVENT
-|individual `commands` ...
-User Logon data, including any attempts.
+|SECURITY_EVENT
+|logons, logon attempts
 |-
 |6
-|
-|Starting a `BR program`, exiting.
+|MAJOR_EVENT
+|starting a `BR program`, exiting, shelling; process starts
 |-
 |8
-|
-|`Commands` such as COPY plus shell calls with parameters.
+|MINOR_EVENT
+|individual `commands` — each command entered is logged as `Command entered <command>`
 |-
 |9
+|DEBUG_PROBLEM
+|detailed logging in critical areas, to help users debug problems (e.g. FORM data dumps)
+|-
+|10
 |DEBUGGING_EVENT
-|added for debugging purposes
+|messages added for debugging purposes
 |-
 |11
-|
-|Any `PRINT` output that goes to the console is also logged (GUI ON only).
+|TRACING_FLOW
+|socket and TLS internals (`sock.cpp`, `ssl.cpp`), and entry traces for two ODBC file routines, `WBReadContextFile` and `WBLinkExternalRecords` (`wbs.cpp`). Also the threshold at which `DEBUG_STR` messages are echoed to the GUI console (see **+CONSOLE**)
 |-
 |12
-|
-|`TRACE`, and `DISPLAY` messages.
+|TRACING_INFO
+|`TRACE` output (`Trace line <nnnnn> in <program>` for every executed line) and `DISPLAY` messages
 |-
 |13
-|
-|Lots of what the system is doing now messages.
+|OBNOXIOUS_INFO
+|information that would make important messages hard to find
+|-
+|14
+|OBNOXIOUS_SIZE
+|information that makes big log files (e.g. per-read byte counts)
+|-
+|15
+|OBNOXIOUS_SPEED
+|information that takes time to log
 |-
 |}
 
@@ -78,7 +90,7 @@ The **UNATTENDED** keyword will cause BR to run in unattended mode, without a st
 
 **DEBUG_LOG_LEVEL** (available as of `4.3`) specifies the log level for debugging log messages independently of the standard log level. If not specified, the Debug_Log_Level is set to the standard loglevel.
 
-**+CONSOLE** (4.3) applies only when `GUI` is ON and specifies that all logging messages also go to the console and the console is to be left visible when not attached to `MyEditBR`. (Console logging output is supressed when GUI is OFF.)
+**+CONSOLE** (4.3) applies only when `GUI` is ON and specifies that `DEBUG_STR()` messages (those within the log level) are also echoed to the console, and that the console is to be left visible when not attached to `MyEditBR`. A log level of 11 or higher turns the same echo on without `+CONSOLE`. System log messages are not echoed; they go only to the log file. (Console logging output is supressed when GUI is OFF.)
 
 ====Examples====
  LOGGING 2, logfile
@@ -120,10 +132,12 @@ The following types of messages are written to the LOGGING file:
 | width="20%" | **Log level 6 or above** 
 | Starting a BR program, exiting.
 |
+|- valign="top"
+| width="20%" | **Log level 8 or above** 
+| Each command entered (`Command entered <command>`).
+|
 |}
-Any DEBUG_STR() calls with a level >10 are deemed to be message level 10.
-
-Commands such as COPY plus shell calls with parameters are logged with system generated warning messages such as OS failures and abnormal exits.
+DEBUG_STR() levels are clamped to 0–10: a level above 10 is logged as 10, and a level below 0 as 0.
 
 ====LOGGING PDF printing events====
 
@@ -136,7 +150,7 @@ The following messages are written to the LOGFILE:
 {|
 |- valign="top"
 | width="20%" | **Log level 11 or above** 
-| Any PRINT output that goes to the console is also logged (GUI ON only).
+| Socket and TLS internals, and entry traces for two ODBC file routines. `DEBUG_STR()` messages are also echoed to the GUI console. Console `PRINT` output is **not** logged at any level.
 |
 |- valign="top"
 | width="20%" | **Log level 12 or above** 
@@ -144,7 +158,7 @@ The following messages are written to the LOGFILE:
 |
 |- valign="top"
 | width="20%" | **Log level 13 or above** 
-| Lots of what the system is doing now messages.
+| Lots of what the system is doing now messages (levels 14 and 15 add ever larger and slower detail).
 |}
 
 ;Examples:

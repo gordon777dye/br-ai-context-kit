@@ -5,13 +5,17 @@ category: 70-commands
 subcategory: 70-commands/information
 kind: command
 related: [string, internal function, Msg$, 0412, 0413, 0414, 0415, 0416, 0417, 0418]
+corrections:
+  - "MSG(\"sleeptime\",n) takes milliseconds, not centiseconds (line 14) or seconds (the closing paragraph); the two statements also contradicted each other. BR 4.4 brmsg.cpp BrMsg_SleeptimeObjCmd stores `sleeptime = (*num) * 1000` and hands it to wb_sleepex, which sleeps in microseconds (common.cpp); the default is `static DWORD sleeptime = 200000` µs = 0.2 s, i.e. 200. Confirmed empirically: a pacing test written to the documented 100 = 1 second ran ten times fast. Reported in context/ERRORS.md 2026-09-28."
+  - "Special-character table listed F14 between F9 and F11; the key table in brmsg.cpp defines |F1| through |F12| only, so the row is F10 (there is no F13 or F14)."
+  - "Special-character table completed from brmsg.cpp's SpecialChar[] table, which has 20 names the page omitted: CLR, SPACE, SEL, PRINT, EXEC, SNAP, LWIN, RWIN, APPS, NUM#, and the ALTL/ALTR, CTRLL/CTRLR and SHIFTL/SHIFTR press/release pairs. Each description is the entry's Windows VK_ code. The L variants are byte-for-byte the same event as the plain modifier; the R variants add KEYEVENTF_EXTENDEDKEY. NUM, was described as the key pad comma; it sends VK_SEPARATOR."
 ---
 MSG("<KB>",<`string`>) ! send string to keyboard
 
 The **MSG** `internal function` (without the dollar sign) is only available for Windows & CS versions.  This should not be confused with `Msg$`.
 For example:
 
- MSG("sleeptime",centiseconds) ! specify MSG keystroke time interval (100 = 1 Second)
+ MSG("sleeptime",milliseconds) ! specify MSG keystroke time interval (1000 = 1 Second)
 
 With the Msg internal function you can directly control the keyboard under the Windows client from within a BR program by issuing a function call to MSG.
 
@@ -74,11 +78,29 @@ Will input the CTRL-P character, which causes BR to perform a printscreen operat
 |-valign="top"
 |**
 |-valign="top"
+|**ALTL+ ALTL- || press / release ALT — the same key event as ALT+ / ALT-
+|-valign="top"
+|**ALTR+ ALTR- || press / release ALT with the Windows extended-key flag set
+|-valign="top"
+|**CTRLL+ CTRLL- || press / release CTRL — the same key event as CTRL+ / CTRL-
+|-valign="top"
+|**CTRLR+ CTRLR- || press / release CTRL with the Windows extended-key flag set
+|-valign="top"
+|**SHIFTL+ SHIFTL- || press / release SHIFT — the same key event as SHIFT+ / SHIFT-
+|-valign="top"
+|**SHIFTR+ SHIFTR- || press / release SHIFT with the Windows extended-key flag set
+|-valign="top"
+|**
+|-valign="top"
 |**TAB || press the tabulation key
 |-valign="top"
 |**RET || press the return key
 |-valign="top"
 |**ESC || press the escape key
+|-valign="top"
+|**SPACE || press the space bar
+|-valign="top"
+|**CLR || press the Clear key (VK_CLEAR)
 |-valign="top"
 |**
 |-valign="top"
@@ -112,6 +134,22 @@ Will input the CTRL-P character, which causes BR to perform a printscreen operat
 |-valign="top"
 |**
 |-valign="top"
+|**SNAP || press the Print Screen key (VK_SNAPSHOT)
+|-valign="top"
+|**PRINT || press the Print key (VK_PRINT — not Print Screen)
+|-valign="top"
+|**SEL || press the Select key (VK_SELECT)
+|-valign="top"
+|**EXEC || press the Execute key (VK_EXECUTE)
+|-valign="top"
+|**LWIN || press the left Windows key
+|-valign="top"
+|**RWIN || press the right Windows key
+|-valign="top"
+|**APPS || press the Applications (context menu) key
+|-valign="top"
+|**
+|-valign="top"
 |**F1 || press the function key F1
 |-valign="top"
 |**F2 || press the function key F2
@@ -130,7 +168,7 @@ Will input the CTRL-P character, which causes BR to perform a printscreen operat
 |-valign="top"
 |**F9 || press the function key F9
 |-valign="top"
-|**F14 || press the function key F14
+|**F10 || press the function key F10
 |-valign="top"
 |**F11 || press the function key F11
 |-valign="top"
@@ -166,7 +204,9 @@ Will input the CTRL-P character, which causes BR to perform a printscreen operat
 |-valign="top"
 |**NUM- || press the - on the key pad
 |-valign="top"
-|**NUM, || press the , on the key pad
+|**NUM, || press the key pad separator key (VK_SEPARATOR)
+|-valign="top"
+|**NUM# || press the key pad decimal point (VK_DECIMAL)
 |-valign="top"
 |**NUM/ || press the / on the key pad
 |-valign="top"
@@ -175,7 +215,7 @@ Will input the CTRL-P character, which causes BR to perform a printscreen operat
 |}
 To send the pipe character specify <nowiki>|||</nowiki>.
 
-MSG("sleeptime",seconds) specifies the number of seconds to wait before issuing each string and each control character. Seconds may also be expressed with *up to three decimal digits*  The default value is 0.2 seconds.
+MSG("sleeptime",milliseconds) specifies the number of milliseconds to wait before issuing each string and each control character (`1000` = one second). The default is 200 (0.2 seconds).
 
 Please note that the ALT key needs to be depressed and released (ALT+ and ALT-) for every Alt-character specified.
 

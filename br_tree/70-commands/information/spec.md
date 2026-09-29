@@ -10,6 +10,7 @@ recovered-fold: NOSTEP (redirect-collision page re-fetched; NOSTEP/NOTRACE alrea
 related: [program-management, editing]
 keywords: [STATUS, LIST, TRACE, DISPLAY, LOGGING, STEP, BREAK, TIME, ALL, FONTS, NORESTORE, DEBUG_STR, PROGRAM$]
 corrections:
+  - "MSG(\"sleeptime\",n) unit corrected to milliseconds (was given as seconds here; see MSG.md corrections for the brmsg.cpp evidence). Reported in context/ERRORS.md 2026-09-28."
   - "BREAK, TIME, ALL, FONTS and NORESTORE added to the frontmatter keywords. All five are in this page's BNF — BREAK has an anchor of its own — and none was declared. Found in brls phase 13."
   - "DEBUG_STR and PROGRAM$ added to the frontmatter keywords. Both are documented in this page's
     body (`DEBUG_STR(level, str$)` has its own anchor; `PROGRAM$` is described alongside `PROCIN`)
@@ -77,7 +78,7 @@ VERIFY                                               -- V; check the system reco
   variables mid-run. `MSG`/`BELL` signal the operator.
 - <a id="msg"></a>**`MSG("KB", str$)`** (function, Windows/CS only — not raw Unix/Linux terminals)
   drives the Windows-client keyboard from BR; special keys go in pipes (`MSG("KB","|CTRL+|c|CTRL-|")`),
-  and `MSG("sleeptime", sec)` paces it (default 0.2s). Full key table: [MSG](MSG.md).
+  and `MSG("sleeptime", ms)` paces it in milliseconds (default 200 = 0.2s). Full key table: [MSG](MSG.md).
 - <a id="printer-list"></a>**`PRINTER_LIST(MAT a$)`** (function) redims `a$` to the active Windows
   printers (default first) and returns the count; the names double as `OPEN "NAME=PRN:/…"` targets
   (any matching substring suffices). Idiom + spooling tip: [PRINTER_LIST](PRINTER_LIST.md).

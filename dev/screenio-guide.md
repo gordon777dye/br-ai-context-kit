@@ -41,8 +41,10 @@ not inferred from behavior.
   - [A third archetype: writing a genuine custom Filter function, and passing `ParentKey$` between screens](#custom-filter)
   - [A fourth technique: a free-floating lookup column, opened once via `fnInit_`/`fnFinal_`](#lookup-column)
   - [Compiling is not optional — and no longer requires the Designer UI](#compiling-from-code)
+  - [How the deployed `screenio.br` is built from `design.brs`](#screenio-build)
   - [`fnCheckScreenErrors` — the Designer's "To Do" validation, also callable from code](#check-screen-errors)
   - [A general lesson: exposing an internal function via bare `LIBRARY` linkage skips *all* of the host program's own top-level setup](#bare-library-linkage)
+- [10. A Windows dropdown menu bar on a ScreenIO screen (`DISPLAY MENU` + fkey 98)](#windows-menu)
 - [See also](#see-also)
 
 <a id="two-halves"></a>
@@ -165,6 +167,40 @@ Under the hood it's plain BR window features plus repeated `fnfm$` calls:
 4. Optionally "predraw" every tab's screen into its own window up front (calling `fnfm`/`fnfm$` on
    all of them before the user switches to each), trading startup time for instant tab switching
    later — `run.brs`'s `Predraw`/`DisplayOnly` parameters are this trade-off exposed as options.
+
+<a id="tabs-shared-record"></a>
+**Sharing one record across all tabs (`FileLay$`).** By default, each tab's screen reads and
+writes its own file, the same as a stand-alone screen. `fnRunTabs`/`fnRunTabs$`/`fnTabs`/`fnTabs$`
+also take an optional **`FileLay$`**, a FileIO layout name. When it is given, `run.brs` owns the
+record, and every tab edits that one in-memory copy. This is confirmed from the `fn_Tabs$` source
+(ScreenIO's `run.brs` dated 2020-10-25 and 2022-05-24). An older `run.brs` whose `fnRunTabs` ends at
+`ParentKey$` has none of these parameters.
+
+1. **Read once.** `run.brs` opens `FileLay$` itself, through its local `fnOpen`, which wraps
+   FileIO's `fnOpenFile`. It reads the record into `mat F$`/`mat F`, by `Key$` if one is given,
+   otherwise by record number (`RecordNum`). If neither is given, it starts from a blank record.
+   A key or record that isn't found shows a message box and skips the tabs.
+2. **Every tab edits the same arrays.** Each tab's screen is run as
+   `fnfm$(Screen$(n),"",…,Usemyf=1,mat F$,mat F,…)`. The key is empty and `Usemyf` is `1`, so
+   ScreenIO does not read the file: the screen works directly on the arrays passed in (`Usemyf`,
+   `mat Myf$` and `mat Myf` are ordinary `fnfm`/`fnfm$` parameters).
+3. **Write once, on exit.** After the tab loop, `run.brs` checks the return value of the screen
+   that was active when the user exited. If it is non-empty (the user did not cancel), `run.brs`
+   rewrites the record by the saved key or record number.
+   With neither, it writes a new record. Then it closes the file.
+4. **`AskSaveTogether`** asks one "The data has changed. Do you want to accept the changes?"
+   question for all the tabs instead of one per screen.
+   - Before the loop, `run.brs` keeps a copy of the record as read, and it compares the arrays
+     with that copy on exit.
+   - `mat IgnoreStrings` / `mat IgnoreNumbers` list the elements to leave out of that
+     comparison.
+   - Unchanged means no write. **No** discards the edits; **Cancel** returns to the tabs.
+   - The same flag is passed to each screen's `fnfm$` as
+     [`SaveDontAsk`](../br_tree/50-libraries/screenio/ScreenIO_Function_Reference.md), so the
+     individual screens don't also ask.
+
+Without `FileLay$`, none of this happens: each screen is called with `Key$`/`RecordNum` and does its
+own reading and writing.
 
 This is a genuinely reusable pattern for any ScreenIO app that wants a tabbed main-menu shell; the
 *specific* tabs, and which employee sees which, are naturally 100% app-defined business logic —
@@ -873,6 +909,47 @@ COMPILESCREEN: ! Compiles One Screen's Helper Library By Screen Code (Callable F
    fnend
 ```
 
+<a id="screenio-build"></a>
+### How the deployed `screenio.br` is built from `design.brs`
+
+Read this if you need to patch the ScreenIO engine by hand (for example, to apply an upstream
+addition before your installation has the release that contains it). **`design.brs` is the source;
+`screenio.br` is built from it in two stages.** The stages below come from one installation, where
+the owner confirmed them end-to-end on 2026-09-18. That installation's files are not in this kit,
+so check its line ranges and file names against your own copy.
+
+1. **Full build.** Edit `design.brs` (Lexi-authored, so use the
+   [Lexi-aware coding loop](APP-DEV-GUIDE.md#lexi-aware-coding-loop)) and compile it to
+   `design.br`. This is the **complete** program, Designer UI included.
+2. **Deployment build.** `design.br` is not what apps load. A short BR procedure loads it,
+   deletes the *source text* of the Designer-UI line ranges, and replaces `screenio.br`. At that
+   installation the procedure is:
+   ```
+   lo design
+   del 71000 74999 source
+   del 70400 source
+   del 25500 source
+   del 13040 source
+   rep screenio.br
+   ```
+   Every `LIBRARY "screenio": …` in an app then resolves to that `screenio.br`. A new process
+   picks up the redeployed file at once.
+
+**The deployment build removes no functionality.** [`DEL … SOURCE`](../br_tree/70-commands/editing/spec.md#del)
+deletes a line's source text and keeps its compiled object. The lines vanish from `LIST` and can't
+be decompiled, but they still run. This is how ScreenIO's copy protection works. It was confirmed
+on the kit's 4.33c runtime with a probe (`context/scratch/delsrc/`):
+- `DEL 100 120 SOURCE` on a program whose lines 100–120 define `fnTwice`
+- `SAVE`, then a fresh `LOAD`
+- result: `LIST` showed only lines 10–40, and `fnTwice(21)` still returned 42.
+
+**Two things to watch when patching:**
+- **Keep new code outside the stripped ranges.** It still *runs* inside them, but its source
+  disappears from your deployed copy.
+- **Compare against real line numbers.** Those ranges are BR line numbers, not physical lines in
+  `design.brs`: Lexi's `#Autonumber#` assigns the real numbers, so check against the translated
+  output (see the `#Autonumber#` caveat under [bare `LIBRARY` linkage](#bare-library-linkage)).
+
 <a id="check-screen-errors"></a>
 ### `fnCheckScreenErrors` — the Designer's "To Do" validation, also callable from code
 
@@ -971,6 +1048,60 @@ Lexi-translated output (§7's CSV-dump method's sibling technique — `lexi-comp
 `#Autonumber#` has physical text-line positions that do not correspond to its real BR line
 numbers** — the crash log's line number can only be matched up against the *translated* output
 with real sequential numbers, not the original source's physical line count.
+
+<a id="windows-menu"></a>
+## 10. A Windows dropdown menu bar on a ScreenIO screen (`DISPLAY MENU` + fkey 98)
+
+ScreenIO has no menu-bar control, but a screen can host BR's own native dropdown menu. Nothing
+here is ScreenIO-specific except where the code goes, and ScreenIO's own manual names this use:
+the Main Loop event is where you "implement special keys or windows menus"
+([ScreenIO_Library](../br_tree/50-libraries/screenio/ScreenIO_Library.md)). The BR half is
+[`DISPLAY MENU`](../br_tree/20-io-screen/controls/Display_Menu.md). The pattern below is taken
+from a production ScreenIO app, with the Lexi removed and names made generic.
+
+1. **Enter event: display the menu once.** The screen's Enter function builds three parallel
+   arrays and issues `display menu: mat M$, mat Pgm$, mat Status$`.
+   - `M$` holds the captions. Each two-space indent makes an item a submenu of the one above.
+   - `Pgm$` holds each item's payload: the string your code will get back.
+   - `Status$` holds each item's flags. **An item must include `E` in its status to raise fkey
+     98 when chosen**; add `R` to keep the menu across program chains.
+2. **Main Loop event: watch for fkey 98.** Main Loop fires every time ScreenIO's main
+   `RINPUT FIELDS` is passed, so a menu click arrives there as `fkey=98`. It does not close the
+   screen: ScreenIO's input loop exits only when `ExitMode` is set, or on Esc or Enter.
+3. **Dispatch on `MENU$`.** `MENU$` returns the chosen item's `Pgm$` string (`MENU` returns its
+   subscript).
+4. **Refresh afterwards.** After running the chosen action, set `RepopulateListviews=1` and
+   `RedrawScreens=1` so the screen repaints. Both are by-reference parameters ScreenIO passes to
+   every event function. The source app also re-issues its `DISPLAY MENU` after each dispatch;
+   copy that, but its cause wasn't traced.
+
+**Why 98 can't collide with a control.** Every ScreenIO hot zone is numbered from `fnBase` = 1500
+upward (see [§8](#child-screens), `fnKeyBase`), and the "click outside this screen" test requires
+`Function>fnBase`. A native BR key code such as 98 is below that floor, so ScreenIO never mistakes
+it for a control click.
+
+**The reusable trick: let the payload be a screen name.** `fnfm(Screen$)` takes a screen name as
+a string, so a menu item whose `Pgm$` is a screen name needs no dispatch branch of its own. Handle
+the few special items explicitly, and send everything else to `fnfm`. A whole menu of screen
+launchers then costs one line:
+
+```
+def fnMenuEnter   ! Enter event
+   ! ... fill mat M$, mat Pgm$, mat Status$ (e.g. "  &Customers","custedit","ER") ...
+   display menu: mat M$, mat Pgm$, mat Status$
+fnend
+def fnMenuLoop    ! Main Loop event
+   if fkey=98 then
+      if lwrc$(menu$)="logoff" then
+         execute "system"
+      else
+         let fnfm(menu$)      ! any other item: its payload is a screen name
+      end if
+      let RepopulateListviews=1
+      let RedrawScreens=1
+   end if
+fnend
+```
 
 <a id="see-also"></a>
 ## See also

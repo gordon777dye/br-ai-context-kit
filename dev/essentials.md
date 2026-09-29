@@ -436,7 +436,13 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
 - **NO argv capability** BR invokation doesn't accept argv style arguments. However, it does 
   support arguments provided by a procedure (batch) file. So, if you need to pass arguments to a 
   BR invokation, create a procedure file that runs the program or proc you desire to run followed 
-  by parameter values, each on a separate line. The command is **`RUN PROC`** (two words)
+  by parameter values, each on a separate line. The line that runs the program is
+  **`RUN <program> PROC`** (or `LOAD <program>` then `RUN PROC`). `PROC` is an option of `RUN`
+  and is **not** followed by a file name: `RUN PROC <file>` loads nothing (error 2104). A plain
+  `RUN` leaves `PROCIN` at 0, so the program waits on the keyboard. The option works only in a
+  proc that is already running, so launch BR with `PROC <that file>`; `RUN <program> PROC` as
+  the startup argument fails with error 2103. Worked example:
+  [`BR_launch.md`](BR_launch.md#run-a-program-with-proc-fed-input).
   Then in the program LINPUT each parameter as if the operator were keying them. Note that 
   multiple values are easily passed between BR programs and this limitation only pertains to 
   BR invokation. 

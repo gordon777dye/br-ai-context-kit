@@ -65,6 +65,7 @@ context/app/
   data-model.md         # STEP 3 — generated from the app's filelay/ folder
   data-model-index.json
   exemplars/            # STEP 5 — ~10–20 blessed real programs, annotated
+  examples/             # optional, created as needed — one-off technique demos, NOT house style
   conventions.md        # STEP 6 — house style, derived from the app's own source
   architecture.md       # STEP 7 — module map + core data flows
   BR_test.md            # STEP 9 — real-BR LOAD/SAVE survey of this app's tree
@@ -217,12 +218,27 @@ compiled form. Record the answer in `context/README.md` at the end of the Rules 
 program masters are stored in source format decompiling is prohibited. 
 
 > **Audit every compiled `.br`/`.wb`: confirm a corresponding source file (e.g. `prog.br.brs` or 
-`prog.brs` for `prog.br`) exists whose modification date-time is the *same as or later than* the compiled file.**
+`prog.brs` for `prog.br`) exists, and compare the two modification date-times.**
 
-- **Pass** (source exists and is ≥ its `.br`) → that source is current; nothing to do.
-- **Fail** (source missing, or older than its `.br`) → the compiled file was changed more recently, so
-  the `.brs` is genuinely stale. **if program masters are stored in compiled form** decompile just 
-  those programs to refresh the source. Otherwise report the stale source in `context/app/STALE_SOURCE.md`.
+A current source is normally a little **older** than its `.br`, not newer. The source is saved
+first, and the compile (`LOAD … source` + `SAVE`/`REPLACE`, or an automatic compile on save)
+writes the `.br` seconds later. So a small gap in the `.br`'s favour is the normal
+save-then-compile sequence, not staleness. In one real audit, 119 of the 134 files a strict
+"source ≥ `.br`" rule flagged were within 60 seconds of their `.br`.
+
+- **Pass:** the source exists, and it is newer than its `.br`, or older by **15 minutes or less**.
+  That source is current; nothing to do.
+- **Stale:** the source is **missing**. If program masters are stored in compiled form, decompile
+  the program to create it. Otherwise report it in `context/app/STALE_SOURCE.md`.
+- **Suspect:** the source is older than its `.br` by **more than 15 minutes**. The `.br` may have
+  been changed without the source, or the compile may simply have happened later.
+  - If program masters are stored in **compiled** form, decompile these programs too; it is
+    harmless when the source was current.
+  - Otherwise, list them in `context/app/STALE_SOURCE.md` with the size of each gap, marked "to
+    verify". Don't call them stale. The confirming sign of genuine staleness is the `.brs` also
+    being clearly smaller, or missing content that the `.br` has, not the date alone.
+
+The 15-minute window is a default. Widen it if this shop routinely compiles long after saving.
 
 If decompiling: After identifying a missing or stale .brs file refresh it by running BR with the command: 
 > `LIST < <path\program-name> > <path\program-name.br.brs> : EXECUTE "system"` 
@@ -365,8 +381,9 @@ then includes "compiles against our data model," not just "looks right."
 ## Maintenance
 - If a data file is added or its layout changes, update `filelay/` (STEP 2) first, then re-run STEP 3.
 - Re-run STEP 3 after any `filelay/` change.
-- Re-run the STEP 4 audit after recompiling; decompile any program whose `.brs` is now older than its
-  `.br` before you re-derive exemplars or conventions.
+- Re-run the STEP 4 audit after recompiling, and handle any **stale** or **suspect** program as
+  STEP 4 says before you re-derive exemplars or conventions. A source up to 15 minutes older than its
+  `.br` is normal.
 - Refresh exemplars when the house pattern for an archetype changes.
 - Language corrections go to `context/br_tree/` and flow to **every** app — never fork them into `context/app/`.
 

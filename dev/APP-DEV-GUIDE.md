@@ -67,6 +67,11 @@ language keyword router; app conventions/architecture aren't keyword-addressable
   - [`../app/data-model.md`](../app/data-model.md) — file schemas & key composition; look up **by file** (generated — §4)
   - [`../app/architecture.md`](../app/architecture.md) — module map, entry points, core data flows (orientation)
   - [`../app/exemplars/`](../app/exemplars/) — blessed real programs; pick **by archetype** and imitate
+  - [`../app/examples/`](../app/examples/README.md) (optional, created as needed; its README says which scripts are safe to run in this app) — throwaway scripts that show **how a technique
+    was done** (e.g. writing a ScreenIO screen's records from code, as
+    [`screenio-guide.md`](screenio-guide.md) §9 refers to). They are verified to work but are
+    **not** house style: never imitate them as you would `exemplars/`. They are kept in a separate
+    folder so they don't dilute that signal.
 
 The `app/` files above are generated/written during onboarding and are app-private (git-ignored) — a
 fresh kit skeleton won't have them yet. `BR_launch.md` is the exception: it lives in `dev/` (this
@@ -214,6 +219,16 @@ failures that it doesn't detect along with any false positives.
 4. Therefore clean `-check` means "no bad lines", clean `-check -sema` means "no bad lines and no bad
   file", and the authoritative gate is still real BR: `LOAD <prog>.brs source`, then `SAVE` or
   `REPLACE` (see §7, step 6).
+
+**VS Code's BR diagnostics are not `brls`.** The "BR Language Server" extension
+(`crs-dev.vslang-br`) runs its own bundled checker, `server\br-lsp.exe`, a separate third-party
+program (`github.com/christopherroyshields/br-lsp`). It has its own table of built-in function
+signatures and does not use this kit's data. Where it and `brls` disagree, go by `brls -check
+-sema`, then by real BR `LOAD … source`.
+
+Known false positive, in 0.1.22: its table knows only `MSG("KB", <string$>)`, so every correct
+`MSG("sleeptime", <milliseconds>)` is flagged "Expected string argument at position 2, got numeric".
+Report further ones to that project, not in `context/ERRORS.md`, unless `brls` agrees with them.
 
 **Before trusting a `brls`/`LOAD ... source` failure, check whether this app uses Lexi** — a
 preprocessor some BR shops write source for (`/* */` comments, `X$&=`, `#Select#/#Case#`, and
@@ -414,6 +429,7 @@ alone over-reports. Instead:
 |---|---|
 | **Syntax-check** a program | `LOAD "<prog>.brs" source` — parses line-by-line, halts on the first error with `ERR`/`LINE` set. The **`source`** keyword is required (`LOAD` defaults to object). |
 | **Run** a program | `RUN "<prog>"` If running attended, end the proc with `EXECUTE "system"` so BR exits instead of waiting at READY. |
+| **Run** an interactive program with scripted input | In a proc: `RUN <prog> PROC`, followed by one answer line per input statement, then `SYSTEM`. Launch it with `PROC <that proc>`. `PROCIN` returns 1 only in this form. Worked example: [`BR_launch.md`](BR_launch.md#run-a-program-with-proc-fed-input). |
 | **Read / maintain data** | Write a short BR program/proc that `OPEN`s the file (layout from `data-model.md`) and `READ`/`REWRITE`/`WRITE`s it — the kit has no external query tool. |
 | **Decompile** `.br` → `.brs` | a proc of `LOAD "<prog>.br"` / `LIST >"<prog>.br.brs"` pairs, ending `EXECUTE "system"` (see [`../app/ONBOARDING.md`](../app/ONBOARDING.md) STEP 4). |
 

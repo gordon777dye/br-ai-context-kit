@@ -305,7 +305,7 @@ already carried by the keyword pack. The "2-D control" gloss was wrong as well a
 | `ENV$(status$, [MAT cfg$ (out)], [arg])` | str | environment / status interrogation (4.30+) |
 | `SETENV(name$, [value$])` | num | set a BR **session** environment variable (function form of `CONFIG SETENV`; read back with `ENV$`). 2 args = `name$`,`value$`; 1 arg = a `NAME=VALUE` directive |
 | `MSG$(text$)` | str | display text in the 2nd box of the command console |
-| `MSG(action$, arg)` | num | keyboard control, Windows/CS (**not** a companion of `MSG$`): `MSG("KB",keys$)` injects keystrokes, `MSG("sleeptime",cs)` sets the delay — home: 70-commands/information |
+| `MSG(action$, arg)` | num | keyboard control, Windows/CS (**not** a companion of `MSG$`): `MSG("KB",keys$)` injects keystrokes, `MSG("sleeptime",ms)` sets the delay in milliseconds — home: 70-commands/information |
 | `SLEEP(seconds)` | num | pause (fractional seconds, ms resolution) |
 | `HELP$([*]kw$, [mark])` | str | enter HELP mode / show a topic; returns a scancode or selection. **Two arguments at most**, and the second is *numeric* — `ck_alph_sysfn` gives `BETWEEN(1, 2, subcount)` with `PARMCHECK_NUMERIC` on it, so the `file$` this row used to list is not a parameter |
 | `MSGBOX(prompt$, [title$], [buttons$], [icon$])` | num | Windows message box; returns the chosen button (also in `CNT`): 1 OK · 2 Yes · 3 No · 4 Cancel |

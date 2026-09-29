@@ -10,6 +10,7 @@ recovered-fold: PrintDir, DATAHILITE, FIELDBREAK, FLOWSTACK, FORSTACK, HELPDFLT,
 related: [environment, client-server, platform, installation-tooling]
 keywords: [CONFIG, DRIVE, OPTION, DATABASE, SUBSTITUTE, STYLE, PRINTER, FONT, COLLATE, LOGGING, WORKPATH, PRINTDIR, SPOOLCMD, INCLUDE, SETENV, ATTRIBUTE, KEYBOARD, SCREEN, RD, STACKS]
 corrections:
+  - "LOGGING summary corrected: the level range runs 0-15 (logger.h), not 0-13, and +CONSOLE echoes only DEBUG_STR messages, not all logging (debug.cpp:561). Added that console PRINT output is never logged, the claim the old level table made. See LOGGING.md corrections; reported in context/ERRORS.md 2026-09-28."
   - "RD and STACKS added to the frontmatter keywords. `RD <0-15>` is in this page's directive list with a retained deep page of its own (RD.md), and `STATUS STACKS` is named where the stack settings are documented; neither was declared. Found in brls phase 13."
 ---
 
@@ -233,8 +234,8 @@ STYLE [INDENT <n> <n>] {KEYWORD|LABEL|EXPRESSION [MIXED|UPPER|LOWER]} ...
 - `INSERT` sets overtype/insert persistence scope (default `ON PERSISTENT`; overridden 
   by `DATAHILITE`). Persistent means remember the last operator setting. `MIN_LENGTH` specifies a second setting for fields => specified length. NON_PESISTENT - reset upon field exit; SESSION_PERSISTENT - reset upon exiting Business Rules; PERSISTENT - keep operator setting across BR exits.
 - `KEYBOARD` builds keystroke macros from BR scancodes (`CON KEYBOARD [<scancode>] CLEAR` removes them); 
-- `LOGGING` filters by level 0 (major-error) … 13 (verbose); `UNATTENDED` runs headless and exits on input; 
-  `+CONSOLE` mirrors to the console (GUI ON). Full level table: [LOGGING](LOGGING.md).
+- `LOGGING` filters by level 0 (major-error) … 15 (obnoxious detail); commands entered log at 8, `TRACE`/`DISPLAY` at 12, and console `PRINT` output is never logged; `UNATTENDED` runs headless and exits on input; 
+  `+CONSOLE` echoes `DEBUG_STR` messages to the console (GUI ON; automatic at level ≥ 11). Full level table: [LOGGING](LOGGING.md).
 - `MAXRECALL` sizes F2 command recall (default 200). 
 - `MAX_SORT_MEMORY` default is 8 MB; range is 2 - 512 MB.
 - `PICTURE` Default `CACHE_ON` caches images by image filename.
