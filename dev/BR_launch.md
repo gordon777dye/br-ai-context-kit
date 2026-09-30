@@ -35,14 +35,41 @@ export BR_AI_USER="context/dev/tools/brconfig.ai_user"
 export BRLS_EXE="context/dev/tools/brls.exe"
 ```
 
-**All paths above, and every invocation in this file and in §6.1, are relative to the kit root**
-(the directory containing `context/` — Run from there, or resolve these paths against it first; 
+**All paths above, and every invocation in this file and in §6.1, are run from the kit root**
+(the directory containing `context/`). Run from there, or resolve these paths against it first.
 `brls.exe` takes no config file and needs none of `$BR_CONFIG`/
 `$BR_AI_UTIL`/`$BR_AI_USER` — it never launches BR.
 
+<a id="start-folder"></a>
+### Two starting folders: where you launch BR, and where BR starts
+
+A BR run involves two folders, and they are not always the same one:
+
+| Path | Resolved against |
+|---|---|
+| The executable, the `-<config-file>` argument, and the config's `LOGGING` file | the **OS folder BR is launched from** — the kit root |
+| Every path handed **to BR**: the startup command (`"PROC …"`, `"RUN …"`, `"LOAD …"`), the lines of a proc, and the names a program opens | **BR's start folder**: the first `DRIVE`'s 2nd parameter plus its 4th (`DRIVE M:,C:\ads,,\app` starts in `C:\ads\app`) — see [br_tree — DRIVE](../br_tree/00-configuration/config-directives/spec.md#paths) |
+
+When the two are the same folder, which is the usual install, a kit path such as
+`context\scratch\x.prc` works in both places. When they differ, give BR the kit file's path from
+BR's start folder. ONBOARDING STEP 1 records that prefix at the end of the AI Model Rules in
+`context/README.md`. For example, if the kit is installed in `y:\wb\ar1` but the first `DRIVE`
+starts BR in `y:\wb`, launch from `y:\wb\ar1` with `"PROC ar1\context\scratch\x.prc"`.
+Keep `LOGGING context\app\startlog.txt` unprefixed, because it resolves against the launch folder.
+
+Don't `CD` to the kit root instead. Production BR starts in the same folder (the AI configs keep
+`brconfig.sys`'s `DRIVE` lines), so any file name an app program gives relative to it would stop
+resolving.
+
+Confirmed on the kit's 4.33c executable, launched from the kit root each time (probe:
+`context/scratch/startdir/`): with BR starting one folder above the kit root, the kit-relative
+`"PROC context\…"` failed with error 4203 ("path does not exist"), and `"PROC <folder>\context\…"`
+ran. With BR starting one folder below it, only the path from that folder ran. In every case the
+`LOGGING` file was written under the launch folder.
+
 ## AI Canonical invocations
 
-Copy these verbatim (the STEP 3 compile check uses the same form).
+Copy these verbatim.
 
 ```
 "$BR_EXE" -"$BR_CONFIG"                           # start BR into the app (interactive)
@@ -63,8 +90,7 @@ Copy these verbatim (the STEP 3 compile check uses the same form).
 ## Development commands
 
 ### Compile / syntax-check
-Sources compile `.br.brs` → `.br` on modification. To force a compile-check of one source
-(the STEP 3 feedback loop):
+Sources compile `.br.brs` → `.br` on modification. To force a compile-check of one source:
 
 ```
 "$BR_EXE" "LOAD program.brs source" -"$BR_AI_UTIL"   # parses; reports first error + line

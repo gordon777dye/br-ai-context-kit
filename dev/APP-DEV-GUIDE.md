@@ -399,8 +399,10 @@ output file is located. This will need to be interrogated after your batch run t
 ended. The log level should be set to 8 or greater.
 
 When interrogating the configuration file take note of the first `DRIVE` statement **to see what folder 
-BR starts in**. You may need to have the proc or program CD to the folder of your choice at the 
-beginning of each test.
+BR starts in**. Paths you hand to BR (the startup `PROC`/`RUN`, proc lines) resolve from that folder,
+not from the kit root you launch in. If the two differ, prefix kit paths as recorded in
+`context/README.md` rather than `CD`-ing away from the app's start folder (see
+[`BR_launch.md`](BR_launch.md#start-folder)).
 
 You can write a `.prc` procedure containing the commands you want and run it through the BR invocation 
 described in [`BR_launch.md`](BR_launch.md).
@@ -431,7 +433,7 @@ alone over-reports. Instead:
 | **Run** a program | `RUN "<prog>"` If running attended, end the proc with `EXECUTE "system"` so BR exits instead of waiting at READY. |
 | **Run** an interactive program with scripted input | In a proc: `RUN <prog> PROC`, followed by one answer line per input statement, then `SYSTEM`. Launch it with `PROC <that proc>`. `PROCIN` returns 1 only in this form. Worked example: [`BR_launch.md`](BR_launch.md#run-a-program-with-proc-fed-input). |
 | **Read / maintain data** | Write a short BR program/proc that `OPEN`s the file (layout from `data-model.md`) and `READ`/`REWRITE`/`WRITE`s it — the kit has no external query tool. |
-| **Decompile** `.br` → `.brs` | a proc of `LOAD "<prog>.br"` / `LIST >"<prog>.br.brs"` pairs, ending `EXECUTE "system"` (see [`../app/ONBOARDING.md`](../app/ONBOARDING.md) STEP 4). |
+| **Decompile** `.br` → `.brs` | a proc of `LOAD "<prog>.br"` / `LIST >"<prog>.br.brs"` pairs, ending `EXECUTE "system"` (see [`../app/ONBOARDING.md`](../app/ONBOARDING.md) STEP 2). |
 
 A proc is just BR commands, one per line, ending in `EXECUTE "system"`; run it with
 `"$BR_EXE" 'PROC <path>' -"$BR_CONFIG"` (exact executable and config in [`BR_launch.md`](BR_launch.md)). A command that

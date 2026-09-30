@@ -21,6 +21,7 @@ corrections:
   - "**§examples contained the error this page now documents.** The FORM was on line 100 and both I/O statements said `USING 160` — line 160 being the WRITE statement itself, so the READ named a WRITE and the WRITE named itself. Both are error 707 at run time. Corrected to `USING 100`, and examples added for the two constructs newly documented here: a repeat group with a variable decimal count, and an inline `USING \"FORM …\"` string. Found by brls's using-not-a-form rule, which is the rule §when-a-form-is-compiled describes."
   - "The variant list gave `CL`/`CU`/`VL`/`VU` as ordinary string variants beside `C`/`CC`/`CR`/`V`, several paragraphs above the note saying `CU`/`CL` raise error 1006 in a FORM. Marked screen-only in the list itself, and `VL`/`VU` added to the 1006 note: they are absent from BR's format table like the others, and a FORM is matched against that table alone, so the outcome is the same. The `FMT(` and case-variant notes now share one lead sentence, since they are one fact — anything not in the table is not a format here. Found in brls phase 10."
   - "keywords: extended from 5 to 27 — **every word-like entry in BR's format table**, so the roster is a closed set a test can hold this page to rather than a selection. `GF`, `GZ`, `NZ`, `BL`, `BH`, `PD`, `ZD`, `DT`, `DH`, `DL`, `CC`, `CR` and the single letters routed nowhere at all before; `DATE` reached only fields-attributes despite `DATE(` being a FORM code. The screen-only variants `CU`/`CL`/`VL`/`VU` are deliberately **not** here — a reader looking one up wants the page that documents it, not the page that says it raises 1006 — and were moved to fields-attributes, along with `GU`/`GL`, which routed nowhere. Pinned by TestEveryFormatCodeIsDocumented in brls."
+  - "§format-codes listed `B n` with no decimal count and had no `BL` row, while the §syntax BNF already gave every internal code an optional `.d`. **`B`, `BL` and `BH` all take a decimal count** and use it identically. BR's encoder scales the value by 10^d and rounds it to an integer. Its decoder divides by 10^d, and the three codes differ only in byte order (nformat.cpp, `FMT_BINARY`/`_LO`/`_HI`). Rows rewritten, `BL` added, and a §semantics bullet added. The same code showed that the range check is symmetric, which refutes the `BH 4` bullet's '≈ −2,147,483,648 … 2,147,483,648'; corrected to ±2,147,483,647. Confirmed with a headless 4.33c probe (context/scratch/bdec/): `B 3.2` 12.346 reads back 12.35, stored `D3 04 00`; `BL 3.2` −12.346 reads back −12.35; `BH 2.1` 3276.7 is stored `7F FF`, and 3276.8 raises error 726. Reported from an app (y:\\wb\\ar1) whose programs use `B 3.2`/`B 2.1`: ERRORS.md item 7."
 ---
 
 # FORM specifications
@@ -89,8 +90,9 @@ interchangeable.
 | `V n` | Variable-length string, max `n` bytes |
 | `X n` | Skip `n` byte positions |
 | `POS n` | Position to byte `n` |
-| `B n` | Binary integer |
-| `BH n.d` | Binary with decimals (high-order) |
+| `B n[.d]` | Binary, `n` = 1–4 bytes, `d` implied decimals; the data file's byte order (low byte first on Windows) |
+| `BL n[.d]` | Binary as `B`, bytes low to high |
+| `BH n[.d]` | Binary as `B`, bytes high to low (sorts as characters when non-negative) |
 | `PD n.d` | Packed decimal |
 | `ZD n.d` | Zoned decimal |
 | `DT 3` / `DT 4` | Date, binary storage (Y2K-compliant) |
@@ -151,7 +153,14 @@ displaying negative values — see [fields-attributes](../../20-io-screen/fields
   `BASEYEAR`; `DH` can be indexed as character data for sorting (see
   [keys-indexes](../keys-indexes/spec.md)).
 - Efficient internal record lengths are `2^N − 1` (see [file-model](../file-model/spec.md#tables)).
-- A **`BH 4`** field holds a signed 32-bit integer (≈ −2,147,483,648 … 2,147,483,648). An **empty,
+- **`B`/`BL`/`BH` all take a decimal count**, and apply it the same way. On write the value is
+  multiplied by 10^`d` and rounded to the nearest integer; on read the stored integer is divided by
+  10^`d`. So `B 3.2` stores 12.346 as 1235 and reads it back as 12.35. The byte-size range applies to
+  the *scaled* integer, and is symmetric — the most negative two's-complement value is refused too.
+  So `BH 2.1` holds −3276.7 … 3276.7, and writing 3276.8 raises error **726** (trappable with
+  `CONV`). The three differ only in byte order.
+- A **`BH 4`** field holds a signed 32-bit integer, −2,147,483,647 … 2,147,483,647 with no decimals (see the
+  bullet above). An **empty,
   never-written `BH 4` reads as `538,976,288`** (the value of four ASCII spaces) — test for that
   sentinel, not `0`, when detecting unwritten records.
 

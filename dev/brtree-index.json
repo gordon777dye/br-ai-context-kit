@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-09-28",
+  "generated": "2026-09-30",
   "source": "br_tree/",
-  "source_sha256": "0a4372df99bc1f2d859dd8c2c2b23c98563bd367a186b902970a5296dc1ca706",
+  "source_sha256": "6324c6a0dd39c003e553790bba8cb967e39f594e1bcb3975034bc1f9850c5186",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -2580,6 +2580,7 @@
       "anchors": [
         "syntax",
         "semantics",
+        "disk-date-formats",
         "see-also"
       ],
       "summary": "FileIO is the standard file-access abstraction in this codebase: you describe each data file once in an ASCII layout file, and FileIO OPENs it, builds the FORM, sizes your record arrays, and defines FILE_FIELD subscript constants — so programs reference fields by name and never hard-code positions. Change a layout and FileIO migrates the data file on the fly; no program needs editing. ScreenIO builds on it."

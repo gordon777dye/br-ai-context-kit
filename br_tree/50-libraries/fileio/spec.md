@@ -8,6 +8,8 @@ kind: spec
 status: 2b           # source-derived reference + online-doc manual captured; ScreenIO/AuditBR build on it; no conflicts
 related: [library-facility, screenio]
 keywords: [FileIO, fnOpen, fnRead, LIBRARY]
+corrections:
+  - "2026-09-30: The 4th-column date format listed only DATE(Julian|cymd|ymd|mdy). Added what Julian means (a DAYS() value), that any DAYS() mask is accepted, and a Disk date formats section. The section covers this kit's local change to fileio.brs, which accepts days in place of serial, and ScreenIO recognizing only julian. Source: fileio.brs FNPARSEDETAILLAYOUTLINE and FNFMTSDATE$/FNFMTNDATE$, screenio.br.brs lines 39266/39508, and a CSV export test run before and after the change."
 ---
 
 # FileIO library
@@ -41,7 +43,9 @@ then `EXECUTE`s the subscript-constant strings the library returns. The public s
 
 - **Layout files** (`filelay\<name>`): a header line `datafile, PREFIX_, version`; one or more key lines
   `keyfile, SUBS[/SUBS][-U]`; a `====` separator; then field lines `SUBSCRIPT[$], description, formspec`
-  with an optional 4th-column disk **date format** `DATE(Julian|cymd|ymd|mdy)`. `X` specs reserve space;
+  with an optional 4th-column disk **date format** — `DATE(Julian)` or `DATE(days)` for a stored BR day
+  number (a `DAYS()` value), otherwise a `DAYS()`/`DATE$()` mask such as `DATE(cymd)`, `DATE(ymd)` or
+  `DATE(mdy)` (see [Disk date formats](#disk-date-formats)). `X` specs reserve space;
   `!` and blank lines are ignored; optional `#eof#` ends it. Full format:
   [FileIO_Library](FileIO_Library.md#file-layouts).
 - **Automatic versioning** — bump the layout's version number on **every** change. On open, FileIO
@@ -56,6 +60,29 @@ then `EXECUTE`s the subscript-constant strings the library returns. The public s
   (`fnDataCrawler`/`fnDataEdit`/`fnShowData`); not for end-users on production data (no validation).
 - **Add-ons that build on FileIO** — [ScreenIO](../screenio/spec.md) (RAD screens) and
   [AuditBR](AuditBR.md) (`fnBeginAudit`/`fnCompare` change auditing).
+
+<a id="disk-date-formats"></a>
+## Disk date formats
+
+A layout's 4th column marks a field as a date only when it is `DATE(…)` or `DATE[…]` (case-insensitive);
+the text inside becomes the field's disk date format. Anything else in column 4 is a comment.
+
+| Inside `DATE(…)` | Meaning | How FileIO converts it |
+|---|---|---|
+| contains `julian` or `days` | the field holds a BR day number (a `DAYS()` value) — not an astronomical Julian day, not `YYDDD` | used as is |
+| anything else | a `DAYS()`/`DATE$()` mask describing the stored form, e.g. `cymd`, `ymd`, `mdy`, `ccyymmdd` | `DAYS(value, mask)` in, `DATE$(days, mask)` out |
+
+The match is a case-insensitive substring test (`FNFMTSDATE$`/`FNFMTNDATE$`), for string and numeric
+fields alike. Dates are shown in the DataCrawler in the `dateformatdisplay` setting and exported to CSV
+in `dateformatexport` (both default `m/d/cy`).
+
+- **`days` is a local change.** The FileIO in this kit (`dev/tools/fileio.brs`) accepts `days` where
+  the vendor's FileIO accepts `serial`. With this kit's FileIO, `DATE(serial)` is no longer a day
+  number: it is used as a mask and the date exports as `00/00/0000`. Confirmed on 2026-09-30 by a
+  CSV export before and after the change.
+- **ScreenIO recognizes only `julian`.** Its screen generator, not changed, treats `DATE(days)` as a
+  mask and would add a `DATE(days)` output conversion to the field. Use `DATE(Julian)` for any field a
+  ScreenIO screen displays.
 
 <a id="see-also"></a>
 ## See also

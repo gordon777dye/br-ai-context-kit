@@ -15,7 +15,11 @@
 /app/*
 !/app/ONBOARDING.md
 !/app/onboarding/
-!/app/onboarding/*
+# only the kit's templates; STEP 1's config backups here are app-private.
+# A new template needs its own line or it is silently ignored.
+/app/onboarding/*
+!/app/onboarding/context-kit-always-load.md
+!/app/onboarding/copilot-instructions.md
 
 # Already tracked null version - no need to keep updating it
 /ERRORS.md/

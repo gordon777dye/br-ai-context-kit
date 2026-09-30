@@ -46,6 +46,10 @@ tooling at whatever BR codebase you're on. There are three published parts:
   If the program masters are stored in source format decompiling (REPLACE SOURCE) 
   is prohibited. 
 
+- BR starts in ___________, so kit paths handed to BR take the prefix ___________ 
+  (none when BR starts in the app root). (completed in ONBOARDING STEP 1; see
+  `dev/BR_launch.md#start-folder`)
+
 ## Installation
 
 Note: This context kit itegrates with any BR app. 

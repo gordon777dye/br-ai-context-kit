@@ -6,6 +6,8 @@ subcategory: 50-libraries/fileio
 kind: concept
 related: []
 provenance: recovered-2b (redirect-collision casualty re-fetched from wiki)
+corrections:
+  - "2026-09-30: The Disk Date Format paragraph did not say what Julian means. Added that it is a BR day number (a DAYS() value), that DATE(days) is equivalent with this kit's FileIO, and a link to spec.md#disk-date-formats."
 ---
 > **See also the source-derived [FileIO_Function_Reference.md](FileIO_Function_Reference.md)** — the
 > authoritative list of all **80 `DEF LIBRARY` exports** taken from `fileio.brs`. This online-doc manual
@@ -274,7 +276,7 @@ Those descriptions are also used for the default captions for your fields if you
 
 The third parameter is the form statement, which is pretty straightforward. Any items with a form statement of type “X” will be ignored, except that the length will still be used to calculate the position on disk of all remaining fields in the record. The library will take X fields into consideration when building the form statement, but not at any other time.
 
-The fourth parameter is optionally a Disk Date Format. You can specify DATE(Julian) if you're storing your dates in Julian format on disk. Or you can specify DATE(cymd) or DATE(ymd) or DATE(mdy) or any other valid date spec here, and FileIO will treat this field like a date.
+The fourth parameter is optionally a Disk Date Format. You can specify DATE(Julian) if you're storing your dates as BR day numbers (the value `DAYS()` returns; not an astronomical Julian day and not YYDDD) on disk. With the FileIO in this kit, DATE(days) means the same thing. Or you can specify DATE(cymd) or DATE(ymd) or DATE(mdy) or any other valid date spec here, and FileIO will treat this field like a date. See [Disk date formats](spec.md#disk-date-formats).
 
 Your programs will still have to unpack it for you, fileio can't do that because fileio doesn't read the file for you.
 

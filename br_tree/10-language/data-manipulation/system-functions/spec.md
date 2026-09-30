@@ -163,7 +163,7 @@ anywhere an expression is allowed.
 |---|---|
 | `UDIM(arr[,dim])` | current size of an array (or of dimension `dim`) |
 | `SUM(arr)` | sum of all elements |
-| `SRCH(MAT arr,arg[,start])` | row of match (0/-1 if none); `^` prefix = case-insensitive substring |
+| `SRCH(MAT arr,arg[,start])` | row of match [0/ -1(opt 56) if none]; `^` prefix = case-insensitive substring |
 | `AIDX(arr)` / `DIDX(arr)` | ascending / descending **index** array (original unchanged) |
 | `STR2MAT(s$,MAT a$[,[MAT]sep$][,flags$])` | split `s$` → array; **dynamically redimensions** `a$`; returns the element count (delimiter/flags below) |
 | `MAT2STR(MAT a$,s$[,[MAT]sep$][,flags$])` | join array → `s$` (delimiter/flags below) |

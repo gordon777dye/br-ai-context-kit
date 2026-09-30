@@ -62,7 +62,7 @@ brevity as it ascends. (Language facts still ascend into `topics.json`; app fact
 ```
 context/app/
   ONBOARDING.md         # this sheet (stays)
-  data-model.md         # STEP 3 — generated from the app's filelay/ folder
+  data-model.md         # STEP 4 — generated from the app's filelay/ folder
   data-model-index.json
   exemplars/            # STEP 5 — ~10–20 blessed real programs, annotated
   examples/             # optional, created as needed — one-off technique demos, NOT house style
@@ -82,13 +82,17 @@ language keyword router.
 
 ## Procedure
 
-Do them in order. STEP 1 (BR launch) and STEP 2 (locate/create `filelay/`) are prerequisites —
-nothing else can run BR or read data layouts without them. After that, ROI is highest at the top:
-the data model (STEP 3) and exemplars (STEP 5) alone deliver most of the value (correct file I/O +
-demonstrated style) — but STEP 4 (audit source currency, using the BR runtime STEP 1 configured)
-comes first so the source used to create those exemplars is current. STEP 2 gates STEP 3:
-`extract-schema.exe` only parses `filelay/`, so STEP 3 has nothing to read until STEP 2 confirms or
-creates it.
+Do them in order. Each step's prerequisites come before it:
+- **STEP 1 (BR launch)** comes first, because nothing else can run BR without it.
+- **STEP 2 (audit source currency)** uses the BR runtime STEP 1 configured. It comes next because
+  everything after it reads the app's source. STEP 3 cross-checks layouts against it, and STEPS 5–6
+  learn the house style from it. For a compiled-masters app, that source doesn't exist until
+  STEP 2 decompiles it.
+- **STEP 3 (locate/create `filelay/`)** gates STEP 4. `extract-schema.exe` only parses `filelay/`,
+  so STEP 4 has nothing to read until STEP 3 confirms or creates it.
+
+The data model (STEP 4) and exemplars (STEP 5) deliver most of the value: correct file I/O and
+demonstrated style.
 
 ### STEP 1 — BR launch entries (fully automated)
 Create 2 of the 4 files to be used by AI for application development.
@@ -124,85 +128,40 @@ Create 2 of the 4 files to be used by AI for application development.
 
 The UNATTENDED keyword lets AI run BR in a headless (no user prompts) mode.
 
-Now make a backup copy of all 3 configuration files (plus any include files) in 
-`context/onboarding/`. These will be needed for applying future kit updates.
-
 Both are regenerated whenever `brconfig.sys` changes — generated, never hand-edited (same
 convention as `data-model.md`/`topics.json`).
+
+Now back up all 3 configuration files — `brconfig.sys`, `brconfig.ai_user` and
+`brconfig.ai_util`, plus any files they include — to `context/app/onboarding/`. These will be
+needed for applying future kit updates. They stay out of git: only the kit's own templates in that
+folder are tracked.
+
+**Find BR's start folder.** Take the first `DRIVE` line in `brconfig.ai_util`: BR starts in its
+2nd parameter plus its 4th (`DRIVE Y:,y:\,,\wb` starts in `y:\wb`). Compare that folder with the app
+root (the folder holding `context/`):
+- **Same folder:** kit paths work unchanged. Record "BR starts in the app root; no prefix".
+- **Different:** every kit path handed to BR needs the app root's path from BR's start folder
+  (`ar1\` for the example above, with the kit in `y:\wb\ar1`). Record the folder and that prefix. If
+  the app root isn't below BR's start folder, there is no such relative prefix: stop and ask the
+  user.
+
+Record it in the "BR starts in" line at the end of the AI Model Rules in `context/README.md`. The
+rules, and the probe behind them, are in
+[`dev/BR_launch.md`](../dev/BR_launch.md#start-folder). Don't change the `DRIVE` lines to fix a
+mismatch: production starts in the same folder, so the app's programs depend on it.
 
 **While here, check whether this app is written for Lexi** (a preprocessor some BR shops use —
 see [`dev/BR_launch.md`](../dev/BR_launch.md#the-lexi-preprocessor) for what
 it is and [`dev/essentials.md`](../dev/essentials.md#1-core-language-rules) for its syntax). A
-quick signal: grep the app's `.brs` source for `/* `, `&=`, or `#Select#` (a bare `SELECT CASE`
+quick signal: grep the app's `.brs/.wbs` source for `/* `, `&=`, or `#Select#` (a bare `SELECT CASE`
 with no `#` is **not** a useful signal — it isn't valid syntax in Lexi or base BR either, see
 `essentials.md`). If any show up outside `br_tree`/comments, ask the app owner to confirm — don't
-just infer it from a grep hit alone. This matters for STEP 4 (a Lexi-based app's `.br` is produced
+just infer it from a grep hit alone. This matters for STEP 2 (a Lexi-based app's `.br` is produced
 by Lexi, typically via the "BR Language Server" VS Code extension compiling on save — not by
 `LOAD ... source`/`SAVE` directly, though the mtime relationship the audit checks still holds
 either way) and STEP 6 below (record it in `conventions.md` if confirmed).
 
-### STEP 2 — Locate or create `filelay/` ◆ prerequisite for STEP 3
-STEP 3 does **not** inspect the app's actual data files to learn their layout. `extract-schema.exe`
-only parses the plain-text **`filelay/`** directory (described in Appendix A): one 
-hand-declared layout file per data file, giving the FORM spec, disk position, and 
-key composition of every field. If `filelay/`doesn't exist, STEP 3 has nothing to read.
-
-1. **Search the app tree for an existing `filelay/` directory** — check case variants too, and don't
-   assume it sits directly under the app root: FileIO's `DefaultFileLayoutPath$` setting (in
-   `fileio.ini`) can relocate it anywhere, so a real app's dictionary may live elsewhere in the
-   tree. If found and it holds one layout file per data file in the Appendix A format, note its
-   actual path as `<filelay-path>` and skip to STEP 3.
-2. **If none exists, synthesize one — from authoritative sources only, never by guessing at record
-   shape:**
-   - **Best source: the app's own data dictionary**, if one exists. It need not be a text file — a
-     dictionary can just as easily be stored as a BR `INTERNAL` (binary) file, since BR reads its
-     own internal formats most conveniently. If it's in `INTERNAL` format, write a short BR program
-     to read it and export its contents into `context/app/filelay/` in the Appendix A format.
-   - If no dictionary — text or `INTERNAL` — can be located, ask the user where it lives and in
-     what format, rather than guessing.
-   - **Cross-check against the app's own BR source once a draft layout exists**: named `FORM`
-     declarations and the `OPEN`/`DIM` statements that reference them describe the real on-disk
-     field order. Treat this as **confirmation only, not the primary source** — `FORM` specs can
-     jump position (`POS n`), skip bytes (`X n`), and be partial, so they don't reliably reconstruct
-     a complete layout on their own.
-   - **Do not derive a field layout from the raw `.dat` bytes.** A record's field boundaries aren't
-     recoverable from binary data without the FORM spec — reverse-engineering a plausible-looking
-     layout that way is exactly the kind of guess [README.md's rule](../README.md) forbids.
-   - Write each confirmed layout into `context/app/filelay/`, in the exact format given in **Appendix A**:
-     header line (data file, prefix, version `0`), key lines, optional `recl=`, `====` divider, then
-     one field line per field in on-disk order. Appendix A's "Conversion checklist" is the
-     step-by-step for this. Note this path as `<filelay-path>` `context/app/filelay/` or 
-     `<app-root>/filelay`) for STEP 3.
-3. **Sanity-check before moving on:** every layout file has a header line, a divider, and at least
-   one field line; if `recl=` is given, be sure it's consistent with the sum of field sizes. If not,
-   stop and report the discrepancy to the user. A solid `filelay/` folder is required to proceed. If
-   the user tells you to ignore the discrepancy then do so.
-
-### STEP 3 — Data model (automated) ◆ highest ROI
-The LLM cannot write valid `OPEN` / `READ…USING` / `KEY=` without the real field layouts and key
-composition. This step is deterministic.
-
-```
-context/dev/tools/extract-schema.exe <filelay-path> context/app
-context/dev/tools/gen_datamodel_index.exe
-```
-
-Run both from the app root (the directory containing `context/`), like every invocation in
-`context/dev/BR_launch.md`.
-
-`<filelay-path>` is the directory STEP 2 resolved — not necessarily `<app>/filelay`; use whatever
-path STEP 2 found or created.
-
-- **Produces:** `context/app/data-model.md` (readable) — per file: data path, record length, key indexes
-  **with their composing fields in order**, and every field's FORM type/position. Each file section
-  carries an `<a id="…">` anchor.
-- **Index:** `gen_datamodel_index.exe` then builds `context/app/data-model-index.json` — a per-file map to
-  1-based inclusive line ranges (like `dev/topics.json` for statement-semantics). Load one file's
-  slice instead of the whole (large) `data-model.md`.
-- **Verify:** the extractor prints `layouts: N, total fields: M`; the indexer prints `files: N …`.
-- **Re-run both** whenever `filelay/` changes — they are generated, never hand-edited.
-
-### STEP 4 — Audit source currency (`.brs` vs `.br`) ◆ automated; no user decision
+### STEP 2 — Audit source currency (`.brs` vs `.br` and `.wbs` vs `.wb` ) ◆ automated; no user decision
 Typically AI models have trouble with this one because they don't understand how BR DRIVE statements work. 
 Get familiar with the DRIVE statement, examine the first drive statement and thereby learn what 
 folder is current (present working directory) when BR starts. Note, BR uses backslashes in 
@@ -244,6 +203,69 @@ If decompiling: After identifying a missing or stale .brs file refresh it by run
 > `LIST < <path\program-name> > <path\program-name.br.brs> : EXECUTE "system"` 
 
 Or put the LIST commands into a procedure (batch) file and execute it with "PROC <batch-file-pathname>". 
+
+### STEP 3 — Locate or create `filelay/` ◆ prerequisite for STEP 4
+STEP 4 does **not** inspect the app's actual data files to learn their layout. `extract-schema.exe`
+only parses the plain-text **`filelay/`** directory (described in Appendix A): one 
+hand-declared layout file per data file, giving the FORM spec, disk position, and 
+key composition of every field. If `filelay/`doesn't exist, STEP 4 has nothing to read.
+
+1. **Search the app tree for an existing `filelay/` directory** — check case variants too, and don't
+   assume it sits directly under the app root: FileIO's `DefaultFileLayoutPath$` setting (in
+   `fileio.ini`) can relocate it anywhere, so a real app's dictionary may live elsewhere in the
+   tree. If found and it holds one layout file per data file in the Appendix A format, note its
+   actual path as `<filelay-path>` and skip to STEP 4.
+2. **If none exists, synthesize one — from authoritative sources only, never by guessing at record
+   shape:**
+   - **Best source: the app's own data dictionary**, if one exists. It need not be a text file — a
+     dictionary can just as easily be stored as a BR `INTERNAL` (binary) file, since BR reads its
+     own internal formats most conveniently. If it's in `INTERNAL` format, write a short BR program
+     to read it and export its contents into `context/app/filelay/` in the Appendix A format.
+   - If no dictionary — text or `INTERNAL` — can be located, ask the user where it lives and in
+     what format, rather than guessing.
+   - **Cross-check against the app's own BR source once a draft layout exists.** STEP 2 has made
+     that source current. Skip any program STEP 2 listed in `STALE_SOURCE.md`, and don't take its
+     `FORM`s as confirmation. Named `FORM`
+     declarations and the `OPEN`/`DIM` statements that reference them describe the real on-disk
+     field order. Treat this as **confirmation only, not the primary source** — `FORM` specs can
+     jump position (`POS n`), skip bytes (`X n`), and be partial, so they don't reliably reconstruct
+     a complete layout on their own.
+   - **Do not derive a field layout from the raw `.dat` bytes.** A record's field boundaries aren't
+     recoverable from binary data without the FORM spec — reverse-engineering a plausible-looking
+     layout that way is exactly the kind of guess [README.md's rule](../README.md) forbids.
+   - Write each confirmed layout into `context/app/filelay/`, in the exact format given in **Appendix A**:
+     header line (data file, prefix, version `0`), key lines, optional `recl=`, `====` divider, then
+     one field line per field in on-disk order. Appendix A's "Conversion checklist" is the
+     step-by-step for this. Note this path as `<filelay-path>` `context/app/filelay/` or 
+     `<app-root>/filelay`) for STEP 4.
+3. **Sanity-check before moving on:** every layout file has a header line, a divider, and at least
+   one field line; if `recl=` is given, be sure it's consistent with the sum of field sizes. If not,
+   stop and report the discrepancy to the user. A solid `filelay/` folder is required to proceed. If
+   the user tells you to ignore the discrepancy then do so.
+
+### STEP 4 — Data model (automated) ◆ highest ROI
+The LLM cannot write valid `OPEN` / `READ…USING` / `KEY=` without the real field layouts and key
+composition. This step is deterministic.
+
+```
+context/dev/tools/extract-schema.exe <filelay-path> context/app
+context/dev/tools/gen_datamodel_index.exe
+```
+
+Run both from the app root (the directory containing `context/`), like every invocation in
+`context/dev/BR_launch.md`.
+
+`<filelay-path>` is the directory STEP 3 resolved — not necessarily `<app>/filelay`; use whatever
+path STEP 3 found or created.
+
+- **Produces:** `context/app/data-model.md` (readable) — per file: data path, record length, key indexes
+  **with their composing fields in order**, and every field's FORM type/position. Each file section
+  carries an `<a id="…">` anchor.
+- **Index:** `gen_datamodel_index.exe` then builds `context/app/data-model-index.json` — a per-file map to
+  1-based inclusive line ranges (like `dev/topics.json` for statement-semantics). Load one file's
+  slice instead of the whole (large) `data-model.md`.
+- **Verify:** the extractor prints `layouts: N, total fields: M`; the indexer prints `files: N …`.
+- **Re-run both** whenever `filelay/` changes — they are generated, never hand-edited.
 
 ### STEP 5 — Blessed exemplars ◆ the real way style is learned
 An LLM learns style far better from a few gold-standard *real programs* than from prose about style.
@@ -302,7 +324,7 @@ STEP 9 checks that calibration for your app specifically.
 
 `context/dev/tools/loadsave.exe` and `context/dev/tools/lscheck.exe` are two independent survey
 programs, prebuilt and deployed the same way `brls.exe` is (`context/lsp/brls/build.ps1`) — nothing to
-build on-site, run them directly, the same as `extract-schema.exe`/`gen_datamodel_index.exe` in STEP 3.
+build on-site, run them directly, the same as `extract-schema.exe`/`gen_datamodel_index.exe` in STEP 4.
 
 **Run both from the app root** — the directory the kit (`context/`) was installed into, one level above
 `context/` itself — **not from inside `context/dev/tools/`.**
@@ -356,12 +378,13 @@ If the counts already match, no `ERRORS.md` entry is needed for this step.
 
 ## Done criteria
 
-- [ ] `filelay/` exists (found or synthesized per STEP 2), one layout file per data file, in
+- [ ] Source currency audited (STEP 2): every `.br`/`.wb` passed, or its source was decompiled or
+      listed in `context/app/STALE_SOURCE.md`, before layouts were cross-checked and
+      exemplars/conventions derived.
+- [ ] `filelay/` exists (found or synthesized per STEP 3), one layout file per data file, in
       Appendix A format — no guessed field layouts; any file without a locatable FORM/DIM source
       was flagged to the user instead.
 - [ ] `context/app/data-model.md` regenerates cleanly from `filelay/` (0 unparsed files).
-- [ ] Source currency audited (STEP 4): every `.br`/`.wb` has an as-new-or-newer source file; any
-      stale `.brs` was refreshed before exemplars/conventions were derived.
 - [ ] `context/app/exemplars/` holds ≥10 annotated, representative programs across task archetypes.
 - [ ] `context/app/conventions.md` states each rule and points to an exemplar that shows it.
 - [ ] `context/dev/BR_launch.md` lets a newcomer build, run, test, and deploy without asking.
@@ -374,15 +397,15 @@ If the counts already match, no `ERRORS.md` entry is needed for this step.
       fixed or ignored).
 
 ## The feedback loop (why this works)
-With STEP 3 (real schema) plus a compile pass in BR itself (`.brs` → `.br`), generated code is
+With STEP 4 (real schema) plus a compile pass in BR itself (`.brs` → `.br`), generated code is
 **verifiable**: it can be checked against the actual files and the grammar before it ships. "Style"
 then includes "compiles against our data model," not just "looks right."
 
 ## Maintenance
-- If a data file is added or its layout changes, update `filelay/` (STEP 2) first, then re-run STEP 3.
-- Re-run STEP 3 after any `filelay/` change.
-- Re-run the STEP 4 audit after recompiling, and handle any **stale** or **suspect** program as
-  STEP 4 says before you re-derive exemplars or conventions. A source up to 15 minutes older than its
+- If a data file is added or its layout changes, update `filelay/` (STEP 3) first, then re-run STEP 4.
+- Re-run STEP 4 after any `filelay/` change.
+- Re-run the STEP 2 audit after recompiling, and handle any **stale** or **suspect** program as
+  STEP 2 says before you re-derive exemplars or conventions. A source up to 15 minutes older than its
   `.br` is normal.
 - Refresh exemplars when the house pattern for an archetype changes.
 - Language corrections go to `context/br_tree/` and flow to **every** app — never fork them into `context/app/`.
@@ -391,7 +414,7 @@ then includes "compiles against our data model," not just "looks right."
 
 # Appendix A — the `filelay` file format
 
-STEP 3 consumes a **`filelay/`** directory: one plain-text layout file per data file, describing its
+STEP 4 consumes a **`filelay/`** directory: one plain-text layout file per data file, describing its
 keys and field record layout. If your application's data dictionary is in some other form, convert it
 to this format and place the results in `filelay/`. This appendix is the complete spec.
 (Source: FileIO Library, `br_tree/50-libraries/fileio/`.)
@@ -400,7 +423,8 @@ to this format and place the results in `filelay/`. This appendix is the complet
 
 Each layout file has three parts in order: a **header** (data file + keys + optional `recl`), a
 **divider**, then the **field definitions**. Columns on every line are comma-separated; extra spacing
-is cosmetic and ignored.
+is cosmetic and ignored, except that `recl=` and the divider should start in column 1 (see
+[Divider](#divider)).
 
 ```
  price.dat, PR_, 1                         ← data file, subscript prefix, version
@@ -408,8 +432,8 @@ is cosmetic and ignored.
  price.ky2, ITEM                           ← key 2
  price.ky3, FARM/ITEM/GRADE                ← key 3 (composite)
  price.ky4, DESCRIPTION-U/COST             ← key 4 (DESCRIPTION segment case-insensitive)
- recl=127                                  ← optional record length
- ===================================================   ← divider (ignored)
+recl=127                                   ← optional record length (column 1)
+===================================================    ← divider (column 1)
  FARM$,          Farm Code (or blank),        C 4,                 , 1 -   4, 1 $
  ITEM$,          Item Code,                   C 4,                 , 5 -   8, 2 $
  GRADE$,         Quality,                     C 4,                 , 9 -  12, 3 $
@@ -449,12 +473,23 @@ is cosmetic and ignored.
 - As many keys as you like; parsing stops at the first non-key header line.
 
 **`recl=<n>`** (optional) — record length used when a file is created or upgraded. If omitted, it is
-computed from the field FORM specs.
+computed from the field FORM specs. Start it in column 1, for the reason given under
+[Divider](#divider).
 
 ## Divider
 
-A line of `=` characters separates the header from the fields. It is skipped entirely — purely for
-readability.
+A line of `=` characters separates the header from the fields. The line itself is skipped, but it is
+what ends the header, so it is required. **Start it, and `recl=`, in column 1.** FileIO's open reader
+trims these lines, but its other readers (`FNREADLAYOUTARRAYS`, `FNMAKESUBPROC` and the version-backup
+routine) test the first characters as they stand:
+- An indented divider is never found, so those readers take every field line as header and stop with
+  "Incomplete Layout." That breaks CSV export, the DataCrawler and layout migration.
+- An indented `recl=` is skipped by the array readers, but the version-backup routine copies it as a
+  key line named `orecl=…`, which corrupts the saved layout in `filelay/version/`.
+
+`extract-schema.exe` follows FileIO: it does not recognise either line when indented. It also lists
+every such layout on its `indented recl=/divider` output line so it can be fixed. An indented divider
+also gives `total fields: 0` and a `no-field-parse` entry.
 
 ## Field definition lines
 
@@ -466,7 +501,7 @@ Note that only the first 3 columns are required.
 | 1 | **Subscript name** | Append `$` for string fields; nothing for numeric. Gets the header `PREFIX_` in code. Must be unique and stable (see versioning). |
 | 2 | **Description** | Human label; also DataCrawler column heading and ScreenIO default caption. Keep ≤ ~80 chars. |
 | 3 | **FORM spec** | A BR FORM type + size, e.g. `C 4`, `BH 3.2`, `PD 5`, `N 6`. Type **`X`** = filler: the field is ignored except that its length still advances the disk position of later fields. Full FORM type list: `br_tree/30-io-file/form-spec/`. |
-| 4 | **Disk date format** *(optional)* | `DATE(Julian)`, `DATE(cymd)`, `DATE(ymd)`, `DATE(mdy)`, etc. — marks the field as a date in that storage format (enables DataCrawler/ScreenIO/CSV date handling; your program still unpacks it). **Any col-4 text that isn't `DATE(...)` is treated as a comment and ignored.** |
+| 4 | **Disk date format** *(optional)* | `DATE(Julian)`, `DATE(cymd)`, `DATE(ymd)`, `DATE(mdy)`, etc. — marks the field as a date in that storage format (enables DataCrawler/ScreenIO/CSV date handling; your program still unpacks it). **Any col-4 text that isn't `DATE(...)` is treated as a comment and ignored.** **`Julian` here means a BR day number** — the value `DAYS()` returns — not an astronomical Julian day number and not a `YYDDD` ordinal date. `DATE(days)` means the same with this kit's FileIO, but ScreenIO recognizes only `Julian`, so use `DATE(Julian)` for any field a ScreenIO screen shows. `DATE(serial)` is **not** a day number here. Any other text inside `DATE(...)` is taken as a `DAYS()` mask. Details: [FileIO — Disk date formats](../br_tree/50-libraries/fileio/spec.md#disk-date-formats). |
 | 5 | **Positions** *(recommended)* | `start - end`, the 1-based inclusive byte range of the field in the record, e.g. `13 - 49`. Documentation for humans and for cross-checking the FORM sizes; it is one of the "comments" columns the parser ignores. **Column 4 must be present (empty if the field is not a date) so this lands in column 5.** |
 | 6 | **Subscript** *(recommended)* | The subscript number FileIO assigns to the field on OPEN, followed by ` $` for a string field, e.g. `4 $` or `2` — see [Subscript numbers](#subscript-numbers). **Gap rows (`X`) have none.** Also documentation only. |
 | 7+ | **Comments** | Ignored. |
