@@ -68,8 +68,9 @@ context/app/
   examples/             # optional, created as needed — one-off technique demos, NOT house style
   conventions.md        # STEP 6 — house style, derived from the app's own source
   architecture.md       # STEP 7 — module map + core data flows
-  BR_test.md            # STEP 9 — real-BR LOAD/SAVE survey of this app's tree
-  BRLS_test.md          # STEP 9 — brls's own parse/sema survey of the same tree
+  test/                 # STEP 9 — de-identified sample data, one sub-folder per data folder
+  BR_test.md            # STEP 10 — real-BR LOAD/SAVE survey of this app's tree
+  BRLS_test.md          # STEP 10 — brls's own parse/sema survey of the same tree
 ```
 
 `context/dev/BR_launch.md` (referenced by STEP 1 — BR launch env, canonical invocations, run/build commands) is a
@@ -160,6 +161,8 @@ just infer it from a grep hit alone. This matters for STEP 2 (a Lexi-based app's
 by Lexi, typically via the "BR Language Server" VS Code extension compiling on save — not by
 `LOAD ... source`/`SAVE` directly, though the mtime relationship the audit checks still holds
 either way) and STEP 6 below (record it in `conventions.md` if confirmed).
+
+When STEP 1 regenerates brconfig.ai_user and brconfig.ai_util from a changed brconfig.sys, append the include subs.txt line from step 9 to them again.
 
 ### STEP 2 — Audit source currency (`.brs` vs `.br` and `.wbs` vs `.wb` ) ◆ automated; no user decision
 Typically AI models have trouble with this one because they don't understand how BR DRIVE statements work. 
@@ -314,13 +317,235 @@ your AI agent's memory file (`CLAUDE.md` or `AGENTS.md`).
 6. Advise the user that the first prompt after onboarding and restarting should be: 
   "Which documents did you read in full during initialization?"
 
-### STEP 9 — Survey brls vs real BR ⏱ typically long-running (30–60 minutes)
+### STEP 9 — Build a test data environment ◆ automated; protects production data
+
+Programs under development or debugging must never run against live data. This step builds a
+small, de-identified copy of the application's data under `context/app/test/`, and points the
+kit's BR configs at it with `SUBSTITUTE` statements. Every later headless or interactive AI run
+then reads and writes test data only.
+
+**1. Create the test folders.**
+- Make `context/app/test/`.
+- Read the `Data file:` line of every file in `context/app/data-model.md` (e.g. `ard\customer` →
+  data folder `ard`). Make one sub-folder for each distinct data folder:
+  `context/app/test/ard/`, `context/app/test/oed/`, and so on.
+- **Leave out `screen\`, `screenio\`, `tools\` and `toold\`**, and every file in them. They hold ScreenIO's
+  screen definitions and the development tools' own data (`toold\`: `app`, `context`, `file_app`,
+  `record`), not application data. So they get no test folder, no sample copy and no
+  `SUBSTITUTE` statements. Programs keep using the production copies.
+- **Skip a data folder that is empty in production** and whose files are all missing or
+  per-workstation (`[wsid]`) names. There is nothing to copy, and its name may occur in unrelated
+  paths (e.g. `data\` inside Windows `AppData\`), which a `SUBSTITUTE` would then break (step 5).
+
+**2. Copy a sample of every data file.**
+- For each file in the data model, copy **the greater of 10 % of its records or 100 records** into
+  its test sub-folder. Copy every record of a file that has fewer than 100.
+- Do the copy with a BR program, not an OS file copy. Open the production file `INPUT` with
+  `SHR`, read each record whole as one string (`FORM C <recl>`), change the de-identified fields
+  by position (step 3), and `WRITE` it to a new `INTERNAL` file of the same name and record length
+  in the test folder. Every other byte is copied unchanged.
+- **Take the record length and record count from the file, not the data model.** First run a
+  read-only BR probe that opens each production file and records `RLN(n)` (record length) and the
+  number of records it can read. In QSMRP 18 files had a different record length than
+  `data-model.md` says.
+- Pick the sample spread evenly through the file: of `N` records, keep record `i` when
+  `INT(i*M/N)` differs from `INT((i-1)*M/N)`, where `M` is the sample size. This keeps exactly
+  `M` records.
+- **Rebuild every key file of the data file** in the test folder, under the same key-file names,
+  with BR's `INDEX` command:
+  - **Key-file name:** in parentheses on each key line of `data-model.md` (e.g.
+    `` `ky2` (`customer.ky2`) ``), taken from the file's `filelay/` header. A name with no folder
+    is in the data file's folder.
+  - **Positions and lengths: take them from the production key file.** The probe opens the data
+    file with each `KFNAME=` and records `KPS(n,seg)` and `KLN(n,seg)` for `seg` 1–6 (`-1` = no
+    more sections). Compare them with the data model's fields. BR reports adjacent sections as
+    one (`1/9/11` with lengths `8/2/9` is `1` with length `19`), so merge adjacent data-model
+    segments before comparing. In QSMRP 30 of 308 keys still differed, from filelay errors; the
+    production key file is what programs open, so it wins.
+  - **Modifiers:** `KPS`/`KLN` don't report them. Take `Y`, `YB` and the like from the data model
+    where a data-model segment lines up exactly with a production section, and report any that
+    sit inside a merged section (they can't be reproduced). Test `U` (case-insensitive) on
+    production: read a record, rebuild its key with one section's letters in the opposite case,
+    and look it up with `KEY=`. If it's found, that section is `U`. Write each modifier after the
+    section length, as BR's `INDEX` takes them: `INDEX <master> <key> 20/9 30U/2 REPLACE`.
+  - **Build a key file only from the data file it's named for.** Some layouts borrow another
+    data file's key file. Building it from the borrowing
+    file overwrites the real one, or fails with error 7600 when positions lie beyond its record
+    length. Leave those to the owning file and report them.
+  - **Key files that don't exist** next to the production data file: copy the data without them
+    and report them, unless the user says otherwise.
+  - Use `REPLACE DUPKEYS LISTDUPKEYS >file`. Without `DUPKEYS`, a duplicate key stops `INDEX` with
+    error 7603 and ends an unattended run. Then, for each key with duplicates in
+    test, scan the production key file in key order and confirm production has duplicates there
+    too. An empty list file still holds one end-of-file byte (`\x1a`).
+- Build the key files once the copy, with step 3's de-identification applied, has written the
+  last record. A de-identified field can be part of a key (e.g. `customer`'s `ky2` starts with
+  `CustomerName`), so the keys must be built from the changed data.
+- Before executing this step, read the next step which augments this step.
+- Run the probe and copy programs headlessly with `$BR_AI_UTIL`, **before** step 6 adds the
+  `include`. Once the configs redirect the data folders, a program can no longer reach the
+  production files by their normal names.
+
+**3. De-identify name fields.** Do this inside the step 2 copy program, on each record between
+its `READ` and its `WRITE`, so no real name is ever written to the test folder.
+
+*a. Choose the fields.* Read them from `data-model.md`, file by file:
+- **Candidates:** a field whose name or description contains "name" (e.g. `CustomerName$`,
+  "Customer Name"), and whose type is a string (`C` or `V`).
+- **Key fields are included.** A name that is part of a key (e.g. `customer`'s `CustomerName`,
+  in `ky2` and `ky3`) is changed like any other. Part *c* keeps every copy of it in step, so
+  records in other files that hold it still point to the same record.
+- **Never change a system identifier.** "name" also matches fields that name parts of the
+  application: files, key files, fields, tables, printers (e.g.
+  `file_app.KeyFileName$`, `eqtm.TableName$`, `printer.PrinterName$`). Programs use these
+  values to find things, and they hold no personal data. Keep them unchanged.
+- **Get the list confirmed.** Write `context/app/test/DEIDENTIFY.md`, with one row per field:
+  file, field, position, length, whether it is part of a key, and its status (change, or system
+  identifier kept). Ask the user to confirm it before changing any data. Add any other fields
+  they want de-identified, such as addresses, phone numbers or tax IDs.
+- **`DEIDENTIFY.md` controls the copy.** Once the user has confirmed it, build the copy program's
+  field list from this file, not from your own scan. **Only rows whose Status is exactly
+  `change` are scrambled.** Any other Status, or a deleted row, leaves the field as it is in
+  production. Say this at the top of `DEIDENTIFY.md` too, so the user knows how to edit it.
+
+*b. Build each replacement.* For a field value `V$`:
+1. If `RTRM$(V$)` is empty, leave it blank.
+2. Otherwise, build a new value one character at a time over `LEN(RTRM$(V$))` characters:
+   - a letter becomes a random letter of the same kind, a vowel for a vowel and a consonant for a
+     consonant, so the result stays pronounceable (its case is set as part *c* describes);
+   - a digit becomes a random digit;
+   - a space or punctuation mark stays as it is, so word breaks and the length are kept.
+   Use `RND` for the random choices.
+3. Pad the result with spaces to the field's full width, and store it at the field's position.
+
+*c. Keep replacements consistent.* The same real value must get the same replacement everywhere
+it appears, in every file and field. That keeps key values and the references to them in other
+files in step. Build the table before you copy anything:
+1. **Collect.** In one pass over the production records being sampled, collect every distinct
+   non-blank trimmed value of every field marked "change", into an array of originals.
+2. **Compare without case.** Store each original as `UPRC$` of its value, and build its replacement
+   in upper case. When you apply a replacement, give each letter the case of the letter it
+   replaces. Keys marked `-U` ignore case, so values that differ only in case must still match
+   after the change.
+3. **Assign longest first.** Give replacements in order of length, longest first. If an original
+   is the start of a longer original (a name stored cut short, as in `customer`'s `ky3`, which
+   uses `CustomerName(1:8)`), give it the same start of the longer one's replacement, not a new
+   one.
+4. **Keep replacements unique.** If a new replacement is already in the replacements array, make
+   another, so two different names never become the same name and no key gets a duplicate.
+5. **Look up while copying.** For each field value, find its original with `SRCH` and use the
+   matching replacement.
+
+Size both arrays for the number of distinct values (see [`essentials.md`](../dev/essentials.md) §2).
+
+*d. Check the result.* After the copy, read each changed field in the test files back. Confirm
+that:
+- every non-blank value differs from the production record's value, and has the same trimmed
+  length;
+- the same production value has the same test value in every file;
+- every key file builds without a duplicate-key error where production has none.
+
+**4. Copy the rest of each data folder.**
+Once a data folder is redirected (step 5), programs find **only** what is in its test folder.
+A production data folder holds far more than the data model covers: system files such as
+`cnd\security`, `cnd\permits` and `cnd\menu.dat`, files with no layout, old copies, logs,
+per-workstation work files and subfolders. In QSMRP about 840 files (about 500 MB) were not in
+the data model. Without them much of the app fails in test.
+
+- **Data folders:** copy every file and subfolder that the step 2 sample didn't create, whole and
+  unchanged, with an OS copy (no BR needed). These files have no layout, so they can't be
+  sampled or de-identified. **Names in them stay real** (e.g. `cnd\names`, `cnd\email`); say so to
+  the user. Copy any program or proc in the folder too, so it still runs once the folder is
+  redirected.
+- **Program folders** (a data folder that also holds the app's programs, e.g. QSMRP's `cop\` and
+  `bcp\`): don't redirect the folder; step 5 redirects their data files one by one. Copy only the
+  non-program files (not `.br`, `.brs`, `.wb`, `.wbs`, `.bro`, `.prc`).
+- **Leave in production any program-folder file whose name is the start of a program's name**
+  (e.g. data file `bcp\unibarf` and program `bcp\unibarfm.br`, or `cop\ebmxcode` and
+  `cop\ebmxcode.br`), together with its key files. Its `SUBSTITUTE` would also redirect the
+  program, which then isn't found. Report these files to the user.
+- Compare names without case: `HIS\ACCUMCHH` and `his\accumchh` are one file on Windows.
+
+**5. Write the `SUBSTITUTE` statements.**
+Write them to `context/dev/tools/subs.txt` (create the file if it doesn't exist). Four facts about
+how BR applies them decide the design. They aren't in br_tree (see `context/ERRORS.md`) and were
+confirmed on the kit's 4.33c executable with `FILE$`:
+- the from-text matches **anywhere** in a path, including the start of a longer name;
+- **every** matching entry is applied, **in order, each to the previous one's output**;
+- matching ignores case;
+- an entry that changes nothing does not stop a later entry from matching.
+
+So a plain pair per folder (`SUBSTITUTE ard\ context\app\test\ard\`) is not enough. It would also
+rewrite `reports\standard\…` to `reports\standcontext\app\test\ard\…`, and turn `cod\his\…` into
+`context\app\test\cod\context\app\test\his\…`. Write `subs.txt` in four ordered parts:
+
+1. **Protect.** Search the app tree's folder names, and the paths in its source (`OPEN`, `RUN`,
+   `EXECUTE`), for a data-folder name that ends a longer folder name or sits below another data
+   folder. Rewrite each to a placeholder spelling that no entry matches. QSMRP needed
+   `standard\` (contains `ard\`), `save.this\` and the subfolders `cod\his\` and `obd\his\`
+   (contain `his\`), and the SFTP folders `download\` and `upload\` (contain `oad\`).
+2. **Redirect data folders** to the placeholder `@T@`. Two entries per folder: `/dir` for the
+   `name/dir` form and `dir\` for the backslash form.
+3. **Redirect program-folder files** (step 4), also to `@T@`, one `name/dir` entry per file. For
+   the backslash form, list only the shortest name of a group: `cop\window` already redirects
+   `cop\window.key` and `cop\window2`, and a second entry would rewrite that output again.
+4. **Restore.** `@T@` becomes `context\app\test\`, then each placeholder becomes its real text.
+
+```
+SUBSTITUTE standard\ st@nd@rd\
+SUBSTITUTE cod\his\ cod\h@s\
+SUBSTITUTE /ard /@T@ard
+SUBSTITUTE ard\ @T@ard\
+SUBSTITUTE /cod /@T@cod
+SUBSTITUTE cod\ @T@cod\
+SUBSTITUTE interchg/cop interchg/@T@cop
+SUBSTITUTE cop\interchg @T@cop\interchg
+SUBSTITUTE @T@ context\app\test\
+SUBSTITUTE h@s\ his\
+SUBSTITUTE st@nd@rd\ standard\
+```
+
+Put a `!` comment at the top of `subs.txt` saying the order matters. The `to` paths are handed to
+BR, so they resolve from **BR's start folder**, not the kit root. If STEP 1 recorded a prefix for
+that folder in `context/README.md`, put it in front of `context\app\test\` in the restore entry.
+See [`dev/BR_launch.md`](../dev/BR_launch.md#start-folder).
+
+**6. Include `subs.txt` in the configs.**
+Append this line to the end of each config file in `context/dev/tools/` — `brconfig.sys`,
+`brconfig.ai_user` and `brconfig.ai_util`:
+
+```
+include subs.txt
+```
+
+`INCLUDE` in a config file resolves relative to the file that contains it, so it finds
+`context/dev/tools/subs.txt`. See
+[`config-directives`](../br_tree/00-configuration/config-directives/spec.md).
+
+When STEP 1 regenerates `brconfig.ai_user` and `brconfig.ai_util` from a changed `brconfig.sys`,
+append the `include subs.txt` line to them again.
+
+**7. Verify.**
+Run a short headless BR program (`$BR_AI_UTIL`) that opens files through their normal app names
+and prints `FILE$(n)` for each to a debug file. When an `OPEN` fails, the LOGGING file's
+`Opening file …` line shows the path BR actually tried. Check all of these:
+- one file from each redirected data folder, in both the `dir\name` and `name/dir` forms: each
+  must resolve inside `context\app\test\`;
+- each protected path from step 5 (e.g. a file under `reports\standard\`): it must resolve to its
+  real production path, unchanged;
+- a subfolder of a data folder (e.g. `cod\his\…`), and a program-folder data file: test;
+- a program in each program folder, and each file step 4 left in production: production.
+
+`STATUS SUBSTITUTE` lists the active entries. If any data file resolves to production, or any
+other path is changed, stop and fix `subs.txt` before going on.
+
+### STEP 10 — Survey brls vs real BR ⏱ typically long-running (30–60 minutes)
 
 brls's own diagnostic rejections (which findings mean "BR will actually reject this") are calibrated
 against BR itself, not asserted — but that calibration was checked against the programs brls was
 developed on, not necessarily against *your* application's source. We need to check each app-specific 
 construct BR happens to tolerate, or reject, to be sure our language server handles all code patterns. 
-STEP 9 checks that calibration for your app specifically. 
+STEP 10 checks that calibration for your app specifically. 
 
 `context/dev/tools/loadsave.exe` and `context/dev/tools/lscheck.exe` are two independent survey
 programs, prebuilt and deployed the same way `brls.exe` is (`context/lsp/brls/build.ps1`) — nothing to
@@ -391,8 +616,14 @@ If the counts already match, no `ERRORS.md` entry is needed for this step.
 - [ ] `context/app/architecture.md` names entry points and the core data flows.
 - [ ] `APP-DEV-GUIDE.md` has terse pointer rows to every app doc (conventions/BR_launch marked
       always-load; data-model/exemplars/architecture on-demand); `topics.json` left as the language router.
-- [ ] `context/br_tree/` and `context/dev/` (except the `APP-DEV-GUIDE.md` pointer rows) are **unchanged**.
-- [ ] STEP 9 ran to completion: `context/app/BR_test.md` and context/app/BRLS_test.md` both exist; their summary
+- [ ] `context/br_tree/` and `context/dev/` are **unchanged**, except the `APP-DEV-GUIDE.md` pointer
+      rows, `dev/tools/subs.txt`, and the `include subs.txt` line in each `dev/tools/brconfig.*`.
+- [ ] STEP 9 test environment built: `context/app/test/` has one sub-folder per data folder, each
+      file sampled (greater of 10 % or 100 records) with its key files rebuilt, name fields
+      de-identified per the user-confirmed `DEIDENTIFY.md`, the rest of each data folder copied
+      whole, `dev/tools/subs.txt` written as protect / redirect / restore, and the step 7 checks
+      passed: data names resolve inside `context\app\test\`, and protected paths and programs don't.
+- [ ] STEP 10 ran to completion: `context/app/BR_test.md` and context/app/BRLS_test.md` both exist; their summary
       counts were compared, and any discrepancy is recorded in `context/ERRORS.md` (not silently
       fixed or ignored).
 
