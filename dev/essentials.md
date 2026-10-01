@@ -424,6 +424,14 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
   folder location. This makes applications portable without code changes but coders need to 
   be aware of it when creating an `OPEN` statement.
 
+- **`SUBSTITUTE` rewrites more than you expect.** An entry matches its text anywhere in a file
+  name, ignoring case, including the start of a longer name (`bcp\unibarf` also catches
+  `bcp\unibarfm.br`). Every matching entry is applied in order, each to the previous one's
+  output, and an identity entry protects nothing. So `SUBSTITUTE ard\ test\ard\` also rewrites
+  `reports\standard\…`. Check the result with `FILE$(n)` or `STATUS SUBSTITUTE`, and use the
+  protect/restore pattern in
+  [config-directives](../br_tree/00-configuration/config-directives/spec.md#substitute-matching).
+
 - **A `DISPLAY OUTPUT` file with no `RECL=` wraps output at a 132 byte default width** — inserting a
   mid-line CRLF that silently splits one `PRINT`'d line into two physical lines on disk. This
   produced no error at all; it just corrupted a generated JSON file (a long string value cut across

@@ -12,6 +12,7 @@ keywords: [CONFIG, DRIVE, OPTION, DATABASE, SUBSTITUTE, STYLE, PRINTER, FONT, CO
 corrections:
   - "LOGGING summary corrected: the level range runs 0-15 (logger.h), not 0-13, and +CONSOLE echoes only DEBUG_STR messages, not all logging (debug.cpp:561). Added that console PRINT output is never logged, the claim the old level table made. See LOGGING.md corrections; reported in context/ERRORS.md 2026-09-28."
   - "RD and STACKS added to the frontmatter keywords. `RD <0-15>` is in this page's directive list with a retained deep page of its own (RD.md), and `STATUS STACKS` is named where the stack settings are documented; neither was declared. Found in brls phase 13."
+  - "SUBSTITUTE matching rules added (#substitute-matching): match anywhere in the name, every matching entry applied in order to the previous output, case-insensitive, name/dir form, space separator, and the protect/restore technique. Confirmed on 4.33c (context/scratch/step9/subprobe*.brs). Also restored the missing opening backtick on `STATUS SUBSTITUTE`. Reported in context/lsp/ERRORS.md 2026-10-01."
 ---
 
 # BRConfig.sys directives
@@ -38,7 +39,7 @@ FILENAMES {UPPER_CASE|LOWER_CASE|MIXED_CASE} [SEARCH]
 INCLUDE <filename>            -- nest up to 10 deep
 PRINTDIR <path> [+DATE][+TIME][+LOGIN_NAME][+CHANNEL][\LOGIN_NAME][RAW]
 SPOOLPATH [@[:][:]] <directory>   
-SUBSTITUTE <from-string> ',' { <to-string> | CLEAR }
+SUBSTITUTE <from-string> { ',' | ' ' } { <to-string> | CLEAR }   -- see #substitute-matching
 WORKPATH <path> 
 ```
 - `DRIVE` maps a logical drive to physical paths (env variables allowed). 
@@ -63,7 +64,27 @@ in program `PRREG` archives a copy as `<path>\PRREG.40`.)
 commands and `OPEN` statements before execution — the core mechanism for redirecting **printer
 classes** (`PRN:/nn`) to real devices/files, mapping `COM1:`→`/dev/ttyXX`, etc.
 `SUBSTITUTE <from>,CLEAR` removes one entry; `CONFIG SUBSTITUTE CLEAR` clears all (except `[WSID]`).
-STATUS SUBSTITUTE` lists active entries; `FILE$(n)` shows what a channel actually opened. 
+`STATUS SUBSTITUTE` lists active entries; `FILE$(n)` shows what a channel actually opened.
+
+<a id="substitute-matching"></a>**How entries match** (confirmed on 4.33c with `FILE$` and the
+LOGGING file):
+- **The from-text matches anywhere in the name**, not only at its start or at a folder boundary.
+  With `SUBSTITUTE ard\ x\ard\`, `reports\standard\inv.docx` becomes `reports\standx\ard\inv.docx`.
+  It also matches the start of a longer name: `SUBSTITUTE bcp\unibarf …` redirects
+  `bcp\unibarfm.br` too. (The `PRN:` → `PRN:/11/12` trap in
+  [Multi-spooled printers](Multi-spooled_printers.md) is the same rule.)
+- **Every matching entry is applied, in the order the entries were defined, each to the previous
+  entry's output.** With entries for `cod\` and then `his\`, `cod\his\x` gets both. An identity
+  entry (`SUBSTITUTE standard\ standard\`) does not protect a name from a later entry.
+- **Matching ignores case**: `ARD\CUSTOMER` matches an `ard\` entry.
+- The `name/dir` file form is matched like any other text: a `/ard` entry redirects `customer/ard`,
+  and an `ard\` entry does not.
+- `<from>` and `<to>` may be separated by a space instead of the comma (`SUBSTITUTE ard\ x\ard\`).
+
+To keep some paths out of a broad entry, rename them first and restore them last: protect
+(`SUBSTITUTE standard\ st@nd@rd\`), then the redirects, then restore
+(`SUBSTITUTE st@nd@rd\ standard\`). Pick placeholder text that no real name contains. Probes:
+`context/scratch/step9/subprobe*.brs`; a worked scheme is in `context/app/ONBOARDING.md` STEP 9.5.
 
 <a id="spool-work"></a>**`SPOOLPATH`** sets where print spool files (and PDFs) are staged; it
 defaults to a `SPOOL\` dir off the first `DRIVE`'s BR root and is auto-created. 

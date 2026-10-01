@@ -268,6 +268,9 @@ path STEP 3 found or created.
   1-based inclusive line ranges (like `dev/topics.json` for statement-semantics). Load one file's
   slice instead of the whole (large) `data-model.md`.
 - **Verify:** the extractor prints `layouts: N, total fields: M`; the indexer prints `files: N …`.
+  Then run `context/dev/tools/gen_datamodel_index.exe --verify`, which checks the index against
+  `data-model.md` without writing anything and prints `VERIFY OK: …` when they match (exit 1 and a
+  list of problems otherwise).
 - **Re-run both** whenever `filelay/` changes — they are generated, never hand-edited.
 
 ### STEP 5 — Blessed exemplars ◆ the real way style is learned

@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-09-30",
+  "generated": "2026-10-01",
   "source": "br_tree/",
-  "source_sha256": "6324c6a0dd39c003e553790bba8cb967e39f594e1bcb3975034bc1f9850c5186",
+  "source_sha256": "2b8c21ba24e5ff36d6528ea4312b47d1a2d136577677d5c829c96f3c5296712d",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -1412,6 +1412,7 @@
         "paths",
         "printdir",
         "substitute",
+        "substitute-matching",
         "spool-work",
         "appearance",
         "behavior",

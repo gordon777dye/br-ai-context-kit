@@ -39,6 +39,12 @@ The language axis has **two parallel keyword indexes** — use whichever fits th
   `keyword_index` maps a token to its br_tree spec path(s) + anchors: **`brtree-index.json` →
   `../br_tree/<spec>/spec.md#<anchor>`**. It complements `topics.json`; it does not replace it.
 
+Both are generated, never hand-edited: line ranges go stale as soon as their source changes. After
+editing `statement-semantics.md` (or `tools/lexicon.json`), run `context/dev/tools/gen_topics.exe`;
+after editing a br_tree `spec.md`'s frontmatter, anchors or opening paragraph, run `context/dev/tools/gen_brtree_index.exe`.
+Either tool given `--verify` checks its index against the source without writing anything: it
+prints `VERIFY OK` when they match, and otherwise lists what is out of step and exits 1.
+
 | Task | Start with | Then pull in |
 |---|---|---|
 | **Interpret / debug** — read existing BR | `topics.json` → `statement-semantics.md` | [`system-functions-catalog.md`](system-functions-catalog.md), [`error-reference.md`](error-reference.md), the app data-model (§4) |
@@ -157,6 +163,8 @@ see [`../app/ONBOARDING.md`](../app/ONBOARDING.md) Appendix A — then run the t
 per-file map to 1-based inclusive line ranges (the same sharding `topics.json` gives
 `statement-semantics.md`). **Don't load the whole data model:** look the file up in the index and
 read only its line slice. Re-run the indexer whenever the model is regenerated.
+`gen_datamodel_index.exe --verify` checks the index against `data-model.md` without writing
+anything: it prints `VERIFY OK` when they match, and otherwise lists what is out of step and exits 1.
 
 ### Read records (raw BR keyed I/O)
 
@@ -514,26 +522,3 @@ These bite the *runner*, not the program, and each one masquerades as something 
 6. Syntax-check it — `$BRLS_EXE -check` first for a fast iteration loop, then
   `LOAD <prog>.brs source` and `SAVE` or `REPLACE` in real BR (§6) — checking the log before 
   considering it done.
-
----
-
-## 8. Kit Maintenance Helpers
-
-The kit ships four build-time helpers, each a standalone executable — no Python or Node.js runtime
-needed to run them (the `.py`/`.js` sources beside each `.exe` are kept only for maintenance):
-[`tools/extract-schema.exe`](tools/extract-schema.exe) (schema →
-`data-model.md`, §4), [`tools/gen_topics.exe`](tools/gen_topics.exe) (rebuild `topics.json` after
-editing `statement-semantics.md`), [`tools/gen_datamodel_index.exe`](tools/gen_datamodel_index.exe)
-(rebuild `data-model-index.json`), and [`tools/gen_brtree_index.exe`](tools/gen_brtree_index.exe)
-(rebuild `brtree-index.json` from br_tree spec frontmatter). The three generators take
-**`--verify`** — a non-writing drift check (source hash + range/structure validation +
-regenerate-and-compare, exit 1 on drift) for catching a stale index after the source was edited but
-not regenerated. **Everything else is done by BR itself, driven headlessly** — with one exception:
-[`tools/lexi-compile.ps1`](tools/lexi-compile.ps1) (PowerShell — parameters in
-[`BR_launch.md`](BR_launch.md#the-lexi-preprocessor), used as part of the
-[Lexi-aware coding loop](#lexi-aware-coding-loop) above), which drives the **Lexi**
-preprocessor for apps that use it. Unlike the four helpers above, it isn't a self-contained
-binary — it depends on the "BR Language Server" VS Code extension (`crs-dev.vslang-br`) being
-installed on the machine it runs on (or explicit `-LexiPath`/`-BrExe`/`-WbConfig` pointing
-somewhere else that has a Lexi library + BR runtime + config), since that's where the bundled
-Lexi engine and runtime it drives normally live.
