@@ -33,6 +33,15 @@ corrections: |
   only on this leaf's retained deep page MAT.md (§MAT subarray operator), under the leaf that owns
   redimensioning rather than the one that owns MAT operations, so a reader of the MAT-operations
   section had no path to it. Found in brls phase 12; see LSP_PLAN.md finding 37.
+
+  2026-10-01 §redimensioning, §syntax: the page said a redimension "cannot exceed the original `DIM`
+  size without re-`DIM`ming", while its own example grows `DIM A(100)` to `MAT A(200)`. The example
+  was right and the sentence wrong (stated by the project owner, who runs real BR); the sentence now
+  says a DIM size is not a ceiling. Added that `MAT` is not allowed inside a DIM (error 1026 at LOAD,
+  from ERRORS.md: `dim A$*5,MAT KP(6)` on BR 4.33c; only that position was tested, not a leading
+  `DIM MAT A(5)`), and defined `<array-name>` so the string-array form `NAMES$(100)*30` is in the
+  grammar and not only in the examples. Also stated what OPTION BASE does to a DIM: under BASE 0,
+  `DIM A(5)` is six elements, `A(0)` to `A(5)` (verified by the project owner against real BR).
 ---
 
 # Declaration (variables & arrays)
@@ -57,8 +66,13 @@ DIM <variable-list>
                          | <string-variable> '*' <max-length>
                          | <array-declaration>
 <array-declaration>    ::= <array-name> '(' <dimension> [',' <dimension>]* ')' ['*' <max-length>]
+<array-name>           ::= <identifier> | <identifier> '$'   ! '$' goes before the '(' : NAMES$(100)*30
 <dimension>            ::= <integer>
 ```
+
+A `DIM` declares by plain name. `MAT` is not part of a declaration: `MAT` in a `DIM` list is
+rejected at LOAD as error 1026, "invalid expression" (confirmed for `DIM A$*5,MAT KP(6)`). Write
+`DIM KP(6)`; `MAT KP(n)` is the runtime [redimension](#redimensioning).
 
 <a id="semantics"></a>
 ## Semantics
@@ -70,7 +84,8 @@ DIM <variable-list>
 - **Naming**: **begin with a letter or `_`** (1–30 chars of letters, digits and `_`); not a reserved
   word, and **never an `FN…` name** (those are reserved for user-defined functions). The *same*
   identifier can coexist as a numeric scalar, numeric array, string scalar **and** string array —
-  `A`, `MAT A`, `A$`, `MAT A$` are four distinct variables.
+  `A`, `MAT A`, `A$`, `MAT A$` are four distinct variables. (`MAT` is how an expression or statement
+  *refers* to the array; a `DIM` names it without `MAT`.)
 - Values **persist** until reassigned, or cleared by `CLEAR`, `RUN`, `LOAD`, `CHAIN`, or exit.
 
 <a id="dim"></a>
@@ -86,6 +101,9 @@ DIM <variable-list>
 - **1-based** by default (first element is index 1). Arrays of **≤10 elements need no `DIM`**
   (auto-dimensioned to 10). **1 to 7 dimensions**. Elements are contiguous; defaults are `0`
   (numeric) / empty (string).
+- **A dimension is the highest subscript, not the element count.** Under the default `OPTION BASE 1`,
+  `DIM A(5)` holds five elements, `A(1)` to `A(5)`; under `OPTION BASE 0` it holds **six**, `A(0)` to
+  `A(5)`. See [OPTION & base](#option).
 - **Size limit** 99,999,999 bytes (4.30+; previously 512 KB).
 
 <a id="option"></a>
@@ -95,7 +113,7 @@ The `OPTION` statement sets program-wide choices. It takes a **comma-separated l
 
 | Option | Takes | Effect |
 |---|---|---|
-| `BASE` | `0` or `1` | `BASE 0` makes every array include a **zero element**; `BASE 1` is the default, 1-based. Any other value is error 1006 |
+| `BASE` | `0` or `1` | `BASE 0` makes every array include a **zero element**, so `DIM A(5)` holds six elements, `A(0)` to `A(5)`; `BASE 1` is the default, 1-based, and `DIM A(5)` holds five. Any other value is error 1006 |
 | `PRTZO` | `1`–`128` | Print-zone width, for the `,` separator in a print list (default 24). Outside the range is error 1006 |
 | `INVP` | — | Inverted (European) decimal/comma format: the roles of `.` and `,` swap in `PIC`, `N`, `NZ`, `L`, `G` and `GZ` [format specifications](../../../30-io-file/form-spec/spec.md) and in `INPUT FIELDS` |
 | `COLLATE` | `NATIVE`, `ALTERNATE` or `EBCIDIC` | Letters-vs-numbers sort order: `NATIVE` is the platform/character-set order (ASCII: digits before letters), `ALTERNATE` moves digits *after* letters, `EBCIDIC` uses EBCDIC order. A fourth word is error 1022. **`EBCIDIC` is BR's own spelling** of the keyword |
@@ -112,8 +130,9 @@ was declared in a `DIM` — a discipline aid against typo-variables.
 
 <a id="redimensioning"></a>
 ### Redimensioning (MAT)
-Resize at runtime with `MAT`; existing values are preserved when growing and lost when shrinking,
-and you cannot exceed the original `DIM` size without re-`DIM`ming.
+Resize at runtime with `MAT`; existing values are preserved when growing and lost when shrinking.
+The size a `DIM` gave is not a ceiling: a redimension may grow an array past it, and no re-`DIM` is
+needed.
 ```business-rules
 00400 DIM A(100), B(50)
 00410 MAT A(200)        ! grow to 200

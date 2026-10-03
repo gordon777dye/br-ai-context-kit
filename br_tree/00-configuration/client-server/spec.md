@@ -9,6 +9,8 @@ status: 2b           # reference base + br_tree fold (reconnect/keepalive, servi
 recovered-fold: BRListener.Conf, BRListener.exe, BRListener.Log, Client_Server, MultiSession (5 redirect-collision pages folded from re-fetched source — Security section, TLS, 64/32-bit install + /ALTERNATE, SHELL LIMIT/DEFAULT + flags, CLIENT_CURRENT_DIR modes, conf-read-fresh; verbatim retained on the BR wiki)
 related: [config-directives, platform, environment]
 keywords: [CLIENT_SERVER, BRSERVER, SERVER, CONFIG]
+corrections:
+  - "Client-file COPY examples changed from the `COPY \"x\" TO \"@:C:\\...\"` form to `COPY <from> <to>`: no TO, unquoted names, and `@::` for a client absolute path, as file-directory documents. BR 4.4's console refuses the TO form. The unquoted form was confirmed to copy a file to the client (ERRORS.md, 2026-10-01). The Examples line now also runs COPY through EXECUTE, because a command cannot be a numbered program statement (program-management#command-vs-statement), and no longer reuses line number 10100. The same bullet's `EXISTS(\"@:C:\\...\")` changed to `@::` for the same absolute-path reason (confirmed by the user, 2026-10-02)."
 ---
 
 # Client-server
@@ -90,8 +92,8 @@ commands, but the workstation appears to "lock up" while waiting.
 - **Remote printing**: printer targets pick client vs server by suffix and `OPTION 30` —
   `PRN:/` vs `PRN:@/`, `WIN:/` vs `WIN:@/`, `DIRECT:/`, `PREVIEW:/`. Client spooling via
   `SPOOLCMD @ …` and `SPOOLPATH @ …`.
-- **Client files** use the `@:` prefix: `COPY "data.txt" TO "@:C:\ClientData\data.txt"`,
-  `EXISTS("@:C:\Config\settings.ini")`.
+- **Client files** use the `@:` prefix (`@::` for a client absolute path): `COPY data.txt @::C:\ClientData\data.txt`,
+  `EXISTS("@::C:\Config\settings.ini")`.
 - **`CLIENT_CURRENT_DIR`** sets where `@:` (single-colon) client references resolve: a **full path**,
   **`SYNC`** (mirror each server `CD` onto the client, per-DRIVE), or **`OFF`** (default — use the client
   startup dir). The **third `DRIVE` parameter** supplies a per-drive client full path (must begin `\\`
@@ -103,7 +105,7 @@ commands, but the workstation appears to "lock up" while waiting.
 ```business-rules
 10100 EXECUTE "SYSTEM -s ls -la"                 ! run on server
 10200 EXECUTE "SYSTEM -@ dir"                     ! run on client
-10100 COPY "report.pdf" TO "@:C:\Upload\report.pdf"   ! send to client
+10300 EXECUTE "COPY report.pdf @::C:\Upload\report.pdf"   ! send to client
 ```
 
 <a id="service-install"></a>
