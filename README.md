@@ -58,6 +58,16 @@ Note: This context kit itegrates with any BR app.
 Rename it to "context/". Then copy your brconfig.sys fileto dev/tools.
 The rest is done by AI. 
 
+## Update Procedure
+
+- Download a fresh zipped copy of this repo
+- Unzip it to it's own folder
+- Save your config and "config include" files to a work folder (e.g. app/onboarding/)
+- delete br_tree/ and dev/ from your context/ folder
+- **move the br_tree/ and dev/ folders from the update into context/**
+- restore your config files into dev/tools/
+
+
 ## Start here
 
 **→ [`app/ONBOARDING.md`](app/ONBOARDING.md)** - Onboarding instructions - do this first. 
