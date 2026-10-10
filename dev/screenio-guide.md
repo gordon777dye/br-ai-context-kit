@@ -540,6 +540,59 @@ ordinary colors, shows whatever changed).
 Same `fnMaster$` engine as any other screen call throughout — a "screen" control is purely a
 *placement and activation* wrapper around it, not a different runtime path.
 
+### Driving a child screen from its parent
+
+Three facts confirmed by ScreenIO's author (2026-10-09) against the `screenio.brs` source, while
+designing a parent screen whose embedded child lists the parent record's detail lines:
+
+1. **Pass the child its key through the control's `FUNCTION$` text.** `fnOpenScreen` builds
+   `"[" & FieldName$ & "]" & Function$` and hands it to `Fnparsescreeninfo`, which `EXECUTE`s
+   everything after the `]` (or, if that text starts with `{` or `#`, calls it as a function and
+   uses the result as the child's *key*). So a `screen` control whose `FIELDNAME$` is the child
+   screen and whose `FUNCTION$` is `ParentKey$=F$(IV_INVOICENO)` hands the child the parent's
+   current invoice number as `ParentKey$`; the child's Filter then shows only matching rows.
+2. **Refresh it with `RedrawScreens`, and only when something changed.** Any event can set
+   `RedrawScreens=1`; on its next pass the main loop calls `fnDrawScreens`, which redraws every
+   embedded child (a fresh load, so the child's listview is repopulated). `RedrawScreens=-n`
+   redraws only control `n`. Redrawing children is relatively slow, so set it only when the
+   child's data actually changed — e.g. after a line was really added, never after a failed
+   lookup.
+3. **Validate, not Main Loop, for "the user typed something and pressed Enter".** After each input
+   pass, ScreenIO runs the Validate event (the control's `FUNCTION$`) of every input field whose
+   text changed, before acting on the key. Enter (`Function=0`) only exits a screen that has its
+   own `listview` control (`fnTheresAListview`); a screen whose list lives in an embedded child has
+   none, so Enter just validates and stays. Main Loop also works but fires on every pass, so it
+   would have to test which field was current and which key was pressed; Validate only fires when
+   the data changed. A barcode scanner (it types the code and presses Enter) therefore works
+   through Validate too.
+
+**Enter and Esc on a listview screen** (verified in `screenio.brs`'s `Fnrespondtouseraction`,
+2026-10-09; an earlier belief that Enter depended on exit buttons turned out to be about Esc):
+
+- **Enter always selects and exits** on a screen with its own listview control:
+  `if Function=0 then if fnTheresAListview(mat FieldType$) then ExitMode=SelectAndQuit`. Select,
+  Cancel or other exit buttons make no difference.
+- **Esc is the key that checks for exit buttons.** If any control's function contains both
+  `exitmode` and `quitonly` (`Fnsearchclosely`), Esc sets no exit mode at all, leaving exiting to
+  that button. The main loop likewise skips saving pending changes on Esc in that case. Without
+  such a button, Esc quits a listview screen (`QuitOnly`) or asks to save on an edit screen.
+- **To give Enter (or any key) another meaning** — e.g. open the selected row in an edit screen
+  instead of selecting it — use the **Main Loop** event. It runs **last** in
+  `Fnrespondtouseraction`, *after* Enter has already set `ExitMode=SelectAndQuit`, so the handler
+  has to cancel that. The owner's production pattern (confirmed in a real app's Main Loop
+  functions, 2026-10-09) does three things after acting on the key:
+  ```
+  if fkey=0 then
+     ! ... act on Enter, e.g. let fnfm("someedit",CurrentKey$) ...
+     if fkey<>93 then let fkey(-1)   ! reset the key, unless the user closed the window (93)
+     let Function=-1                 ! so nothing else treats this pass as Enter
+     let ExitMode=0                  ! don't exit after processing the key
+  end if
+  ```
+  `ExitMode` and `Function` are passed to event functions by reference. The same three-statement
+  cancel suppresses other keys: Esc (`function=99 or fkey=99`), the window's close X (`93`, e.g.
+  only after a "you still have unsaved work" `Msgbox`), or a tab click (`fkey=92`).
+
 <a id="authoring"></a>
 ## 9. Authoring a new screen programmatically (writing `screenio.dat`/`screenfld.dat` directly)
 
@@ -659,7 +712,13 @@ before you read that dump, so the raw CSV makes sense on sight:
 - A `LISTVIEW` with a **blank `FUNCTION$`** has no Filter function at all — every record in the
   bound file shows, unconditionally (the "bare listview" pattern; see §6 for what a non-blank
   Filter function's return value would otherwise control).
-- `FGCOLOR$`/`BGCOLOR$` are fixed **6-character** fields — a short code like `"W"` (white) is
+- **An empty listview always shows one blank row.** When no record passes the filter,
+  `Fnpopulatealllistviews` prints a single row of empty values (`if ~Populatecolorudim then …
+  mat Populatedata$(1:Populatedataudim)=("")`) so the listview stays clickable (owner,
+  2026-10-09). Numeric columns with an `N`/`PIC` conversion show it as `0`/`0.00`. It disappears
+  once a real row is added — expected, not a filter bug.
+- `FGCOLOR$`/`BGCOLOR$` are fixed **6-character** fields — a short code like `"W"` (BR's system
+  *window* colors: black text on a white field, not "white") is
   stored left-justified, **padded with trailing spaces to 6 chars**, not bare. Blank/inherited
   color is 6 literal spaces, not an empty string.
 - **Column order is not controlled by `VPOSITION`/`HPOSITION`.** Every `LISTCHLD` sibling of the

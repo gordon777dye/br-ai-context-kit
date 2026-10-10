@@ -396,6 +396,14 @@ becomes:
    END IF  ! #End Select#
 ```
 
+**The first `#Case#` must be on the same line as `#Select#`.** Lexi only recognizes the
+`#Select# expr #Case# value` pair as one line. Split them (`#Select# Type$` on one line,
+`#Case# "caption"` on the next) and Lexi leaves the `#Select#` and `#Case#` lines untouched but
+still turns `#End Select#` into `END IF`. The result has an unopened `END IF`, which `brls -check
+-sema` reports and real BR refuses to LOAD (confirmed 2026-10-09). One `#Case#` can match several
+values separated by `#`, as ScreenIO's own source does:
+`#Select# Lwrc$(Trim$(Fieldtype$(Index))) #Case# "c" # "search" # "combo" # "filter"`.
+
 The trailing comments are what let "Strip Line Numbers" turn the `IF`/`ELSE IF` chain back into
 `#Select#`/`#Case#` form on the editor/number-free side. **A bare `SELECT CASE ... END SELECT`
 (no `#` signs) is not valid syntax at all** — confirmed live: Lexi leaves it completely untouched
