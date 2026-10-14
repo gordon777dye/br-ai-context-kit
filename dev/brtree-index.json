@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-10-13",
+  "generated": "2026-10-14",
   "source": "br_tree/",
-  "source_sha256": "f2c17c52d148a26fc2adcd295ee3991220af49b79f3ba57cc46005401b5b2fe7",
+  "source_sha256": "d6de944571a2fe40b8d5a3a2388f971d1903d3b692569a63a1a621f442f2e2e9",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -23,7 +23,8 @@
       "70-commands/program-management"
     ],
     "ALL": [
-      "70-commands/information"
+      "70-commands/information",
+      "70-commands/program-management"
     ],
     "ALTERNATE": [
       "10-language/data-manipulation/declaration"
@@ -628,6 +629,9 @@
     ],
     "LOGIN_NAME$": [
       "10-language/data-manipulation/system-functions"
+    ],
+    "LOGOFF": [
+      "70-commands/program-management"
     ],
     "LOOP": [
       "10-language/flow-control/other-flow"
@@ -2892,6 +2896,8 @@
         "CHAIN",
         "PROC",
         "SYSTEM",
+        "LOGOFF",
+        "ALL",
         "SUBPROC",
         "PROCERR",
         "ALERT",
@@ -2913,6 +2919,7 @@
         "command-vs-statement",
         "entry-exit",
         "system",
+        "system-logoff",
         "program-commands",
         "loading",
         "merge",

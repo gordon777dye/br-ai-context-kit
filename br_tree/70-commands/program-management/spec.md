@@ -8,8 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree fold (LOAD modes, CHAIN passing, CLEAR variants, GO form, MERGE, express procs); CHAIN/Procedure_files retained; no conflicts
 recovered-fold: REPLACE (folded+pruned — source-vs-object/.BRS/.BRO rules, .BAK + OPTION 26, default-extension; verbatim retained on the BR wiki)
 related: [file-directory, information, editing]
-keywords: [RUN, LOAD, SAVE, REPLACE, MERGE, CLEAR, GO, EXECUTE, CHAIN, PROC, SYSTEM, SUBPROC, PROCERR, ALERT, FILES, ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP, NOTRACE]
+keywords: [RUN, LOAD, SAVE, REPLACE, MERGE, CLEAR, GO, EXECUTE, CHAIN, PROC, SYSTEM, LOGOFF, ALL, SUBPROC, PROCERR, ALERT, FILES, ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP, NOTRACE]
 corrections:
+  - "SYSTEM LOGOFF was one line (`log the BR client off`). Now documents `SYSTEM LOGOFF [ALL]` in the system-logoff subsection: it is an exit form (exit code 0, error 2108 if keyed while a program is active), what the client clears at exit, and that ALL widens only the session-table clear from this session's slot to all nine. Also the parse rules: ALL is a whole word, and nothing else after LOGOFF is read. LOGOFF and ALL added to keywords. From BR source in context/lsp/brls/brs: command7.cpp SYSTEM_CMD (the LOGOFF/ALL parse and the CLIENT_LOGOFF_ASYNC call), remoteargs.cpp (sets g_logoffAtExit and g_logoffAllSessions), brterm.cpp (runs logoffClient at client exit), term.cpp logoffClient, session.cpp clearSessionID/clearSessionIDs, brlistener.cpp logoffSession. Read from source only; not run against a BR executable."
   - "RUN syntax now shows the program name and the PROC option: `RUN [<program>] [PROC] [STEP|TRACE]`. Added a run-proc subsection giving the literal forms (`RUN <program> PROC`, or `LOAD <program>` then `RUN PROC`) and saying they work only inside a procedure. The page had described RUN PROC's effect and never its syntax. From BR 4.4 source: command9.cpp PROC_TYPE sets RUN_PROCIN and raises BREPROCPARAMETER (2103) when no proc is active. commandc.cpp RUN reads a first word that is an option (PROC among them) as that option, not a file name. Confirmed on brserver 4.33c with a probe: both forms gave PROCIN=1 and fed the LINPUT; plain RUN gave PROCIN=0; the startup argument `RUN <prog> PROC` gave 2103. Reported in context/lsp/ERRORS.md 2026-09-09."
   - "Eleven keywords added to the frontmatter: the CHAIN clause FILES, the commands SUBPROC, PROCERR and ALERT, and the qualifiers ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP and NOTRACE. Every one is documented in this page's BNF or semantics and none was declared, so BR's own spelling of each reached nothing. Found in brls phase 13."
   - "CHAIN's backing/deep-reference page carried `kind: command` and lived under this
@@ -53,7 +54,7 @@ Any statement can be run immediately as a command; a bare expression is an impli
 BR [<instructions>] [-<id>] [-<config>] [-<ref>]   -- start BR (optionally run a command / set WSID / config)
 SYSTEM | SY                                         -- exit BR to the OS (closes files)
 SYSTEM <integer>                                    -- exit to the OS, returning <integer> as the process exit code
-SYSTEM LOGOFF                                        -- log the BR client off
+SYSTEM LOGOFF [ALL]                                  -- exit BR and log the client off (ALL: every session slot)
 SYSTEM [<flags>] "<os-command>"                      -- run an OS shell command, then return to BR
 ```
 
@@ -63,7 +64,8 @@ SYSTEM [<flags>] "<os-command>"                      -- run an OS shell command,
 [`EXECUTE`](#execute) or a `PROC`. Three forms:
 
 - **Exit** — bare `SYSTEM` (`SY`) closes files and returns to the OS; `SYSTEM <n>` returns `<n>` as the
-  process **exit code** (readable by a calling shell/script). `SYSTEM LOGOFF` logs the BR client off.
+  process **exit code** (readable by a calling shell/script). `SYSTEM LOGOFF [ALL]` exits and also
+  logs the client off — see [logoff](#system-logoff).
 - **Shell call** — `SYSTEM "<os-command>"` runs an operating-system command (launch another program,
   run a script), then returns to BR — **the program's main way to invoke other applications through the
   OS.** This is consequential for app development and for security review (it executes arbitrary OS
@@ -87,6 +89,39 @@ SYSTEM [<flags>] "<os-command>"                      -- run an OS shell command,
 | `+<n>` | request `<n>` of memory for the child |
 
 (`SYSTEM ONQ …` invokes the built-in ONQ interface rather than a generic shell command.)
+
+<a id="system-logoff"></a>
+#### SYSTEM LOGOFF / SYSTEM LOGOFF ALL
+
+`SYSTEM LOGOFF` is an **exit** form: it ends BR exactly as bare `SYSTEM` does (files closed, exit
+code **0**). It is subject to the same rule as the other exit forms: keyed at the console while a
+program is active, it fails with error **2108** ("program is active"). Before exiting, it flags the
+client to log off. The logoff then runs when the client shuts down, and it removes what a logon
+leaves on the workstation:
+
+| Cleared | Scope |
+|---|---|
+| The persistent-login session id (registry `ClientServer\sessionId_<listener port>`) | machine |
+| The login dialog's **AutoLogin** and **Remember me** settings | machine |
+| The saved Windows credentials | machine |
+| The session table entry — WSID, window handle, window class name, process time | **this session's slot only** (`SYSTEM LOGOFF`) or **all nine slots** (`SYSTEM LOGOFF ALL`) |
+
+In client-server mode the client also tells the listener to drop this session's multisession
+login, so the next connection must log on again.
+
+The machine-wide items are cleared by both forms. **`ALL` only changes the session table.**
+- Plain `SYSTEM LOGOFF` frees only this session's slot and leaves the other eight as they were.
+- `SYSTEM LOGOFF ALL` zeroes every slot. That includes the WSIDs of sessions that are still
+  running, which is why it is not the default. It is the recovery for a slot left unusable — for
+  example when Windows reports another session's window as still live, so that session's WSID is
+  never freed and WSIDs get assigned wrongly.
+
+Parsing:
+- `LOGOFF` and `ALL` are case-insensitive. `ALL` must be spelled in full and be a whole word
+  (followed by a space, a tab or the end of the line). `SYSTEM LOGOFF ALLOCATE` is therefore plain
+  `SYSTEM LOGOFF`.
+- Nothing else after `LOGOFF` is read. A number there is **not** an exit code: `SYSTEM LOGOFF 5`
+  still exits with 0.
 
 <a id="program-commands"></a>
 ## Program lifecycle commands
