@@ -113,6 +113,7 @@
       "SHIFT",
       "SIN",
       "SLEEP",
+      "SPAWN_RESTRICTED",
       "SQL_DATE$",
       "SQR",
       "SRCH",

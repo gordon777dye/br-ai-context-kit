@@ -87,7 +87,7 @@ Base-16 (digits `0-9` then `A-F`). Hex constants are written with a leading `#` 
 | Integer | `[±]digits` | `10`, `-10`, `+10` |
 | Fixed-point | `[±]digits.digits` | `12.34`, `12.`, `-12.3` |
 | Scientific | `mantissa E [±]exp` | `1.5E+6` (= 1,500,000) |
-| `inf` | infinity ≈ `1E+307` | `S$(inf:inf)` |
+| [`inf`](../system-functions/spec.md#numeric-functions) | infinity ≈ `1E+307` — the literal form; the value is defined with the numeric functions | `S$(inf:inf)` |
 | String | `"..."` or `'...'` | `"Hello"`, `'Bruno''s'` |
 
 <a id="examples"></a>

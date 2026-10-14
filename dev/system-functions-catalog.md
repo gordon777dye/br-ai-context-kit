@@ -22,10 +22,11 @@ usability against the `numfunct.cpp`/`strfunct.cpp`/`trig.cpp` implementations.
 > forms this file called impossible: `LPAD$`/`RPAD$` with a pad character, `SREP$` with a start
 > position, `DATE`/`DATE$` with none or one argument, and `CMDKEY`, `FKEY`, `RND` and `MENU` with
 > the one numeric argument this file's own *prose* documents while its signature column omitted it.
-> Those eight are corrected. The rest of the roster has **not** been checked case by case, and the
-> mechanical check — generating the arities from the two checkers, which state each range in a
-> comment on every `case` — is specified in `lsp/brls/LSP_PLAN.md`, under
-> *Where the authority sits*.
+> Those eight are corrected. **The mechanical check now exists** (2026-10-13): brls reads the
+> signatures from the br_tree spec, runs both checkers over every argument count and type against
+> them, and fails its build if **this file's** names or argument counts disagree with the spec. The
+> spec is the authority; argument *types* — including positions BR accepts either way — are written
+> only there, in its signature notation. See `lsp/brls/LSP_PLAN.md`, phase 16.
 
 Entries marked **✗** are keywords in the runtime tables that are **not usable**:
 either reserved-but-unimplemented (`TRUNC`, `DEG`, `RAD` — parse but error at runtime) or compiler-rejected
@@ -140,7 +141,7 @@ Two things to read off the rows:
 | `ERR` | num | last error number |
 | `LINE` | num | current line number |
 | `CNT` | num | items processed by the last I/O |
-| `CODE` | num | return value of the most recent procedure (`EXIT n`) |
+| `CODE` | num | the return code the last **program** set, with `STOP n`/`END n`; cleared by `LOAD`, `CHAIN` and `CLEAR`. There is no `EXIT n` — see the CODE correction in [system-functions](../br_tree/10-language/data-manipulation/system-functions/spec.md) |
 | `PROCIN` ‡ | num | non-zero while a procedure feeds input |
 | `FILENUM` | num | file number of the most recent I/O error |
 | `PI` | num | 3.14159265358979 |
@@ -229,8 +230,8 @@ already carried by the keyword pack. The "2-D control" gloss was wrong as well a
 | `SGN(n)` | num | sign: `-1` / `0` / `1` (a near-zero value can round to `0` per the `RD` config) |
 | `SQR(n)` | num | square root |
 | `MOD(a, b)` / `REM(a, b)` | num | remainder (`REM` is an alias of `MOD`); **function only — no infix `a MOD b`** |
-| `MAX(n…)` / `MIN(n…)` | num | largest / smallest of a numeric list |
-| `MAX$(s$…)` / `MIN$(s$…)` | str | largest / smallest string (ASCII order) |
+| `MAX(n, n…)` / `MIN(n, n…)` | num | largest / smallest of a numeric list — **two or more** arguments |
+| `MAX$(s$, s$…)` / `MIN$(s$, s$…)` | str | largest / smallest string (ASCII order) — **two or more** arguments |
 | `SIN(n)` `COS(n)` `TAN(n)` `ATN(n)` | num | trig / arctangent (radians) |
 | `LOG(n)` / `EXP(n)` | num | natural log / e^n |
 | `DEG(n)` ✗ / `RAD(n)` ✗ | num | **reserved but not implemented** — recognized keywords that error at runtime (`trig()` has no case); no conversion exists in the current source |
@@ -264,7 +265,7 @@ already carried by the keyword pack. The "2-D control" gloss was wrong as well a
 |---|---|---|
 | `FILE$([n], [keyword$])` | str | open file's name; no arg = file of the most recent I/O error. **A second, keyword argument queries the open file** — `"HTTPINFO"`, `"PAGE-URL"` and others dispatched in `strfunct.cpp`'s `FILE_` arm — and is not otherwise documented in this kit |
 | `FILE(n)` | num | status: `-1` not open, `0` ok, `10/11` EOF, `20/21` transmission error |
-| `FILE(n, kind$, MAT a (out))` | num | `"WINDOW_RECT"`/`"USABLE_RECT"` (x,y,w,h px) or `"FONTSIZE"` (cell) |
+| `FILE(n, kind$, [MAT a (out)])` | num | `"WINDOW_RECT"`/`"USABLE_RECT"` (x,y,w,h px) or `"FONTSIZE"` (cell) |
 | `FREESP(n)` | num | free bytes on the drive holding file `n` |
 | `EXISTS(file$)` | num | nonzero if file/PROC exists (`1`=directory, `>1`=file) — test zero/nonzero only |
 | `BR_FILENAME$(os$)` / `OS_FILENAME$(br$)` | str | convert OS path ↔ BR filename (4.18+) |
@@ -305,8 +306,9 @@ already carried by the keyword pack. The "2-D control" gloss was wrong as well a
 | `ENV$(status$, [MAT cfg$ (out)], [arg])` | str | environment / status interrogation (4.30+) |
 | `SETENV(name$, [value$])` | num | set a BR **session** environment variable (function form of `CONFIG SETENV`; read back with `ENV$`). 2 args = `name$`,`value$`; 1 arg = a `NAME=VALUE` directive |
 | `MSG$(text$)` | str | display text in the 2nd box of the command console |
-| `MSG(action$, arg)` | num | keyboard control, Windows/CS (**not** a companion of `MSG$`): `MSG("KB",keys$)` injects keystrokes, `MSG("sleeptime",ms)` sets the delay in milliseconds — home: 70-commands/information |
+| `MSG(action$, [arg…])` | num | session control, Windows/CS (**not** a companion of `MSG$`): `MSG("send",keys$)` types into this session through BR's own buffer, `MSG("sleeptime",ms)` sets the delay between keys in milliseconds; `MSG("kb")` was removed in 4.4 (0412). The compiler takes one or more arguments, the first a string — home: 70-commands/information/MSG.md |
 | `SLEEP(seconds)` | num | pause (fractional seconds, ms resolution) |
+| `SPAWN_RESTRICTED(command$, [config$], [wait])` | num | **BR 4.4.** start a disposable **restricted** session on this WSID running `command$`; returns its process id, or with `wait` (seconds) its exit code. Errors 4154–4157 — home: system-functions/SPAWN_RESTRICTED.md |
 | `HELP$([*]kw$, [mark])` | str | enter HELP mode / show a topic; returns a scancode or selection. **Two arguments at most**, and the second is *numeric* — `ck_alph_sysfn` gives `BETWEEN(1, 2, subcount)` with `PARMCHECK_NUMERIC` on it, so the `file$` this row used to list is not a parameter |
 | `MSGBOX(prompt$, [title$], [buttons$], [icon$])` | num | Windows message box; returns the chosen button (also in `CNT`): 1 OK · 2 Yes · 3 No · 4 Cancel |
 | `DEBUG_STR(level, str$)` | num | emit `str$` to the debug log (4.3+) |
@@ -330,7 +332,7 @@ Signatures below are source-verified against `strfunct.cpp`/`numfunct.cpp` (`GET
 | `GET$("#f,r,c", prop$)` | str | read a `.NET`/PEM control property (remote `PEM_PROPERTY_CALL`) |
 | `SET$("#f,r,c", assign$)` | str | set a control property, `"prop=value"` (dotted paths allowed) |
 | `INVOKE$("#f,r,c", method$, MAT args$)` | str | invoke a control method (`method$` from `INPUT FIELDS … METHOD_NAMES`); results written back into the args array |
-| `DLL(a$, b$, …)` | num | call a client-side DLL command (≥2 args, first two strings; errors 0321–0327) |
+| `DLL(a$, b$, [arg…])` | num | call a client-side DLL command (≥2 args, first two strings; errors 0321–0327) |
 | `CALL` ✗ | num | **reserved keyword, no implementation** — in `table7k` but rejected as a function expression |
 
 > **OS shell access — `SYSTEM` (a command, not a function).** Not in `table6k`/`table7k`, so it has no

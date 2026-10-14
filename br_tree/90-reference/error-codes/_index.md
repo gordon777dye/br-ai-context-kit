@@ -2,7 +2,7 @@
 
 Every BR numeric error code, one file each. See the table below for fast lookup.
 
-_761 entries._
+_775 entries._
 
 | Code | Description |
 |---|---|
@@ -114,7 +114,9 @@ _761 entries._
 | [0418](0418.md) | env$ array data type is wrong |
 | [0419](0419.md) | Error in special char spec. Invalid MSG special char specification. |
 | [0420](0420.md) | Operation not permitted with debugger attached |
+| [0421](0421.md) | Debugger authentication failed |
 | [0422](0422.md) | Unknown host name |
+| [0423](0423.md) | A debug observer is already attached |
 | [0424](0424.md) | Debugging Connection failed |
 | [0426](0426.md) | Bad debugging port defined |
 | [0428](0428.md) | Debugging Accept failed |
@@ -123,6 +125,7 @@ _761 entries._
 | [0434](0434.md) | Line number too long during Edit ~ |
 | [0436](0436.md) | Bad flags for MAT2STR or STR2MAT. Available as of BR! 4.30. |
 | [0438](0438.md) | Input String not valid UTF-8 format.<br> |
+| [0440](0440.md) | MSG answer is not a number and the result variable is numeric |
 | [0501](0501.md) | Not enough data for INPUT |
 | [0520](0520.md) | The given PEM property does not exist |
 | [0522](0522.md) | Components are not allowed to have grouped IO |
@@ -255,6 +258,7 @@ _761 entries._
 | [10013](10013.md) | "accept failed errno 10013" reported in the client server log file. |
 | [10018](10018.md) | Thought I would share. Had an odd one today where a client running BR off a drive share couldn't get in BR because they got an error 10018… |
 | [1002](1002.md) | Invalid use of keyword |
+| [10023](10023.md) | Too many sessions - maximum 9 sessions allowed |
 | [1003](1003.md) | Missing quote |
 | [10038](10038.md) | Error 10038 is Socket operation on nonsocket. |
 | [1005](1005.md) | Duplicate label or function |
@@ -402,17 +406,23 @@ _761 entries._
 | [4148](4148.md) | File sharing violation |
 | [4149](4149.md) | File Open. Different version of BR running with locking |
 | [4150](4150.md) | Duplicate file name |
+| [4151](4151.md) | CLOSE DROP or FREE requires the file to be opened for output |
 | [4152](4152.md) | File not found |
-| [4153](4153.md) | Device not connected |
+| [4153](4153.md) | Restricted session: may not change a file this session did not create |
+| [4154](4154.md) | Restricted session: this operation is not permitted |
+| [4155](4155.md) | No session is free on this WSID for a restricted session |
+| [4156](4156.md) | A restricted session can be started only from a local Windows session |
+| [4157](4157.md) | The restricted session did not finish in time and was ended |
+| [4158](4158.md) | No assistant is listening on this session's channel |
 | [4159](4159.md) | DEPRECATED ERROR, as of 4.30: Volume not on line |
 | [4160](4160.md) | Open files limit exceeded. See System Limits. As of 4.30: Out of internal file handles |
-| [4161](4161.md) | Failed reading |
-| [4162](4162.md) | Unable to lock marker (reserving) |
-| [4163](4163.md) | Couldn't lock marker (releasing) |
-| [4164](4164.md) | Could not blank out |
-| [4165](4165.md) | Error writing |
-| [4166](4166.md) | Unable to find |
-| [4167](4167.md) | Limit for reserve |
+| [4161](4161.md) | The assistant channel was closed after repeated bad handshakes |
+| [4162](4162.md) | A process belonging to another user tried to reach the assistant channel |
+| [4163](4163.md) | No assistant connected to the channel in time and it has been closed |
+| [4164](4164.md) | This session is in user mode and cannot change to DEVELOP mode |
+| [4165](4165.md) | Restricted session: brrestrict.sys does not permit this file |
+| [4166](4166.md) | The assistant's own commands may not raise the keyboard grant - only the person at the session may |
+| [4167](4167.md) | The operator did not permit this operation for the assistant |
 | [4168](4168.md) | Write failed |
 | [4169](4169.md) | Release failed |
 | [4170](4170.md) | Unable to release file |
@@ -606,6 +616,7 @@ _761 entries._
 | [4614](4614.md) | The standard handle is not valid, possibly not opened |
 | [4616](4616.md) | failed initializing PDF library |
 | [4618](4618.md) | An error that aborts further reconnect attempts has occurred |
+| [4619](4619.md) | Reconnection timeout - will retry |
 | [4620](4620.md) | Client server connection failure |
 | [4890](4890.md) | Temporary index creation failure |
 | [5321](5321.md) | Error occurs every second time the printer is accessed |
@@ -654,8 +665,11 @@ _761 entries._
 | [6246](6246.md) | Internal BR failure relating to a utility print |
 | [6247](6247.md) | Malformed Color Specification |
 | [6248](6248.md) | Invalid Picture Specification |
+| [6249](6249.md) | Invalid NWP font specification |
 | [6250](6250.md) | Invalid PDF import specification |
+| [6251](6251.md) | Requested print font is not available, a substitute was used |
 | [6252](6252.md) | Print PDF requires either READER or an output file name. |
+| [6253](6253.md) | Internal font resolution error |
 | [6254](6254.md) | Creating a new PDF document failed. |
 | [6255](6255.md) | Adding a page to a PDF document failed. |
 | [6256](6256.md) | Sending a PDF document failed. |

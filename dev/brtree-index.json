@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-10-02",
+  "generated": "2026-10-13",
   "source": "br_tree/",
-  "source_sha256": "c17a1bb13c37de3a67700a3b23225f5afdff9cfc87e8b0082b197d111fa5c632",
+  "source_sha256": "f2c17c52d148a26fc2adcd295ee3991220af49b79f3ba57cc46005401b5b2fe7",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -151,6 +151,7 @@
       "30-io-file/statements"
     ],
     "CMDKEY": [
+      "10-language/data-manipulation/system-functions",
       "20-io-screen/windows-cursor"
     ],
     "CNT": [
@@ -211,21 +212,25 @@
       "20-io-screen/fields-attributes"
     ],
     "CURCOL": [
+      "10-language/data-manipulation/system-functions",
       "20-io-screen/windows-cursor"
     ],
     "CURFLD": [
+      "10-language/data-manipulation/system-functions",
       "20-io-screen/windows-cursor"
     ],
     "CURPOS": [
       "10-language/data-manipulation/system-functions"
     ],
     "CURROW": [
+      "10-language/data-manipulation/system-functions",
       "20-io-screen/windows-cursor"
     ],
     "CURTAB": [
       "10-language/data-manipulation/system-functions"
     ],
     "CURWINDOW": [
+      "10-language/data-manipulation/system-functions",
       "20-io-screen/windows-cursor"
     ],
     "D": [
@@ -257,6 +262,7 @@
       "00-configuration/installation-tooling"
     ],
     "DEBUG_STR": [
+      "10-language/data-manipulation/system-functions",
       "70-commands/information"
     ],
     "DECRYPT$": [
@@ -394,6 +400,7 @@
       "30-io-file/statements"
     ],
     "FKEY": [
+      "10-language/data-manipulation/system-functions",
       "10-language/flow-control/error-handling"
     ],
     "FMT": [
@@ -544,12 +551,14 @@
       "30-io-file/statements"
     ],
     "KLN": [
+      "10-language/data-manipulation/system-functions",
       "30-io-file/keys-indexes"
     ],
     "KPS": [
       "10-language/data-manipulation/system-functions"
     ],
     "KREC": [
+      "10-language/data-manipulation/system-functions",
       "30-io-file/keys-indexes"
     ],
     "KSTAT$": [
@@ -655,6 +664,7 @@
       "20-io-screen/controls"
     ],
     "MENU$": [
+      "10-language/data-manipulation/system-functions",
       "20-io-screen/controls"
     ],
     "MERGE": [
@@ -854,6 +864,7 @@
       "00-configuration/config-directives"
     ],
     "PRINTER_LIST": [
+      "10-language/data-manipulation/system-functions",
       "40-io-printing/statements"
     ],
     "PRIOR": [
@@ -875,6 +886,7 @@
       "00-configuration/installation-tooling"
     ],
     "PROGRAM$": [
+      "10-language/data-manipulation/system-functions",
       "70-commands/information"
     ],
     "PROTECT": [
@@ -1052,6 +1064,9 @@
     "SOURCE": [
       "70-commands/editing",
       "70-commands/program-management"
+    ],
+    "SPAWN_RESTRICTED": [
+      "10-language/data-manipulation/system-functions"
     ],
     "SPOOLCMD": [
       "00-configuration/config-directives"
@@ -1805,13 +1820,26 @@
         "MSG$",
         "MSG",
         "SLEEP",
+        "SPAWN_RESTRICTED",
         "HELP$",
         "GET$",
         "SET$",
         "INVOKE$",
         "CALL",
         "ENCRYPT$",
-        "DECRYPT$"
+        "DECRYPT$",
+        "CMDKEY",
+        "FKEY",
+        "CURROW",
+        "CURCOL",
+        "CURFLD",
+        "CURWINDOW",
+        "MENU$",
+        "KLN",
+        "KREC",
+        "PROGRAM$",
+        "DEBUG_STR",
+        "PRINTER_LIST"
       ],
       "related": [
         "expressions",
@@ -1821,6 +1849,7 @@
       ],
       "anchors": [
         "syntax",
+        "signature-notation",
         "semantics",
         "mat-qualifier",
         "tables",
