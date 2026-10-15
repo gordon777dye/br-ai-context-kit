@@ -110,7 +110,7 @@ data) and `Mat Form$` (per-channel FORM, indexed by file number) recur throughou
 | Function | Signature | Purpose |
 |---|---|---|
 | `fnCsvImport` | `(Layout$; SupressDialog, FileName$, ImportModeKey)` | Import a CSV into a layout's file. |
-| `fnCsvExport` | `(Layout$; DialogType, Filename$, IncludeRecNums, KeyNumber, StartKey$, KeyMatch$, Startrec, Mat Records, SearchMatch$, Launch)` | Export a file to CSV. |
+| `fnCsvExport` | `(Layout$; DialogType, Filename$, IncludeRecNums, KeyNumber, StartKey$, KeyMatch$, Startrec, Mat Records, SearchMatch$, Launch)` | Export a file to CSV. `DialogType=1` is the only unattended value; parameters and behaviour: [FileIO_Library §fnCSVExport](FileIO_Library.md#fncsvexport). |
 | `fnExportListviewCSV` | `(Window, SPEC$; GenFileName, Delim$, Filename$)` | Export an on-screen listview to CSV. |
 
 <a id="audit"></a>

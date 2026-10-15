@@ -113,8 +113,14 @@ Two kinds of content, both load-bearing:
   parameters after `;` (which double as the **local-variable idiom** — trailing params the caller
   never passes are fresh 0/null scratch locals each call; an unpassed by-reference optional
   defaults an array to dim 1 and a string to length 18 — the 18-char default again, see §2), and
-  by-reference parameters marked `&`. A function name is capped at **30 characters including the
-  `FN` prefix**. Two traps. **Return name is write-only - never a "value so far".** A bare
+  by-reference parameters marked `&`. **An unpassed optional `MAT` parameter cannot be
+  redimensioned**: `MAT Z(1)` on it raises error
+  [0315](../br_tree/90-reference/error-codes/0315.md). So the local-variable idiom does not cover
+  scratch arrays. If a function needs one, don't list it as a parameter; use an ordinary array name
+  in the body. A function name is capped at **30 characters including the `FN` prefix**. **A
+  longer name is reported as if it lacked the prefix**: `brls` says "every BR function name begins
+  FN", and real BR's `LOAD … source` rejects it without pointing at the length either. When a name
+  that plainly starts with `FN` is rejected, count its characters. Two traps. **Return name is write-only - never a "value so far".** A bare
   `FN<name>` in the body of the function is always another call. BR keeps no readable slot for the
   pending return value. So `IF NOT FNRESOLVE` or `LET FOUND = FNRESOLVE` re-invokes `FNRESOLVE`
   (producing runaway recursion). It does not test what you last assigned. Assign `FN<name>` as
@@ -151,7 +157,10 @@ Two kinds of content, both load-bearing:
   - **`#Autonumber# <line>,<increment>`** — a comment-line directive controlling the numbers Lexi
     assigns from that point on (default: start at `00001`, count by 1 with none present). Numbers
     between successive directives must stay ascending with room for the lines between them, or
-    Lexi raises an error and stops rather than silently mis-numbering.
+    Lexi raises an error and stops rather than silently mis-numbering. **Only Lexi expands it.**
+    Base BR's `LOAD … source` given an un-numbered `#Autonumber#` file fails with error 1011,
+    "illegal immediate statement". Put such a file through Lexi
+    ([`lexi-compile.ps1`](BR_launch.md#the-lexi-preprocessor)), or give it real line numbers.
   - **`` #Define# `name` = text ``** — a preprocess-time text-substitution constant: every
     occurrence of `` `name` `` afterward expands to `text` when Lexi compiles, and reverts to
     `` `name` `` when line numbers are stripped back out. Not a runtime BR construct at all — the
@@ -254,6 +263,14 @@ Two kinds of content, both load-bearing:
 - **`LIBRARY "name":` with a library name but no function list LOADS that library immediately —
   it does not detach a linkage.** The only way to fully detach a library linkage is to end the main
   program. Don't infer a "no functions ⇒ unlink" meaning from the empty list.
+- **Two common shapes in library source files.** You will meet both in existing code:
+  - **A run-guard as the first statement:** `print "This is a library and cannot be run
+    directly." : stop`. A library holds only `DEF`s, which BR skips, so `RUN`ning one otherwise
+    just ends without a word. Some files put real driver code before the `STOP` instead, so the
+    same file works as both a program and a library.
+  - **Linking once:** the file's `LIBRARY "x": FN…` statements sit in one function (named
+    something like `fnLibraryLinkage`), and a flag variable makes them execute only on the first
+    call.
 _ **OS utility use** BR has no regex, grep or find. However it has full access to such OS commands
   via `EXECUTE system <string>`.
 
@@ -285,12 +302,20 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
   longer than that pass them by reference. e.g. `DEF FNA$*500(&BIG_STR$)` But if you 
   pass by reference keep in mind that any changes to the passed values change the original variables. 
 
-- **A config-level ceiling can override the documented string-length limit entirely.**
-  `BRConfig.sys`/startup-config `OPTION 60` selects the **legacy BR internal program-save format**,
-  which caps every variable (including strings) at **32767 bytes** — regardless of the
-  99,999,999-byte `DIM` limit documented for the current format (4.30+). 
-  **If a program needs string buffers in the tens/hundreds of KB, check the target config for
-  `OPTION 60` first** — remove it, or keep every `DIM`'d string under 32767 bytes if it must stay.
+- **This kit does not support `OPTION 60`.** That config option saves programs in the legacy
+  (4.18-and-earlier) format, which caps every variable, strings included, at 32767 bytes, against
+  the 99,999,999-byte `DIM` limit of the current format (4.30+). The limits and idioms in this kit
+  assume the current format. If the app's config turns `OPTION 60` on, raise it with the user
+  rather than coding around it. (Its documentation stays in br_tree, e.g.
+  [Backward Compatibility](../br_tree/00-configuration/platform/Backward_Compatibility.md).)
+
+- **Arrays that a library grows to fit the data need `DIM name$(0)*<width>`.** Declare the arrays
+  FileIO's `Fnopenfile` resizes with zero elements and a string width big enough for the file's
+  widest field (`DIM F$(0)*1023, F(0)`). The width is checked against the declaration, not the
+  data: a width narrower than the widest field overflows even when the actual value is short.
+  Leaving off `*width` doesn't help, because the elements then default to 18 characters. Older
+  code that says `DIM name$(1)*<width>` is not wrong: BR 4.2 and earlier rejected a zero count, so
+  `(1)` was the smallest legal start. Use `(0)` in new code.
 
 - **`MAT arr(n)` resizing a shared/reusable scratch array is sticky.** A generic subroutine 
   (e.g. a sort/dedupe helper) that does `MAT WORK$(n)` to resize a shared array before
@@ -370,9 +395,8 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
 
 - **`EXTERNAL` file `RECL=` is capped at `32767`, untrapped.** `RECL=32768` (or higher) on an
   `EXTERNAL OPEN` fails outright at the `OPEN` statement.  `RECL=32767` works; `32768` doesn't. 
-  This is a **different** ceiling from the
-  documented `OPTION 60` 32767-byte *string* limit ([[br-option60-string-limit-gotcha]]) — it bites
-  even with `OPTION 60` absent, and it's on the *file record* size, not any string variable's `DIM`.
+  It is a limit on the *file record* size, not on any string variable's `DIM`, and it applies
+  under the current program-save format (§2: the kit does not support `OPTION 60`).
   **To read a large `EXTERNAL` file, chunk it in a loop at ≤32767 bytes/record**, not one giant
   `RECL`.
 
@@ -431,6 +455,13 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
   `reports\standard\…`. Check the result with `FILE$(n)` or `STATUS SUBSTITUTE`, and use the
   protect/restore pattern in
   [config-directives](../br_tree/00-configuration/config-directives/spec.md#substitute-matching).
+
+- **A `KEY=` value must be exactly the key's length.** A shorter one is not padded for you; it
+  fails with error [0718](../br_tree/90-reference/error-codes/0718.md). Pad it with
+  `RPAD$(K$, KLN(n))`, or with FileIO's `fnKey$(n, K$)`, which is exactly that. A literal that
+  happens to be the right length works, which hides the bug until a shorter value arrives.
+  **`SEARCH=` is different:** it may be shorter, and matches the leading part of the key
+  ([KEY vs SEARCH](../br_tree/30-io-file/keys-indexes/spec.md#key-clause)).
 
 - **A `DISPLAY OUTPUT` file with no `RECL=` wraps output at a 132 byte default width** — inserting a
   mid-line CRLF that silently splits one `PRINT`'d line into two physical lines on disk. This

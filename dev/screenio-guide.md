@@ -112,6 +112,14 @@ behavior, edit the relevant `function/<name>.brs` and
 recompile the **screen** — never hand-edit the generated `screenio/<screenname>.brs`; it is fully
 regenerated from scratch on every compile and any hand edit is silently lost.
 
+**A `function/` file that no screen uses is not, by itself, a defect.** ScreenIO ships example
+functions with no screens to go with them, so a `function/` folder normally holds some that nothing
+calls. The Designer's **Tools ▸ Orphaned Functions** lists them: `fnPopulateOrphanedFunctions`
+(`tools/screenio.brs` line 11925) keeps each `function/` file that no screen references and that
+no used function `#include`s. That list is "not used by a screen", not "safe to delete": before
+reporting one as dead code, check whether anything else calls it (Tools ▸ Power Search;
+[ScreenIO_Library](../br_tree/50-libraries/screenio/ScreenIO_Library.md)).
+
 **This whole sequence is also callable from code, not just the Designer's Load/Save-and-Compile
 menu items** — see §9's `fnCompileScreen(ScreenCode$)`, added in ScreenIO v2.93.
 
@@ -352,19 +360,27 @@ fnend
 ## 7. Investigating a specific screen's structure directly
 
 `screenio.dat`/`screenfld.dat` are BR `INTERNAL` files — don't hex-dump them (same rule as any
-other data file, see `APP-DEV-GUIDE.md` §4's "Inspecting actual data values" section). Since
+other data file, see [`APP-DEV-GUIDE.md` §4's "Inspecting actual data values"](APP-DEV-GUIDE.md#inspecting-actual-data-values)
+section, including which `DialogType` is safe headless). Since
 ScreenIO is itself FileIO-based, the exact same method applies: export both to CSV with
 FileIO's `fnCsvExport` and read the result as plain text.
 
-1. Confirm the app has the `csvdump.brs`-style generic exporter described in `APP-DEV-GUIDE.md`
-   §4 (or build one — it's a few lines: `library "fileio" : fnCsvExport` +
-   `let fnCsvExport(Layout$,1,OutFile$)`, `Layout$`/`OutFile$` via `LINPUT`/`RUN PROC`).
+1. Use the app's generic exporter if it has one, or write the minimal caller described in
+   `APP-DEV-GUIDE.md` §4: `library "fileio" : fnCsvExport` +
+   `let fnCsvExport(Layout$,1,OutFile$)`, with `Layout$` and `OutFile$` read by `LINPUT`.
 2. Export **both** files — a screen's own record in `screenio.dat` only has the screen-level
    settings and event-function references; every one of its **controls** is a separate record in
-   `screenfld.dat`, matched back by `SCREENCODE`:
+   `screenfld.dat`, matched back by `SCREENCODE`. One proc can run the exporter twice, giving it
+   the two `LINPUT` answers each time (`<exporter>` is whatever you named the caller; see
+   [`BR_launch.md`](BR_launch.md#run-a-program-with-proc-fed-input)):
    ```
-   RUN PROC (Layout$=screenio, OutFile$=screenio_dump.csv)
-   RUN PROC (Layout$=screenfld, OutFile$=screenfld_dump.csv)
+   RUN <exporter> PROC
+   screenio
+   screenio_dump.csv
+   RUN <exporter> PROC
+   screenfld
+   screenfld_dump.csv
+   SYSTEM
    ```
 3. Grep both dumps for the screen code (case-insensitive, e.g. `grep -i '^"SOMESCREEN"'`) — the
    `screenio_dump.csv` hit is the screen header (one row); the `screenfld_dump.csv` hits are its
@@ -881,21 +897,34 @@ documented separately into one worked example:
    ```
    The `,1` trailing argument to `fnOpen` is `Inputonly=1` (read-only) — appropriate for a pure
    lookup file the screen never writes to. The `KEY=` value here is a bare `f$(tl_project)`, **not**
-   wrapped in `Fnkey$()`, copied exactly from the real reference example — apparently safe in this
-   context (unlike the standalone-program case in the source app's own screen-layout-preview tool, where a
-   bare `KEY=` failed with `ERR 718` on a too-short value). This wasn't independently re-derived,
-   just faithfully reproduced from working, shipped code — if writing a *new* lookup outside this
-   exact pattern, don't assume the bare form is always safe without checking a comparably real
-   example first.
+   wrapped in `Fnkey$()`, copied exactly from the real reference example. It works only because
+   that field is exactly as long as the project file's key: a `KEY=` value must equal the key
+   length, or it fails with error 0718
+   ([`essentials.md`](essentials.md#5-outputio-gotchas) §5). In new code, pad it:
+   `key=rpad$(f$(tl_project),kln(project))`, which is plain BR, or FileIO's `Fnkey$` where that is
+   linked.
 3. **Naming the `fnInit_`/`fnFinal_` companions correctly matters** — they're recognized by exact
    name, not simply "any function near the main one." The derivation (`design.brs`'s
    `fnGetSpecialFunctionName$`) inserts `Init_`/`Final_` right after the `fn` prefix of the *base*
-   function name, then truncates the whole result to the 30-character cap — see `essentials.md`'s
-   new entry on this for the exact confirmed mechanics (a genuinely non-obvious BR string-slice
-   behavior: assigning to a backwards range `X$(3:2)=...` inserts rather than replacing or
-   erroring). For `fnTimelogFilter$` (no truncation needed), that's `fnInit_TimelogFilter` /
+   function name, then truncates the whole result to the 30-character cap. The insertion is an
+   ordinary BR substring assignment: a range whose end is before its start, `X$(3:2)=...`,
+   inserts and replaces nothing
+   ([assignment — substring mutation](../br_tree/10-language/data-manipulation/assignment/spec.md#substring)).
+   For `fnTimelogFilter$` (no truncation needed), that's `fnInit_TimelogFilter` /
    `fnFinal_TimelogFilter` — confirmed correct by checking the compiled Helper Library's own
    generated dispatcher, which calls exactly those two names.
+
+<a id="sort-column"></a>
+**A related trick: a hidden column that only sets the sort order.** A listview's **Sort Column**
+(the Designer attribute, "which column the listview is sorted on at load";
+[ScreenIO_Library](../br_tree/50-libraries/screenio/ScreenIO_Library.md)) is stored in the
+LISTVIEW control's `SPECWIDTH`. When the listview is populated, `tools/screenio.brs` (lines
+1901–1906) sends BR's `,SORT` with that column number: once for a positive value (ascending),
+and twice on its absolute value for a negative one. Sending `SORT` twice reverses the sort
+([Grid and List — `SORT_ORDER`](../br_tree/20-io-screen/controls/Grid_and_List.md)). That lets the
+sort key be a column nobody reads. One production screen has a free-floating column of width `0`
+whose Filter function fills it with a priority digit, then the description and date, and sorts on
+it. The rows come out grouped by priority, which sorting on the raw key fields can't do.
 
 <a id="compiling-from-code"></a>
 ### Compiling is not optional — and no longer requires the Designer UI

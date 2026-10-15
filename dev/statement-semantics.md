@@ -3706,7 +3706,7 @@ EXIT CONV 100, SOFLOW 100, OFLOW 100    ! three conditions → one handler
 - **By reference** — `DEF FNF(&X)` — the function reads/writes the caller's **original** variable
 - **Arrays are always by reference** — `DEF FNF(MAT DATA)` — the array is **not copied** (efficient)
 - **String length** — `DEF FN<name>$*<len>` specifies the max length of the returned string
-- **Optional parameters & locals (`;`)** — a semicolon makes **every parameter after it optional**. An optional the caller omits becomes a **fresh temporary variable** (`0`/null on each call). Idiom: after the `;`, list first any optional parameters the caller *may* pass, then the names used purely as **local scratch variables** (never passed). Unpassed by-reference optionals default an array to dim 1 and a string to length 18; a caller may not pass more args than defined, and types must match
+- **Optional parameters & locals (`;`)** — a semicolon makes **every parameter after it optional**. An optional the caller omits becomes a **fresh temporary variable** (`0`/null on each call). Idiom: after the `;`, list first any optional parameters the caller *may* pass, then the names used purely as **local scratch variables** (never passed). Unpassed by-reference optionals default an array to dim 1 and a string to length 18. Such an array cannot be redimensioned (`MAT Z(1)` raises 0315), so a scratch array belongs in the body, not the parameter list; a caller may not pass more args than defined, and types must match
 
 **Semantics:**
 - **Scope** — By-value parameters are local (fresh copy per call); global variables are accessible

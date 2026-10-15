@@ -32,6 +32,11 @@ corrections:
     concrete forms (`IF NOT FN...`, `LET x = FN...`), the outcome (runaway recursion), and the fix
     (scratch variable). No semantic change. Kept in sync with `dev/statement-semantics.md` and
     `dev/essentials.md`."
+  - "2026-10-14 §Declaring locals: the page said an unpassed by-reference optional defaults an
+    array to dimension 1, which reads as a usable scratch array. It is not one: such an array
+    cannot be redimensioned, and `MAT Z(1)` on it raises 0315. Error page 0315 already gave this
+    exact case (`def fna(mat y;mat z)` / `mat z(1)`), and the owner confirmed it 2026-10-14. Added
+    a sentence and a link to 0315. Kept in sync with `dev/essentials.md` §1."
 related: [other-flow, syntax, system-functions, error-handling]
 keywords: [DEF, FNEND, FN, LIBRARY, CONV]
 ---
@@ -139,7 +144,9 @@ not `FNGETNAME$()` (empty `()` is a syntax error). Call a function for its side 
   **fresh temporary variable** for it, initialised to `0`/null on *each* call. This is the standard idiom
   for **local variables**: after the `;`, list first any optional parameters the caller *may* pass, then
   the names you want purely as private scratch variables (which no call ever passes). An unpassed
-  by-reference optional defaults an array to dimension 1 and a string to length 18. A function may be
+  by-reference optional defaults an array to dimension 1 and a string to length 18. Such an array
+  cannot be redimensioned (`MAT Z(1)` raises [0315](../../../90-reference/error-codes/0315.md)), so
+  don't list a scratch array as a parameter; use an ordinary array name in the body. A function may be
   all-optional (`DEF FNX(;A,B$)`); a caller may **not** pass more arguments than are defined, and the
   variable types (numeric/string) must match.
 - Each library has its own set of global variables. The rules for clearing these variables are sophisticated and need to be carefully considered.

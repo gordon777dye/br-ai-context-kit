@@ -8,6 +8,15 @@ related: []
 provenance: recovered-2b (redirect-collision casualty re-fetched from wiki)
 corrections:
   - "2026-09-30: The Disk Date Format paragraph did not say what Julian means. Added that it is a BR day number (a DAYS() value), that DATE(days) is equivalent with this kit's FileIO, and a link to spec.md#disk-date-formats."
+  - "2026-10-14 §fnCSVExport: checked against this kit's dev/tools/fileio.brs (def library
+    fnCsvExport, line 1753; fnExportToCSV; fnCSVExportDlg) and corrected. The 2nd parameter was
+    called SuppressDialog, taking 0 or 1. The source calls it DialogType and acts on four values:
+    1 and 3 skip the dialog (1755), 2 pre-ticks Select Columns (2015), 2 and 3 show the column
+    picker (1865), and every value but 1 and 3 shows a closing MsgBox (1949). The trailing Launch
+    parameter (1772) was missing. Added: a blank Filename$ is replaced by a generated name (1760),
+    which the by-value parameter never returns; the function never assigns a return value; the
+    CSV is opened with REPLACE; a failed open shows a MsgBox whatever DialogType is (1951);
+    dates follow DateFormatExport$ (line 64)."
 ---
 > **See also the source-derived [FileIO_Function_Reference.md](FileIO_Function_Reference.md)** — the
 > authoritative list of all **80 `DEF LIBRARY` exports** taken from `fileio.brs`. This online-doc manual
@@ -1073,22 +1082,46 @@ This function calls the FileIO Import routine, the same one that you get from th
   - 0 - Update by Record Number (The file must contain a RecNum column and it must be first)
   - 1+ - Any positive number means Update by that Key (as listed in the layout).
 
+<a id="fncsvexport"></a>
 #### fnCSVExport
 
 This function exports a data file to a CSV file.
 
-*fnCsvExport(Layout$*64;SuppressDialog,Filename$*300,IncludeRecNums,KeyNumber,StartKey$,KeyMatch$,Startrec,mat Records,SearchMatch$)*
+*fnCsvExport(Layout$*64;DialogType,Filename$*300,IncludeRecNums,KeyNumber,StartKey$,KeyMatch$,Startrec,mat Records,SearchMatch$,Launch)*
 
 - Layout$ - The File Layout to Export
-- SuppressDialog - (1 to Suppress the Export Dialog, 0 to show it)
-- Filename$ - the output file name (Required if SuppressDialog is 1)
-- IncludeRecNums - Include a column with the Record Numbers in it
+- DialogType - which screens the export shows:
+  - 0 - the Export to CSV dialog (file name, Include Record Numbers, Select Columns), then an
+    "Export complete!" message box. The user can tick Select Columns, which then brings up the
+    column picker.
+  - 1 - no screens at all. This is the only value that runs unattended.
+  - 2 - as 0, with Select Columns already ticked.
+  - 3 - no dialog, but the column picker.
+- Filename$ - the output file name. With DialogType 1 or 3, a blank name is replaced by a
+  generated one (`@:csvexpt…csv`). Filename$ is passed by value, so the caller is not told the
+  generated name: pass a name when you need to find the file afterwards. With DialogType 0 or 2,
+  a blank name makes the dialog open a Save As file browser first.
+- IncludeRecNums - Include a column with the Record Numbers in it. With DialogType 0 or 2, the
+  dialog's Include Record Numbers box sets this.
 - KeyNumber - Use this key when reading the data for export
 - StartKey$ - Start with the record that matches StartKey$
 - KeyMatch$ - Export only the record(s) that match KeyMatch$
 - StartRec - Start with this Record Number
 - mat Records - Export only these records
 - SearchMatch$ - Export only records containing this search string anywhere in them
+- Launch - 1 to open the finished CSV in the operating system's default program
+  (`sy -C -M start`). Leave it 0 in unattended runs.
+
+Behaviour worth knowing:
+
+- **The return value is always 0.** The function never assigns one, so it cannot be used to test
+  whether the export worked. Check for the output file instead.
+- **An existing file of that name is overwritten.** The CSV is opened with `REPLACE`
+  (`recl=32000`).
+- **If the file cannot be opened**, a "could not open output file" message box appears, with any
+  DialogType, 1 included.
+- **Dates are written in the `DateFormatExport$` setting's format** (default `m/d/cy`; see the
+  date settings above).
 
 #### fnExportListViewCsv
 

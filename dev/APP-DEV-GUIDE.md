@@ -183,6 +183,45 @@ own access functions). Prefer the codebase's established layer for new code so i
 surrounding programs — find the candidates in the **app's own library source** and the FileIO
 reference under [`../br_tree/50-libraries/fileio/`](../br_tree/50-libraries/fileio/).
 
+<a id="inspecting-actual-data-values"></a>
+### Inspecting actual data values, not just schema
+
+`data-model.md` gives a file's *shape* (fields, keys, positions), not what is stored in it. Don't
+decode an `INTERNAL` file from a hex dump: `V` strings and packed `BH`/`PD` numerics are easy to
+misread. Read the records with a BR program that uses the file's `FORM` (§4 above), or, if the app
+uses **FileIO**, export them with its `fnCsvExport`, which decodes the real on-disk format:
+
+```
+def library fnCsvExport(Layout$*64;DialogType,Filename$*300,IncludeRecNums,KeyNumber,StartKey$,KeyMatch$,Startrec,mat Records,SearchMatch$,Launch,___,SearchNow$,OkToRun)
+```
+
+That is the signature in this kit's copy of FileIO ([`tools/fileio.brs`](tools/fileio.brs) line
+1753). An app's own FileIO copy may differ, so check its source. Every parameter is described in
+[FileIO_Library §fnCSVExport](../br_tree/50-libraries/fileio/FileIO_Library.md#fncsvexport).
+
+**Headless, pass `DialogType=1` and nothing else.** In this copy of the source:
+
+| `DialogType` | What it opens |
+|---|---|
+| `1` | Nothing: uses `Filename$`, or generates a name when it is blank. No completion message. |
+| `3` | No file dialog, but a column-picker screen (`fnSelectDataCrawlerCols`, line 1868) |
+| `0`, `2`, other | The `fnCsvExportDlg` file dialog (line 1764), then an `"Export complete!"` `MsgBox` |
+
+Anything that opens a screen or a `MsgBox` stops an `UNATTENDED` run with "Input attempted in
+unattended mode". Two more things to know:
+
+- Leave `Launch` at 0. When it is set, FileIO runs `sy -C -M start` on the CSV to open it in the
+  OS's default program (line 1772).
+- If the output file can't be opened, `fnExportToCSV` shows a `MsgBox` even with `DialogType=1`
+  (line 1951). So a run that stops at an input wait here may mean a bad `Filename$`.
+
+A minimal caller is `library "fileio" : fnCsvExport` followed by
+`let fnCsvExport(Layout$, 1, OutFile$)`. To reuse it across files without editing it, read
+`Layout$` and `OutFile$` with `LINPUT` and feed them from a proc
+([`BR_launch.md`](BR_launch.md#run-a-program-with-proc-fed-input)). ScreenIO's own
+`screenio.dat`/`screenfld.dat` are FileIO files, so the same method works for them
+([`screenio-guide.md`](screenio-guide.md#investigating) §7).
+
 ---
 
 ## 5. Screens, printing, web library
@@ -456,6 +495,8 @@ These bite the *runner*, not the program, and each one masquerades as something 
 - **Every *non-headless* BR start pays a splash delay (~20s observed) before it does anything.** 
   Budget a generous timeout — **≥90s** — or a perfectly healthy run looks like a hang and gets 
   killed just before it starts working. Note this applies to BRconfig.AI_user not BRconfig.AI_util.
+  The splash is **skipped when another BR session is already running**, and a person can dismiss
+  it with its button.
 - **A headless BR GUI run can steal OS keyboard focus from a live, interactive BR session.** A
   keystroke typed into the real session has been observed landing in the headless one (and the reverse
   is presumably possible). Therefore users should not run production concurrently with AI programming.

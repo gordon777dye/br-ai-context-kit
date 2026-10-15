@@ -104,7 +104,7 @@ name**. Source-verified against `fileio.brs` (80 `DEF LIBRARY` exports). Full pr
 | `Fndataedit(…)` | num | Editable DataCrawler entry point. |
 | `fnShowData(FileLay$; Edit, sRow, sCol, Rows, Cols, KeyNumber, Caption$, Path$, KeyMatch$, SearchMatch$, CallingProgram$, MAT Records, MAT IncludeCols$, MAT IncludeUI$, MAT ColumnDescription$, MAT ColumnWidths, MAT ColumnForms$, DisplayField$, MAT FilterFields$, MAT FilterForm$, MAT FilterCompare$, MAT FilterCaption$, MAT FilterDefaults$, MAT FilterKey, IncludeRecordNumbers, BypassDateProcessing)` | num | Show (optionally edit) a file in a grid with column/filter control. |
 | `fnCsvImport(Layout$; SupressDialog, FileName$, ImportModeKey)` | num | Import a CSV into a layout's file. |
-| `fnCsvExport(Layout$; DialogType, Filename$, IncludeRecNums, KeyNumber, StartKey$, KeyMatch$, Startrec, MAT Records, SearchMatch$, Launch)` | num | Export a file to CSV. |
+| `fnCsvExport(Layout$; DialogType, Filename$, IncludeRecNums, KeyNumber, StartKey$, KeyMatch$, Startrec, MAT Records, SearchMatch$, Launch)` | num | Export a file to CSV. Headless: pass `DialogType=1` only — see [APP-DEV-GUIDE §4](APP-DEV-GUIDE.md#inspecting-actual-data-values). |
 | `fnExportListviewCSV(Window, SPEC$; GenFileName, Delim$, Filename$)` | num | Export an on-screen listview to CSV. |
 
 ### Audit BR · logging · proc files

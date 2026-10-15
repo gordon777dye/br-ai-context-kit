@@ -119,6 +119,11 @@ Create 2 of the 4 files to be used by AI for application development.
    ```
    LOGGING 10, context\app\startlog.txt
    ```
+6. Check `brconfig.sys`, and every file it includes, for an active `OPTION 60` line (matched the
+   same way as step 2, so a commented-out one doesn't count). **This kit does not support
+   `OPTION 60`** (see [`essentials.md`](../dev/essentials.md) §2). If you find one, stop and tell
+   the user. Don't remove it yourself: it makes BR save programs in the 4.18-and-earlier format,
+   and production may depend on that.
 
 **Generate `context/dev/tools/brconfig.ai_util`** from the `brconfig.ai_user` just produced:
 1. Copy `brconfig.ai_user`.
