@@ -9,6 +9,8 @@ status: 2b           # reference base + br_tree enrichment
 recovered-fold: Getting_Started (folded+pruned — WBSERVER.DAT/error 4175, spool RAW gotcha, SYSTEM exit/Ctrl-A; verbatim retained on the BR wiki)
 related: [config-directives, client-server, installation-tooling]
 keywords: [platform, executable, WSID, startup, brnative]
+corrections:
+  - "OPTION 60 in the backward-compatibility list no longer says it saves in 4.18 format. BR no longer writes that format at all; the option now selects the 4.2/4.3 object format (save level 38), which omits the source line positions level 39 records. From BR 4.4 source: config.cpp case 60, brexe.cpp processNewSaveFile. See the SAVE / REPLACE section of 70-commands/program-management."
 ---
 
 # Platforms & executables
@@ -99,7 +101,8 @@ The separate **BR-as-webserver** model (serving HTML to browsers) is
 Newer BR (4.1+) checks syntax more strictly, so programs that ran on older releases may break.
 BRC provides a set of legacy [`OPTION <nn>`](../config-directives/spec.md#behavior) toggles you add
 to `BRConfig.sys` to relax the new checks (e.g. `OPTION 29` save as `.WB`, `OPTION 41` ignore GUI
-statements in non-GUI mode, `OPTION 47` allow `PRINTER=` in OPEN, `OPTION 60` save in 4.18 format,
+statements in non-GUI mode, `OPTION 47` allow `PRINTER=` in OPEN, `OPTION 60` save in the 4.2/4.3
+object format (it no longer writes the 4.18 one),
 plus `FieldBreak Min_Spaces`, `CONFIG GUI OFF`). The full annotated upgrade list is in
 [Backward_Compatibility](Backward_Compatibility.md).
 

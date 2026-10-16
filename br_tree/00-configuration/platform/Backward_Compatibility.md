@@ -37,7 +37,9 @@ Here is a list of the `Option (Config)` that are most useful when upgrading and 
             ! can be necessary in certain circumstances.
   option 56 ! Make SRCH return -1 when a matching index is not found.
   option 58 ! Allow ON FNKEY syntax (in addition to ON FKEY).
-  option 60 ! Save in the format used by 4.18 and earlier releases.
+  option 60 ! Save in the 4.2/4.3 object format (save level 38) so a pre-4.4 BR can load the
+            ! program.  BR no longer writes the 4.18-and-earlier format at all, though programs
+            ! already in it still load.  Also sets option 74.
   option 62 ! Use line draw border specification.
   option 65 ! Ignore ON ATTN statements.
   

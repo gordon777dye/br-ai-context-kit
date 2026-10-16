@@ -10,6 +10,7 @@ recovered-fold: REPLACE (folded+pruned — source-vs-object/.BRS/.BRO rules, .BA
 related: [file-directory, information, editing]
 keywords: [RUN, LOAD, SAVE, REPLACE, MERGE, CLEAR, GO, EXECUTE, CHAIN, PROC, SYSTEM, LOGOFF, ALL, SUBPROC, PROCERR, ALERT, FILES, ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP, NOTRACE]
 corrections:
+  - "SAVE / REPLACE now states which object format is written: level 39 in BR 4.4, level 38 in 4.2/4.3, an older BR refusing level 39 with error 2240, and OPTION 60 selecting level 38. The page described source-versus-object and said nothing about the format level, which an upgrade has to know. From BR 4.4 source: brexe.cpp (SAVE_LEVEL, processNewSaveFile, loadExeFile's level test), config.cpp case 60. Confirmed on brserver 4.4 x64 Debug: a default SAVE wrote level 39 and BR 4.33c refused it with 2240; with OPTION 60 it wrote level 38 and 4.33c loaded it."
   - "SYSTEM LOGOFF was one line (`log the BR client off`). Now documents `SYSTEM LOGOFF [ALL]` in the system-logoff subsection: it is an exit form (exit code 0, error 2108 if keyed while a program is active), what the client clears at exit, and that ALL widens only the session-table clear from this session's slot to all nine. Also the parse rules: ALL is a whole word, and nothing else after LOGOFF is read. LOGOFF and ALL added to keywords. From BR source in context/lsp/brls/brs: command7.cpp SYSTEM_CMD (the LOGOFF/ALL parse and the CLIENT_LOGOFF_ASYNC call), remoteargs.cpp (sets g_logoffAtExit and g_logoffAllSessions), brterm.cpp (runs logoffClient at client exit), term.cpp logoffClient, session.cpp clearSessionID/clearSessionIDs, brlistener.cpp logoffSession. Confirmed on brserver 4.4 x64 Debug over a live client/server link: with eight slots occupied, plain SYSTEM LOGOFF cleared only this session's slot and left the other seven; SYSTEM LOGOFF ALL zeroed all nine; SYSTEM LOGOFF ALLOCATE behaved as plain SYSTEM LOGOFF. All three forms cleared AutoLogin, Remember me, the saved Windows credential and the ClientServer persistent-login id for the listener port."
   - "RUN syntax now shows the program name and the PROC option: `RUN [<program>] [PROC] [STEP|TRACE]`. Added a run-proc subsection giving the literal forms (`RUN <program> PROC`, or `LOAD <program>` then `RUN PROC`) and saying they work only inside a procedure. The page had described RUN PROC's effect and never its syntax. From BR 4.4 source: command9.cpp PROC_TYPE sets RUN_PROCIN and raises BREPROCPARAMETER (2103) when no proc is active. commandc.cpp RUN reads a first word that is an option (PROC among them) as that option, not a file name. Confirmed on brserver 4.33c with a probe: both forms gave PROCIN=1 and fed the LINPUT; plain RUN gave PROCIN=0; the startup argument `RUN <prog> PROC` gave 2103. Reported in context/lsp/ERRORS.md 2026-09-09."
   - "Eleven keywords added to the frontmatter: the CHAIN clause FILES, the commands SUBPROC, PROCERR and ALERT, and the qualifiers ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP and NOTRACE. Every one is documented in this page's BNF or semantics and none was declared, so BR's own spelling of each reached nothing. Found in brls phase 13."
@@ -167,6 +168,18 @@ file's full original name (a trailing period suppresses the default extension). 
 omits source — *unrecoverable*, used to ship protected code. Before overwriting, BR copies the original
 to **`.BAK`** (recoverable until the next `REPLACE`); **`OPTION 26`** suppresses `.BAK` creation. End
 execution before `REPLACE`; to save without ending, `LIST >tmp` then `LOAD` it from source.
+
+**Which object format is written.** BR 4.4 writes **save level 39**, which records for each
+statement the source file line it came from. BR 4.2 and 4.3 wrote **level 38**, which has nowhere
+to keep that. A BR older than 4.4 given a level 39 program **refuses it** with error **2240**
+(*release level error*) rather than misreading it; BR 4.4 loads either level, and a level 38
+program simply has no source line positions in it.
+
+**`OPTION 60`** makes `SAVE` and `REPLACE` write level 38, so a program can be read by a 4.2 or
+4.3 BR - at the cost of those positions. It also sets `OPTION 74`. The 4.18-and-earlier format
+this option used to write is no longer written at all, though programs already in it still load.
+**`OPTION 60` governs saving only**: BR 4.4 loads the pre-4.2 format, level 38 and level 39 alike,
+set or not.
 
 <a id="clear"></a>
 ### CLEAR
