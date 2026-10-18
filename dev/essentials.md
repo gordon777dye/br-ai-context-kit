@@ -302,11 +302,18 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
   longer than that pass them by reference. e.g. `DEF FNA$*500(&BIG_STR$)` But if you 
   pass by reference keep in mind that any changes to the passed values change the original variables. 
 
-- **This kit does not support `OPTION 60`.** That config option saves programs in the legacy
-  (4.18-and-earlier) format, which caps every variable, strings included, at 32767 bytes, against
-  the 99,999,999-byte `DIM` limit of the current format (4.30+). The limits and idioms in this kit
-  assume the current format. If the app's config turns `OPTION 60` on, raise it with the user
-  rather than coding around it. (Its documentation stays in br_tree, e.g.
+- **`OPTION 60` means different things in BR 4.3 and BR 4.4.** It only changes how programs are
+  saved: it should be **OFF under 4.3 and ON under 4.4**.
+  - **Under BR 4.3** it saves the legacy 4.18-and-earlier format, which caps every variable,
+    strings included, at 32767 bytes, against the 99,999,999-byte `DIM` limit of the current
+    format (4.30+). The limits and idioms in this kit assume the current format, so this kit does
+    not support it under 4.3. If a 4.3 config (such as the app's `brconfig.sys`) turns it on,
+    raise it with the user rather than coding around it.
+  - **Under BR 4.4** it saves the 4.3 format (level 38), so a 4.3 BR can load the program. BR 4.4
+    loads every format whatever the setting. The kit's AI configs run BR 4.4 and set it ON
+    ([`BR_launch.md`](BR_launch.md#option-60)).
+
+  (Detail: [SAVE / REPLACE](../br_tree/70-commands/program-management/spec.md),
   [Backward Compatibility](../br_tree/00-configuration/platform/Backward_Compatibility.md).)
 
 - **Arrays that a library grows to fit the data need `DIM name$(0)*<width>`.** Declare the arrays
@@ -396,7 +403,7 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
 - **`EXTERNAL` file `RECL=` is capped at `32767`, untrapped.** `RECL=32768` (or higher) on an
   `EXTERNAL OPEN` fails outright at the `OPEN` statement.  `RECL=32767` works; `32768` doesn't. 
   It is a limit on the *file record* size, not on any string variable's `DIM`, and it applies
-  under the current program-save format (§2: the kit does not support `OPTION 60`).
+  under the current program-save format (§2: the kit does not support `OPTION 60` under BR 4.3).
   **To read a large `EXTERNAL` file, chunk it in a loop at ≤32767 bytes/record**, not one giant
   `RECL`.
 

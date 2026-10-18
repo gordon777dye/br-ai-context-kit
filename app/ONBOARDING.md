@@ -102,7 +102,7 @@ Create 2 of the 4 files to be used by AI for application development.
 
 | Role | Path |
 |---|---|
-| BR executable | `context/dev/tools/brserver-433c-Win32-Debug-2026-08-27.exe` |
+| BR executable (BR 4.4) | `context/dev/ai_access/brserver.exe` |
 | Existing app startup config | `context/dev/tools/brconfig.sys` |
 | AI Utility config (headless) | `context/dev/tools/brconfig.ai_util` |
 | AI User config (interactive) | `context/dev/tools/brconfig.ai_user` |
@@ -120,10 +120,19 @@ Create 2 of the 4 files to be used by AI for application development.
    LOGGING 10, context\app\startlog.txt
    ```
 6. Check `brconfig.sys`, and every file it includes, for an active `OPTION 60` line (matched the
-   same way as step 2, so a commented-out one doesn't count). **This kit does not support
-   `OPTION 60`** (see [`essentials.md`](../dev/essentials.md) §2). If you find one, stop and tell
-   the user. Don't remove it yourself: it makes BR save programs in the 4.18-and-earlier format,
-   and production may depend on that.
+   same way as step 2, so a commented-out one doesn't count). **Under BR 4.3 this kit does not
+   support `OPTION 60`** (see [`essentials.md`](../dev/essentials.md) §2). If you find one, stop
+   and tell the user. Don't remove it yourself: under 4.3 it makes BR save programs in the
+   4.18-and-earlier format, and production may depend on that. Explain that `OPTION 60` has been 
+   repurposed as described in the next step. 
+7. Insert this line just before the `include subs.txt` line (or as the last line, if there is none yet):
+   ```
+   option 60 ! BR 4.4 ($BR_EXE): save in the 4.3 format (level 38) so BR 4.3 can load it
+   ```
+   The AI configs run `$BR_EXE`, which is BR 4.4. There this option makes `SAVE`/`REPLACE` write
+   the 4.3 object format, which a 4.3 production BR can load; without it, 4.3 refuses the program
+   with error 2240. Under 4.3 the option means something else, which is why `brconfig.sys` itself
+   keeps it off ([`BR_launch.md`](../dev/BR_launch.md#option-60)).
 
 **Generate `context/dev/tools/brconfig.ai_util`** from the `brconfig.ai_user` just produced:
 1. Copy `brconfig.ai_user`.

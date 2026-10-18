@@ -40,6 +40,22 @@ node_modules/
 /dev/*
 !/dev/*.md
 !/dev/*.json
+# --- the harness kit: the docs, the standard procedures and the driver ---
+# /dev/* above ignores the whole FOLDER, so each of these needs its own
+# line or it is silently left out of the published kit - which is what
+# happened: nothing under dev/ai_access/ was tracked at all.
+# THE BR BINARIES ARE DELIBERATELY STILL IGNORED.  BR is the product, it is
+# versioned per site, and a debug build is 46 MB; BR_harness.md tells a
+# reader to point $BR44_EXE at their own BR 4.4 instead.
+!/dev/ai_access/
+/dev/ai_access/*
+!/dev/ai_access/*.md
+!/dev/ai_access/br_mcp_driver.exe
+!/dev/ai_access/brls.exe
+!/dev/ai_access/brserver.exe
+!/dev/ai_access/brclientdll444-x64-Debug-gui.dll
+!/dev/ai_access/prc/
+!/dev/ai_access/prc/*.prc
 # allow access to the folder
 !/dev/tools/
 # but block unspecified content

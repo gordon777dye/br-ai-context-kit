@@ -13,27 +13,52 @@ never hand-edited.
 
 | Fact | Value | Nature |
 |---|---|---|
-| **BR executable** | `$BR_EXE` | Ships with the kit |
+| **BR executable** | `$BR_EXE` | Ships with the kit — BR 4.4, in `ai_access/` |
+| **`br_mcp_driver.exe`** | `$BR_MCP_DRIVER` | Ships with the kit — launches a live BR 4.4 session for the harness ([below](#harness-launch)) |
 | **`brconfig.sys`** | `$BR_CONFIG` | Existing app startup config |
 | **`brconfig.ai_util`** | `$BR_AI_UTIL` | AI Utility — headless (`UNATTENDED`) |
 | **`brconfig.ai_user`** | `$BR_AI_USER` | AI User — interactive, for testing user interfaces |
 | **`brls.exe`** | `$BRLS_EXE` | Standalone syntax pre-check (optional semantic pass via `-check -sema`) — does **not** invoke BR (§6.1) |
 
 ```powershell
-$env:BR_EXE     = "context\dev\tools\brserver-433c-Win32-Debug-2026-08-27.exe"
-$env:BR_CONFIG  = "context\dev\tools\brconfig.sys"
-$env:BR_AI_UTIL = "context\dev\tools\brconfig.ai_util"
-$env:BR_AI_USER = "context\dev\tools\brconfig.ai_user"
-$env:BRLS_EXE   = "context\dev\tools\brls.exe"
+$env:BR_EXE        = "context\dev\ai_access\brserver.exe"
+$env:BR_MCP_DRIVER = "context\dev\ai_access\br_mcp_driver.exe"
+$env:BR_CONFIG     = "context\dev\tools\brconfig.sys"
+$env:BR_AI_UTIL    = "context\dev\tools\brconfig.ai_util"
+$env:BR_AI_USER    = "context\dev\tools\brconfig.ai_user"
+$env:BRLS_EXE      = "context\dev\tools\brls.exe"
 ```
 
 ```bash
-export BR_EXE="context/dev/tools/brserver-433c-Win32-Debug-2026-08-27.exe"
+export BR_EXE="context/dev/ai_access/brserver.exe"
+export BR_MCP_DRIVER="context/dev/ai_access/br_mcp_driver.exe"
 export BR_CONFIG="context/dev/tools/brconfig.sys"
 export BR_AI_UTIL="context/dev/tools/brconfig.ai_util"
 export BR_AI_USER="context/dev/tools/brconfig.ai_user"
 export BRLS_EXE="context/dev/tools/brls.exe"
 ```
+
+**`$BR_EXE` is BR 4.4, and it is the same `brserver.exe` the harness runs.** The executables
+live in [`ai_access/`](ai_access/); the config files stay in [`tools/`](tools/). Run directly, as
+every invocation in this file does, it is an ordinary BR: it runs a program and leaves you its
+output, and opens no harness channel. To attach to a **live** session and watch a screen, start
+it through `$BR_MCP_DRIVER` instead — see [Live sessions](#harness-launch) below, then
+[`BR_harness.md`](BR_harness.md).
+
+*Measured, 2026-10-18:* `"$BR_EXE" "PROC <proc>" -"$BR_AI_UTIL"` ran a proc headlessly and
+exited 0, and `LOAD … source` / `SAVE` compiled a program.
+
+<a id="option-60"></a>
+> **`OPTION 60` is ON in `$BR_AI_UTIL` and `$BR_AI_USER`, because they run BR 4.4, so what they
+> save loads in BR 4.3.** BR 4.4 loads all three object formats, but by default it saves its own
+> (level 39), which a pre-4.4 BR refuses with **error 2240, "release level error"**. Under 4.4,
+> `OPTION 60` saves the 4.3 format (level 38) instead
+> ([SAVE / REPLACE](../br_tree/70-commands/program-management/spec.md)). *Measured:* without it,
+> a program `SAVE`d by `$BR_EXE` failed to `LOAD` in 4.33c with 2240; with it, the same program
+> loaded. **The option means something else in BR 4.3**: there it saves the legacy
+> 4.18-and-earlier format. So it stays **OFF in `$BR_CONFIG`** while production is 4.3, and the
+> AI configs belong with `$BR_EXE` only. Don't `SAVE` through them with the 4.33c executable
+> still in `context\dev\tools\`.
 
 **All paths above, and every invocation in this file and in §6.1, are run from the kit root**
 (the directory containing `context/`). Run from there, or resolve these paths against it first.
@@ -76,6 +101,7 @@ Copy these verbatim.
 "$BR_EXE" "RUN glp\trial_bal" -"$BR_AI_UTIL"       # run a program, headless
 "$BR_EXE" "RUN cnp\menu" -"$BR_AI_USER"            # run a statement/command, interactive
 "$BR_EXE" "PROC cnp\batch.prc" -"$BR_AI_UTIL"      # run a procedure, headless
+"$BR_MCP_DRIVER" start --config "$BR_AI_USER"      # live session with the harness (see below)
 ```
 
 - **`-<config-file>`** names a config file — a dash **immediately followed** by the
@@ -135,6 +161,182 @@ SYSTEM
   as commands once it ends, so finish with `SYSTEM`.
 - **The `RUN` line must not be the proc's last line.**
 - Full rules: [`br_tree` — RUN … PROC](../br_tree/70-commands/program-management/spec.md#run-proc).
+
+---
+
+<a id="harness-launch"></a>
+## Live sessions: launching BR with the harness
+
+Everything above runs a program and leaves you its output. To **watch** a program while it
+runs (its screen, its fields, its listviews, a picture of its window), start the session through
+the BR MCP driver instead. What you can do once it is up is in [`BR_harness.md`](BR_harness.md).
+This section is only how to bring it up.
+
+### The files in `ai_access/`
+
+**[`ai_access/`](ai_access/) is self-contained, and that is the whole of the setup.** Four
+files, and nothing on `PATH`, nothing in the registry and **no environment variables**:
+
+| File | What needs it | Kept current by |
+|---|---|---|
+| `br_mcp_driver.exe` (`$BR_MCP_DRIVER`) | you — it is the launcher and the MCP server | `br/mcpdriver/build.ps1` |
+| `brserver.exe` (`$BR_EXE`) | the driver, which looks for **exactly that name** beside itself | `br/winbuild/dllbuild/bld.ps1` |
+| `brclientdll444-<platform>-<config>-gui.dll` | BR, which loads it from its own directory | the same, as a pair with the server |
+| `brls.exe` | the `check_source` tool, which the driver finds beside itself | the brls tree's own `build.ps1` |
+
+**Each is deployed here by whatever builds it, on every build**, with an up-to-date
+check so that costs nothing and a warning rather than a failure when this folder is
+not on the machine. Nothing is hand-copied, and that is deliberate: every one of these
+four has gone silently stale at least once, and a stale one does not announce itself
+([`BR_harness.md` §1](BR_harness.md#setup)).
+
+*Measured, with every variable explicitly unset:* the driver found BR, BR loaded its DLL, the
+channel came up on **protocol 5**, and `windows`, `program`, `get_reference` and `check_source`
+all answered.
+
+**The server is renamed and the DLL is not, and both of those matter.** The driver resolves BR
+as `$BRSERVER`, then a file called exactly `brserver.exe` beside itself, then `PATH`, so the
+name has to be that one for the second route to work. The DLL keeps its versioned name because
+BR builds the name it looks for from **compile-time constants** (release, platform,
+configuration, display) and prefixes its own directory. The server's filename plays no part,
+so renaming the server does not disturb it. **They are a matched pair**, so `bld.ps1` copies
+both whenever either is out of date, and deletes a `brclientdll*-x64-Debug-gui.dll`
+left behind by an earlier version string.
+
+**Running `$BR_EXE` directly gives you no harness.** It is the same `brserver.exe`, but the
+channel is opened only by the procedure the driver starts BR on (below), so a session started by
+any invocation earlier in this file has no channel to attach to.
+
+**The one variable you may still need** is `$BR_CONTEXT_KIT`, and only when this kit is not at
+`C:\ADS\qsmrp\context`, which is the default the driver compiles in. It is how `get_reference`
+and `get_layout` answer at all. *Measured: with the kit found, `guide` comes back carrying the
+catalogue (49 reference topics and every data-dictionary file name), and
+`get_reference print-fields` returns this kit's own `PRINT FIELDS` section.*
+
+Two overrides exist for when the folder is not what you want to run: **`$BRSERVER`** to point
+at a different BR, and **`$BRLS`** at a different checker. Both are read by the process that
+runs `start`, and only that one. The MCP shim ([below](#harness-mcp)) holds no credential, no
+connection and no state.
+
+### The procedure has to sit in BR's start folder
+
+This is the one that will cost you an hour, and it does not announce itself when it goes wrong.
+
+The launcher starts BR with the command `proc BR_dev.prc`: **no path, and you cannot change
+it**. BR resolves it against **BR's start folder**, not the folder you launched from
+([above](#start-folder)).
+
+So **`BR_dev.prc` must be in BR's start folder.** For this application the first `DRIVE` is
+`DRIVE m:,c:\ads,xxx,\qsmrp`, so that folder is `C:\ADS\qsmrp`, the application root.
+
+```
+copy context\dev\ai_access\prc\BR_dev.prc   <BR's start folder>
+copy context\dev\ai_access\prc\BR_user.prc  <BR's start folder>
+```
+
+*Measured both ways.* Without it:
+
+```
+BR started from ...brserver-x64-Debug.exe (pid 6664) on BR_dev.prc; waiting for the channel
+br_mcp_driver start: BR is running (pid 6664) but BR_dev.prc published no channel within 30s
+```
+
+With it:
+
+```
+harness claimed on port 8720, protocol 5
+serving \\.\pipe\br_mcp_driver.Gordon.requests and .replies, holding the harness on port 8720
+```
+
+`BR_report.prc` is different and needs no copying: the `run_report` tool writes it and its
+loader into the directory it is told to run in.
+
+### The configuration file
+
+`--config` is resolved against the **launch** folder, not BR's start folder, so a kit-relative
+name works. **`$BR_AI_USER`** is the right one to start with: interactive, logging to
+`context\app\startlog.txt`, `OPTION 60` on ([above](#option-60)), and otherwise this
+application's own settings. *Measured: a session on it opens the channel and answers every
+reading request.*
+
+Three config keywords change what you can see, and they are the session's, not yours:
+
+| Keyword | Effect on you |
+|---|---|
+| `GUI ON` / `GUI OFF` | which tool reads the program's screen ([`BR_harness.md` §0, §5](BR_harness.md#the-one-thing)) |
+| `OPTION 82 ON` | parks BR's windows off the display area, so a session of yours does not take the screen from whoever is using the machine. **Reading and picturing still work.** *Measured: `shot ... COMPOSED` succeeded on a window parked at x=2019, outside the desktop* |
+| `LOGGING <n>, <file>` | where BR's own diagnostics go, for when a program dies and the screen does not say why |
+
+**Do not flip an application's `GUI` setting to make it easier to read.** The two modes are not
+display preferences: under `GUI ON`, `PRINT` to the screen and `LINPUT` are *not allowed*, so a
+program written for `GUI OFF` stops working
+([br_tree](../br_tree/20-io-screen/windows-cursor/spec.md#gui-console)).
+
+### Starting the session
+
+```
+"$BR_MCP_DRIVER" start [--user] [--config FILE] [--br PATH] [--port N] [--wait DURATION]
+```
+
+For example, from the kit root:
+
+```
+"$BR_MCP_DRIVER" start --config "$BR_AI_USER"
+```
+
+It launches BR on a standard procedure, claims the channel that procedure opens, and then
+*becomes the service* that fronts it.
+
+| Command | Procedure | Session | Grant |
+|---|---|---|---|
+| `start` | `BR_dev.prc` | **`DEVELOP` mode** | none given |
+| `start --user` | `BR_user.prc` | user mode | the keyboard, for an hour |
+
+**`DEVELOP` mode is what you want for development work**, and it is chosen by the procedure's
+third argument to `MSG("harness", <port>, "DEVELOP")`. **Nothing outside BR can set it**, not
+a flag here and not a tool. It buys two things:
+
+- **you may type at the `READY` prompt.** In user mode keys go in only while a program is
+  waiting for input, so a command typed at `READY` sits in the queue instead of running.
+  In a development session the `READY` prompt is where the work is.
+- **it does not raise the AI-user-mode flag**, so a BR session started from this one comes up
+  unrestricted and can write the application's own files. A user-mode session raises it, and
+  every session started while it is up is restricted to files it created itself.
+
+What `start` does **not** do: set `DEVELOP` mode (above), and give a grant. `BR_dev.prc`
+deliberately gives none, because a development session usually wants an assistant that reads.
+To let it type, somebody at the session types `LET X=MSG("grant",600)`.
+
+`--config` names the configuration **file** in full: BR reads the text after the dash as that
+name, so `--config mine` asks for a file called `mine`.
+
+**BR's own output does not come back to the shell.** `brserver.exe` is a GUI-subsystem binary
+with no console: its screen goes to its own window and its diagnostics to the `LOGGING` file.
+What appears in the shell is the launcher's own three lines.
+
+To end it: close BR, or from inside the session `LET X=MSG("harness",0)`.
+
+<a id="harness-mcp"></a>
+### The MCP server entry
+
+For Claude Code, in the MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "br": { "command": "<full path to br_mcp_driver.exe>", "args": ["connect"] }
+  }
+}
+```
+
+`connect` is a relay onto a pipe pair the running service holds. It can be restarted any number
+of times at no cost, which is the whole reason the arrangement is split in two: the harness
+token is spent at the first handshake, so a process that claimed the channel itself would get
+**one** attempt.
+
+With the service up and the client connected, go to
+[`BR_harness.md` §3](BR_harness.md#attaching).
+
 ---
 
 ## The Lexi preprocessor

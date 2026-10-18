@@ -50,7 +50,15 @@ prints `VERIFY OK` when they match, and otherwise lists what is out of step and 
 | **Interpret / debug** — read existing BR | `topics.json` → `statement-semantics.md` | [`system-functions-catalog.md`](system-functions-catalog.md), [`error-reference.md`](error-reference.md), the app data-model (§4) |
 | **Coding** — write correct, idiomatic BR | `topics.json` → `statement-semantics.md` | the two catalogs + data-model, closed by a fast **`brls -check -sema`** pass (§6 — `-check` alone is per-line and will not tell you a block is still open) then the authoritative **`LOAD … source`** syntax check in BR (write→check→fix; §6) |
 | **App design** — architecture, data model, modules | [`../app/architecture.md`](../app/architecture.md) + generated **data-model** (§4) + [`../app/conventions.md`](../app/conventions.md) | br_tree concept leaves — [`file-model`](../br_tree/30-io-file/file-model/spec.md), [`library-facility`](../br_tree/50-libraries/library-facility/spec.md), [`screenio`](../br_tree/50-libraries/screenio/spec.md) |
-| **Testing** — validate behaviour | headless BR (§6) | syntax-check via `LOAD "<prog>.brs" source`; run programs and procs headlessly through the BR invocation |
+| **Testing** — validate behaviour headlessly | headless BR (§6) | syntax-check via `LOAD "<prog>.brs" source`; run programs and procs headlessly through the BR invocation |
+| **Watching a program run** — screens, fields, listviews, a ScreenIO screen, anything interactive | [`BR_launch.md` — Live sessions](BR_launch.md#harness-launch) to start one, then [`BR_harness.md`](BR_harness.md) | the `guide` tool first, then [`ai_access/README.md`](ai_access/README.md) for the driver and [`ai_access/AI-Access-Protocol.md`](ai_access/AI-Access-Protocol.md) for the protocol |
+
+**Which of those last two you want:** headless BR runs a program and leaves you its output —
+a log, a file, a CSV — and cannot show you a screen. The harness attaches to a **live BR 4.4
+session** and reads the screen, the fields, the cursor and a listview's rows while the program
+is still running, and can type into it. If the thing you need to know is "what is on the glass
+right now", it is [`BR_harness.md`](BR_harness.md) and not §6.
+
 
 *Why `topics.json` and not a flat keyword list: BR's lexicon is **positional** — only system
 functions are reserved against variable names, so telling a keyword from a variable needs the
