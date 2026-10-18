@@ -76,8 +76,7 @@ All of this should be done by AI at your direction. Just tell your AI agent (one
 
 **→ [`dev/BR_harness.md`](dev/BR_harness.md)** — How to run **BR 4.4 with an assistant attached**
 and watch a program while it runs: its screen, its fields, its listviews, a picture of its
-window. This is the only way to see an interactive program or a ScreenIO screen; `BR_launch.md`
-runs programs headlessly and cannot.
+window. This is the only way to see an interactive program or a ScreenIO screen.
 
 **→ [`dev/APP-DEV-GUIDE.md`](dev/APP-DEV-GUIDE.md)** — After completing the onboarding, this
 becomes your AI task entry point. Its *"Start here — by task type"* preamble routes your 

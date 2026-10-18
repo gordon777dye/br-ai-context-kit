@@ -96,7 +96,7 @@ only a little behind looks like one that works.
 
 This is why `brserver.exe` and its DLL are **replaced together by the build script**
 ([`BR_launch.md`](BR_launch.md#harness-launch)) rather than left to drift. You will meet it
-anyway if you point `$BRSERVER` at a BR of your own.
+anyway if you point `$BR_EXE` (or `$BRSERVER`) at a BR of your own.
 
 Two things to do about it:
 
@@ -121,7 +121,7 @@ rather than copying it. A second assistant is told `another assistant is already
 ## 2. Starting a session
 
 Moved to [`BR_launch.md` — Starting the session](BR_launch.md#harness-launch):
-`"$BR_MCP_DRIVER" start --config "$BR_AI_USER"`, what `start` and `start --user` each give you
+`"$BR_MCP_DRIVER" start`, what `start` and `start --user` each give you
 (`DEVELOP` mode or user mode, and no grant or an hour's), and how to end it.
 
 ---
@@ -381,7 +381,7 @@ Watching a program you have just changed:
 
 1. **`check_source`** on the file. It runs `brls -check -sema`, which catches an unclosed block
    that a per-line check will not.
-2. Start the session — `"$BR_MCP_DRIVER" start --config "$BR_AI_USER"`
+2. Start the session — `"$BR_MCP_DRIVER" start`
    ([`BR_launch.md`](BR_launch.md#harness-launch)) — or, if one is already up, skip to 3.
 3. **`guide`**, once.
 4. **`windows`** — read the `cells` flags and settle which mode you are in (§0). Everything

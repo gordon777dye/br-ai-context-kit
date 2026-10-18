@@ -278,6 +278,21 @@ so `--config mine` asks for a file called `mine`. The startup command this passe
 `brconfig.sys` `EXECUTE`, which applies only when no command was given, so a site that has one will
 not silently override it.
 
+**Omitted, `--config` falls to `$BR_AI_USER`** — the context kit's own name for the interactive
+configuration, which `BR_launch.md` has a developer export before anything else and then writes this
+very command as `start --config "$BR_AI_USER"`. **The flag is consulted first**, so it overrides the
+variable rather than merely being preferred to it; same for `--br` against `$BR_EXE`/`$BRSERVER`.
+The variable is worth honouring because forgetting it is **not loud**: with no configuration named,
+BR hunts `brconfig.sys` beside the executable and then in the launch folder and comes up on
+whichever it meets first, which is a session with different `DRIVE` mappings and no `LOGGING` — and
+that looks like a working session right up until something reaches for a file.
+
+**Whichever of the two supplied it, the file is checked before BR is launched.** `--config` used to
+go to BR unexamined while `--br` beside it was checked, so a misspelt one reached BR, which could not
+find it either and fell back to exactly that silent default. Being told the name is wrong beats a
+session running on the wrong `DRIVE` mappings, so both sources now refuse, naming the flag or the
+variable.
+
 **BR is launched detached, and nothing about the session depends on its having been started here.**
 Its own process group, so a Ctrl-C in this shell no longer kills the database engine mid-write; no
 inherited handles; no process handle kept on this side — see `spawn_windows.go`, which holds the
@@ -328,8 +343,11 @@ exactly what a person running `brls` would be told. `brls.exe` therefore **ships
 driver looks: `BRLS` in the environment, then beside this executable, then `PATH`. A fixed install
 path is never guessed at — a wrong one that silently finds nothing is worse than a refusal — and the
 value of `BRLS` is checked rather than trusted, so a stale one is refused here instead of failing
-later with the operating system's words. The same helper finds `brserver.exe` for `start`, under
-`BRSERVER`.
+later with the operating system's words. The same helper finds `brserver.exe` for `start` and
+`run_report`, under **`BRSERVER` or `BR_EXE`** — two names for one thing because the context kit got
+there first, exporting `BR_EXE` in every example a person reads before they ever run this. The first
+of the two that is *set* decides, even if what it names is missing: falling through to the other
+would quietly run a different BR than the one just pointed at.
 
 **Where `brls` is, is said when the mode starts**, not at the first question. A report writer whose
 checker is missing still works — the model is told the source is unchecked and to say so — but it

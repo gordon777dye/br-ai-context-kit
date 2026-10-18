@@ -101,7 +101,7 @@ Copy these verbatim.
 "$BR_EXE" "RUN glp\trial_bal" -"$BR_AI_UTIL"       # run a program, headless
 "$BR_EXE" "RUN cnp\menu" -"$BR_AI_USER"            # run a statement/command, interactive
 "$BR_EXE" "PROC cnp\batch.prc" -"$BR_AI_UTIL"      # run a procedure, headless
-"$BR_MCP_DRIVER" start --config "$BR_AI_USER"      # live session with the harness (see below)
+"$BR_MCP_DRIVER" start                            # live session with the harness (see below)
 ```
 
 - **`-<config-file>`** names a config file — a dash **immediately followed** by the
@@ -175,12 +175,12 @@ This section is only how to bring it up.
 ### The files in `ai_access/`
 
 **[`ai_access/`](ai_access/) is self-contained, and that is the whole of the setup.** Four
-files, and nothing on `PATH`, nothing in the registry and **no environment variables**:
+files, and nothing on `PATH`, nothing in the registry and **no environment variables required**:
 
 | File | What needs it | Kept current by |
 |---|---|---|
 | `br_mcp_driver.exe` (`$BR_MCP_DRIVER`) | you — it is the launcher and the MCP server | `br/mcpdriver/build.ps1` |
-| `brserver.exe` (`$BR_EXE`) | the driver, which looks for **exactly that name** beside itself | `br/winbuild/dllbuild/bld.ps1` |
+| `brserver.exe` (`$BR_EXE`) | the driver: `$BR_EXE` or `$BRSERVER` if either is set, else **exactly that name** beside itself | `br/winbuild/dllbuild/bld.ps1` |
 | `brclientdll444-<platform>-<config>-gui.dll` | BR, which loads it from its own directory | the same, as a pair with the server |
 | `brls.exe` | the `check_source` tool, which the driver finds beside itself | the brls tree's own `build.ps1` |
 
@@ -259,6 +259,19 @@ name works. **`$BR_AI_USER`** is the right one to start with: interactive, loggi
 application's own settings. *Measured: a session on it opens the channel and answers every
 reading request.*
 
+**`start` uses `$BR_AI_USER` when you give it no `--config`**, so with the variables above
+exported the flag is optional. *Measured, 2026-10-18:* `start` with no flags printed
+`configuration from BR_AI_USER: context\dev\tools\brconfig.ai_user` and BR wrote
+`context\app\startlog.txt`, which is that file's `LOGGING` destination and not the default
+one's.
+
+**Omit it with the variable unset and nothing tells you.** BR takes no configuration from the
+command line, hunts `brconfig.sys` beside the executable and then in the launch folder, and
+comes up on whichever it meets first — a session with different `DRIVE` mappings and no
+`LOGGING`, which looks like a working session right until something reaches for a file. Note
+that the first place it looks is **`ai_access/`**, where the build script puts BR but no
+configuration file, so what you actually get is the launch folder's.
+
 Three config keywords change what you can see, and they are the session's, not yours:
 
 | Keyword | Effect on you |
@@ -278,10 +291,34 @@ program written for `GUI OFF` stops working
 "$BR_MCP_DRIVER" start [--user] [--config FILE] [--br PATH] [--port N] [--wait DURATION]
 ```
 
-For example, from the kit root:
+For example, from the kit root — with the variables at the top of this file exported, this is
+the whole command:
 
 ```
-"$BR_MCP_DRIVER" start --config "$BR_AI_USER"
+"$BR_MCP_DRIVER" start
+```
+
+**The flag beats the variable, which beats the fallback.** For each of the two:
+
+| | `--config` | `--br` |
+|---|---|---|
+| 1. the flag, if given | the file it names | the BR it names |
+| 2. else the variable | `$BR_AI_USER` | `$BR_EXE`, else `$BRSERVER` |
+| 3. else | BR's own `brconfig.sys` hunt — see the warning above | `brserver.exe` beside the driver, else `PATH` |
+
+*Measured, 2026-10-18:* with `$BR_EXE`, `$BRSERVER` and `$BR_AI_USER` all pointed at files
+that do not exist, `start --br <real> --config <real>` came up and claimed the channel — the
+flags are consulted first, not merely preferred. **Whichever step answers, what it names is
+checked before BR is launched**, so a misspelling is a refusal naming the flag or the variable
+rather than a session quietly running on the wrong configuration.
+
+It is worth confirming the two lines `start` prints before `harness claimed`, because they say
+which BR and which configuration it actually got:
+
+```
+configuration from BR_AI_USER: context\dev\tools\brconfig.ai_user
+BR started from context\dev\ai_access\brserver.exe (pid 26860) on BR_dev.prc; waiting for the channel
+harness claimed on port 8720, protocol 5
 ```
 
 It launches BR on a standard procedure, claims the channel that procedure opens, and then
