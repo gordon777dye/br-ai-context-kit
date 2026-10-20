@@ -4,7 +4,7 @@ file: SPAWN_RESTRICTED.md
 category: 10-language
 subcategory: 10-language/data-manipulation/system-functions
 kind: function
-since: BR 4.4
+since: BR 5.0
 related: [internal function, restricted session, PROC, SLEEP, WSID$, SESSION$, 4154, 4155, 4156, 4157]
 ---
 `SPAWN_RESTRICTED(command$ [, config$ [, wait]])`

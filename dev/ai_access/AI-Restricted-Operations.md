@@ -487,7 +487,7 @@ the pointer or pressing a button is refused.
 **`send`.** In every session, restricted or not, the client puts its keys into BR's own
 key buffer, as the harness does for the assistant, so they reach this session and nothing else.
 It does not need BR to be the window in front. (`MSG("kb")`, which was `send` plus a check that
-BR's window was on top, was removed in 4.4 — once `send` could not leave BR there was nothing for
+BR's window was on top, was removed in 5.0 — once `send` could not leave BR there was nothing for
 it to guard. A call to it gets 412 *invalid MSG action*.) Named keys (`|RET|`, `|TAB|`, `|F5|`, the arrows and
 so on) become BR's own key values; `|SHIFT+|` shifts ordinary characters on the keyboard layout and
 gives the shifted named keys, and `|CTRL+|` gives Ctrl+letter; keys with no meaning inside BR — Alt,

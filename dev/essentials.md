@@ -302,15 +302,15 @@ overflowed or errored upstream, not that the program is genuinely waiting on the
   longer than that pass them by reference. e.g. `DEF FNA$*500(&BIG_STR$)` But if you 
   pass by reference keep in mind that any changes to the passed values change the original variables. 
 
-- **`OPTION 60` means different things in BR 4.3 and BR 4.4.** It only changes how programs are
-  saved: it should be **OFF under 4.3 and ON under 4.4**.
+- **`OPTION 60` means different things in BR 4.3 and BR 5.0.** It only changes how programs are
+  saved: it should be **OFF under 4.3 and ON under 5.0**.
   - **Under BR 4.3** it saves the legacy 4.18-and-earlier format, which caps every variable,
     strings included, at 32767 bytes, against the 99,999,999-byte `DIM` limit of the current
     format (4.30+). The limits and idioms in this kit assume the current format, so this kit does
     not support it under 4.3. If a 4.3 config (such as the app's `brconfig.sys`) turns it on,
     raise it with the user rather than coding around it.
-  - **Under BR 4.4** it saves the 4.3 format (level 38), so a 4.3 BR can load the program. BR 4.4
-    loads every format whatever the setting. The kit's AI configs run BR 4.4 and set it ON
+  - **Under BR 5.0** it saves the 4.3 format (level 38), so a 4.3 BR can load the program. BR 5.0
+    loads every format whatever the setting. The kit's AI configs run BR 5.0 and set it ON
     ([`BR_launch.md`](BR_launch.md#option-60)).
 
   (Detail: [SAVE / REPLACE](../br_tree/70-commands/program-management/spec.md),

@@ -306,9 +306,9 @@ already carried by the keyword pack. The "2-D control" gloss was wrong as well a
 | `ENV$(status$, [MAT cfg$ (out)], [arg])` | str | environment / status interrogation (4.30+) |
 | `SETENV(name$, [value$])` | num | set a BR **session** environment variable (function form of `CONFIG SETENV`; read back with `ENV$`). 2 args = `name$`,`value$`; 1 arg = a `NAME=VALUE` directive |
 | `MSG$(text$)` | str | display text in the 2nd box of the command console |
-| `MSG(action$, [arg…])` | num | session control, Windows/CS (**not** a companion of `MSG$`): `MSG("send",keys$)` types into this session through BR's own buffer, `MSG("sleeptime",ms)` sets the delay between keys in milliseconds; `MSG("kb")` was removed in 4.4 (0412). The compiler takes one or more arguments, the first a string — home: 70-commands/information/MSG.md |
+| `MSG(action$, [arg…])` | num | session control, Windows/CS (**not** a companion of `MSG$`): `MSG("send",keys$)` types into this session through BR's own buffer, `MSG("sleeptime",ms)` sets the delay between keys in milliseconds; `MSG("kb")` was removed in 5.0 (0412). The compiler takes one or more arguments, the first a string — home: 70-commands/information/MSG.md |
 | `SLEEP(seconds)` | num | pause (fractional seconds, ms resolution) |
-| `SPAWN_RESTRICTED(command$, [config$], [wait])` | num | **BR 4.4.** start a disposable **restricted** session on this WSID running `command$`; returns its process id, or with `wait` (seconds) its exit code. Errors 4154–4157 — home: system-functions/SPAWN_RESTRICTED.md |
+| `SPAWN_RESTRICTED(command$, [config$], [wait])` | num | **BR 5.0.** start a disposable **restricted** session on this WSID running `command$`; returns its process id, or with `wait` (seconds) its exit code. Errors 4154–4157 — home: system-functions/SPAWN_RESTRICTED.md |
 | `HELP$([*]kw$, [mark])` | str | enter HELP mode / show a topic; returns a scancode or selection. **Two arguments at most**, and the second is *numeric* — `ck_alph_sysfn` gives `BETWEEN(1, 2, subcount)` with `PARMCHECK_NUMERIC` on it, so the `file$` this row used to list is not a parameter |
 | `MSGBOX(prompt$, [title$], [buttons$], [icon$])` | num | Windows message box; returns the chosen button (also in `CNT`): 1 OK · 2 Yes · 3 No · 4 Cancel |
 | `DEBUG_STR(level, str$)` | num | emit `str$` to the debug log (4.3+) |

@@ -28,6 +28,7 @@ AUTO  [<start-line>] [{','|' '} <increment>]      -- AU; default 10, 10
 RENUM [-<from>] [-<to>] [<first>] [<incr>] [LABELS_ONLY]   -- RENU; updates GOTO/GOSUB references
 DEL   { <line> | <start-line> <end-line> } [SOURCE]   -- DE; delete line(s)
 LIST  [<line-range>]                              -- LIS; display/edit; edit a listed line + Enter
+LIST  '<'<program-file> [<line> [<line>]]         -- list a saved program without loading it
 EDIT                                              -- ED; open the program in a third-party editor
 ```
 
@@ -54,6 +55,13 @@ EDIT                                              -- ED; open the program in a t
   keywords); edit directly on a listed line and press Enter on that line to store it. After a `RUN`
   you must `LIST` again before editing. (`LIST "string"` instead *searches/replaces* — see
   [information](../information/spec.md#list-search).)
+- <a id="list-input"></a>**`LIST <program`** lists the program saved in a file instead of the one in
+  memory, which is left as it is. The `<` is written against the name (`LIST <menu`, or quoted
+  `LIST <"my prog"`); a name with no extension is tried with `.br` and then `.wb`. The file must be a BR
+  program file, else error **4122**; a second `<` is error **2220**. Line numbers separated by a
+  blank may limit it, but a `-` range or a label with `<` is a syntax error. At the `READY` prompt,
+  Tab completes the name after the `<` — see
+  [filename-patterns](../file-directory/filename-patterns.md#tab-completion).
 - <a id="edit"></a>**EDIT** (`ED`) hands the current program to a configured third-party editor.
 - <a id="builtin-keys"></a>**Built-in editor keys**: BR's own line editor is active at startup (just
   type). **F7** marks then copies the marked span to a scratch buffer ("*x* Bytes Saved"); **F8**
@@ -74,6 +82,7 @@ RENUM -330 -480 500   ! renumber lines 330-480 starting at 500
 DEL 20 60             ! delete lines 20 through 60
 DEL 100 200 SOURCE    ! strip source for 100-200, keep object (security)
 LIST 100-200
+LIST <menu 100 500    ! lines 100-500 of menu.br on disk; memory untouched
 ```
 
 <a id="see-also"></a>
@@ -82,6 +91,7 @@ LIST 100-200
 - [program-management](../program-management/spec.md) — `LOAD`/`SAVE`/`REPLACE`/`RUN`, `MERGE`
 - [information](../information/spec.md#list-search) — `LIST "search"`/REPLACE, STEP/TRACE debugging
 - [10-language/syntax](../../10-language/syntax/spec.md) — line numbers & labels being edited
+- [file-directory/filename-patterns](../file-directory/filename-patterns.md#tab-completion) — Tab completion of file names at `READY`, `LIST <` and `LIST >` included
 
 *(Backing keyword pages `Editing_Commands`, `AUTO`, and the misfiled `Delete_(command)` were folded
 into this spec and pruned.)*

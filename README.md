@@ -74,7 +74,7 @@ The rest is done by AI.
 All of this should be done by AI at your direction. Just tell your AI agent (one step at a time)
  to execute the instructions. 
 
-**→ [`dev/BR_harness.md`](dev/BR_harness.md)** — How to run **BR 4.4 with an assistant attached**
+**→ [`dev/BR_harness.md`](dev/BR_harness.md)** — How to run **BR 5.0 with an assistant attached**
 and watch a program while it runs: its screen, its fields, its listviews, a picture of its
 window. This is the only way to see an interactive program or a ScreenIO screen.
 

@@ -13,8 +13,8 @@ never hand-edited.
 
 | Fact | Value | Nature |
 |---|---|---|
-| **BR executable** | `$BR_EXE` | Ships with the kit — BR 4.4, in `ai_access/` |
-| **`br_mcp_driver.exe`** | `$BR_MCP_DRIVER` | Ships with the kit — launches a live BR 4.4 session for the harness ([below](#harness-launch)) |
+| **BR executable** | `$BR_EXE` | Ships with the kit — BR 5.0, in `ai_access/` |
+| **`br_mcp_driver.exe`** | `$BR_MCP_DRIVER` | Ships with the kit — launches a live BR 5.0 session for the harness ([below](#harness-launch)) |
 | **`brconfig.sys`** | `$BR_CONFIG` | Existing app startup config |
 | **`brconfig.ai_util`** | `$BR_AI_UTIL` | AI Utility — headless (`UNATTENDED`) |
 | **`brconfig.ai_user`** | `$BR_AI_USER` | AI User — interactive, for testing user interfaces |
@@ -38,7 +38,7 @@ export BR_AI_USER="context/dev/tools/brconfig.ai_user"
 export BRLS_EXE="context/dev/tools/brls.exe"
 ```
 
-**`$BR_EXE` is BR 4.4, and it is the same `brserver.exe` the harness runs.** The executables
+**`$BR_EXE` is BR 5.0, and it is the same `brserver.exe` the harness runs.** The executables
 live in [`ai_access/`](ai_access/); the config files stay in [`tools/`](tools/). Run directly, as
 every invocation in this file does, it is an ordinary BR: it runs a program and leaves you its
 output, and opens no harness channel. To attach to a **live** session and watch a screen, start
@@ -49,9 +49,9 @@ it through `$BR_MCP_DRIVER` instead — see [Live sessions](#harness-launch) bel
 exited 0, and `LOAD … source` / `SAVE` compiled a program.
 
 <a id="option-60"></a>
-> **`OPTION 60` is ON in `$BR_AI_UTIL` and `$BR_AI_USER`, because they run BR 4.4, so what they
-> save loads in BR 4.3.** BR 4.4 loads all three object formats, but by default it saves its own
-> (level 39), which a pre-4.4 BR refuses with **error 2240, "release level error"**. Under 4.4,
+> **`OPTION 60` is ON in `$BR_AI_UTIL` and `$BR_AI_USER`, because they run BR 5.0, so what they
+> save loads in BR 4.3.** BR 5.0 loads all three object formats, but by default it saves its own
+> (level 39), which a pre-5.0 BR refuses with **error 2240, "release level error"**. Under 5.0,
 > `OPTION 60` saves the 4.3 format (level 38) instead
 > ([SAVE / REPLACE](../br_tree/70-commands/program-management/spec.md)). *Measured:* without it,
 > a program `SAVE`d by `$BR_EXE` failed to `LOAD` in 4.33c with 2240; with it, the same program
@@ -181,7 +181,7 @@ files, and nothing on `PATH`, nothing in the registry and **no environment varia
 |---|---|---|
 | `br_mcp_driver.exe` (`$BR_MCP_DRIVER`) | you — it is the launcher and the MCP server | `br/mcpdriver/build.ps1` |
 | `brserver.exe` (`$BR_EXE`) | the driver: `$BR_EXE` or `$BRSERVER` if either is set, else **exactly that name** beside itself | `br/winbuild/dllbuild/bld.ps1` |
-| `brclientdll444-<platform>-<config>-gui.dll` | BR, which loads it from its own directory | the same, as a pair with the server |
+| `brclientdll500-<platform>-<config>-gui.dll` | BR, which loads it from its own directory | the same, as a pair with the server |
 | `brls.exe` | the `check_source` tool, which the driver finds beside itself | the brls tree's own `build.ps1` |
 
 **Each is deployed here by whatever builds it, on every build**, with an up-to-date

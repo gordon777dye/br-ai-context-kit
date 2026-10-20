@@ -10,7 +10,7 @@ recovered-fold: BR_FILENAME$, BRErr$, COS, MSGBOX, NEWPAGE, REM (6 redirect-coll
 runtime-gap-closure: added the table6k/table7k intrinsics that had no br_tree signature — SGN, RND, XLATE$, RLN, VERSION(file), LINESTATUS$, CURPOS, SCR_FREEZE/THAW, SERIAL, SESSION$, PROCLVL, TIMER, SETENV, VARIABLE$, WBVERSION$, WBPLATFORM$, SYSERR/SYSERR$ (xref), MSG (xref), and the PEM integration set GET$/SET$/INVOKE$/DLL. Sourced from the brulescorp wiki + release notes; the delimiter arg of STR2MAT/MAT2STR documented (there is no DLM$ function).
 source-verified: 'cross-checked against the BR interpreter source (basfn.h/tblfn.cpp function tables, ck_num_sysfn/ck_alph_sysfn arity checkers, numfunct.cpp/strfunct.cpp/trig.cpp impls). Corrections: TRUNC/DEG/RAD are reserved keywords that parse but return a runtime bad-function error (NOT implemented — trig() lacks them); CALL is in table7k but has no function implementation (compiler-rejected); SHIFT is a fixed-0 System/23 no-op; SCR_FREEZE/THAW take no args (freeze/thaw remote display); DLL is ≥2 strings dispatched client-side; SETENV is 1–2 args.'
 corrections:
-  - "The MSG row documented MSG(\"KB\",keys$) as injecting keystrokes through Windows. BR 4.4
+  - "The MSG row documented MSG(\"KB\",keys$) as injecting keystrokes through Windows. BR 5.0
     removed the kb action - it now raises 0412 - and send has not gone through the operating
     system since 2026-09-30: it puts its keys into BR's own buffer, reaching this session only and
     needing no focus. Rewritten around send; MSG.md carries the full action list and the
@@ -37,14 +37,14 @@ corrections:
     it, and `EXIT` exists only as the loop statement `EXIT DO`/`EXIT FOR` (`EXIT_PRI`, tblopr.cpp).
     Measured rather than inferred - a proc whose line is `EXIT 3` raises **error 1000**,
     *unidentified source remaining*, and CODE is still 0 afterwards; the documented idiom was run
-    end to end in BR 4.4 and reports `code-after-proc 0`.
+    end to end in BR 5.0 and reports `code-after-proc 0`.
 
     What CODE actually is: `t.returncode`, read by `numfunct.cpp` at `case CODE` (commented there
     as 'the return code set by last program'). Every assignment to it, exhaustively: `STOP n` and
     `END n` (run.cpp, `t.returncode = (dict) ? toInt(dict) : 0` - so a BARE `STOP` sets it to 0,
     which is why a program ending normally clears it); `SYSTEM n` (command7.cpp), which is BR's
     exit status to the operating system rather than a value a program lives to read; the `ONQ` and
-    shell returns (command7.cpp); and a zeroing by `CLEAR`. BR 4.4 added a zeroing by `LOAD` and by
+    shell returns (command7.cpp); and a zeroing by `CLEAR`. BR 5.0 added a zeroing by `LOAD` and by
     `CHAIN` (2026-10-13) so that CODE cannot be read stale from a program that ran before the one
     now loaded. `RUN` deliberately does NOT reset it: re-running an already-loaded program leaves
     the previous run's code standing until that run sets one, which for a program ending in a bare
@@ -57,7 +57,7 @@ corrections:
     dev/system-functions-catalog.md carried the same claim, derived from this table, and is
     corrected with it. brls.exe and lscheck.exe embed the old wording and need a rebuild from the
     corrected pack. 2026-10-13."
-  - "Signatures made exact against BR 4.4's own argument checkers, and this page made the source
+  - "Signatures made exact against BR 5.0's own argument checkers, and this page made the source
     brls reads them from (2026-10-13). A [signature notation](#signature-notation) section now says
     what a signature claims: the counts and types ck_alph_sysfn (command2.cpp) and ck_num_sysfn
     (command3.cpp) accept, with a|a$ for a position BR types either way and nested brackets for
@@ -324,9 +324,9 @@ but there is **no `DLM$` function**) — or, as of **4.3**, a `MAT` of delimiter
 | `SYSERR` / `SYSERR$[(n)]` | the underlying **OS** error number / its description (companion to `ERR`/`BRERR$`); `SYSERR$(n)` describes that code rather than the last — see [90-reference/error-codes](../../../90-reference/error-codes/_index.md) |
 | `SHIFT[(n)]` | always returns **`0`** — a legacy **System/23-compatibility** no-op (any argument is accepted and ignored) |
 | `MSG$("text")` | display text in the 2nd box of the command console |
-| `MSG(action$[,arg\|arg$…])` | twenty-five actions (Windows / Client-Server): `MSG("send",keys$)` types into **this session** — the keys go into BR's own buffer, so they reach no other window and need no focus — with special keys in pipes, e.g. `"|CTRL+|c|CTRL-|"`; `MSG("sleeptime",ms)` sets the delay between them in milliseconds. **`MSG("kb")` was removed in BR 4.4 and raises 0412.** Full action list: [70-commands/information/MSG.md](../../../70-commands/information/MSG.md) |
+| `MSG(action$[,arg\|arg$…])` | twenty-five actions (Windows / Client-Server): `MSG("send",keys$)` types into **this session** — the keys go into BR's own buffer, so they reach no other window and need no focus — with special keys in pipes, e.g. `"|CTRL+|c|CTRL-|"`; `MSG("sleeptime",ms)` sets the delay between them in milliseconds. **`MSG("kb")` was removed in BR 5.0 and raises 0412.** Full action list: [70-commands/information/MSG.md](../../../70-commands/information/MSG.md) |
 | `SLEEP(seconds)` | pause; fractional seconds, ms resolution (3.83h+) |
-| `SPAWN_RESTRICTED(command$[,config$[,wait]])` | **BR 4.4.** Start a disposable **restricted** session on this WSID — the next free session number — running `command$` as its startup command, typically `PROC <file>`. `config$` defaults to this session's. No `wait` or `0` returns the new process id at once; a `wait` in seconds yields as `SLEEP` does and returns the session's **exit code**. See [SPAWN_RESTRICTED](SPAWN_RESTRICTED.md) for the errors and the ordering that makes the restriction hold |
+| `SPAWN_RESTRICTED(command$[,config$[,wait]])` | **BR 5.0.** Start a disposable **restricted** session on this WSID — the next free session number — running `command$` as its startup command, typically `PROC <file>`. `config$` defaults to this session's. No `wait` or `0` returns the new process id at once; a `wait` in seconds yields as `SLEEP` does and returns the session's **exit code**. See [SPAWN_RESTRICTED](SPAWN_RESTRICTED.md) for the errors and the ordering that makes the restriction hold |
 | `HELP$([*]kw$[,mark])` | enter HELP mode / show a topic (see [windows-cursor §help](../../../20-io-screen/windows-cursor/spec.md#help-facility)). Two arguments at most, the second numeric |
 | `PROGRAM$` | full path of the loaded program — handy in shared error routines (see [information](../../../70-commands/information/spec.md#procin-program)) |
 | `DEBUG_STR(level,str$)` | write `str$` to the debug log at `level` (4.3+; see [information](../../../70-commands/information/spec.md#debug-str)) |

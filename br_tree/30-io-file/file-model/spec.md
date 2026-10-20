@@ -151,6 +151,26 @@ as a special `SUBSTITUTE` default and accepts it in any case, effectively applyi
 processing); `STATUS` shows the current WSID. It's indispensable when two workstations run the same
 program — every temp/output/index name must be unique or one run will fail.
 
+<a id="slash"></a>
+### A `/` in a file name (BR 5.0, `OPTION 84`)
+
+A name with a `/` in it can be read two ways: as a System/23 name, **`file/directory/drive`**
+(`CUST/DATA/2` is file `CUST` in directory `DATA` on the drive that 2 stands for, and `file//10` and
+`file//11` are the spooler and AUX), or as a **folder separator**, so that `data/rpt/a.dat` is
+`data\rpt\a.dat`. BR does not look at the disk to decide. It resolves the name the way
+it prefers and, if the file or folder is **not found** (error 4152 or 4203), tries the other reading
+before giving up. If both fail the error is the first reading's, except that "file not found" replaces
+"path does not exist" when the other reading found the folder - that is what lets a file be created.
+
+The first reading is the System/23 one if the name has a `\` in it, has only one `/`, or has `//` and a
+digit (which is never read any other way); otherwise it is the folder one. `OPTION 84` changes that
+(see [OPTION (config)](../../00-configuration/config-directives/OPTION_(Config).md)); level `0` is the
+behaviour of earlier releases.
+
+When both readings exist the first wins, so a name can mean different files as folders are created
+or removed. Names with a drive letter or a device (`C:/data/x`, `PRN:/10`, `PDF:/x`) have only one
+reading.
+
 <a id="tables"></a>
 ## Tables
 

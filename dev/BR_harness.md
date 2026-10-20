@@ -2,7 +2,7 @@
 alwaysApply: false
 ---
 
-# BR Harness — watching a running BR 4.4 program
+# BR Harness — watching a running BR 5.0 program
 
 **Read this when you need to see what a program is doing while it does it.** Not afterwards,
 from a log or a CSV, but the screen the person is looking at, the fields on it, the rows in its
@@ -12,11 +12,11 @@ listview, and a PNG of the window.
 headlessly, and **launch the session this file attaches to**
 ([Live sessions](BR_launch.md#harness-launch)). **This file is for the case a headless run
 cannot reach** — an
-interactive program, a screen, a form that is waiting for input. The difference is a BR 4.4
+interactive program, a screen, a form that is waiting for input. The difference is a BR 5.0
 facility called the **harness**: a side channel a session opens on its own account, which an
 assistant reads and types through while the program runs.
 
-> **Everything below marked *measured* was run on this machine against BR 4.4 and the output
+> **Everything below marked *measured* was run on this machine against BR 5.0 and the output
 > kept.** Everything else is cited to the authority that states it. Nothing here is inferred
 > from how it ought to work — see [AI Model Rules](../README.md) on guessing.
 
@@ -88,7 +88,7 @@ ERR 4 unknown request
 **That is the one error that means "the BR build is too old", not "you called it wrong."** No
 other error says it, and nothing warns you up front.
 
-*Measured, on a BR 4.4 build six days older than the one beside it:* `windows` and `program`
+*Measured, on a BR 5.0 build six days older than the one beside it:* `windows` and `program`
 answered `ERR 4`, and `shot` replied without any of the fields §5 describes. `controls`,
 `attrs`, `cursor`, `read_view` and `field_info` all worked on it. So **`windows` — the very
 first call §0 tells you to make — is the one most likely to be missing**, and a BR that is
@@ -222,7 +222,7 @@ control with error 3. Call `controls` or `windows` again.
 <a id="seeing"></a>
 ## 5. Seeing a running program — and the trap
 
-This is the table to work from. **Every row measured on BR 4.4**, on one hand-built screen —
+This is the table to work from. **Every row measured on BR 5.0**, on one hand-built screen —
 two captions, two input fields (`C 20` and `N 10.2`), a button, a 10-row grid and a 3-row
 list — run twice through the same configuration file with nothing different but `gui off` /
 `gui on`.
@@ -323,7 +323,7 @@ the normal resting state, not a fault.
 - **`pace`** is for a demonstration rather than for filling a form: with no pace the keys go in
   as fast as BR's event loop runs, which is too fast for anybody to follow or interrupt.
 
-**Break is `press 1`, and in BR 4.4 it interrupts — it does not answer anything.** It halts what
+**Break is `press 1`, and in BR 5.0 it interrupts — it does not answer anything.** It halts what
 is running with no error and `GO` resumes; at a permission question it is not one of the
 answers. Do not use it to decline something.
 

@@ -10,7 +10,7 @@ recovered-fold: BRListener.Conf, BRListener.exe, BRListener.Log, Client_Server, 
 related: [config-directives, platform, environment]
 keywords: [CLIENT_SERVER, BRSERVER, SERVER, CONFIG]
 corrections:
-  - "Client-file COPY examples changed from the `COPY \"x\" TO \"@:C:\\...\"` form to `COPY <from> <to>`: no TO, unquoted names, and `@::` for a client absolute path, as file-directory documents. BR 4.4's console refuses the TO form. The unquoted form was confirmed to copy a file to the client (ERRORS.md, 2026-10-01). The Examples line now also runs COPY through EXECUTE, because a command cannot be a numbered program statement (program-management#command-vs-statement), and no longer reuses line number 10100. The same bullet's `EXISTS(\"@:C:\\...\")` changed to `@::` for the same absolute-path reason (confirmed by the user, 2026-10-02)."
+  - "Client-file COPY examples changed from the `COPY \"x\" TO \"@:C:\\...\"` form to `COPY <from> <to>`: no TO, unquoted names, and `@::` for a client absolute path, as file-directory documents. BR 5.0's console refuses the TO form. The unquoted form was confirmed to copy a file to the client (ERRORS.md, 2026-10-01). The Examples line now also runs COPY through EXECUTE, because a command cannot be a numbered program statement (program-management#command-vs-statement), and no longer reuses line number 10100. The same bullet's `EXISTS(\"@:C:\\...\")` changed to `@::` for the same absolute-path reason (confirmed by the user, 2026-10-02)."
 ---
 
 # Client-server

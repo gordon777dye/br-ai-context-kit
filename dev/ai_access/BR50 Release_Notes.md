@@ -1,6 +1,6 @@
-# BR 4.4 Release Notes
+# BR 5.0 Release Notes
 
-What changed in BR 4.4 that a user, an administrator or a support engineer needs to know about.
+What changed in BR 5.0 that a user, an administrator or a support engineer needs to know about.
 Entries that can change how an existing program behaves come first, because those are the ones worth
 reading before an upgrade rather than after.
 
@@ -23,7 +23,7 @@ Deeper reference material stays in its own document; this page links to it rathe
   - [The command console is set aside rather than hidden](#the-command-console-is-set-aside-rather-than-hidden)
   - [`CONFIG CONSOLE` now defaults to `DATA_ONLY`](#config-console-now-defaults-to-data-only)
   - [`OPTION 82` - work off the display area](#option-82-work-off-the-display-area)
-  - [A program saved by 4.4 will not load in an earlier BR](#a-program-saved-by-44-will-not-load-in-an-earlier-br)
+  - [A program saved by 5.0 will not load in an earlier BR](#a-program-saved-by-50-will-not-load-in-an-earlier-br)
   - [`OPTION 60` - save in the 4.2/4.3 object format](#option-60-save-in-the-42-43-object-format)
 - [Security](#security)
   - [The debugger connection is now encrypted and authenticated](#the-debugger-connection-is-now-encrypted-and-authenticated)
@@ -312,7 +312,7 @@ column 105 was stored as `10:10`.
 teal background. `INSERT` keeps the status line's own attributes - or reverse video where the mode
 differs from the configured default - so a field in insert mode looks ordinary.
 
-Before 4.4 the indicator shared reverse video with every other status, which says *something is
+Before 5.0 the indicator shared reverse video with every other status, which says *something is
 different* without saying which of insert and overtype is in force, and that is the one thing an
 operator needs to know before the next keystroke. A colour nothing else uses is recognised without
 being read.
@@ -379,21 +379,21 @@ at the keyboard. That proved unworkable: `UNATTENDED` changes much more about a 
 name suggests, enough that requiring it would have put this out of reach of the very sessions that
 want it.
 
-<a id="a-program-saved-by-44-will-not-load-in-an-earlier-br"></a>
-### A program saved by 4.4 will not load in an earlier BR
+<a id="a-program-saved-by-50-will-not-load-in-an-earlier-br"></a>
+### A program saved by 5.0 will not load in an earlier BR
 
 **Please read this before upgrading if programs are saved on one machine and run on another, or if
 some machines will stay on 4.3 for a while.**
 
-BR 4.4 records, for every statement, which line of the source file it came from. That number is
+BR 5.0 records, for every statement, which line of the source file it came from. That number is
 kept in the line table, and the line table is part of a saved program, so the object format has
-moved: 4.4 writes save level **39** where 4.2 and 4.3 wrote level **38**.
+moved: 5.0 writes save level **39** where 4.2 and 4.3 wrote level **38**.
 
 An older BR given a level 39 program **refuses it**, with error **2240** - *release level error*.
 It does not misread it. Nothing is damaged and nothing runs with a wrong program; the load simply
 does not happen, and says why.
 
-The direction that matters less is already fine: **4.4 loads anything an earlier BR saved.** A
+The direction that matters less is already fine: **5.0 loads anything an earlier BR saved.** A
 level 38 program loads and runs normally. It has no source line positions in it - there were none
 to save - and BR reports positions without them, which is the only difference.
 
@@ -410,7 +410,7 @@ written at all** - it was retired on 2026-09-26. Programs already in it still lo
 cannot be produced any more.
 
 `OPTION 60 ON` now makes `SAVE` write the **4.2/4.3 format, save level 38**, so the program can be
-loaded by a BR that predates 4.4. The cost is in the name of what level 39 added: **the source
+loaded by a BR that predates 5.0. The cost is in the name of what level 39 added: **the source
 line positions are not written**, because level 38's line table has nowhere to put them. Such a
 program runs identically; what it loses is BR's ability to say which line of the source file a
 statement came from.
@@ -418,7 +418,7 @@ statement came from.
 Use it when a program must be read by an older BR. Leave it off otherwise - level 39 is the
 default and loses nothing.
 
-**It affects saving only.** BR 4.4 loads all three object formats - the pre-4.2 one, level 38 and
+**It affects saving only.** BR 5.0 loads all three object formats - the pre-4.2 one, level 38 and
 level 39 - whether `OPTION 60` is set or not. Nothing about loading depends on it.
 
 `OPTION 60` continues to set `OPTION 74` as well (*treat `IGNORE` as a label reference for line
@@ -1332,7 +1332,7 @@ reach the user it was a generic "no shared cipher" text that was wrong for this 
 <a id="new-error-codes-for-ai-and-restricted-sessions"></a>
 ### New error codes for AI and restricted sessions
 
-Thirteen error codes are new in 4.4, all in the 41xx range. None of them exists in 4.3, so a
+Thirteen error codes are new in 5.0, all in the 41xx range. None of them exists in 4.3, so a
 program written against 4.3 can meet any of them for the first time here - which matters if it
 traps by number.
 
@@ -1364,7 +1364,7 @@ it exactly the one somebody would come to this table to look up.
 
 One nearby code is **not** an AI restriction and is easy to mistake for one: **4151**,
 `BREFREEREADONLY`, *CLOSE DROP or FREE requires the file to be opened for output*. It is also new
-in 4.4 and has its own entry under [Behaviour
+in 5.0 and has its own entry under [Behaviour
 changes](#close-free-and-close-drop-now-require-a-file-opened-for-output). 4159 is deprecated and
 4160 is unrelated.
 
@@ -1525,7 +1525,7 @@ status that follows (step mode) and the absence of a breakpoint on that line tel
 ### Recording what a debugger submits
 
 BR's log records commands as they are entered but not immediate statements such as `PRINT X` or
-`LET X=0`, whoever enters them. `DEBUG LOG COMMANDS <file>` — present before 4.4 but little known —
+`LET X=0`, whoever enters them. `DEBUG LOG COMMANDS <file>` — present before 5.0 but little known —
 records every line a debugger submits, statements included, and is now documented as the way to
 keep a full record of what an attached debugger, human or assistant, did at the prompt. See
 `AI-Access-Protocol.md` 7.6, *The `DEBUG` commands*.
@@ -1551,7 +1551,7 @@ counted, one statement can span several physical lines through the `!:` continua
 precompiler may renumber entirely. The clause and the source line answer both.
 
 **The source line is left out rather than shown as zero** when BR has none - a program saved
-before 4.4, or saved with [`OPTION 60`](#option-60-save-in-the-42-43-object-format). An absent
+before 5.0, or saved with [`OPTION 60`](#option-60-save-in-the-42-43-object-format). An absent
 field cannot be mistaken for line zero:
 
 ```
@@ -1643,7 +1643,7 @@ failed command. Other platforms were not affected.
 
 The splash screen waits for the first session on a workstation, and for any session whose startup
 produced configuration messages; sessions 2 to 9 otherwise start at once. Since comment-only lines
-in `brconfig.sys` began to be shown on the splash screen earlier in 4.4, each one counted as a
+in `brconfig.sys` began to be shown on the splash screen earlier in 5.0, each one counted as a
 configuration message, so every session using a configuration file with a comment line waited the
 full time. Comments are still shown, but no longer hold the splash screen; a real configuration
 error still does.
@@ -1678,7 +1678,7 @@ systematic.
 Nothing was wrong with the data: every field was being given the right text, in the right colours,
 in a correctly positioned control. The field **widths** were the problem. They were written as
 literal pixel counts - about ten pixels per character - against the small font that wxWidgets 2.6
-gave the status bar through BR 4.3. wxWidgets 3.1, which BR 4.4 uses, supplies a considerably
+gave the status bar through BR 4.3. wxWidgets 3.1, which BR 5.0 uses, supplies a considerably
 larger one, and a text control that cannot fit its text in Windows draws **nothing at all** rather
 than clipping it. Only the two fields with room to spare still appeared.
 

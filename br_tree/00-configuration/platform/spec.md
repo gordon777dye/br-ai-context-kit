@@ -10,7 +10,7 @@ recovered-fold: Getting_Started (folded+pruned — WBSERVER.DAT/error 4175, spoo
 related: [config-directives, client-server, installation-tooling]
 keywords: [platform, executable, WSID, startup, brnative]
 corrections:
-  - "OPTION 60 in the backward-compatibility list no longer says it saves in 4.18 format. BR no longer writes that format at all; the option now selects the 4.2/4.3 object format (save level 38), which omits the source line positions level 39 records. From BR 4.4 source: config.cpp case 60, brexe.cpp processNewSaveFile. See the SAVE / REPLACE section of 70-commands/program-management."
+  - "OPTION 60 in the backward-compatibility list no longer says it saves in 4.18 format. BR no longer writes that format at all; the option now selects the 4.2/4.3 object format (save level 38), which omits the source line positions level 39 records. From BR 5.0 source: config.cpp case 60, brexe.cpp processNewSaveFile. See the SAVE / REPLACE section of 70-commands/program-management."
 ---
 
 # Platforms & executables

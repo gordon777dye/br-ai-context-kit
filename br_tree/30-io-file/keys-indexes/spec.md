@@ -158,6 +158,7 @@ INDEX CUSTOMER.DAT CUSTZIP.KEY 1/50 20/5 REPLACE
 - [statements](../statements/spec.md#io) — `READ`/`REWRITE`/`DELETE` with `KEY=`/`SEARCH=`
 - [file-model](../file-model/spec.md#access-methods) — keyed vs relative vs sequential
 - [form-spec](../form-spec/spec.md) — key field types (incl. `DH` dates as character keys)
+- [filename-patterns](../../70-commands/file-directory/filename-patterns.md#tab-completion) — Tab completes the file after `INDEX`'s `>`/`>>` at `READY` (not its master or key file)
 - Backing keyword pages (deep detail retained): [INDEX](INDEX.md), [Index_Facility](Index_Facility.md)
 
 *(5 redirect-collision pages re-fetched in 2b — `BTree`, `Key_Spec`, `KFName`, `KLn`, `KRec` — were

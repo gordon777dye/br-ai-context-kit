@@ -12,10 +12,10 @@ keywords: [STATUS, LIST, TRACE, DISPLAY, LOGGING, STEP, BREAK, TIME, ALL, FONTS,
 corrections:
   - "MSG(\"sleeptime\",n) unit corrected to milliseconds (was given as seconds here; see MSG.md corrections for the brmsg.cpp evidence). Reported in context/ERRORS.md 2026-09-28."
   - "BREAK, TIME, ALL, FONTS and NORESTORE added to the frontmatter keywords. All five are in this page's BNF — BREAK has an anchor of its own — and none was declared. Found in brls phase 13."
-  - "The MSG bullet documented MSG(\"KB\"), which BR 4.4 removed - it now raises 0412 - and
+  - "The MSG bullet documented MSG(\"KB\"), which BR 5.0 removed - it now raises 0412 - and
     described the function as driving the WINDOWS keyboard, which it has not done since
     2026-09-30: send puts its keys into BR's own buffer and reaches this session only. Rewritten
-    around send; see MSG.md's corrections for the brmsg.cpp evidence. BR 4.4, 2026-10-12."
+    around send; see MSG.md's corrections for the brmsg.cpp evidence. BR 5.0, 2026-10-12."
   - "DEBUG_STR and PROGRAM$ added to the frontmatter keywords. Both are documented in this page's
     body (`DEBUG_STR(level, str$)` has its own anchor; `PROGRAM$` is described alongside `PROCIN`)
     and were routing nowhere despite the status line above already noting their 'home resolved'.
@@ -85,7 +85,7 @@ VERIFY                                               -- V; check the system reco
   ring a key pressed in BR's window lands in, so they reach no other window and need no focus.
   Special keys go in pipes (`MSG("send","|CTRL+|c|CTRL-|")`), and `MSG("sleeptime", ms)` paces them
   in milliseconds (default 200 = 0.2s) — `MSG` returns before they arrive, since they are fed in one
-  at a time while the program runs. **`MSG("kb")` was removed in BR 4.4 and raises `0412`**; it was
+  at a time while the program runs. **`MSG("kb")` was removed in BR 5.0 and raises `0412`**; it was
   only `send` behind a foreground-window check, and error `0413` went with it. The full action list
   (twenty-five, of which a restricted session permits eighteen) and the key table: [MSG](MSG.md).
 - <a id="printer-list"></a>**`PRINTER_LIST(MAT a$)`** (function) redims `a$` to the active Windows
@@ -114,6 +114,7 @@ LOGGING 9, trace.log
 
 - [program-management](../program-management/spec.md) — `RUN`/`GO`/`STOP`, `GO STEP/.line`, procedures
 - [editing](../editing/spec.md#list) — `LIST` for display/editing (vs `LIST "search"` here)
+- [filename-patterns](../file-directory/filename-patterns.md#tab-completion) — Tab completes the file after `>`/`>>` of `STATUS`, `DISPLAY`, `LIST` and `RUN` at `READY`
 - [system-functions](../../10-language/data-manipulation/system-functions/spec.md#system-info) — `ERR`/`LINE`/`CODE`, and the `PROCIN`/`PROGRAM$` cross-links
 - Backing keyword pages retained (deep reference): [MSG](MSG.md) (keystroke table),
   [PRINTER_LIST](PRINTER_LIST.md) (printer-select idiom), [PROCIN](PROCIN.md), [PROGRAM$](PROGRAM$.md)

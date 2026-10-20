@@ -54,7 +54,7 @@ prints `VERIFY OK` when they match, and otherwise lists what is out of step and 
 | **Watching a program run** — screens, fields, listviews, a ScreenIO screen, anything interactive | [`BR_launch.md` — Live sessions](BR_launch.md#harness-launch) to start one, then [`BR_harness.md`](BR_harness.md) | the `guide` tool first, then [`ai_access/README.md`](ai_access/README.md) for the driver and [`ai_access/AI-Access-Protocol.md`](ai_access/AI-Access-Protocol.md) for the protocol |
 
 **Which of those last two you want:** headless BR runs a program and leaves you its output —
-a log, a file, a CSV — and cannot show you a screen. The harness attaches to a **live BR 4.4
+a log, a file, a CSV — and cannot show you a screen. The harness attaches to a **live BR 5.0
 session** and reads the screen, the fields, the cursor and a listview's rows while the program
 is still running, and can type into it. If the thing you need to know is "what is on the glass
 right now", it is [`BR_harness.md`](BR_harness.md) and not §6.

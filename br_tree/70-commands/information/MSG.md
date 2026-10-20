@@ -11,26 +11,26 @@ corrections:
     MSG(\"send\") since 2026-09-30, when the foreground-window check that was its only difference
     became meaningless. Rewritten around send, with the full action list taken from brmsg.cpp's
     brmCommand[] table and the restricted-session permit list from numfunct.cpp
-    restrictedMsgCheck(). BR 4.4."
+    restrictedMsgCheck(). BR 5.0."
   - "Error 0413 Window Not On Top removed: nothing raises it. It was kb's refusal when BR was not
-    the foreground window, and it went with kb. The number stays reserved - BR 4.4 wberrdefs.h
+    the foreground window, and it went with kb. The number stays reserved - BR 5.0 wberrdefs.h
     carries it as BR_DEPRECATED_ERR - so it is listed below as retired rather than deleted
     silently. Error 0440 added, which the page never had."
   - "\"This facility operates through the operating system, so it does not utilize BR scancodes\"
     was true and is not. Since 2026-09-30 send puts its keys into BR's OWN key buffer through
     putKeyVal, the same ring a key pressed in BR's window lands in, and named keys are translated
     to BR's own key values. It reaches this session and nothing else, whatever window has the
-    focus, and it needs no focus at all. BR 4.4 brmsg.cpp, the comment above sendKeyFor()."
+    focus, and it needs no focus at all. BR 5.0 brmsg.cpp, the comment above sendKeyFor()."
   - "Keys that mean nothing inside BR - Alt, the Windows and Apps keys, PrintScreen - are now
     DROPPED rather than sent, so the ALT+/ALT- advice at the foot of the page no longer describes
     anything that happens, and LWIN, RWIN, APPS and SNAP in the table below are accepted and
     discarded. The pipe syntax itself is unchanged, and |CTRL+| and |SHIFT+| still work as they
-    did. BR 4.4 brmsg.cpp sendKeyFor()."
+    did. BR 5.0 brmsg.cpp sendKeyFor()."
   - "MSG returns BEFORE its keys arrive. They are queued and fed to BR one at a time, sleeptime
     apart, while the program runs (harnessQueueProgramKey, harness.cpp), so a program must not
     expect them to be there when the call returns - and a string is no longer limited by the size
-    of BR's key buffer. BR 4.4."
-  - "MSG(\"sleeptime\",n) takes milliseconds, not centiseconds (line 14) or seconds (the closing paragraph); the two statements also contradicted each other. BR 4.4 brmsg.cpp BrMsg_SleeptimeObjCmd stores `sleeptime = (*num) * 1000` and hands it to wb_sleepex, which sleeps in microseconds (common.cpp); the default is `static DWORD sleeptime = 200000` µs = 0.2 s, i.e. 200. Confirmed empirically: a pacing test written to the documented 100 = 1 second ran ten times fast. Reported in context/ERRORS.md 2026-09-28."
+    of BR's key buffer. BR 5.0."
+  - "MSG(\"sleeptime\",n) takes milliseconds, not centiseconds (line 14) or seconds (the closing paragraph); the two statements also contradicted each other. BR 5.0 brmsg.cpp BrMsg_SleeptimeObjCmd stores `sleeptime = (*num) * 1000` and hands it to wb_sleepex, which sleeps in microseconds (common.cpp); the default is `static DWORD sleeptime = 200000` µs = 0.2 s, i.e. 200. Confirmed empirically: a pacing test written to the documented 100 = 1 second ran ten times fast. Reported in context/ERRORS.md 2026-09-28."
   - "Special-character table listed F14 between F9 and F11; the key table in brmsg.cpp defines |F1| through |F12| only, so the row is F10 (there is no F13 or F14)."
   - "Special-character table completed from brmsg.cpp's SpecialChar[] table, which has 20 names the page omitted: CLR, SPACE, SEL, PRINT, EXEC, SNAP, LWIN, RWIN, APPS, NUM#, and the ALTL/ALTR, CTRLL/CTRLR and SHIFTL/SHIFTR press/release pairs. Each description is the entry's Windows VK_ code. The L variants are byte-for-byte the same event as the plain modifier; the R variants add KEYEVENTF_EXTENDEDKEY. NUM, was described as the key pad comma; it sends VK_SEPARATOR."
 ---
@@ -41,7 +41,7 @@ versions. This should not be confused with `Msg$`. The first parameter is the **
 case insensitive. MSG has no effect on Unix or Linux **terminal** sessions, but works under
 Client / Server with Unix the same as WINDOWS.
 
-> **`MSG("kb")` was removed in BR 4.4 and now raises `0412`. Use `MSG("send")`,** which takes the
+> **`MSG("kb")` was removed in BR 5.0 and now raises `0412`. Use `MSG("send")`,** which takes the
 > same arguments and behaves the same way. `kb` was only ever `send` behind a check that BR's
 > window was in front; once `send` stopped being able to leave BR there was nothing for that check
 > to do.
@@ -78,7 +78,7 @@ are refused with **4154**, and each refusal is logged as a security event naming
 pressed in BR's window lands in, so they reach **this session only**, whatever window has the
 focus, and no focus is needed at all.
 
-This changed in BR 4.4. `send` used to emit operating-system keyboard input, which went to whichever
+This changed in BR 5.0. `send` used to emit operating-system keyboard input, which went to whichever
 window had the focus — so a program could type into another application, a command prompt, or
 another BR session. That is also why error `0413` existed, and why it is now retired.
 
@@ -112,7 +112,7 @@ function, arrow or editing key gives that key's control or shifted variant.
 
 **A key that means nothing inside BR is dropped** rather than sent anywhere: Alt, the Windows and
 Apps keys, and PrintScreen. They are accepted in the string and discarded, so `LWIN`, `RWIN`,
-`APPS` and `SNAP` in the table below do nothing on BR 4.4.
+`APPS` and `SNAP` in the table below do nothing on BR 5.0.
 
 =====Examples=====
 
@@ -296,6 +296,6 @@ interpreted Alt combinations when `send` went through the operating system, and 
 > the ALT key needs to be depressed and released (ALT+ and ALT-) for every Alt-character
 > specified - `|alt+|m|alt-||alt+|b|alt-|` works, `|alt+|mb|alt-|` fails.
 
-BR 4.4 drops Alt rather than sending it, so neither form does anything now. Nothing replaces it:
+BR 5.0 drops Alt rather than sending it, so neither form does anything now. Nothing replaces it:
 there is no Alt combination to send, because there is no longer an operating system in the path to
 interpret one.

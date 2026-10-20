@@ -102,7 +102,7 @@ Create 2 of the 4 files to be used by AI for application development.
 
 | Role | Path |
 |---|---|
-| BR executable (BR 4.4) | `context/dev/ai_access/brserver.exe` |
+| BR executable (BR 5.0) | `context/dev/ai_access/brserver.exe` |
 | Existing app startup config | `context/dev/tools/brconfig.sys` |
 | AI Utility config (headless) | `context/dev/tools/brconfig.ai_util` |
 | AI User config (interactive) | `context/dev/tools/brconfig.ai_user` |
@@ -127,9 +127,9 @@ Create 2 of the 4 files to be used by AI for application development.
    repurposed as described in the next step. 
 7. Insert this line just before the `include subs.txt` line (or as the last line, if there is none yet):
    ```
-   option 60 ! BR 4.4 ($BR_EXE): save in the 4.3 format (level 38) so BR 4.3 can load it
+   option 60 ! BR 5.0 ($BR_EXE): save in the 4.3 format (level 38) so BR 4.3 can load it
    ```
-   The AI configs run `$BR_EXE`, which is BR 4.4. There this option makes `SAVE`/`REPLACE` write
+   The AI configs run `$BR_EXE`, which is BR 5.0. There this option makes `SAVE`/`REPLACE` write
    the 4.3 object format, which a 4.3 production BR can load; without it, 4.3 refuses the program
    with error 2240. Under 4.3 the option means something else, which is why `brconfig.sys` itself
    keeps it off ([`BR_launch.md`](../dev/BR_launch.md#option-60)).

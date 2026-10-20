@@ -11,6 +11,7 @@ related: [program-management, information]
 keywords: [DIR, COPY, RENAME, MKDIR, RMDIR, CHDIR, FREE, PROTECT, DROP, TYPE]
 corrections:
   - "TYPE added to the frontmatter keywords. `TYPE <file>` is in this page's BNF and its semantics, and was not declared. Found in brls phase 13."
+  - "FREE's abbreviation `FR` removed: FREE has none, so only `FREE` in full deletes a file. `FRE` is refused with error 1000 (unidentified source remaining), and in 5.0 `FR` goes to the same refusal (it had reached calculator mode, where a bare `FR` printed a variable). `F <file>` also ends in error 1000; a bare `F` is still an expression. Confirmed by running `FR <file>`, `fr <file>`, `FR` and `F <file>` headless: error 1000 each time and the file kept; `FREE <file>` deleted it. 2026-10-20."
 ---
 
 # File & directory commands
@@ -28,12 +29,12 @@ length, when combined, must come **last**.
 CHDIR [<drive>':'] ['\']<path> [-N]     -- CD / CH; no arg = show current dir
 MKDIR [<drive>':']<path>                -- MK
 RMDIR [<drive>':']<path>                -- RM; directory must be empty
-DIR  [<drive>':'][<path>][<filename>] [-AOLPWUCB] [PRINT | '>'['>'] <file>]   -- DI
+DIR  [<drive>':'][<path>][<filename> | <glob>] [-AOLPWUCB] [PRINT | '>'['>'] <file>]   -- DI
 COPY   <from> { <to> | PRN: | AUX: } [-ACDNPSV] [-<new_recl>] [PRINT | '>'['>'] <file>]  -- COP
 RENAME <from> <to> [-NPVF] [PRINT | '>'['>'] <file>]   -- REN; renames or moves (wildcards ok)
 TYPE   <file> [PRINT | '>'['>'] <file>] -- TY; dump a file to screen/printer/file
 DROP <file-ref> [-ANPV] [PRINT | '>'['>'] <file>]   -- DR; empties contents, keeps the name (size→0)
-FREE <file-ref> [-ANPV] [PRINT | '>'['>'] <file>]   -- FR; deletes the file (unrecoverable)
+FREE <file-ref> [-ANPV] [PRINT | '>'['>'] <file>]   -- no abbreviation; deletes the file (unrecoverable)
 PROTECT <file-ref> ',' { RESERVE | RELEASE }        -- PROT; reserve a path to one workstation
 ```
 
@@ -53,6 +54,32 @@ screen, `-W` wide four-column (sorted, long names; like `-C` but across not down
 (no extended names), `-C` columnar sorted with a trailing `\` on directories and `*` on
 executables, `-L` long names + permissions (Linux), `-B` bare long name. `>file` redirects (`>>`
 appends), `PRINT` to the printer (mutually exclusive with `>`).
+
+<a id="dir-glob"></a>**Glob patterns (BR 5.0), shown for DIR.** The name may be a glob, in any part of the path.
+`*` and `?` are as above; the additions are:
+
+| Pattern | Matches |
+|---|---|
+| `[abc]` `[a-z]` | one character of the set or range |
+| `[^abc]` | one character not in the set (`[!abc]` too, but `!` starts a comment unless the name is quoted) |
+| `{a,b,c}` | any one alternative; alternatives may be patterns and may nest |
+| `**` (a whole path part) | any number of directories, including none |
+
+`DIR src\**\*.cpp` lists every `.cpp` in `src` and below; `DIR data\20*\*.rpt` allows `*` and `?`
+in a directory part. The listing has a `Directory of` heading per directory that has a match, directories
+in name order, and one total; `-O` sorts within each directory. Rules:
+
+- A last part with only `*` and `?` is unchanged (including `DIR name` meaning `name.*`); a pattern
+  using any new form is taken as written, with no `.*` added.
+- Case follows `FILENAMES SEARCH`. A leading dot is not special; `.` and `..` are never listed.
+- No escape character (`\` is the separator): put `[`, `{`, `}` in a set to match them (`[[]`). An
+  unclosed `[` or `{`, and `{}` with no comma, are literal, and a file named exactly as the pattern is
+  still found.
+- A comma inside braces is part of the name (`DIR *.{brs,prc}`); outside braces it separates names.
+- `**` descends at most 40 levels. No match is error **4152**.
+- `COPY`, `RENAME`, `FREE`, `DROP` and `TYPE` take the same patterns for the files they act on, directory
+  by directory in name order. With a directory target, files from several directories (`**`) all go into
+  it without their sub-directories. `MKDIR`, `RMDIR` and `CHDIR` take no pattern.
 
 <a id="copy"></a>**COPY** duplicates one or more files (same/different disk, or rename-in-place with
 a new name), and can copy to a device. Options: `-A` archive-bit only then clears it (DOS), `-C`
@@ -91,6 +118,8 @@ exclusive use (and releases it) — the multi-user purge idiom; see
 ```text
 CHDIR \DATA\REPORTS
 DIR *.BR -C
+DIR DATA\*.{BRS,PRC}               ! glob (5.0): alternatives
+DIR SRC\**\*.CPP -O               ! glob (5.0): every .CPP below SRC, sorted per directory
 COPY CUST.FIL TEMP[WSID].FIL -D     ! copy omitting deleted records
 RENAME TEMP[WSID].FIL CUST.FIL
 COPY A:SAMPLE.* B: -DC              ! copy group; drop deleted recs; prompt on full disk
@@ -104,6 +133,7 @@ TYPE README.TXT PRINT
 - [program-management](../program-management/spec.md) — these commands inside procedures / `EXECUTE`
 - [30-io-file/statements](../../30-io-file/statements/spec.md) — in-program `OPEN`/`CLOSE … FREE/DROP`
 - [30-io-file/file-model](../../30-io-file/file-model/spec.md) — `[WSID]` per-workstation names, `PROTECT`
+- [filename-patterns](filename-patterns.md) — glob patterns, `/` in names and Tab completion in full
 - Client-side **OPEN/SAVE file browser** (`OPEN #99: "NAME=OPEN|SAVE:dir[mask],…"`) →
   [30-io-file/statements](../../30-io-file/statements/spec.md)
 
