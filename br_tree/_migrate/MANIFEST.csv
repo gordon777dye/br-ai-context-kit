@@ -1472,3 +1472,4 @@ org/RETRY.md,10-language/flow-control/error-handling/RETRY.md,RETRY,10-language,
 50-libraries/library-facility/FileIO_Function_Reference.md,50-libraries/fileio/FileIO_Function_Reference.md,FileIO Function Reference (source-derived),50-libraries,50-libraries/fileio,reference,moved-2b,high
 50-libraries/library-facility/FileIO_Library.md,50-libraries/fileio/FileIO_Library.md,FileIO_Library,50-libraries,50-libraries/fileio,concept,moved-2b,high
 50-libraries/library-facility/AuditBR.md,50-libraries/fileio/AuditBR.md,AuditBR,50-libraries,50-libraries/fileio,concept,moved-2b,high
+70-commands/command-signatures.md,70-commands/command-signatures.md,Command signatures,70-commands,70-commands,reference,ok,high

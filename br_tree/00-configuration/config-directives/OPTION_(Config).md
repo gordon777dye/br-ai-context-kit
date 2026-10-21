@@ -38,7 +38,7 @@ See also `Option (disambiguation)`.
 | `3` | set print flags | |
 | `4` | pads to record length for display out if `EOL=NONE` | Yes (4.18+) |
 | `5` | default to `ISAM` (index type 4). The normal default is `BTREE` (index type 7) | |
-| `6` | keep path=0 defaults to change to path when exiting BR same as when entered, as in UNIX | |
+| `6` | **BR 5.0.** `COPY` and `RENAME` onto a file that exists do not ask: `COPY` replaces it silently and `RENAME` refuses it with error `4150` unless `-F`, as before 5.0. Off (the default), the operator is asked `Overwrite <name>? (y/n/all)` - see [COPY and RENAME](../../70-commands/file-directory/spec.md#overwrite). (Before 5.0 this number was keep path on exit, long since withdrawn and accepted as a no-op, so a configuration file still carrying `OPTION 6` keeps the behaviour it always had.) | Yes |
 | `7` | use old style syntax checking of `IF` statements | Yes (4.18+) |
 | `8` | use old style loop counter for keyboard — 2nd Option on break | |
 | `11` | don't clear unreferenced variable | Yes (4.18+) |

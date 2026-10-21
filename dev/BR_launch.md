@@ -13,7 +13,7 @@ never hand-edited.
 
 | Fact | Value | Nature |
 |---|---|---|
-| **BR executable** | `$BR_EXE` | Ships with the kit — BR 5.0, in `ai_access/` |
+| **BR executable** | `$BR_EXE` | Ships with the kit — BR 5.0 x64 Release, in `tools/` |
 | **`br_mcp_driver.exe`** | `$BR_MCP_DRIVER` | Ships with the kit — launches a live BR 5.0 session for the harness ([below](#harness-launch)) |
 | **`brconfig.sys`** | `$BR_CONFIG` | Existing app startup config |
 | **`brconfig.ai_util`** | `$BR_AI_UTIL` | AI Utility — headless (`UNATTENDED`) |
@@ -21,7 +21,7 @@ never hand-edited.
 | **`brls.exe`** | `$BRLS_EXE` | Standalone syntax pre-check (optional semantic pass via `-check -sema`) — does **not** invoke BR (§6.1) |
 
 ```powershell
-$env:BR_EXE        = "context\dev\ai_access\brserver.exe"
+$env:BR_EXE        = "context\dev\tools\brserver-x64-Release.exe"
 $env:BR_MCP_DRIVER = "context\dev\ai_access\br_mcp_driver.exe"
 $env:BR_CONFIG     = "context\dev\tools\brconfig.sys"
 $env:BR_AI_UTIL    = "context\dev\tools\brconfig.ai_util"
@@ -30,7 +30,7 @@ $env:BRLS_EXE      = "context\dev\tools\brls.exe"
 ```
 
 ```bash
-export BR_EXE="context/dev/ai_access/brserver.exe"
+export BR_EXE="context/dev/tools/brserver-x64-Release.exe"
 export BR_MCP_DRIVER="context/dev/ai_access/br_mcp_driver.exe"
 export BR_CONFIG="context/dev/tools/brconfig.sys"
 export BR_AI_UTIL="context/dev/tools/brconfig.ai_util"
@@ -38,8 +38,9 @@ export BR_AI_USER="context/dev/tools/brconfig.ai_user"
 export BRLS_EXE="context/dev/tools/brls.exe"
 ```
 
-**`$BR_EXE` is BR 5.0, and it is the same `brserver.exe` the harness runs.** The executables
-live in [`ai_access/`](ai_access/); the config files stay in [`tools/`](tools/). Run directly, as
+**`$BR_EXE` is BR 5.0, and with it exported it is also the BR the harness runs.** BR itself
+lives in [`tools/`](tools/) beside the config files; the driver and `brls.exe` live in
+[`ai_access/`](ai_access/). Run directly, as
 every invocation in this file does, it is an ordinary BR: it runs a program and leaves you its
 output, and opens no harness channel. To attach to a **live** session and watch a screen, start
 it through `$BR_MCP_DRIVER` instead — see [Live sessions](#harness-launch) below, then
@@ -172,38 +173,43 @@ runs (its screen, its fields, its listviews, a picture of its window), start the
 the BR MCP driver instead. What you can do once it is up is in [`BR_harness.md`](BR_harness.md).
 This section is only how to bring it up.
 
-### The files in `ai_access/`
+### The files the harness uses
 
-**[`ai_access/`](ai_access/) is self-contained, and that is the whole of the setup.** Four
-files, and nothing on `PATH`, nothing in the registry and **no environment variables required**:
+Two folders, and nothing on `PATH` and nothing in the registry. **BR is not in `ai_access/`**:
+since 2026-10-21 it is deployed to [`tools/`](tools/), and the driver finds it only through a
+variable or a flag (below).
 
-| File | What needs it | Kept current by |
-|---|---|---|
-| `br_mcp_driver.exe` (`$BR_MCP_DRIVER`) | you — it is the launcher and the MCP server | `br/mcpdriver/build.ps1` |
-| `brserver.exe` (`$BR_EXE`) | the driver: `$BR_EXE` or `$BRSERVER` if either is set, else **exactly that name** beside itself | `br/winbuild/dllbuild/bld.ps1` |
-| `brclientdll500-<platform>-<config>-gui.dll` | BR, which loads it from its own directory | the same, as a pair with the server |
-| `brls.exe` | the `check_source` tool, which the driver finds beside itself | the brls tree's own `build.ps1` |
+| File | Folder | What needs it | Kept current by |
+|---|---|---|---|
+| `br_mcp_driver.exe` (`$BR_MCP_DRIVER`) | `ai_access/` | you — it is the launcher and the MCP server | `br/mcpdriver/build.ps1` |
+| `brls.exe` | `ai_access/` | the `check_source` tool, which the driver finds beside itself | the brls tree's own `build.ps1` |
+| `brserver-x64-Release.exe` (`$BR_EXE`) | `tools/` | the driver, through `--br`, `$BRSERVER` or `$BR_EXE` | `br/winbuild/dllbuild/bld.ps1` |
+| `brclientdll500-x64-Release-gui.dll` | `tools/` | BR, which loads it from its own directory | the same, with the server |
+| `brclient-x64-Release.exe` | `tools/` | a person starting a client by hand | the same, with the server |
 
-**Each is deployed here by whatever builds it, on every build**, with an up-to-date
-check so that costs nothing and a warning rather than a failure when this folder is
-not on the machine. Nothing is hand-copied, and that is deliberate: every one of these
-four has gone silently stale at least once, and a stale one does not announce itself
-([`BR_harness.md` §1](BR_harness.md#setup)).
+**Each is deployed by whatever builds it, on every build**, with an up-to-date check so that
+costs nothing and a warning rather than a failure when the folder is not on the machine.
+Nothing is hand-copied, and that is deliberate: every one of these has gone silently stale at
+least once, and a stale one does not announce itself ([`BR_harness.md` §1](BR_harness.md#setup)).
 
-*Measured, with every variable explicitly unset:* the driver found BR, BR loaded its DLL, the
-channel came up on **protocol 5**, and `windows`, `program`, `get_reference` and `check_source`
-all answered.
+**Only an x64 Release build updates `tools/`** — a full build, or
+`bld.ps1 -Recompile -Configuration Release`. The everyday Debug `-Recompile` leaves it as it is,
+so a change you have only built in Debug is not yet in the BR the kit runs.
 
-**The server is renamed and the DLL is not, and both of those matter.** The driver resolves BR
-as `$BRSERVER`, then a file called exactly `brserver.exe` beside itself, then `PATH`, so the
-name has to be that one for the second route to work. The DLL keeps its versioned name because
-BR builds the name it looks for from **compile-time constants** (release, platform,
-configuration, display) and prefixes its own directory. The server's filename plays no part,
-so renaming the server does not disturb it. **They are a matched pair**, so `bld.ps1` copies
-both whenever either is out of date, and deletes a `brclientdll*-x64-Debug-gui.dll`
-left behind by an earlier version string.
+**The driver needs to be told where BR is.** It resolves BR as `--br`, then `$BRSERVER`, then
+`$BR_EXE`, then a file called exactly `brserver.exe` beside itself, then `PATH`. The first
+variable that is set decides, even when what it names is missing. No `brserver.exe` ships beside
+the driver any more, so with no flag and neither variable set, `start` refuses with
+`brserver.exe was not found`. Exporting `$BR_EXE` as above is enough.
 
-**Running `$BR_EXE` directly gives you no harness.** It is the same `brserver.exe`, but the
+**The three BR files are a matched set.** The DLL keeps its versioned name because BR builds the
+name it looks for from **compile-time constants** (release, platform, configuration, display)
+and prefixes its own directory; the server's filename plays no part. A new server beside an old
+DLL is a mismatch BR cannot report usefully, so `bld.ps1` copies all three whenever any one is
+out of date, and deletes a `brclientdll*-x64-Release-gui.dll` left behind by an earlier version
+string.
+
+**Running `$BR_EXE` directly gives you no harness.** It is the same executable, but the
 channel is opened only by the procedure the driver starts BR on (below), so a session started by
 any invocation earlier in this file has no channel to attach to.
 
@@ -213,8 +219,8 @@ and `get_layout` answer at all. *Measured: with the kit found, `guide` comes bac
 catalogue (49 reference topics and every data-dictionary file name), and
 `get_reference print-fields` returns this kit's own `PRINT FIELDS` section.*
 
-Two overrides exist for when the folder is not what you want to run: **`$BRSERVER`** to point
-at a different BR, and **`$BRLS`** at a different checker. Both are read by the process that
+Two variables choose what runs: **`$BRSERVER`** (or `$BR_EXE`) names the BR, and **`$BRLS`**
+names a checker other than the `brls.exe` beside the driver. Both are read by the process that
 runs `start`, and only that one. The MCP shim ([below](#harness-mcp)) holds no credential, no
 connection and no state.
 
@@ -269,8 +275,9 @@ one's.
 command line, hunts `brconfig.sys` beside the executable and then in the launch folder, and
 comes up on whichever it meets first — a session with different `DRIVE` mappings and no
 `LOGGING`, which looks like a working session right until something reaches for a file. Note
-that the first place it looks is **`ai_access/`**, where the build script puts BR but no
-configuration file, so what you actually get is the launch folder's.
+that the first place it looks is beside BR, which is now **`tools/`** — and `tools/` holds
+`brconfig.sys`, the application's own startup configuration. So what you get is that file,
+with its `EXECUTE` lines (which start the application) and none of the AI configs' changes.
 
 Three config keywords change what you can see, and they are the session's, not yours:
 
@@ -303,8 +310,8 @@ the whole command:
 | | `--config` | `--br` |
 |---|---|---|
 | 1. the flag, if given | the file it names | the BR it names |
-| 2. else the variable | `$BR_AI_USER` | `$BR_EXE`, else `$BRSERVER` |
-| 3. else | BR's own `brconfig.sys` hunt — see the warning above | `brserver.exe` beside the driver, else `PATH` |
+| 2. else the variable | `$BR_AI_USER` | `$BRSERVER`, else `$BR_EXE` |
+| 3. else | BR's own `brconfig.sys` hunt — see the warning above | `brserver.exe` beside the driver (none ships there now), else `PATH` |
 
 *Measured, 2026-10-18:* with `$BR_EXE`, `$BRSERVER` and `$BR_AI_USER` all pointed at files
 that do not exist, `start --br <real> --config <real>` came up and claimed the channel — the
@@ -317,7 +324,7 @@ which BR and which configuration it actually got:
 
 ```
 configuration from BR_AI_USER: context\dev\tools\brconfig.ai_user
-BR started from context\dev\ai_access\brserver.exe (pid 26860) on BR_dev.prc; waiting for the channel
+BR started from context\dev\tools\brserver-x64-Release.exe (pid 26860) on BR_dev.prc; waiting for the channel
 harness claimed on port 8720, protocol 5
 ```
 

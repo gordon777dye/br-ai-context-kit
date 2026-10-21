@@ -102,7 +102,7 @@ Create 2 of the 4 files to be used by AI for application development.
 
 | Role | Path |
 |---|---|
-| BR executable (BR 5.0) | `context/dev/ai_access/brserver.exe` |
+| BR executable (BR 5.0) | `context/dev/tools/brserver-x64-Release.exe` |
 | Existing app startup config | `context/dev/tools/brconfig.sys` |
 | AI Utility config (headless) | `context/dev/tools/brconfig.ai_util` |
 | AI User config (interactive) | `context/dev/tools/brconfig.ai_user` |

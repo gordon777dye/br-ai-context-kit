@@ -233,13 +233,16 @@ the command adds one itself (`LOAD`, `RUN`, `LIST <`).
 |---|---|
 | one | it is put in. A directory gets a separator after it, so the next Tab goes into it. A file that is the first name of `COPY` or `RENAME` gets a blank after it, ready for the second (a `>` file does not) |
 | none | the bell; the line is unchanged |
-| several | what they all start with is put in, if that is more than was typed, and the bell sounds |
+| several | they are **listed**, sorted, in columns above the command line, and the line comes back below the list with the first of them put in and the cursor after it. No bell |
 
 Tab again, with the line and the cursor exactly as the last Tab left them,
-**lists** the names, sorted, in columns above the command line, and the line
-comes back below the list. The list is cut to the height of the screen less
-three rows and ends `... and n more`. Anything typed or moved in between makes
-the next Tab a fresh completion, not a listing.
+puts the **next** name in place of the one before, and after the last comes
+round to the first again; the list is shown only once. Enter takes the name
+that is there. Anything typed or moved ends the round and makes the next Tab a
+fresh completion, so a directory is entered by typing `\` or `/` after it and
+pressing Tab. A name put in this way gets nothing after it: no separator for a
+directory and no blank before a second name. The list is cut to the height of
+the screen less three rows and ends `... and n more`.
 
 <a id="tab-details"></a>
 ### 3.2 Details

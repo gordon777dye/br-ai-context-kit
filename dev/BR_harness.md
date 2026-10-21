@@ -72,7 +72,8 @@ application is `GUI ON`, because ScreenIO's listviews cannot exist without it (�
 ## 1. What has to be true before anything works
 
 **Setting up and starting a session is in [`BR_launch.md`](BR_launch.md#harness-launch)**: the
-four files in [`ai_access/`](ai_access/), the procedure that has to sit in BR's start folder (the
+driver and `brls.exe` in [`ai_access/`](ai_access/), BR itself in [`tools/`](tools/) (which the
+driver finds only through `$BR_EXE`, `$BRSERVER` or `--br`), the procedure that has to sit in BR's start folder (the
 one that will cost you an hour), the configuration file, and the MCP server entry. Two things
 remain here, because you only meet them once you are attached.
 
@@ -94,9 +95,10 @@ answered `ERR 4`, and `shot` replied without any of the fields §5 describes. `c
 first call §0 tells you to make — is the one most likely to be missing**, and a BR that is
 only a little behind looks like one that works.
 
-This is why `brserver.exe` and its DLL are **replaced together by the build script**
-([`BR_launch.md`](BR_launch.md#harness-launch)) rather than left to drift. You will meet it
-anyway if you point `$BR_EXE` (or `$BRSERVER`) at a BR of your own.
+This is why BR's three files in [`tools/`](tools/) are **replaced together by the build script**
+on every x64 Release build ([`BR_launch.md`](BR_launch.md#harness-launch)) rather than left to
+drift. You will still meet it after a change built only in Debug, which does not reach `tools/`,
+or if you point `$BR_EXE` (or `$BRSERVER`) at a BR of your own.
 
 Two things to do about it:
 
@@ -108,7 +110,8 @@ Two things to do about it:
    answer carries a `REQUESTS` record naming what *this* session offers, and
    [`AI-Access-Protocol.md`](ai_access/AI-Access-Protocol.md) says plainly that this is the list
    to test against and not the number. In practice: call `windows` early, and if it answers
-   `ERR 4`, get a newer BR beside the driver before going further.
+   `ERR 4`, get a newer BR — an x64 Release build, which deploys to `tools/` — before going
+   further.
 
 ### 1.2 One client at a time
 

@@ -97,7 +97,22 @@ directory; `@:file file` pulls from it; `@::` for client absolute paths).
 <a id="rename"></a>**RENAME** renames or moves one or more files (wildcards ok — `RENAME C:*.*
 C:\DIR\*.*` moves a whole group keeping each original name). Options: `-N` (no action log), `-P`
 (pause per screen), `-V` (verify each rename), **`-F`** (force-delete an existing target when needed to
-complete the rename); `PRINT` / `>` / `>>` redirect the log. **TYPE** sends a file's contents to the
+complete the rename); `PRINT` / `>` / `>>` redirect the log.
+
+<a id="overwrite"></a>**Onto a file that exists (BR 5.0).** `COPY` and `RENAME` ask before replacing
+one: `Overwrite <full target name>? (y/n/all)` on a line of its own. `Y` overwrites, `N` leaves that
+file and goes on to the next, `A` overwrites it and every later one in the command without asking,
+and Esc stops the command. **`-F`** overwrites without asking, on `COPY` as well as `RENAME`. Nobody
+is asked in `UNATTENDED` mode or while an assistant holds the prompt: the command stops with error
+**4150** (file already exists), and `-F` is the way past it. A target that is the source itself under
+another name (a change of case, a relative or 8.3 short name, a hard link) is not another file, so
+nothing is asked or refused: `RENAME` goes ahead, and `COPY` becomes a `RENAME`, since there is no
+second file to make. The file is left under the second name exactly as written, so `RENAME abc.txt
+abc.txt` turns `Abc.txt` into `abc.txt`. [`OPTION 6`](../../00-configuration/config-directives/OPTION_(Config).md)
+restores the earlier behaviour: `COPY` replaces the file silently and `RENAME` refuses it with **4150**
+unless `-F`.
+
+**TYPE** sends a file's contents to the
 screen, a printer, or another file. **MKDIR** subdirectory names follow file-name rules, and the same
 name may exist under different parent directories.
 
