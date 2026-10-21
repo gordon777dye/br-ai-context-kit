@@ -10,6 +10,7 @@ recovered-fold: REPLACE (folded+pruned — source-vs-object/.BRS/.BRO rules, .BA
 related: [file-directory, information, editing]
 keywords: [RUN, LOAD, SAVE, REPLACE, MERGE, CLEAR, GO, EXECUTE, CHAIN, PROC, SYSTEM, LOGOFF, ALL, SUBPROC, PROCERR, ALERT, FILES, ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP, NOTRACE]
 corrections:
+  - "Added the command-help section: `-?` as the whole of a command's arguments lists what the command takes (BR 5.0, wbosCommandHelp() in wbos.cpp, called from cmdproc() in commandc.cpp). In the same pass, from the BR 5.0 parsers (see br50 br/docs/FLAGS.md): SKIP's label is written without its colon - the BNF said `SKIP n|:label`, which never matches, while this page's own example used `SKIP BUSY` - and a label search wraps to the top of the procedure (command0.cpp SKIP_CMD); PROCERR REM documented (command0.cpp PROCERR, command.cpp proc_comment); SYSTEM -W and +n are accepted and ignored, -W setting SHC_WINDOWS only under BR_V4, and SYSTEM ONQ is no longer special (command7.cpp SYSTEM_CMD); CLEAR name clears a resident program without RESIDENT, and CLEAR ... STATUS demotes only while a program is halted (command7.cpp CLEAR). From source reading, not yet confirmed by a run. 2026-10-21."
   - "SAVE / REPLACE now states which object format is written: level 39 in BR 5.0, level 38 in 4.2/4.3, an older BR refusing level 39 with error 2240, and OPTION 60 selecting level 38. The page described source-versus-object and said nothing about the format level, which an upgrade has to know. From BR 5.0 source: brexe.cpp (SAVE_LEVEL, processNewSaveFile, loadExeFile's level test), config.cpp case 60. Confirmed on brserver 5.0 x64 Debug: a default SAVE wrote level 39 and BR 4.33c refused it with 2240; with OPTION 60 it wrote level 38 and 4.33c loaded it."
   - "SYSTEM LOGOFF was one line (`log the BR client off`). Now documents `SYSTEM LOGOFF [ALL]` in the system-logoff subsection: it is an exit form (exit code 0, error 2108 if keyed while a program is active), what the client clears at exit, and that ALL widens only the session-table clear from this session's slot to all nine. Also the parse rules: ALL is a whole word, and nothing else after LOGOFF is read. LOGOFF and ALL added to keywords. From BR source in context/lsp/brls/brs: command7.cpp SYSTEM_CMD (the LOGOFF/ALL parse and the CLIENT_LOGOFF_ASYNC call), remoteargs.cpp (sets g_logoffAtExit and g_logoffAllSessions), brterm.cpp (runs logoffClient at client exit), term.cpp logoffClient, session.cpp clearSessionID/clearSessionIDs, brlistener.cpp logoffSession. Confirmed on brserver 5.0 x64 Debug over a live client/server link: with eight slots occupied, plain SYSTEM LOGOFF cleared only this session's slot and left the other seven; SYSTEM LOGOFF ALL zeroed all nine; SYSTEM LOGOFF ALLOCATE behaved as plain SYSTEM LOGOFF. All three forms cleared AutoLogin, Remember me, the saved Windows credential and the ClientServer persistent-login id for the listener port."
   - "RUN syntax now shows the program name and the PROC option: `RUN [<program>] [PROC] [STEP|TRACE]`. Added a run-proc subsection giving the literal forms (`RUN <program> PROC`, or `LOAD <program>` then `RUN PROC`) and saying they work only inside a procedure. The page had described RUN PROC's effect and never its syntax. From BR 5.0 source: command9.cpp PROC_TYPE sets RUN_PROCIN and raises BREPROCPARAMETER (2103) when no proc is active. commandc.cpp RUN reads a first word that is an option (PROC among them) as that option, not a file name. Confirmed on brserver 4.33c with a probe: both forms gave PROCIN=1 and fed the LINPUT; plain RUN gave PROCIN=0; the startup argument `RUN <prog> PROC` gave 2103. Reported in context/lsp/ERRORS.md 2026-09-09."
@@ -49,6 +50,18 @@ A **command** executes immediately when typed (no line number) and manages the e
 Any statement can be run immediately as a command; a bare expression is an implied `PRINT`
 (`6+4`→`10`). Commands can't appear in a program **except** via `EXECUTE` or inside a `PROC`.
 
+<a id="command-help"></a>
+## `-?` — what a command takes (BR 5.0)
+
+Any command given `-?` as the **whole** of its arguments lists the forms and options it accepts and
+does nothing else: `COPY -?`, `LIST -?`, `STATUS -?`. Nothing runs, so `RUN -?` loads nothing and
+`SYSTEM -?` does not leave BR. `-?` alongside other arguments is not the help: `COPY a.txt -?` is a
+`COPY` with an unknown option, a syntax error, and a `LIST` search string containing `-?` is a
+search. A long list pauses after each screenful (any key goes on, Ctrl-A stops). `DIR -?` lists the
+options of the listing in use — the 5.0 ones, or the 4.x ones under `OPTION 8`. Every command in
+BR's command table has it except `HELP` (and the internal `LINK`). The lists are written from each
+command's parser, so where this tree and `-?` differ, `-?` is the one that matches the code.
+
 <a id="entry-exit"></a>
 ## Entry & exit
 ```bnf
@@ -83,13 +96,13 @@ SYSTEM [<flags>] "<os-command>"                      -- run an OS shell command,
 | `-C` / `-c` | **continue asynchronously** — don't wait for the command to finish (conflicts with `-R`) |
 | `-M` / `-m` | **hide** / **minimize** the launched program's window |
 | `-H` / `-h` | **hide** / **minimize** BR's own window during the call |
-| `-W` / `-w` | a **Windows** program is being launched (conflicts with `-R`) |
+| `-W` / `-w` | accepted and **ignored** in BR 5.0 (it marked a Windows program in 4.x, and no longer conflicts with `-R`) |
 | `-E` / `-e` | permit a shell-call **error** to be reported/trapped |
 | `-P` / `-p` | page |
 | `-T`/`-t<secs>` | override the shell-call **timeout** |
-| `+<n>` | request `<n>` of memory for the child |
+| `+<n>` | accepted and **ignored** (it once requested `<n>` of memory for the child) |
 
-(`SYSTEM ONQ …` invokes the built-in ONQ interface rather than a generic shell command.)
+(`SYSTEM ONQ …` is an ordinary shell command in BR 5.0: the built-in ONQ interface was removed.)
 
 <a id="system-logoff"></a>
 #### SYSTEM LOGOFF / SYSTEM LOGOFF ALL
@@ -186,8 +199,9 @@ set or not.
 `CLEAR` (`CL`) with no argument clears the program for new entry. `ALL` ends the program, closes all
 procedures and clears memory. `PROC` closes all procedures but **keeps** memory (variables remain
 for debugging); `PROC ONLY` additionally keeps the program running. `RESIDENT` clears all resident
-libraries (`"name"` clears one); adding `STATUS` instead *demotes* resident → present rather than
-unloading. `CHAIN` and `LOAD` perform an implicit `CLEAR`.
+libraries (`"name"` clears one, and so does `CLEAR name` without `RESIDENT`); adding `STATUS`
+instead *demotes* resident → present rather than unloading — but only while a program is halted;
+otherwise `STATUS` is read as `RESIDENT`. `CHAIN` and `LOAD` perform an implicit `CLEAR`.
 
 <a id="go"></a>
 ### GO — resume / step
@@ -272,8 +286,11 @@ RUN PROC                     ! ... then run what is in memory with proc-fed inpu
   ends, the following proc lines are commands again. Confirmed on 4.33c.
 - **The `RUN … PROC` line must not be the proc's last line.** See [look-ahead](#look-ahead).
 
-**Flow & errors**: `SKIP n|:label [IF <cond>]` branches; `PROCERR STOP` (default) halts on error,
-`PROCERR RETURN` continues (sets `ERR`); `ALERT msg` pauses for the operator (`GO` resumes; under
+**Flow & errors**: `SKIP n|label [IF <cond>]` branches — the label is written **without** its
+colon (`SKIP BUSY` goes to the line `:BUSY`; `SKIP :BUSY` never matches), and a label search that
+reaches the end of the procedure carries on from the top, so a skip may go backward;
+`PROCERR STOP` (default) halts on error, `PROCERR RETURN` continues (sets `ERR`), and
+`PROCERR REM`, with `RETURN`, keeps a program line that fails to load as a `REM`; `ALERT msg` pauses for the operator (`GO` resumes; under
 `PROC NOECHO` the message shows but the operator must press F2/F3 to see the *command* — bracket
 `ALERT` with `PROC ECHO`…`PROC NOECHO`); `CLEAR PROC` / `CLEAR ALL` close procedures.
 

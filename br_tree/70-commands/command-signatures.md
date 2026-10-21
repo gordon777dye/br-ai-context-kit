@@ -5,6 +5,8 @@ category: 70-commands
 subcategory: 70-commands
 kind: reference
 related: [program-management, file-directory, information, editing]
+corrections:
+  - "Brought into line with the 2026-10-21 corrections to the four command specs (from the BR 5.0 parsers; see br50 br/docs/FLAGS.md): a fifth reading rule for the `-?` command help; COPY/DROP/FREE lose -A, which BR accepts and ignores, and COPY gains -F; the record-length rule narrowed; TYPE gains -P; PROTECT gains READ and WRITE; EDIT gains its operands; BREAK and DISPLAY gain IF and FILE; PROCERR gains REM. brls reads these signatures through its generator, so it follows only once regenerated."
 ---
 
 # Command signatures
@@ -41,23 +43,28 @@ whatever it holds.
 <a id="reading"></a>
 ### How a line is read
 
-The signatures describe the operands; four rules describe how BR reads the line around them, and are
+The signatures describe the operands; five rules describe how BR reads the line around them, and are
 applied to every command. Each was found by running the signatures over the QSMRP source, where
 production programs use forms the command specs do not write down, and each is backed by the tree where
 the tree speaks:
 
 - **Options stand anywhere.** A word that is a dash and letters or digits (`-N`, `-D`, `-124`) is an
   option, and is passed over wherever it falls and for any command. The specs list options per command
-  ([file-directory](file-directory/spec.md) gives `-A -C -D -N -P -S -V -F` for the file commands, and
+  ([file-directory](file-directory/spec.md) gives `-D -F -N -P -S -V` for the file commands, and
   [INDEX](../30-io-file/keys-indexes/INDEX.md) gives `-N`), but QSMRP also writes `-N` after `SORT`,
   `TYPE`, `DIR`, `MKDIR`, `PROTECT` and `PROC`, and `COPY a b -124 -d -n` with the record length
-  *before* other options although the spec says it must be last. The letters are not checked.
+  *before* other options, which BR accepts: it must be last only within one combined option word. The
+  letters are not checked.
 - **A comma is a blank.** [INDEX.md](../30-io-file/keys-indexes/INDEX.md) says parameters are
   separated by spaces or commas, and QSMRP writes `PROTECT f Release` and `PROTECT f, Release` alike.
   A `','` in a signature is therefore never required.
 - **Keywords may be abbreviated** to two letters or more (`INDEX … Rep Dup -N`). The commands have no
   table to say which prefixes are unique, so any prefix is accepted.
 - **Case is ignored.**
+- **`-?` alone is the command help** (BR 5.0). A line whose operands are exactly `-?` matches every
+  command in BR's table except `HELP` and `LINK`: it lists the command's options and runs nothing
+  ([command-help](program-management/spec.md#command-help)). `-?` among other operands is not this,
+  and is not an option either, since `?` is neither a letter nor a digit.
 
 | Operand | Accepts |
 |---|---|
@@ -82,26 +89,26 @@ AUTO     [<int>] [[','] <int>]
 RENUM    [<dashint>] [<dashint>] [<int>] [<int>] [LABELS_ONLY]
 DEL      <word> [<word>] [SOURCE]
 LIST     { <fromfile> [<int> [<int>]] | [<word>] [<word>] [<search>] [<search>] [<search>] [REPLACE <string>] [<redirect>] }
-EDIT
+EDIT     [{ '-' | '~' | <path> }]
 
 -- file-directory/spec.md#syntax
 CHDIR    [<path>] [<flags:N>]
 MKDIR    <path>
 RMDIR    <path>
 DIR      [<path>] [<flags:AOLPWUCB>] [<redirect>]
-COPY     <path> <path> [<flags:ACDNPSV>] [<dashint>] [<redirect>]
-RENAME   <path> <path> [<flags:NPVF>] [<redirect>]
-TYPE     <path> [<redirect>]
-DROP     <path> [<flags:ANPV>] [<redirect>]
-FREE     <path> [<flags:ANPV>] [<redirect>]
-PROTECT  <path> ',' { RESERVE | RELEASE }
+COPY     <path> <path> [<flags:DFNPSV>] [<dashint>] [<redirect>]
+RENAME   <path> <path> [<flags:DNPVF>] [<redirect>]
+TYPE     <path> [<flags:P>] [<redirect>]
+DROP     <path> [<flags:NPV>] [<redirect>]
+FREE     <path> [<flags:NPV>] [<redirect>]
+PROTECT  <path> ',' { RESERVE | RELEASE | READ | WRITE }
 
 -- information/spec.md#syntax
 DATE     [<word>]
 TIME     [<word>]
 RUN      [<word>] [PROC] [STEP] [TRACE] [NORESTORE] [RESTORE]
-BREAK    { ALL OFF | ['-p' <word>] <word> [OFF] }
-DISPLAY  ['-p' <word>] { ALL | MAT <word> | <word> } [{ OFF | <redirect> }]
+BREAK    { ALL OFF | IF <text> | FILE <word> [{ OPEN | CLOSE }] [OFF] | ['-p' <word>] <word> [OFF] [IF <text>] }
+DISPLAY  { FILE <word> [{ OPEN | CLOSE }] [OFF] [PRINT] | ['-p' <word>] { ALL | MAT <word> | <word> } [{ OFF | <redirect> }] [IF <text>] }
 STATUS   [<status-topic>] [<text>]
 VERIFY
 
@@ -115,7 +122,7 @@ CLEAR    [{ ALL | PROC [ONLY] | RESIDENT [<string>] [STATUS] }]
 GO       [RUN] [{ STEP | NOSTEP }] [{ TRACE [PRINT] | NOTRACE }] [<word>]
 PROC     [<text>]
 SUBPROC  <text>
-PROCERR  { STOP | RETURN }
+PROCERR  { STOP | RETURN | REM }
 ALERT    <text>
 SKIP     <word> [IF <text>]
 

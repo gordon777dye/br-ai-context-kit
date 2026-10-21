@@ -155,7 +155,8 @@ in its first dot matches only names with no dot. A glob is taken as written:
   and `>` work as for any `DIR`; `-O` sorts within each directory.
   `DIR` lists directories that match as well as files.
 - `COPY`, `RENAME`, `FREE`, `DROP` and `TYPE` act on **files only**, never on a
-  matching directory.
+  matching directory. (`RENAME -D` renames one folder, and takes no pattern; see
+  [spec.md](spec.md#rename-folder).)
 - `COPY ... dir\` puts every file into the directory, **without its
   sub-directories**, so two files with the same name from different
   directories overwrite each other. `RENAME` and `COPY` to a name with `*` apply

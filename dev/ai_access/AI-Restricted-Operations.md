@@ -660,7 +660,7 @@ either mode. These lists say what each state does and does not do.
   read, so the name has nothing to mean there.
 - The AI-user-mode flag goes up on a valid `HELLO` and cannot be taken down by anything while the
   connection lasts - not a program, not the user, not an agent holding the keyboard.
-- With `GUI OFF`, `SCROLLBACK` is withheld and left out of `PING`'s request list.
+- With `GUI OFF`, `HISTORY` is withheld and left out of `PING`'s request list.
 - `COMMAND` is refused outside of a turn of the console conversation.
 - **A turn cannot open over work in progress without its consent.** While a program or a
   procedure is active, the `AI` command itself is refused with **4169** unless

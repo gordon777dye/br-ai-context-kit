@@ -10,6 +10,8 @@ recovered-fold: MkDir, RENAME (2 redirect-collision pages folded from re-fetched
 related: [program-management, information]
 keywords: [DIR, COPY, RENAME, MKDIR, RMDIR, CHDIR, FREE, PROTECT, DROP, TYPE]
 corrections:
+  - "From the BR 5.0 parsers (see br50 br/docs/FLAGS.md), 2026-10-21, source reading not yet confirmed by a run: COPY, FREE and DROP `-A` removed from the BNF and described as accepted with no effect - findSources() collects every file whatever its archive bit and nothing clears it (wbos.cpp); COPY's BNF gains `-F`, already documented in the overwrite section; the `-<n>` must-be-last rule narrowed to a combined option word (options(), the default case), which is how QSMRP's `COPY a b -124 -d -n` works; TYPE gains `-P` and, new in 5.0, a digit at its pause (processTypeFile()); PROTECT gains READ and WRITE (command0.cpp PROTECT); and the intro points at the new `-?` command help. Later the same day COPY `-C` (prompt for another diskette on a full disk) was removed from BR 5.0, and is removed here from the BNF, the options and the example."
+  - "BR 5.0, 2026-10-21, from the source change (confirmed headless with a proc: a folder renamed, a folder moved into an existing folder, and a file and a folder refused on E: with both left in place): RENAME gains `-D` to rename a folder (wbos.cpp, RENAME_CMD), and RENAME refuses a target on another file system with 4138, whose message now covers both cases (renameFile() in file_os.cpp, MoveFileEx without MOVEFILE_COPY_ALLOWED; EXDEV on Unix). Added the rename-folder and rename-filesystem paragraphs and `-D` in the BNF."
   - "TYPE added to the frontmatter keywords. `TYPE <file>` is in this page's BNF and its semantics, and was not declared. Found in brls phase 13."
   - "FREE's abbreviation `FR` removed: FREE has none, so only `FREE` in full deletes a file. `FRE` is refused with error 1000 (unidentified source remaining), and in 5.0 `FR` goes to the same refusal (it had reached calculator mode, where a bare `FR` printed a variable). `F <file>` also ends in error 1000; a bare `F` is still an expression. Confirmed by running `FR <file>`, `fr <file>`, `FR` and `F <file>` headless: error 1000 each time and the file kept; `FREE <file>` deleted it. 2026-10-20."
 ---
@@ -20,7 +22,9 @@ OS-level file and directory operations, runnable interactively or from a procedu
 For opening files inside a program see
 [30-io-file/statements](../../30-io-file/statements/spec.md). Each command has a short abbreviation
 (in parentheses below). Options follow a leading dash and may be combined (`-AW`); a `-<n>` record
-length, when combined, must come **last**.
+length, when combined into one word, must come **last** in it (`-D124`, not `-124D`) — as a word of
+its own it may stand anywhere (`-124 -D`). In BR 5.0 each command lists its own options when given
+[`-?`](../program-management/spec.md#command-help) alone (`COPY -?`).
 
 <a id="syntax"></a>
 ## Syntax
@@ -30,12 +34,12 @@ CHDIR [<drive>':'] ['\']<path> [-N]     -- CD / CH; no arg = show current dir
 MKDIR [<drive>':']<path>                -- MK
 RMDIR [<drive>':']<path>                -- RM; directory must be empty
 DIR  [<drive>':'][<path>][<filename> | <glob>] [-AOLPWUCB] [PRINT | '>'['>'] <file>]   -- DI
-COPY   <from> { <to> | PRN: | AUX: } [-ACDNPSV] [-<new_recl>] [PRINT | '>'['>'] <file>]  -- COP
-RENAME <from> <to> [-NPVF] [PRINT | '>'['>'] <file>]   -- REN; renames or moves (wildcards ok)
-TYPE   <file> [PRINT | '>'['>'] <file>] -- TY; dump a file to screen/printer/file
-DROP <file-ref> [-ANPV] [PRINT | '>'['>'] <file>]   -- DR; empties contents, keeps the name (size→0)
-FREE <file-ref> [-ANPV] [PRINT | '>'['>'] <file>]   -- no abbreviation; deletes the file (unrecoverable)
-PROTECT <file-ref> ',' { RESERVE | RELEASE }        -- PROT; reserve a path to one workstation
+COPY   <from> { <to> | PRN: | AUX: } [-DFNPSV] [-<new_recl>] [PRINT | '>'['>'] <file>]  -- COP
+RENAME <from> <to> [-DNPVF] [PRINT | '>'['>'] <file>]  -- REN; renames or moves (wildcards ok); -D a folder
+TYPE   <file> [-P] [PRINT | '>'['>'] <file>] -- TY; dump a file to screen/printer/file
+DROP <file-ref> [-NPV] [PRINT | '>'['>'] <file>]   -- DR; empties contents, keeps the name (size→0)
+FREE <file-ref> [-NPV] [PRINT | '>'['>'] <file>]   -- no abbreviation; deletes the file (unrecoverable)
+PROTECT <file-ref> ',' { RESERVE | RELEASE | READ | WRITE }   -- PROT; reserve a path / set read-only
 ```
 
 <a id="semantics"></a>
@@ -48,12 +52,41 @@ current drive; `drive:\path` changes the current directory *on* that drive witho
 Relative forms work: `\` → root, `..` → parent, `..\..` → grandparent. `-N` suppresses the
 "new directory" echo (useful under `PROC NOECHO`). An invalid path raises error **4152**.
 
-<a id="dir"></a>**DIR** lists files (wildcards `*`/`?`), with file size, date and time. Options:
-`-A` archive-bit files only (DOS; ignored on Linux), `-O` sort alphabetically, `-P` pause per
-screen, `-W` wide four-column (sorted, long names; like `-C` but across not down), `-U` unadorned
-(no extended names), `-C` columnar sorted with a trailing `\` on directories and `*` on
-executables, `-L` long names + permissions (Linux), `-B` bare long name. `>file` redirects (`>>`
-appends), `PRINT` to the printer (mutually exclusive with `>`).
+<a id="dir"></a>**DIR** lists files (wildcards `*`/`?`), with file size, date and time. `>file`
+redirects (`>>` appends), `PRINT` to the printer (mutually exclusive with `>`).
+
+**BR 5.0 listing.** Sorted by name; one line per entry: `yyyy-mm-dd hh:mm`, the size in bytes with
+commas (`<DIR>` for a folder), and the long name, in double quotes if it has a space or a comma.
+No 8.3 names, and `.` and `..` are not listed. A `Directory of` heading comes first and a summary
+last (files and folders counted separately, space in KB/MB/GB/TB). Options:
+
+| Option | Effect |
+|---|---|
+| `-T` | sort by date and time, newest first |
+| `-S` | sort by size, largest first |
+| `-R` | reverse whichever order applies; ties go by name |
+| `-A` | attributes: names on Windows (`ReadOnly Hidden System Archive`); permission string, owner and group on Unix |
+| `-L` | the permission string as well (Unix); on Windows the same as no option |
+| `-N` | no `Directory of` heading |
+| `-B` | names only, one per line, quoted as in the listing |
+| `-W` | names only, across the rows, as many columns as the window holds; `\` after a folder, `*` after an executable |
+| `-C` | the same, down the columns |
+| `-M` | machine format: `bytes,yyyy-mm-dd,hh:mm:ss,type,attributes,owner,group,name`, no heading or summary, every field before the name in a fixed column, size right-aligned in 15 with no commas, type `D` or `F`, attributes `RHSA`/`-` on Windows or `rwxr-x---` on Unix, owner and group empty on Windows, name last and quoted by the CSV rule |
+| `-ddd` | only entries changed *ddd* or fewer calendar days ago (today is day 0) |
+| `+ddd` | only entries changed *ddd* or more calendar days ago; with `-ddd`, a range, both ends inclusive: `-30 +7` is days 7 to 30 |
+| `-P` | pause per screen |
+| `-O` | the pre-5.0 listing, below |
+
+An option `DIR` does not know is error **1006**. A name matching nothing is **4152**; one whose
+matches the day filters all remove lists nothing, without an error.
+
+**`-O`, or `OPTION 8`, gives the pre-5.0 listing** and the pre-5.0 meaning of every other option
+given with it: 8.3 name and extension, size switching to KB/MB, `mm/dd/yy` and a 12-hour time, the
+long name, and a summary in kilobytes; `-A` archive-bit files only (DOS; ignored on Linux), `-O`
+sort alphabetically, `-P` pause per screen, `-W` wide four-column (sorted, long names; like `-C`
+but across not down), `-U` unadorned (no extended names), `-C` columnar sorted with a trailing `\`
+on directories and `*` on executables, `-L` long names + permissions (Linux), `-B` bare long name,
+`-N` no screen output. Options meant for other commands are accepted and ignored, as before.
 
 <a id="dir-glob"></a>**Glob patterns (BR 5.0), shown for DIR.** The name may be a glob, in any part of the path.
 `*` and `?` are as above; the additions are:
@@ -67,7 +100,9 @@ appends), `PRINT` to the printer (mutually exclusive with `>`).
 
 `DIR src\**\*.cpp` lists every `.cpp` in `src` and below; `DIR data\20*\*.rpt` allows `*` and `?`
 in a directory part. The listing has a `Directory of` heading per directory that has a match, directories
-in name order, and one total; `-O` sorts within each directory. Rules:
+in name order, and one total. Each directory's entries are sorted on their own (by name, or by
+`-T`/`-S`); with `-N`, and always with `-M`, there are no headings, each name is given whole, and
+the listing is sorted as one. Under `-O`, `-O` sorts within each directory. Rules:
 
 - A last part with only `*` and `?` is unchanged (including `DIR name` meaning `name.*`); a pattern
   using any new form is taken as written, with no `.*` added.
@@ -82,11 +117,14 @@ in name order, and one total; `-O` sorts within each directory. Rules:
   it without their sub-directories. `MKDIR`, `RMDIR` and `CHDIR` take no pattern.
 
 <a id="copy"></a>**COPY** duplicates one or more files (same/different disk, or rename-in-place with
-a new name), and can copy to a device. Options: `-A` archive-bit only then clears it (DOS), `-C`
-prompt on full disk, `-D` omit deleted records (internal files — **rebuild indexes after**), `-N`
+a new name), and can copy to a device. Options: `-D` omit deleted records (internal files — **rebuild indexes after**), `-N`
 no action log, `-P` pause per screen, `-S` copy an **open** file (must be opened `SHR`/`SHRI` else
-error **4148**), `-V` verify each action, `-<n>` set the new internal-file record length
-(space-padded; must be the last option). Device targets `PRN:`/`AUX:`/`COM1:`/`LPT1:`… send to a
+error **4148**), `-V` verify each action, `-F` overwrite without asking (see
+[overwrite](#overwrite)), `-<n>` set the new internal-file record length (space-padded; last within
+a combined option word). **`-A` is accepted and has no effect**: it was documented as copying only
+archive-bit files and then clearing the bit, but BR 5.0 collects the files without looking at the
+bit and clears nothing. **`-C`** (ask for another diskette when the disk fills) **was removed in BR
+5.0**; the letter is still accepted, and does nothing for `COPY`. Device targets `PRN:`/`AUX:`/`COM1:`/`LPT1:`… send to a
 printer (on Linux these need a `SUBSTITUTE` mapping in [BRConfig.sys](../../00-configuration/config-directives/spec.md));
 copying *to* `PRN:`/`WIN:` is illegal — use `TYPE` with redirection. As of 4.2 a print file copies
 unaltered to a `DIRECT:` device. **Destination wildcards truncate**: `COPY src\* dest\*` strips the
@@ -98,6 +136,21 @@ directory; `@:file file` pulls from it; `@::` for client absolute paths).
 C:\DIR\*.*` moves a whole group keeping each original name). Options: `-N` (no action log), `-P`
 (pause per screen), `-V` (verify each rename), **`-F`** (force-delete an existing target when needed to
 complete the rename); `PRINT` / `>` / `>>` redirect the log.
+
+<a id="rename-folder"></a>**`RENAME <from> <to> -D` renames a folder (BR 5.0)**, with everything in
+it. *from* is one folder, with no wildcards; a *from* that is not a folder is error **4203**. As
+with a file, a *to* that is a folder already gets *from* put inside it under its own name; any other
+*to* that exists is refused with **4150** and never replaced, so `-F` does nothing with `-D`. A *to*
+that is the folder itself under another name (a change of case) renames it, rather than putting it
+inside itself. `-V` asks `Rename? (y/n)`. Without `-D`, `RENAME` acts on files only, as before.
+
+<a id="rename-filesystem"></a>**One file system only (BR 5.0).** `RENAME` never copies. A *to* on
+another drive, share or mounted file system is refused with error **4138** and both names are left
+as they were; use `COPY` and then `FREE`. This holds for files and for `-D`. Before 5.0 a file renamed
+to another drive on Windows was copied there and the original deleted (Unix refused it), and a
+forced rename deleted the existing target before trying, so a rename that then failed lost it; in 5.0
+the target is replaced in the same step. A rename between the client (`@:`) and the server was, and
+is, refused with the same **4138**.
 
 <a id="overwrite"></a>**Onto a file that exists (BR 5.0).** `COPY` and `RENAME` ask before replacing
 one: `Overwrite <full target name>? (y/n/all)` on a line of its own. `Y` overwrites, `N` leaves that
@@ -113,19 +166,23 @@ restores the earlier behaviour: `COPY` replaces the file silently and `RENAME` r
 unless `-F`.
 
 **TYPE** sends a file's contents to the
-screen, a printer, or another file. **MKDIR** subdirectory names follow file-name rules, and the same
+screen, a printer, or another file. **`-P`** pauses after each screenful; at the pause a digit
+from 2 to 9 shows the next that many lines before pausing again (BR 5.0), and any other key the next
+screenful. **MKDIR** subdirectory names follow file-name rules, and the same
 name may exist under different parent directories.
 
 <a id="drop-free"></a>**DROP** empties a file's contents — freeing all allocated space and leaving
 only the header record for internal files — but keeps the name (size→0). **FREE** deletes the
-file(s) outright (unrecoverable). Both take `-A`/`-N`/`-P`/`-V` and accept wildcards (use `-V` to
-verify). A procedure can `FREE` itself as its last line; a `.$$$`-named procedure self-deletes
+file(s) outright (unrecoverable). Both take `-N`/`-P`/`-V` and accept wildcards (use `-V` to
+verify); `-A` is accepted and has no effect, as on `COPY`. A procedure can `FREE` itself as its last line; a `.$$$`-named procedure self-deletes
 after running. *(The same-named `DROP`/`FREE` **CLOSE parameters** inside a program are a separate
 file operation — [30-io-file/statements](../../30-io-file/statements/spec.md#close).)*
 
 <a id="protect"></a>**PROTECT … RESERVE/RELEASE** reserves a full path name for one workstation's
 exclusive use (and releases it) — the multi-user purge idiom; see
-[30-io-file/file-model](../../30-io-file/file-model/spec.md).
+[30-io-file/file-model](../../30-io-file/file-model/spec.md). **`PROTECT … READ`** makes the file
+read-only (it is refused while the file is open for output) and **`PROTECT … WRITE`** makes it
+writable again. A name containing `*` is accepted and ignored.
 
 <a id="examples"></a>
 ## Examples
@@ -137,7 +194,7 @@ DIR DATA\*.{BRS,PRC}               ! glob (5.0): alternatives
 DIR SRC\**\*.CPP -O               ! glob (5.0): every .CPP below SRC, sorted per directory
 COPY CUST.FIL TEMP[WSID].FIL -D     ! copy omitting deleted records
 RENAME TEMP[WSID].FIL CUST.FIL
-COPY A:SAMPLE.* B: -DC              ! copy group; drop deleted recs; prompt on full disk
+COPY A:SAMPLE.* B: -D               ! copy group; drop deleted recs
 FREE *.BAK -V
 TYPE README.TXT PRINT
 ```

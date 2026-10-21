@@ -8,8 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree fold (BREAK detail, DISPLAY -p/MAT, STATUS/VERIFY, DEBUG_STR, LIST search); PROCIN/PROGRAM$ home resolved; no conflicts
 recovered-fold: NOSTEP (redirect-collision page re-fetched; NOSTEP/NOTRACE already covered by the GO bnf in program-management — pruned; verbatim retained on the BR wiki)
 related: [program-management, editing]
-keywords: [STATUS, LIST, TRACE, DISPLAY, LOGGING, STEP, BREAK, TIME, ALL, FONTS, NORESTORE, DEBUG_STR, PROGRAM$]
+keywords: [STATUS, LIST, TRACE, DISPLAY, LOGGING, STEP, BREAK, TIME, ALL, FONTS, NORESTORE, DEBUG_STR, PROGRAM$, ATTRIBUTES, BREAKPOINTS, COLORS, DIMS, ENCRYPTION, LOCKS, MEMORY, USERS]
 corrections:
+  - "From the BR 5.0 parsers (see br50 br/docs/FLAGS.md), 2026-10-21, source reading not yet confirmed by a run: the BREAK paragraph said conditional breakpoints aren't set with BREAK - BR 5.0 has `IF <cond>` on a target, `BREAK IF <cond>` and `BREAK IF OFF`, plus `BREAK FILE` (commandc.cpp breakDisplay(); release notes 3.10, 3.11); DISPLAY gains IF and FILE likewise; STATUS's topics are listed in full from table8k with -P and redirection (statcmd.cpp); VERIFY described as it is, a message and no check (wbos.cpp VERIFY_CMD); pointer to the new `-?` command help added."
   - "MSG(\"sleeptime\",n) unit corrected to milliseconds (was given as seconds here; see MSG.md corrections for the brmsg.cpp evidence). Reported in context/ERRORS.md 2026-09-28."
   - "BREAK, TIME, ALL, FONTS and NORESTORE added to the frontmatter keywords. All five are in this page's BNF — BREAK has an anchor of its own — and none was declared. Found in brls phase 13."
   - "The MSG bullet documented MSG(\"KB\"), which BR 5.0 removed - it now raises 0412 - and
@@ -34,14 +35,20 @@ single-stepping, breakpoints, variable display, and logging.
 ```bnf
 DATE [<mm-dd-yy>|<mm/dd/yy>]   TIME [<hh:mm:ss>]   -- DA/TI; show/set session date & time (this terminal)
 RUN [STEP] [TRACE] [NORESTORE|RESTORE]             -- step / trace execution (resume with GO → program-management)
-BREAK [-p <prog>] { <line>[:<clause>] | <label>: | <var> | FN<name> | BEGIN } [OFF]   -- ST mode triggers
+BREAK [-p <prog>] { <line>[:<clause>] | <label>: | <var> | FN<name> | BEGIN } [IF <cond>] [OFF]   -- ST mode triggers
+BREAK IF <cond> | BREAK IF OFF                      -- test <cond> after every line (5.0)
+BREAK FILE <name> [OPEN|CLOSE] [OFF]                -- stop when the file is opened or closed (5.0)
 BREAK ALL OFF                                       -- clear every breakpoint
-DISPLAY [-p <prog>] { <var> | MAT <array> | ALL } [OFF | PRINT | '>'['>'] <file>]
+DISPLAY [-p <prog>] { <var> | MAT <array> | ALL } [IF <cond>] [OFF | PRINT | '>'['>'] <file>]
+DISPLAY FILE <name> [OPEN|CLOSE] [OFF] [PRINT]      -- report the file's OPENs and CLOSEs (5.0)
 LIST [<range>] [~]{ "<str>" | '<str>' }[…3x] [REPLACE "<new>"] [PRINT | '>'['>'] <file>]   -- search/replace
 LOGGING <level> ',' <logfile> [',' UNATTENDED] [',' +CONSOLE]
-STATUS <topic>                                      -- ST; e.g. STATUS BREAK / LIBRARY / FONTS / ENV / ALL
-VERIFY                                               -- V; check the system recorded the disk correctly
+STATUS [<topic>…] [-P] ['>'['>'] <file>]          -- ST; topics below
+VERIFY                                               -- V; reports that verify is always on
 ```
+
+Each of these commands lists its forms and options when given
+[`-?`](../program-management/spec.md#command-help) alone (`STATUS -?`, BR 5.0).
 
 <a id="semantics"></a>
 ## Semantics
@@ -60,11 +67,16 @@ VERIFY                                               -- V; check the system reco
   a changed `variable`/array/array-element (e.g. `BREAK CUSTOMER$(6)`, as of 4.16), a `FNname`, or
   `BEGIN` (on entry). `BREAK var` also implies `DISPLAY var`. `OFF` clears one setting, `ALL OFF`
   clears all; `-p <prog>` masks which program/libraries it applies to. **Conditional** breakpoints
-  aren't set with `BREAK` — store a statement like `IF A>B THEN EXECUTE "go step"` instead.
+  (BR 5.0): `IF <cond>` after a target stops only when the condition is true, and `BREAK IF <cond>`
+  with no target tests it after every line (`BREAK IF OFF` ends that). Before 5.0 the way was a
+  stored `IF A>B THEN EXECUTE "go step"`. **`BREAK FILE <name>`** stops when the file is opened or
+  closed (`OPEN` or `CLOSE` for one of the two).
 - <a id="display"></a>**DISPLAY** monitors variables as they change, printing
   `line  var  new-value`. It takes whole arrays (`DISPLAY MAT CUSTOMER$`) and single elements
-  (`DISPLAY CUSTOMER$(5)`); `-p <prog>` masks programs; `OFF` stops it. In STEP/error mode, just
-  typing a variable name prints its current value.
+  (`DISPLAY CUSTOMER$(5)`); `-p <prog>` masks programs; `OFF` stops it. `IF <cond>` (BR 5.0)
+  reports a change only when the condition is true, and takes a variable of its own. `DISPLAY FILE
+  <name>` reports the file's OPENs and CLOSEs. In STEP/error mode, just typing a variable name prints
+  its current value.
 - <a id="list-search"></a>**LIST "str"** searches the program (and `REPLACE "new"` replaces):
   **single** quotes match case-insensitively, **double** quotes require an exact-case match, `~`
   negates a term, and up to three terms combine (all must match). Edit-while-running tip: change a
@@ -74,9 +86,14 @@ VERIFY                                               -- V; check the system reco
   <a id="debug-str"></a>**`DEBUG_STR(level, str$)`** (function, BR 4.3+) emits `str$` to the log
   (when `level` ≤ the active log level) and to the debugger, or to the command console if no
   debugger is attached and GUI is ON (levels >10 clamp to 10).
-- <a id="status-verify"></a>**STATUS** (`ST`) reports system state by topic (`BREAK`, `LIBRARY`,
-  `FONTS`, `ENV`, `ALL`, active procedures, …); **VERIFY** (`V`) checks the disk was recorded
-  correctly.
+- <a id="status-verify"></a>**STATUS** (`ST`) reports system state by topic; with none, the
+  general status (program, active procedures, …). Topics, any of which may be abbreviated:
+  `ALL`, `ATTRIBUTES`, `BREAKPOINTS`, `BTREE_VERIFY`, `COLORS`, `CONFIG`, `DATABASE`,
+  `DIMS [LENGTHS [n]]`, `ENCRYPTION`, `ENV [name]`, `FILES [name]`, `FONTS`, `KEYBOARD`, `LIBRARY`,
+  `LOCKS [name]`, `MEMORY`, `PRINTER`, `STACKS [RESET]`, `SUBSTITUTE` and `USERS`; a name after
+  `ENV`, `FILES` or `LOCKS` narrows the report to it. `-P` pauses after each screenful and
+  `>file`/`>>file` redirects. **VERIFY** (`V`) is kept for old procedures: in BR 5.0 it only
+  reports `Verify is always on.` and checks nothing.
 - <a id="console"></a>**Console**: the **command console** is the programming/run window (the
   bottom row is the **command line**); commands typed there run immediately, and you can inspect
   variables mid-run. `MSG`/`BELL` signal the operator.

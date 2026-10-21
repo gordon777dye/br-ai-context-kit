@@ -393,7 +393,7 @@ _775 entries._
 | [4129](4129.md) | File name is too long |
 | [4135](4135.md) | DEPRECATED ERROR, as of 4.30: Volume ID invalid |
 | [4137](4137.md) | DEPRECATED ERROR, as of 4.30: Not enough storage space to create file |
-| [4138](4138.md) | Can't rename between client and server |
+| [4138](4138.md) | Can't rename from one file system to another, or between client and server |
 | [4139](4139.md) | Could not re-reserve file |
 | [4140](4140.md) | DEPRECATED ERROR, as of 4.30: Shared memory problem |
 | [4141](4141.md) | DEPRECATED ERROR, as of 4.30: Shared memory problem |

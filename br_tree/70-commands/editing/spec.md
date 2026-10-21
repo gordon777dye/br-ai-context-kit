@@ -8,8 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree fold (EDIT, AUTO proc-restriction/restart, DEL SOURCE, abbreviations); no conflicts
 recovered-fold: RENUM (folded+pruned — LABELS_ONLY 4.18a, segment reorder, collision/99999 errors; verbatim retained on the BR wiki)
 related: [program-management, information]
-keywords: [EDIT, LIST, AUTO, RENUM, DEL, SOURCE]
+keywords: [EDIT, LIST, AUTO, RENUM, DEL, SOURCE, CLAUSES, NOEJECT]
 corrections:
+  - "From the BR 5.0 parsers (see br50 br/docs/FLAGS.md), 2026-10-21, source reading not yet confirmed by a run: LIST's -P (a pause after each line, and a digit there lists that many), -n / n- paging, CLAUSES and NOEJECT documented (command9.cpp LIST); EDIT's program, - and ~ forms documented (commandc.cpp editCommand()); pointer to the new `-?` command help added."
   - "SOURCE added to the frontmatter keywords. `DEL … SOURCE` is in this page's BNF and semantics, and was not declared. Found in brls phase 13."
 ---
 
@@ -29,8 +30,13 @@ RENUM [-<from>] [-<to>] [<first>] [<incr>] [LABELS_ONLY]   -- RENU; updates GOTO
 DEL   { <line> | <start-line> <end-line> } [SOURCE]   -- DE; delete line(s)
 LIST  [<line-range>]                              -- LIS; display/edit; edit a listed line + Enter
 LIST  '<'<program-file> [<line> [<line>]]         -- list a saved program without loading it
-EDIT                                              -- ED; open the program in a third-party editor
+LIST  [<range>] [-P] [CLAUSES] [PRINT [NOEJECT] | '>'['>'] <file>]   -- options, below
+LIST  { -<line> | <line>- }                       -- the screenful ending, or starting, at <line>
+EDIT  [ <program> | - | ~ ]                       -- ED; open the program in a third-party editor
 ```
+
+Each of these commands lists its forms and options when given
+[`-?`](../program-management/spec.md#command-help) alone (`LIST -?`, BR 5.0).
 
 <a id="semantics"></a>
 ## Semantics
@@ -55,6 +61,12 @@ EDIT                                              -- ED; open the program in a t
   keywords); edit directly on a listed line and press Enter on that line to store it. After a `RUN`
   you must `LIST` again before editing. (`LIST "string"` instead *searches/replaces* — see
   [information](../information/spec.md#list-search).)
+- <a id="list-options"></a>**LIST options.** **`-P`** pauses after **each line**; at the pause a
+  digit from 2 to 9 lists the next that many lines before pausing again, any other key lists one
+  more, and Ctrl-A stops. **`-<line>`** and **`<line>-`** list the screenful ending, or starting, at
+  that line — what PgUp, PgDn and F6 type for you. **`CLAUSES`** marks where each clause begins, for
+  `line:clause` references in `BREAK` and `GO`. **`PRINT`** lists to the printer, ending with a
+  page eject unless **`NOEJECT`** is given; `>printer-name` lists to a named printer.
 - <a id="list-input"></a>**`LIST <program`** lists the program saved in a file instead of the one in
   memory, which is left as it is. The `<` is written against the name (`LIST <menu`, or quoted
   `LIST <"my prog"`); a name with no extension is tried with `.br` and then `.wb`. The file must be a BR
@@ -62,7 +74,10 @@ EDIT                                              -- ED; open the program in a t
   blank may limit it, but a `-` range or a label with `<` is a syntax error. At the `READY` prompt,
   Tab completes the name after the `<` — see
   [filename-patterns](../file-directory/filename-patterns.md#tab-completion).
-- <a id="edit"></a>**EDIT** (`ED`) hands the current program to a configured third-party editor.
+- <a id="edit"></a>**EDIT** (`ED`) hands the current program to a configured third-party editor
+  (`EDITOR` in BRConfig.sys; without one, error **9307**). `EDIT <program>` loads the program
+  first. `EDIT -` opens the last edit's file again without listing the program afresh, and `EDIT ~`
+  takes that file back in without opening the editor at all.
 - <a id="builtin-keys"></a>**Built-in editor keys**: BR's own line editor is active at startup (just
   type). **F7** marks then copies the marked span to a scratch buffer ("*x* Bytes Saved"); **F8**
   marks/moves (cut), or pastes the buffer at the cursor when no mark is active (re-pasteable). A line

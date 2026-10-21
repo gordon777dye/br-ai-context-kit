@@ -450,27 +450,27 @@ expect "Customer not found"
 | `press SHIFT-UP` / `press CTRL-END` | the shifted arrows and pages, and the history's top and bottom |
 | `pace 300` | milliseconds between typed keys |
 | `wait input` / `wait screen` / `wait 2` | until a program asks for input, until the screen settles, or just seconds |
-| `view offset 1` | where the console scrollback view sits; retries like `expect` |
+| `view offset 1` | where the console history view sits; retries like `expect` |
 | `grant?` / `screen` / `view` | record the grant state, dump the screen, or report the view's offset and lines held |
 
 **The shifted keys are named because the console history needs them.** Shift+Up and Shift+PgUp are
-how a person enters the scrollback view, and `scrollbackHandleKey()` tests those very scancodes, so
+how a person enters the history view, and `historyHandleKey()` tests those very scancodes, so
 a script that could not send them could not test the feature. They are separate entries rather than
 `SHIFT-` composed, because that rule is the *function*-key rule (add 10 to the key number) and these
 have scancodes of their own.
 
 **`WHEELUP` and `WHEELDOWN` are for programs that read the wheel, not for the console history.** A
-real wheel is taken by `TextWin::OnMouse` and offered to `scrollbackHandleWheel` before it ever
-becomes a scancode; a wheel scancode sent from here reaches `scrollbackHandleKey` instead, which has
+real wheel is taken by `TextWin::OnMouse` and offered to `historyHandleWheel` before it ever
+becomes a scancode; a wheel scancode sent from here reaches `historyHandleKey` instead, which has
 no navigation case for it, so with `option 44` off it reads as "anything else" and *leaves* the
 history where a real notch would scroll. With `option 44` on the wheel is an arrow before it gets
 anywhere, and `press UP` is a notch. **Shift+wheel cannot be sent at all** - the shift is read from
 the live event rather than carried in the scancode - and nothing needs it: `SCROLLVIEW` moves the
-view directly, `SHIFT-UP` is the keyboard way in, and `scrollbackHandleWheel` calls only what the
+view directly, `SHIFT-UP` is the keyboard way in, and `historyHandleWheel` calls only what the
 key path already calls, differing just in how far one notch scrolls.
 
 **`view` reads the offset, not the history's text.** With `GUI OFF` the harness blanks the rows
-above the seam - the console there is the application's own screens - so a scrollback script asserts
+above the seam - the console there is the application's own screens - so a history script asserts
 on where the view sits. That is enough: the offset moves only if there is history to move into, so
 `view offset 1` after a `press SHIFT-UP` is itself the proof that the ring was armed and had
 something in it. There is deliberately no `view held N`: the ring's budget is bytes, not lines, so an

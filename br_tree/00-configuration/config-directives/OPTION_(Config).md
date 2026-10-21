@@ -40,7 +40,7 @@ See also `Option (disambiguation)`.
 | `5` | default to `ISAM` (index type 4). The normal default is `BTREE` (index type 7) | |
 | `6` | **BR 5.0.** `COPY` and `RENAME` onto a file that exists do not ask: `COPY` replaces it silently and `RENAME` refuses it with error `4150` unless `-F`, as before 5.0. Off (the default), the operator is asked `Overwrite <name>? (y/n/all)` - see [COPY and RENAME](../../70-commands/file-directory/spec.md#overwrite). (Before 5.0 this number was keep path on exit, long since withdrawn and accepted as a no-op, so a configuration file still carrying `OPTION 6` keeps the behaviour it always had.) | Yes |
 | `7` | use old style syntax checking of `IF` statements | Yes (4.18+) |
-| `8` | use old style loop counter for keyboard — 2nd Option on break | |
+| `8` | **BR 5.0.** `DIR` lists as it did before 5.0, as if every `DIR` were given `-O`: the 8.3 layout with two-digit years, and the pre-5.0 meanings of `-A`, `-L`, `-N`, `-O` and `-U`. Off (the default), `DIR` gives the 5.0 listing: ISO dates, sizes in full, long names only, sorted by name. (Before 5.0 this number was use old style loop counter for keyboard, long since withdrawn; 4.3 refused it as a bad `OPTION`, so no working configuration file carries it.) | Yes |
 | `11` | don't clear unreferenced variable | Yes (4.18+) |
 | `13` | sets the number of milliseconds for scancodes wait, e.g. `Option 13 200` (this number can be incremented by 20 till it reaches 400) | |
 | `14` | allow multiple locks on same record from duplicate opens, for same file opened twice at same station | Yes (4.18+) |
@@ -83,12 +83,12 @@ See also `Option (disambiguation)`.
 | `52` | Enable the second click of a double click operation to produce its own interrupt with `FKey` value 201. | Yes (4.18+) |
 | `53` | Allow mouse positioning inside a field other than the current field. Without this Option, clicking anywhere in a non-current active input field will process it as though the field were entered via the arrow keys. | Yes (4.18+) |
 | `54` | Exit BR! at any console command prompt with a message box showing program name and `line number:clause`. Waiting for input by a program has no affect. | |
-| `55` | Some fixed width fonts have characters that aren't exactly the same width as the other characters. This can present column alignment problems. This option slows down printing slightly, but positions each character individually instead of streaming the data to the printer and letting the data self-align. | Yes (4.18+) |
+| `55` | **Retired in BR 5.0**, and refused in `BRConfig.sys`; `STATUS CONFIG` reports `OPTION 55 - no longer used`. Remove it from configuration files. (It used to position each character of a fixed-width font individually, for fonts whose characters are not all exactly the same width.) | n/a - refused |
 | `56` | `Srch` return -1 instead of 0 when no match is found. | |
 | `57` | Clear Fkeys of inactive `Q` combo box fields. | Yes (4.18+) |
 | `58` | `On FnKey` has been disabled in 4.20+ (use `On FKey` instead), however this option restores recognition of `FnKey`. | Yes (`4.20`+) |
 | `59` | Make `CurCol` (not `NxtCol`) work the old way: use cursor position instead of field start for `CURROW`/`COL` | ??? |
-| `60` | allows 4.2 to edit and save programs while maintaining 4.18 compatible formatting so that 4.18 can still run those programs. If this is used you may not utilize 4.2 features. | NO |
+| `60` | **BR 5.0: a new meaning.** `SAVE` and `REPLACE` write the 4.2/4.3 object format (save level 38), so a 4.2 or 4.3 BR can load the program. Without it, 5.0 saves level 39, which an earlier BR refuses with error `2240`. The cost is that the source line positions are not saved. It affects saving only: 5.0 loads every format either way. It also sets `OPTION 74`. (Before 5.0 it saved the 4.18-and-earlier format, which 5.0 no longer writes.) | Yes |
 | `61` | Do not Map a Drive if not explicitly defined by `DRIVE` statements in `BRConfig.sys` | |
 | `62` | Use Draw Line Border Specification (otherwise report error!). | |
 | `63` | Allow `INPUT SELECT` to input data; `INPUT SELECT` "Reads Data" — we should use `INPUT FIELDS` with `^LABEL` instead! | |

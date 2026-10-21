@@ -42,7 +42,7 @@ a restricted session may do.
   - [5.2 How to read an exchange](#how-to-read-an-exchange)
   - [5.3 The requests](#the-requests)
     - [5.3.1 Opening and closing](#g1) — `HELLO`, `PING`, `BYE`
-    - [5.3.2 Reading the screen](#g2) — `SCROLLVIEW`, `SCROLLBACK`, `ATTRS`, `CONTROLS`, `CURSOR`, `GRID`, `LIST`, `FIELDINFO`
+    - [5.3.2 Reading the screen](#g2) — `SCROLLVIEW`, `HISTORY`, `ATTRS`, `CONTROLS`, `CURSOR`, `GRID`, `LIST`, `FIELDINFO`
     - [5.3.3 Windows and pictures](#g3) — `WINDOWS`, `SHOT`
     - [5.3.4 The keyboard](#g4) — `GRANT?`, `GRANT`, `RELEASE`, `KEYS`, `SCANCODE`, `PENDING`, `PACE`
     - [5.3.5 Being told instead of asking](#g5) — `SUBSCRIBE`, `UNSUBSCRIBE`, and the events
@@ -1057,7 +1057,7 @@ The protocol version and the requests this build answers. **Grant: no.**
 ← OK 3
 ← VERSION 5 0
 ←
-← REQUESTS PING SCROLLBACK SCROLLVIEW ATTRS CONTROLS CURSOR GRID LIST WINDOWS SHOT GRANT? RELEASE KEYS SCANCODE PENDING SUBSCRIBE UNSUBSCRIBE QUESTIONS SOURCE MESSAGE COMMAND FIELDINFO PACE PROGRAM LISTING BYE 0
+← REQUESTS PING HISTORY SCROLLVIEW ATTRS CONTROLS CURSOR GRID LIST WINDOWS SHOT GRANT? RELEASE KEYS SCANCODE PENDING SUBSCRIBE UNSUBSCRIBE QUESTIONS SOURCE MESSAGE COMMAND FIELDINFO PACE PROGRAM LISTING BYE 0
 ←
 ← MODE normal command 0
 ←
@@ -1068,7 +1068,7 @@ The protocol version and the requests this build answers. **Grant: no.**
 | Response record (←) | Fields | What it means |
 |---|---|---|
 | `VERSION` | the protocol version | `5` today. See the version note below. |
-| `REQUESTS` | every request this build answers, space separated | **`HELLO` is not listed** — it is spent by the time you could ask. `SCROLLBACK` is absent under `GUI OFF`. |
+| `REQUESTS` | every request this build answers, space separated | **`HELLO` is not listed** — it is spent by the time you could ask. `HISTORY` is absent under `GUI OFF`. |
 | `MODE` | where this channel may type, and where BR is taking input | Two words; the table below. |
 
 `MODE`'s **first** word is the mode the session opened the channel in: `normal`, or `develop` if
@@ -1138,7 +1138,7 @@ Eight requests, no grant between them, and that is the point of the group: an ag
 everything a person at the terminal can see without being able to touch any of it.
 
 They divide by what they read. `SCROLLVIEW` is **the glass** — what is actually displayed.
-`SCROLLBACK` is **the history** behind it. `ATTRS` is the colour of the glass, `CONTROLS` the
+`HISTORY` is **the history** behind it. `ATTRS` is the colour of the glass, `CONTROLS` the
 widgets drawn over it, `CURSOR` where the caret is, `GRID` and `LIST` the contents of one widget,
 and `FIELDINFO` what one input field will *accept* rather than what it shows.
 
@@ -1182,7 +1182,7 @@ error 6.
 `HISTORY` or `LIVE` on each row says where it came from, so a reader does not have to work the
 seam out from the offset itself.
 
-Rows are **padded to the Console's width** here, unlike `SCROLLBACK`'s variable-length lines,
+Rows are **padded to the Console's width** here, unlike `HISTORY`'s variable-length lines,
 because this is the glass and not the store. A cell nothing has been written to is a space, and
 what comes back is what is **displayed** — including text left over from earlier output. It is the
 character cells only; GUI controls drawn over them are `CONTROLS` (5.3.2.4).
@@ -1194,19 +1194,19 @@ keystroke would anyway.
 
 Error 1 if BR has no Command Console.
 
-##### 5.3.2.2 `SCROLLBACK [<first>] [<count>]`
+##### 5.3.2.2 `HISTORY [<first>] [<count>]`
 
 The lines that have scrolled off the top, newest first, 200 at a time. **`GUI ON` only.
 Grant: no.**
 
 ```
-→ SCROLLBACK
+→ HISTORY
 ← OK 1
-← SCROLLBACK 312 80 0 0 0
+← HISTORY 312 80 0 0 0
 ←
-→ SCROLLBACK 0 3
+→ HISTORY 0 3
 ← OK 5
-← SCROLLBACK 312 80 0 3 0
+← HISTORY 312 80 0 3 0
 ←
 ← ATTR 12295 0 0 0 0 7
 ← console
@@ -1222,25 +1222,25 @@ Grant: no.**
 
 | Response record (←) | Fields | What it means |
 |---|---|---|
-| `SCROLLBACK` | `<held> <columns> <first> <returned>` | The summary, always first. Body empty. |
+| `HISTORY` | `<held> <columns> <first> <returned>` | The summary, always first. Body empty. |
 | `ATTR` | `<bitFlags> <fg> <bg> <fontID> <fontFlags>` | The attributes of every `SEG` and `LINE` that **follows** it. Body is the attribute's **name**. |
 | `SEG` | `<line> <length>` | Part of a line; more of it is to the **right**. Body is that part. |
 | `LINE` | `<line> <length>` | The line's text, exactly `<length>` characters. |
 
 | Line | What it is |
 |---|---|
-| `→ SCROLLBACK` | No arguments: this is how to learn `<held>` and `<columns>` before paging. |
-| `← SCROLLBACK 312 80 0 0 0` | `312` whole lines held, `80` columns wide, starting at `0`, and `0` lines returned because none was asked for. |
+| `→ HISTORY` | No arguments: this is how to learn `<held>` and `<columns>` before paging. |
+| `← HISTORY 312 80 0 0 0` | `312` whole lines held, `80` columns wide, starting at `0`, and `0` lines returned because none was asked for. |
 | `← ATTR 12295 0 0 0 0 7` | Five numbers, then a body of `7` bytes. |
 | `← console` | The body: **the name the configuration gave those attributes**. |
 | `← LINE 1 0 0` | An empty line: length `0`, body `0`. Trailing blanks are not stored, so an empty line really is empty. |
 
-`<held>` is how many whole lines the history holds, and is 0 when scrollback is switched off or
+`<held>` is how many whole lines the history holds, and is 0 when history is switched off or
 nothing has scrolled yet. `<returned>` is how many `LINE` records follow, and is 0 when `<first>`
 is at or past `<held>`. `<first>` defaults to 0 and `<count>` to the page size, **200**; a larger
 `<count>` is capped at it.
 
-**`<held>` is not the configured `CONSOLE SCROLLBACK` figure.** That figure buys a byte budget,
+**`<held>` is not the configured `CONSOLE HISTORY` figure.** That figure buys a byte budget,
 not a row count, so a console printing short lines holds considerably more lines than the figure
 names and a heavily attributed one holds fewer. `<columns>` is the Console's width — an upper
 bound on a line, not the length of any particular one.
@@ -1277,7 +1277,7 @@ are a merge. In both cases the five numbers are authoritative and always present
 Only the Command Console's own full-width region is kept: a program window scrolling part of it is
 that program's business, not console history, and is not recorded.
 
-**With `GUI OFF` the history is not offered: error 9, and `SCROLLBACK` is left out of `PING`'s
+**With `GUI OFF` the history is not offered: error 9, and `HISTORY` is left out of `PING`'s
 `REQUESTS` list.** In that mode the application paints the Console itself, so every screen it
 clears with `PRINT NEWPAGE` goes into the ring — and `PRINT FIELDS` data is in the character cells
 there, so the ring would hold the contents of every form the session has been through. Reading
@@ -1315,8 +1315,8 @@ In the exchange above, row 0 is uniform across all 80 columns; row 1 changes at 
 costs two runs. The run count on the `OK` line is therefore a property of how colourful the screen
 is, not of its size.
 
-Unlike `SCROLLBACK`, this does not name the attribute. The two were built for different readers:
-`SCROLLBACK`'s body says what the application *meant* because a reader of history wants intent,
+Unlike `HISTORY`, this does not name the attribute. The two were built for different readers:
+`HISTORY`'s body says what the application *meant* because a reader of history wants intent,
 and here a reader is drawing or comparing and wants the values.
 
 Error 1 if there is no Command Console.
@@ -3140,9 +3140,9 @@ anything else of that kind. Two of its fields belong to this surface, both at th
   applies the restricted-session file rule to its own file operations — the server-forwarded ones,
   `MSG("dump")` and `MSG("shot")` (4.5), a print job written to a named file, printing to a UNC
   name, and `Ctrl-]`, where the shell would start on the client.
-- **`consoleScrollback`**, four bytes. `CONSOLE SCROLLBACK` is read by the *server* from its
+- **`consoleHistory`**, four bytes. `CONSOLE HISTORY` is read by the *server* from its
   configuration, and the ring it sizes lives on the *client*, so the figure has to travel. This is
-  why `SCROLLBACK` (5.3.2.2) works in client/server mode at the size the server was configured with.
+  why `HISTORY` (5.3.2.2) works in client/server mode at the size the server was configured with.
 
 <a id="cs-the-rest"></a>
 ### 6.4 Messages the AI actor depends on
@@ -3650,7 +3650,7 @@ Two consequences follow, and both matter to anyone reading this to build somethi
 - **A `DEBUG:` redirect is invisible to anything attached to the client**, including the
   user-level channel of section 5. An assistant working through a user's client cannot read it,
   and should not try: it reads the same content by running the same commands **without** the
-  redirect, so the output goes to the Command Console, where `SCROLLVIEW` and `SCROLLBACK` reach it.
+  redirect, so the output goes to the Command Console, where `SCROLLVIEW` and `HISTORY` reach it.
   `LIST`, `STATUS STACKS` and the rest all print there by default.
 
 **Opening `DEBUG:<n>` does not require a debugger**, and is not refused when none is attached:

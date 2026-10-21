@@ -8,70 +8,95 @@ Deeper reference material stays in its own document; this page links to it rathe
 
 ## Contents
 
-- [Behaviour changes](#behaviour-changes)
-  - [`CLOSE ,FREE` and `CLOSE ,DROP` now require a file opened for output](#close-free-and-close-drop-now-require-a-file-opened-for-output)
-  - [Debuggers must be updated in order to attach](#debuggers-must-be-updated-to-attach)
-  - [`MSG("send")` now types into BR only, and `MSG("kb")` is removed](#msg-send-now-types-into-br-only-and-msg-kb-is-removed)
-  - [`SPAWN_RESTRICTED` is a new reserved word](#spawn-restricted-is-a-new-reserved-word)
-  - [`GO` after an `AI` line keeps the conversation](#go-after-an-ai-line-keeps-the-conversation)
-  - [`PRINT NEWPAGE` now scrolls the console off rather than discarding it](#print-newpage-now-scrolls-the-console-off-rather-than-discarding-it)
-  - [The splash screen now waits 2 seconds, not 20](#the-splash-screen-now-waits-2-seconds-not-20)
-  - [`MSG` actions that return text no longer add a trailing null character](#msg-actions-that-return-text-no-longer-add-a-trailing-null)
-  - [The serial number is no longer shown on the status line](#the-serial-number-is-no-longer-shown-on-the-status-line)
-  - [Row and column are shown on the status line by default](#row-and-column-are-shown-on-the-status-line-by-default)
-  - [The OVERTYPE indicator is now teal](#the-insert-indicator-is-now-teal)
-  - [The command console is set aside rather than hidden](#the-command-console-is-set-aside-rather-than-hidden)
-  - [`CONFIG CONSOLE` now defaults to `DATA_ONLY`](#config-console-now-defaults-to-data-only)
-  - [`OPTION 82` - work off the display area](#option-82-work-off-the-display-area)
-  - [A program saved by 5.0 will not load in an earlier BR](#a-program-saved-by-50-will-not-load-in-an-earlier-br)
-  - [`OPTION 60` - save in the 4.2/4.3 object format](#option-60-save-in-the-42-43-object-format)
-- [Security](#security)
-  - [The debugger connection is now encrypted and authenticated](#the-debugger-connection-is-now-encrypted-and-authenticated)
-  - [The debugger port no longer accepts connections from the network](#the-debugger-port-no-longer-accepts-connections-from-the-network)
-  - [Restricted sessions](#restricted-sessions)
-  - [Where a restricted session may be: the file list](#the-restricted-session-read-list)
-  - [UI regression scripts](#ui-regression-scripts)
-  - [Starting a disposable restricted session](#starting-a-disposable-restricted-session)
-  - [Calling an assistant from a program](#calling-an-assistant-from-a-program)
-  - [An assistant no longer types at the `READY` prompt by default](#an-assistant-no-longer-types-at-the-ready-prompt-by-default)
-  - [Both windows show a grant and a restriction](#both-windows-show-a-grant-and-a-restriction)
-  - [An assistant cannot extend its own grant](#an-assistant-cannot-extend-its-own-grant)
-  - [A turn asks you before anything destructive](#a-turn-without-a-grant-asks-before-anything-destructive)
-  - [A turn needs the consent of whatever is running](#a-turn-needs-the-consent-of-whatever-is-running)
-  - [A command from an assistant reports the error it died on](#a-run-that-fails-now-says-so)
-  - [A restricted session's log is named for its WSID](#a-restricted-sessions-log-is-named-for-its-wsid)
-  - [A program can tell an assistant something directly](#a-program-can-tell-an-assistant-something-directly)
-  - [A program can be given a whole text in one go](#a-program-can-be-given-a-whole-text-in-one-go)
-  - [`AI` - a conversation at the console](#ai-a-conversation-at-the-console)
-  - [The client refuses a server certificate that was replaced in transit](#the-client-refuses-a-server-certificate-that-was-replaced-in-transit)
-  - [New error codes for AI and restricted sessions](#new-error-codes-for-ai-and-restricted-sessions)
-- [Debugging and observation](#debugging-and-observation)
-  - [Watching a debugging session without taking it over](#watching-a-debugging-session-without-taking-it-over)
-  - [A log of what appeared on the screen](#a-log-of-what-appeared-on-the-screen)
-  - [The debugger can now interrupt a running program](#the-debugger-can-now-interrupt-a-running-program)
-  - [Console scrollback](#console-scrollback)
-  - [A variable watch now reports the value, not just the name](#a-variable-watch-now-reports-the-value-not-just-the-name)
-  - [A step now tells the debugger where it stopped](#a-step-now-tells-the-debugger-where-it-stopped)
-  - [Recording what a debugger submits](#recording-what-a-debugger-submits)
-  - [The log now carries the clause and the source line](#the-log-now-carries-the-clause-and-the-source-line)
-- [Printing and fonts](#printing-and-fonts)
-- [Fixes](#fixes)
-  - [Screen chains on a LIBRARY RELEASE,NOFILES return](#screen-chains-on-a-library-releasenofiles-return)
-  - [`DLL()` calls no longer wait 100 ms each](#dll-calls-no-longer-wait-100-ms-each)
-  - [`PROTECT` no longer repeats forever when it fails on Windows](#protect-no-longer-repeats-forever-when-it-fails-on-windows)
-  - [Comment lines in `brconfig.sys` no longer hold the splash screen](#comment-lines-in-brconfig-sys-no-longer-hold-the-splash-screen)
-  - [`MSG("state")` now checks its argument count](#msg-state-now-checks-its-argument-count)
-  - [The client no longer stops with "Bad action 10129" while connecting](#the-client-no-longer-stops-with-bad-action-10129-while-connecting)
-  - [Most of the status line was blank](#most-of-the-status-line-was-blank)
-- [Debug builds](#debug-builds)
-  - [Memory leak reporting at exit](#memory-leak-reporting-at-exit)
-  - [The harness channel's ring statistics are now Debug-only](#the-harness-channels-ring-statistics-are-now-debug-only)
+- [1. Behaviour changes](#behaviour-changes)
+  - [1.1 `CLOSE ,FREE` and `CLOSE ,DROP` now require a file opened for output](#close-free-and-close-drop-now-require-a-file-opened-for-output)
+  - [1.2 Debuggers must be updated in order to attach](#debuggers-must-be-updated-to-attach)
+  - [1.3 `MSG("send")` now types into BR only, and `MSG("kb")` is removed](#msg-send-now-types-into-br-only-and-msg-kb-is-removed)
+  - [1.4 `MSG("gettext", …)` has been removed](#msggettext--has-been-removed)
+  - [1.5 The `MSG` pointer actions now move a pointer BR keeps itself](#the-msg-pointer-actions-now-move-a-pointer-br-keeps-itself)
+  - [1.6 `SPAWN_RESTRICTED` is a new reserved word](#spawn-restricted-is-a-new-reserved-word)
+  - [1.7 `GO` after an `AI` line keeps the conversation](#go-after-an-ai-line-keeps-the-conversation)
+  - [1.8 `PRINT NEWPAGE` now scrolls the console off rather than discarding it](#print-newpage-now-scrolls-the-console-off-rather-than-discarding-it)
+  - [1.9 The splash screen now waits 2 seconds, not 20](#the-splash-screen-now-waits-2-seconds-not-20)
+  - [1.10 `MSG` string arguments no longer carry the variable's unused tail](#msg-string-arguments-no-longer-carry-the-variables-unused-tail)
+  - [1.11 `MSG("loop", …)` now copies between arrays of the same width](#msgloop--now-copies-between-arrays-of-the-same-width)
+  - [1.12 `MSG` actions that return text no longer add a trailing null character](#msg-actions-that-return-text-no-longer-add-a-trailing-null)
+  - [1.13 The serial number is no longer shown on the status line](#the-serial-number-is-no-longer-shown-on-the-status-line)
+  - [1.14 Row and column are shown on the status line by default](#row-and-column-are-shown-on-the-status-line-by-default)
+  - [1.15 The OVERTYPE indicator is now teal](#the-insert-indicator-is-now-teal)
+  - [1.16 The command console is set aside rather than hidden](#the-command-console-is-set-aside-rather-than-hidden)
+  - [1.17 `CONFIG CONSOLE` now defaults to `DATA_ONLY`](#config-console-now-defaults-to-data-only)
+  - [1.18 `OPTION 82` - work off the display area](#option-82-work-off-the-display-area)
+  - [1.19 A program saved by 5.0 will not load in an earlier BR](#a-program-saved-by-50-will-not-load-in-an-earlier-br)
+  - [1.20 `OPTION 60` - save in the 4.2/4.3 object format](#option-60-save-in-the-42-43-object-format)
+  - [1.21 `SOFLOW-GROW` - a string can grow instead of overflowing](#soflow-grow-a-string-can-grow-instead-of-overflowing)
+  - [1.22 `>` can send output into an array](#redirection-into-an-array)
+  - [1.23 `DIR` takes glob patterns](#dir-glob-patterns)
+  - [1.24 Tab completes file names at the `READY` prompt](#tab-completes-file-names)
+  - [1.25 `OPTION 84` - a `/` in a file name](#option-84-slash)
+  - [1.26 `FR` is refused as `FRE` is](#fr-is-refused-as-fre-is)
+  - [1.27 `COPY` and `RENAME` ask before overwriting a file (`OPTION 6`)](#copy-and-rename-ask-before-overwriting)
+  - [1.28 New `OPTION`s, and which ones are legacy](#new-options-and-legacy-options)
+  - [1.29 `DIR` has a new listing and new options (`OPTION 8`)](#dir-new-listing)
+  - [1.30 `-?` lists a command's options](#command-help)
+  - [1.31 `RENAME` stays on one file system, and renames folders with `-D`](#rename-folders-and-file-systems)
+- [2. Security](#security)
+  - [2.1 The debugger connection is now encrypted and authenticated](#the-debugger-connection-is-now-encrypted-and-authenticated)
+  - [2.2 The debugger port no longer accepts connections from the network](#the-debugger-port-no-longer-accepts-connections-from-the-network)
+  - [2.3 Restricted sessions](#restricted-sessions)
+  - [2.4 Where a restricted session may be: the file list](#the-restricted-session-read-list)
+  - [2.5 UI regression scripts](#ui-regression-scripts)
+  - [2.6 Starting a disposable restricted session](#starting-a-disposable-restricted-session)
+  - [2.7 Calling an assistant from a program](#calling-an-assistant-from-a-program)
+  - [2.8 An assistant no longer types at the `READY` prompt by default](#an-assistant-no-longer-types-at-the-ready-prompt-by-default)
+  - [2.9 Both windows show a grant and a restriction](#both-windows-show-a-grant-and-a-restriction)
+  - [2.10 An assistant cannot extend its own grant](#an-assistant-cannot-extend-its-own-grant)
+  - [2.11 A turn asks you before anything destructive](#a-turn-without-a-grant-asks-before-anything-destructive)
+  - [2.12 `OPTION 83` for an application that starts BR sessions](#option-83-for-an-application-that-starts-br-sessions)
+  - [2.13 A turn needs the consent of whatever is running](#a-turn-needs-the-consent-of-whatever-is-running)
+  - [2.14 A command from an assistant reports the error it died on](#a-run-that-fails-now-says-so)
+  - [2.15 `CODE` is cleared by `LOAD`, `CHAIN` and `CLEAR`](#code-is-cleared-by-load-chain-and-clear)
+  - [2.16 A restricted session's log is named for its WSID](#a-restricted-sessions-log-is-named-for-its-wsid)
+  - [2.17 A program can tell an assistant something directly](#a-program-can-tell-an-assistant-something-directly)
+  - [2.18 A program can be given a whole text in one go](#a-program-can-be-given-a-whole-text-in-one-go)
+  - [2.19 `AI` - a conversation at the console](#ai-a-conversation-at-the-console)
+  - [2.20 The client refuses a server certificate that was replaced in transit](#the-client-refuses-a-server-certificate-that-was-replaced-in-transit)
+  - [2.21 New error codes for AI and restricted sessions](#new-error-codes-for-ai-and-restricted-sessions)
+- [3. Debugging and observation](#debugging-and-observation)
+  - [3.1 Watching a debugging session without taking it over](#watching-a-debugging-session-without-taking-it-over)
+  - [3.2 A log of what appeared on the screen](#a-log-of-what-appeared-on-the-screen)
+  - [3.3 Console history](#console-history)
+  - [3.4 The debugger can now interrupt a running program](#the-debugger-can-now-interrupt-a-running-program)
+  - [3.5 A variable watch now reports the value, not just the name](#a-variable-watch-now-reports-the-value-not-just-the-name)
+  - [3.6 A step now tells the debugger where it stopped](#a-step-now-tells-the-debugger-where-it-stopped)
+  - [3.7 Recording what a debugger submits](#recording-what-a-debugger-submits)
+  - [3.8 The log now carries the clause and the source line](#the-log-now-carries-the-clause-and-the-source-line)
+  - [3.9 `CLEAR PROC`, `STOP` and `END` at a halt in a library reload that library](#clear-proc-stop-and-end-at-a-halt-in-a-library-reload-that-library)
+  - [3.10 `BREAK FILE` and `DISPLAY FILE` watch OPENs and CLOSEs](#break-file-and-display-file-watch-opens-and-closes)
+  - [3.11 `BREAK` and `DISPLAY` take an `IF` condition](#break-takes-an-if-condition)
+  - [3.12 `BREAK` and `DISPLAY` on a parameter watch the variable it stands for](#break-and-display-on-a-parameter-watch-the-variable-it-stands-for)
+  - [3.13 `STATUS` shows the source line](#status-shows-the-source-line)
+  - [3.14 `STATUS STACKS` shows what a function's parameters really are](#status-stacks-shows-what-a-functions-parameters-really-are)
+  - [3.15 `STATUS DIMS LENGTHS` shows how long strings really got](#status-dims-lengths)
+- [4. Printing and fonts](#printing-and-fonts)
+- [5. Fixes](#fixes)
+  - [5.1 `LIST ... CLAUSE` counted `ON ... GOSUB` as two clauses](#list-clause-counted-on-gosub-as-two-clauses)
+  - [5.2 Screen chains on a `LIBRARY RELEASE,NOFILES` return](#screen-chains-on-a-library-releasenofiles-return)
+  - [5.3 `DLL()` calls no longer wait 100 ms each](#dll-calls-no-longer-wait-100-ms-each)
+  - [5.4 `PROTECT` no longer repeats forever when it fails on Windows](#protect-no-longer-repeats-forever-when-it-fails-on-windows)
+  - [5.5 Comment lines in `brconfig.sys` no longer hold the splash screen](#comment-lines-in-brconfig-sys-no-longer-hold-the-splash-screen)
+  - [5.6 `MSG("state")` now checks its argument count](#msg-state-now-checks-its-argument-count)
+  - [5.7 The client no longer stops with "Bad action 10129" while connecting](#the-client-no-longer-stops-with-bad-action-10129-while-connecting)
+  - [5.8 Most of the status line was blank](#most-of-the-status-line-was-blank)
+- [6. Debug builds](#debug-builds)
+  - [6.1 Memory leak reporting at exit](#memory-leak-reporting-at-exit)
+  - [6.2 The harness channel's ring statistics are now Debug-only](#the-harness-channels-ring-statistics-are-now-debug-only)
 
 <a id="behaviour-changes"></a>
-## Behaviour changes
+## 1. Behaviour changes
 
 <a id="close-free-and-close-drop-now-require-a-file-opened-for-output"></a>
-### `CLOSE ,FREE` and `CLOSE ,DROP` now require a file opened for output
+### 1.1 `CLOSE ,FREE` and `CLOSE ,DROP` now require a file opened for output
 
 **New error 4151** — *CLOSE DROP or FREE requires the file to be opened for output*.
 
@@ -93,7 +118,7 @@ today and will fail with 4151 after upgrading. The fix in the program is to open
 the one to look at.
 
 <a id="debuggers-must-be-updated-to-attach"></a>
-### Debuggers must be updated in order to attach
+### 1.2 Debuggers must be updated in order to attach
 
 The debugger connection is now encrypted and authenticated, so a debugger built against an earlier
 release will no longer attach. This is the change most likely to interrupt an upgrade, and there is
@@ -103,7 +128,7 @@ under Security for what changed, what a debugger now has to do, and `DEBUG AUTH 
 the old way during the transition.
 
 <a id="msg-send-now-types-into-br-only-and-msg-kb-is-removed"></a>
-### `MSG("send")` now types into BR only, and `MSG("kb")` is removed
+### 1.3 `MSG("send")` now types into BR only, and `MSG("kb")` is removed
 
 `MSG("send", …)` used to type through the operating system's keyboard input, which goes to whichever
 window has the focus — so a program could type into another application, a command prompt, or
@@ -134,8 +159,8 @@ What changes for a program that uses it:
 The pointer actions (`setpos`, `lclick` and the rest) are unchanged in an ordinary session; a
 restricted session may not use them.
 
-<a id="spawn-restricted-is-a-new-reserved-word"></a>
-### `MSG("gettext", …)` has been removed
+<a id="msggettext--has-been-removed"></a>
+### 1.4 `MSG("gettext", …)` has been removed
 
 **Removed 2026-10-03.** `MSG("gettext", <text$>)` returned the caption of whichever window was in
 front. That was BR's own caption only when BR happened to be the foreground window; at any other
@@ -149,7 +174,8 @@ application's title, and that is deliberate.
 
 `MSG("state", <state$>)` is unaffected and now answers for BR's own window.
 
-### The `MSG` pointer actions now move a pointer BR keeps itself
+<a id="the-msg-pointer-actions-now-move-a-pointer-br-keeps-itself"></a>
+### 1.5 The `MSG` pointer actions now move a pointer BR keeps itself
 
 `MSG("setpos")`, `MSG("setwpos")`, `MSG("lclick")`, `MSG("mclick")` and `MSG("rclick")` used to
 drive the **physical** mouse: `SetCursorPos` moved the cursor on the desk, and the clicks were
@@ -182,30 +208,31 @@ frame.
 These actions were not available before this release — they were compiled out, and a call to any of
 them returned error 412 — so no existing program can be relying on the old behaviour.
 
-### `SPAWN_RESTRICTED` is a new reserved word
+<a id="spawn-restricted-is-a-new-reserved-word"></a>
+### 1.6 `SPAWN_RESTRICTED` is a new reserved word
 
 `SPAWN_RESTRICTED` is now a built-in function — see
 [Starting a disposable restricted session](#starting-a-disposable-restricted-session). A program that
 uses `SPAWN_RESTRICTED` as a variable name will no longer compile, and needs the variable renamed.
 
 <a id="go-after-an-ai-line-keeps-the-conversation"></a>
-### `GO` after an `AI` line keeps the conversation
+### 1.7 `GO` after an `AI` line keeps the conversation
 
 **New 2026-10-09.** Breaking out of a program, asking the assistant something and typing `GO` used
 to lose the answer. The program resumes and repaints its own screen over the Command Console,
 which is where the conversation was - so it vanished from the screen without ever reaching the
-scrollback either.
+history either.
 
 `GO` now scrolls the console off first, exactly as `PRINT NEWPAGE` does, so the conversation goes
-into the history where `SCROLLBACK` and the screen log can still find it. A whole screenful is
+into the history where `HISTORY` and the screen log can still find it. A whole screenful is
 scrolled, because the conversation sits at the bottom of a scrolling window and everything above
 it has to move first. Nothing is scrolled when there was no conversation to keep.
 
 <a id="print-newpage-now-scrolls-the-console-off-rather-than-discarding-it"></a>
-### `PRINT NEWPAGE` now scrolls the console off rather than discarding it
+### 1.8 `PRINT NEWPAGE` now scrolls the console off rather than discarding it
 
 `PRINT NEWPAGE` clears the screen as before. What changed is where the old contents go: they are
-now scrolled into the console scrollback, so what the program had just printed can still be read
+now scrolled into the console history, so what the program had just printed can still be read
 after the page is cleared. Previously a `NEWPAGE` lost it.
 
 An explicit clear - a `CLEAR` command, or the clear a `SORT` or an `INDEX` does - still discards
@@ -218,11 +245,11 @@ typed between two pages and its answer. PgDn and the down arrow are one movement
 magnitudes, and they now leave the same thing behind.
 
 Nothing a program can see changes. The screen is as blank afterwards as it ever was and the cursor
-lands where it always did; only the scrollback is different, and only when
-[console scrollback](#console-scrollback) is switched on - which it is by default.
+lands where it always did; only the history is different, and only when
+[console history](#console-history) is switched on - which it is by default.
 
 <a id="the-splash-screen-now-waits-2-seconds-not-20"></a>
-### The splash screen now waits 2 seconds, not 20
+### 1.9 The splash screen now waits 2 seconds, not 20
 
 The first session on a workstation used to hold the splash screen for 20 seconds before going on,
 and so did any session whose startup produced a configuration message. Both now wait **2 seconds**.
@@ -232,8 +259,8 @@ user counts and any configuration messages, sessions 2 to 9 still start with no 
 `UNATTENDED` session still has no wait in any case. A configuration message that matters is in the
 log as well as on the splash, so the shorter wait does not lose it.
 
-<a id="msg-actions-that-return-text-no-longer-add-a-trailing-null"></a>
-### `MSG` string arguments no longer carry the variable's unused tail
+<a id="msg-string-arguments-no-longer-carry-the-variables-unused-tail"></a>
+### 1.10 `MSG` string arguments no longer carry the variable's unused tail
 
 **Fixed 2026-10-03.** A BR string is stored as a character count followed by the characters, inside
 a variable of its declared width. Every `MSG` action that *takes* a string read the full declared
@@ -249,7 +276,8 @@ LET X=MSG("send",A$)      ! typed AB, then 28 characters of whatever
 A string **literal** was never affected, being exactly the size of its contents, which is why this
 went unnoticed: `MSG("send","AB")` always behaved. Affected actions were `send`, `kb` and `loop`.
 
-### `MSG("loop", …)` now copies between arrays of the same width
+<a id="msgloop--now-copies-between-arrays-of-the-same-width"></a>
+### 1.11 `MSG("loop", …)` now copies between arrays of the same width
 
 **Fixed 2026-10-03.** `MSG("loop", MAT A$, MAT B$)` refused with a string-size error unless the
 destination was at least three characters wider than the source, so the ordinary case — two arrays
@@ -260,7 +288,8 @@ never reads. A string may now be as long as the element is wide.
 The same test guards every `MSG` action that answers with text, so an action returning a value exactly
 as long as the receiving variable is wide no longer refuses it either.
 
-### `MSG` actions that return text no longer add a trailing null character
+<a id="msg-actions-that-return-text-no-longer-add-a-trailing-null"></a>
+### 1.12 `MSG` actions that return text no longer add a trailing null character
 
 Every `MSG` action that answers with text - `state`, `getcb`, `getpos`, `getwpos`, `getcpos`,
 and the error messages some actions write back - returned the text with **one extra
@@ -273,7 +302,7 @@ so check any program that reads a value from one of these actions. A program tha
 value is unaffected and is now correct.
 
 <a id="the-serial-number-is-no-longer-shown-on-the-status-line"></a>
-### The serial number is no longer shown on the status line
+### 1.13 The serial number is no longer shown on the status line
 
 **Changed 2026-10-03.** The status line no longer has a serial number field. It was a fixed
 nine-digit field that never changed during a session, and on the graphical status line it was
@@ -292,7 +321,7 @@ a server must be the same release** - which has always been the rule, and is wor
 because a mismatch here would garble the status line rather than refuse to connect.
 
 <a id="row-and-column-are-shown-on-the-status-line-by-default"></a>
-### Row and column are shown on the status line by default
+### 1.14 Row and column are shown on the status line by default
 
 **Changed 2026-10-03.** The field at the right-hand end of the status line shows the cursor's
 row and column while a program is at an input. Previously this was off unless the configuration
@@ -306,7 +335,7 @@ gets the extra digit it needs. Previously such a position was cut short - on a 1
 column 105 was stored as `10:10`.
 
 <a id="the-insert-indicator-is-now-teal"></a>
-### The OVERTYPE indicator is now teal
+### 1.15 The OVERTYPE indicator is now teal
 
 **Changed 2026-10-08, and reversed 2026-10-10.** The status line's `OVER` indicator is white on a
 teal background. `INSERT` keeps the status line's own attributes - or reverse video where the mode
@@ -332,7 +361,7 @@ cannot be changed by `CONFIG ATTRIBUTE` and cannot collide with a colour an appl
 a meaning of its own.
 
 <a id="the-command-console-is-set-aside-rather-than-hidden"></a>
-### The command console is set aside rather than hidden
+### 1.16 The command console is set aside rather than hidden
 
 **Changed 2026-10-10.** When the console has nothing to show it is moved off the display area
 instead of being hidden. It is still there, and still a window: it paints, it can be captured, and
@@ -347,7 +376,7 @@ a person at the keyboard, and to support staff capturing a screen.
 A parked window has no taskbar button, so an operator is not offered a window they cannot see.
 
 <a id="config-console-now-defaults-to-data-only"></a>
-### `CONFIG CONSOLE` now defaults to `DATA_ONLY`
+### 1.17 `CONFIG CONSOLE` now defaults to `DATA_ONLY`
 
 **Changed 2026-10-10.** The default was `OFF`. Under `DATA_ONLY` the console appears when
 something is written to it and goes away again when there is nothing to show, so output a program
@@ -357,7 +386,7 @@ An application that writes to the console and was built expecting no console win
 one when it writes. `CONFIG CONSOLE OFF` restores the previous behaviour.
 
 <a id="option-82-work-off-the-display-area"></a>
-### `OPTION 82` - work off the display area
+### 1.18 `OPTION 82` - work off the display area
 
 **New 2026-10-10.** `OPTION 82 ON` puts a session's windows past the edge of the display and
 leaves them there. It is for sessions nobody is watching - test runs, development drivers,
@@ -380,7 +409,7 @@ name suggests, enough that requiring it would have put this out of reach of the 
 want it.
 
 <a id="a-program-saved-by-50-will-not-load-in-an-earlier-br"></a>
-### A program saved by 5.0 will not load in an earlier BR
+### 1.19 A program saved by 5.0 will not load in an earlier BR
 
 **Please read this before upgrading if programs are saved on one machine and run on another, or if
 some machines will stay on 4.3 for a while.**
@@ -401,7 +430,7 @@ If a program has to be read by a 4.2 or 4.3 BR, see [`OPTION
 60`](#option-60-save-in-the-42-43-object-format) below.
 
 <a id="option-60-save-in-the-42-43-object-format"></a>
-### `OPTION 60` - save in the 4.2/4.3 object format
+### 1.20 `OPTION 60` - save in the 4.2/4.3 object format
 
 **`OPTION 60` has a new meaning, and its old one is gone.**
 
@@ -427,11 +456,481 @@ or 4.3 wants 4.2/4.3 code generation with it.
 
 `STATUS CONFIG` reports `OPTION 60` again; while it had no meaning it was left out.
 
+<a id="soflow-grow-a-string-can-grow-instead-of-overflowing"></a>
+### 1.21 `SOFLOW-GROW` - a string can grow instead of overflowing
+
+A string that would overflow can now be made longer instead of failing. It is **off unless you ask
+for it**, so no existing program changes.
+
+**Turning it on.** A configuration statement, in `brconfig.sys` or given at run time with
+`EXECUTE "CONFIG ..."` (which reads it exactly as the file does):
+
+```
+SOFLOW-GROW  [ MAX=n ]  [ ON | OFF ]
+```
+
+- `ON` is the default when neither `ON` nor `OFF` is given, so `SOFLOW-GROW` alone turns it on.
+- `MAX=n` also turns it on, unless `OFF` is given with it.
+- No `SOFLOW-GROW` statement means off.
+- **Abbreviations.** The keyword and each word after it may be shortened to a part that no other word
+  starts with: `SOFLOW-G`, `M=40`, `MA=40`, `OF`. `O` alone is both `ON` and `OFF`, so it is refused.
+- `n` is the most bytes one string variable or array element may grow to. Without a `MAX` the
+  limit is that of a dictionary element, 256 MB. `MAX` stays as last given until it is given again.
+- A restricted session may set it, as it may set `PAGEOFLOW`.
+
+**In a program.** `ON SOFLOW GROW` turns it on for the program. GROW is one of the `ON SOFLOW`
+modes, beside `IGNORE`, `SYSTEM` and `GOTO`, and the last one set wins, so any other `ON SOFLOW`
+turns GROW off. There is no `NOGROW`, because it would not say whether to ignore, stop or branch;
+say which. `ON SOFLOW GROW` takes no line number.
+
+**When the setting applies.** Every `RUN` starts in the mode the configuration gives it, and the
+program can change that with `ON SOFLOW`. A change to the configuration does not change a program
+that is already running, except that `MAX=` takes effect at once.
+
+**Where a string grows.** Only where a value is stored into a string that is too short for it:
+
+- an assignment to a string variable, `A$ = expr` or `A$ := expr`, including an assignment inside
+  a larger expression;
+- an assignment to an array element, `A$(3) = expr` or `M$(2,1) = expr`. **Every element of the
+  array gets the longer length**, because the elements of an array are all the same length; the
+  other elements keep their values;
+- `LINPUT` from a file into a string variable or an array element;
+- `PRINTER_LIST` into an array, which is widened until the longest name fits.
+
+Everywhere else a string that would overflow behaves as it always did: assignment to a substring,
+a by-value parameter, `LINPUT` from the keyboard or at the READY prompt, print formatting, input
+fields, and every function that returns text. Redirecting output to an array is not available yet;
+when it is, it will grow.
+
+**Parameters passed by reference** grow the caller's own variable, or the caller's array. This
+holds across a library: a library function runs in **its own mode**, not the caller's, so what
+decides is the library's `ON SOFLOW` or the configuration when the library is loaded. If the
+library is in GROW mode, assigning to a by-reference parameter grows the variable in the
+program that called it; if not, the library's assignment overflows as it always did.
+
+**An array that is in use will not widen.** If another element of the same array is on the stack
+at the time, because it was passed by reference to a function that is still running, the
+assignment that would widen the array raises the overflow error and nothing changes.
+
+**The ceiling.** A string never grows past `MAX`. `MAX` is looked at only when a value is longer
+than the string it is going into; a value that fits is stored whatever `MAX` is, even into a
+string already longer than `MAX`. A value that would take the string past `MAX` is not stored: the
+variable keeps its value and length, and the statement raises the overflow error it always raised
+(and the same happens if there is no memory to grow into). Growing up to `MAX` and then ignoring or
+branching on the rest is not supported. A string that has grown to `MAX` or less is a longer string
+from then on, and `ON SOFLOW IGNORE` or `GOTO` apply to its new length.
+
+**A line exit on the statement wins.** `LINPUT #3: A$ SOFLOW 800` branches to line 800 on overflow
+and does not grow, as an exit on a statement always took precedence over `ON SOFLOW`.
+
+**It lasts for the run.** The longer length is not saved with the program, and the next `RUN`
+starts again from the length in the `DIM` and gives the memory back.
+
+**`STATUS CONFIG`** shows `SOFLOW-GROW`, its `MAX`, and whether the running program is in GROW
+mode.
+
+**New word.** `GROW` is a new word after `ON SOFLOW`. Variables named `GROW` or `NOGROW` keep
+working.
+
+<a id="redirection-into-an-array"></a>
+### 1.22 `>` can send output into an array
+
+Where a command takes `> file` to send its output to a file, it now also takes the name of a string
+array of the program that is loaded:
+
+```
+LIST > L$
+STATUS CONFIG >> LINES$
+```
+
+The output goes into the array, one line to an element, and the array is **redimensioned to fit**, so
+it ends with exactly as many elements as there were lines - none, if the command wrote nothing. The
+program can then read the output as it reads any other array. It works for every command that
+redirects: `LIST`, `STATUS`, `INDEX`, `TYPE` and `DIR`, and from `EXECUTE` as well as at
+the `READY` prompt.
+
+- **`>` replaces and `>>` adds.** `> A$` throws away what the array held. `>> A$` keeps it and puts the
+  new lines after the last element.
+- **A name is an array only if it is one.** The name must end in `$` and be a string array of the
+  program that is loaded. Any other name is a file name, as it always was, including a file whose name
+  ends in `$` when the program has no array of that name.
+- **One dimension.** A two or three dimensional array is refused with error 130, as `MAT REDIM` would
+  refuse it.
+- **A line longer than the array's string length follows `ON SOFLOW`.** In GROW mode (see
+  [`SOFLOW-GROW`](#soflow-grow-a-string-can-grow-instead-of-overflowing)) every element becomes as long
+  as the longest line, up to `MAX`. With `ON SOFLOW IGNORE` the line is cut. Otherwise the command stops
+  with the string overflow error, 58, and the array holds the lines stored before it. The length is a
+  property of the array: `DIM A$(1)*200` takes any line up to 200 characters in any mode.
+- **`TYPE` and `DIR`.** `TYPE file > A$` puts the lines of the file into the array, including a last
+  line that has no line end. `DIR > A$` puts the lines the directory listing would show on the screen.
+  If the file is not found or cannot be read the array is left with the lines stored before the error.
+- **The end of each line is not stored.** A carriage return in front of the line feed is dropped, so
+  the elements are the same text that `> file` would hold, without the line ends.
+- **`RUN >` and `DISPLAY >` do not take an array.** They keep the output open after the command has
+  finished, while the program that holds the array could be cleared. They refuse with error 315, as
+  they refuse any array that cannot be redimensioned.
+- **An array that is in use will not redimension.** If an element of the array is on the stack - an
+  element passed by reference to a function that is running - the redirection stops with error 317,
+  as `MAT REDIM` does.
+- **`STATUS` reports a failed write.** A `STATUS` that could not write to its redirection used to end
+  without saying so. It now ends with the error.
+
+<a id="dir-glob-patterns"></a>
+### 1.23 `DIR` takes glob patterns
+
+The name given to `DIR` may now be a glob pattern. `*` and `?` work as they always have. These are new:
+
+| Pattern | Matches |
+|---|---|
+| `[abc]` `[a-z]` | one character from the set or range |
+| `[^abc]` | one character that is not in the set |
+| `{a,b,c}` | any one of the alternatives; they may contain other patterns, and may nest |
+| `**` as a whole part of the name | any number of directories, or none |
+
+```
+DIR data\*.{brs,prc}
+DIR data\rpt[0-9][0-9].dat
+DIR src\**\*.cpp
+DIR data\20*\*.rpt
+```
+
+`DIR src\**\*.cpp` lists every `.cpp` file in `src` and in every directory below it. `DIR src\**` lists
+everything below `src`. A pattern may also be in a directory part of the name, as in the last example,
+where `*` is not in the last part.
+
+- **One heading per directory.** The listing has a `Directory of` heading for each directory that has
+  a match, a blank line between them, and one total at the end. Directories are taken in name order.
+  `-B`, `-W`, `-C`, `-A` and `>` work as they do for any `DIR`, and `-O` sorts the files within each
+  directory.
+- **What did not change.** A name whose last part has only `*` and `?`, and no other pattern, is
+  listed as before, including `DIR name` meaning `name.*`. A pattern that uses any of the new forms
+  is taken exactly as written: `{a,b}` does not have `.*` added to it.
+- **Case** follows `FILENAMES SEARCH`, as it does for `*` and `?`.
+- **A leading dot is not special.** `*` matches a name that begins with a dot. `.` and `..` are never
+  listed by a pattern.
+- **No escape character.** Backslash is the separator on Windows, so there is none. To match `[`, `{` or
+  `}` itself, put it in a set: `[[]`, `[{]`, `[}]`. A `[` or `{` with no closing partner, and `{}` with no
+  comma in it, stand for themselves. A file whose name is the pattern written out - `a[1].txt` - is also
+  found when it is asked for by that name.
+- **Negation and the comment character.** `[!abc]` also means "not in the set", but `!` begins a comment
+  in a command line unless the name is quoted: `DIR "data\[!ab]*"`. `[^abc]` needs no quotes.
+- **A comma in braces belongs to the name.** `DIR *.{brs,prc}` is one name, not two. A comma that is
+  not inside braces separates names, as it always did.
+- **Nothing matched** is error 4152, file not found.
+- **Depth.** `**` goes down at most 40 directories.
+- **The other file commands take them too.** `COPY`, `RENAME`, `FREE`, `DROP` and `TYPE` accept the
+  same patterns for the files they act on: `COPY src\**\*.cpp backup\`, `FREE tmp\*.{bak,old}`,
+  `TYPE notes\[ab]*.txt`. The files are acted on directory by directory, in name order. A `**` pattern
+  can bring files from several directories; with a directory as the target they all go into it, without
+  their sub-directories, so two files of the same name overwrite each other. `RENAME` and a
+  non-directory `COPY` target keep their `*` rule (`RENAME a{1,2}.txt *.bak`). `MKDIR`, `RMDIR` and
+  `CHDIR` name one directory and take no pattern, but they do take a `/` as a separator (see
+  [1.25](#option-84-slash)).
+
+The full statement of the patterns, with `/` in names and Tab completion, is the document
+`filename-patterns.md` in the context kit (`br_tree/70-commands/file-directory`).
+
+<a id="tab-completes-file-names"></a>
+### 1.24 Tab completes file names at the `READY` prompt
+
+At the `READY` prompt, Tab completes the file name the cursor is in, from the server's files, for
+`COPY`, `RENAME`, `FREE`, `DROP`, `TYPE`, `DIR`, `LOAD`, `RUN`, `SAVE`, `REPLACE`, `MERGE`, `PROC`,
+`SUBPROC`, `RMDIR`, `CHDIR`/`CD`, the program named after `<` in `LIST <program`, and the file named
+after `>` or `>>` on every command that redirects its output (the file commands, `LIST`, `RUN`,
+`STATUS`, `DISPLAY` and `INDEX`). One match is put in. Several are listed and the first is put in;
+each further Tab puts the next in its place, cycling round, until something else is done. The command word may be abbreviated as far as BR itself allows. Everywhere
+else Tab still moves to the next tab stop.
+
+The full statement — which words of each command are completed, the abbreviations, redirections,
+quoting, directories-only for `RMDIR` and `CHDIR`, and the listing — is section 3 of
+`filename-patterns.md`, in the same place as for 1.23.
+
+<a id="option-84-slash"></a>
+### 1.25 `OPTION 84` - a `/` in a file name
+
+A `/` in a file name has always meant System/23: `file/directory/drive`, with `file//10` the spooler
+and `file//11` AUX. It can now also be a **folder separator**, so `data/rpt/a.dat` and `src/**/*.cpp`
+work as they do on other systems. A name that could be either is tried both ways, and BR does not look
+at the disk to decide: the name is resolved the first way, the operation is tried, and if it fails as
+file or folder not found it is tried the other way.
+
+**Which way first.** The System/23 reading is tried first if the name has a `\` in it, has `//` and a
+digit, or has only one `/`. Anything else is tried as folders first. A name with `//` and a digit is
+only ever read as System/23. A name with a drive letter or a device in front (`C:/data/x`, `PRN:/10`)
+has only one reading.
+
+**`OPTION 84 n`** changes that:
+
+| n | First | If not found |
+|---|---|---|
+| 0 | System/23 | not tried again - the behaviour of earlier releases |
+| 1 | by the rule above (the default) | tried the other way |
+| 2 | by the rule above | not tried again |
+| 3 | System/23 | tried as folders |
+| 4 | folders | tried as System/23 |
+| 5 | folders | System/23 names stop working |
+
+`OPTION 84 ON` is 1 and `OFF` is 0. `STATUS CONFIG` shows the level.
+
+- **A failed operation reports the first way's error,** except that "file not found" (4152) replaces
+  "path does not exist" (4203) when the other way found the folder but not the file. That is what
+  lets `OPEN ... NEW` or `REPLACE` create a file by either reading.
+- **When both readings exist the first wins.** `x/y` is file `x` in directory `y` (System/23) or file
+  `y` in folder `x`; with both present it is the first one tried, so a name can change meaning when
+  folders are created or removed. Level 0 or 5 removes the doubt.
+- **It applies to** `OPEN`, `LOAD`/`SAVE`, `DIR`, `COPY`, `RENAME`, `FREE`, `DROP`, `MKDIR`, `RMDIR`,
+  `TYPE` and the other commands and statements that name a file. The `DIR` glob patterns of
+  [1.23](#dir-glob-patterns) work with `/` as with `\`.
+- **`OPTION 84` is a configuration setting** and may be changed with `CONFIG OPTION 84 n`.
+
+<a id="fr-is-refused-as-fre-is"></a>
+### 1.26 `FR` is refused as `FRE` is
+
+`FREE` has no abbreviation: only `FREE` in full deletes a file. `FRE` is refused with error 1000,
+"unidentified source remaining", and deletes nothing, and `FR` now takes that same refusal. Before,
+`FR` reached the error only by being read as an expression, so a bare `FR` at the `READY` prompt
+printed the value of a variable named `FR`; it is now error 1000 as well.
+
+<a id="copy-and-rename-ask-before-overwriting"></a>
+### 1.27 `COPY` and `RENAME` ask before overwriting a file (`OPTION 6`)
+
+`COPY` used to replace a target that already existed without a word, and `RENAME` refused one with
+error 4150 (file already exists) unless given `-F`. Both now ask, on a line of their own:
+
+    Overwrite C:\DATA\CUST.FIL? (y/n/all)
+
+- **`Y`** overwrites; **`N`** leaves that file and goes on to the next one the command names;
+  **`A`** overwrites it and every later one in the same command without asking; **Esc** stops the
+  command. **Ctrl-A** interrupts it, as it does anything else in BR: the command halts with no
+  error, and a procedure that issued it stops there until `GO`. A program that ran the command
+  with `EXECUTE` is interrupted too, at its next statement, exactly as if Ctrl-A had been typed
+  while it ran - its `ON ATTN` applies, so it may carry on by design. The same holds at the `-V`
+  confirmation question.
+- **`-F` overwrites without asking**, and now applies to `COPY` as well as `RENAME`.
+- **Nobody is asked when nobody can answer.** In `UNATTENDED` mode, or while an assistant holds the
+  `READY` prompt, the command stops with error 4150 instead and nothing is overwritten. `-F` gets
+  past it.
+- **A target that is the source itself** under another name (a change of case, a relative or 8.3
+  short name, a hard link) affects no other file, so nothing is asked or refused, with or without
+  `OPTION 6`. `RENAME` goes ahead, and `COPY` becomes a `RENAME`; either way the file is left under
+  the second name exactly as written, so `RENAME abc.txt abc.txt` turns `Abc.txt` into `abc.txt`. Before, `RENAME -F` of a name
+  to its own upper case could delete the file on Windows (the target was deleted first), and
+  `COPY @:x @:X` was error 4299.
+- **`OPTION 6` restores the old behaviour**: `COPY` replaces silently and `RENAME` refuses with 4150
+  unless `-F`. It may be set in `brconfig.sys` or with `CONFIG OPTION 6 ON`, and `STATUS` shows it.
+  The number is reused: `OPTION 6` was once keep path on exit, long withdrawn and accepted as a
+  no-op, so a configuration file that still says `OPTION 6` keeps the behaviour it has always had.
+
+<a id="new-options-and-legacy-options"></a>
+### 1.28 New `OPTION`s, and which ones are legacy
+
+BR 5.0 adds eight `OPTION` numbers (8 and 78 to 84), gives two existing numbers new meanings (6 and
+60), and retires one (55). **Six of them are legacy options**: each one turns a 5.0 behaviour change
+back to what earlier releases did. If an upgrade has changed something an application depends on,
+look here first.
+
+**Legacy options** - set one to get the old behaviour back:
+
+| Set | To get | Instead of the 5.0 default | See |
+|---|---|---|---|
+| `OPTION 6 ON` | `COPY` replaces an existing file without asking, and `RENAME` refuses one with error 4150 unless given `-F` | both ask `Overwrite ...? (y/n/all)` | [1.27](#copy-and-rename-ask-before-overwriting) |
+| `OPTION 8 ON` | `DIR` lists as it did before 5.0, as if every `DIR` were given `-O`: the 8.3 layout with two-digit years, and the old meanings of `-A`, `-L`, `-N`, `-O` and `-U` | the 5.0 listing: ISO dates, sizes in full, long names only, sorted by name | [1.29](#dir-new-listing) |
+| `OPTION 60 ON` | `SAVE` writes the 4.2/4.3 object format (save level 38), which a 4.2 or 4.3 BR can load | level 39, which an earlier BR refuses with error 2240 | [1.19](#a-program-saved-by-50-will-not-load-in-an-earlier-br), [1.20](#option-60-save-in-the-42-43-object-format) |
+| `OPTION 79 3` | no font errors reported to the program, as before 5.0. The conditions are still logged | `0`: errors 6249, 6251 and 6253 are all reported | |
+| `OPTION 81 ON` | 4.3.3's print sizing: a proportional face is never scaled, and a fixed-pitch face is stretched to the cell | the size derived from the pitch, with every face scaled to the cell | [4](#printing-and-fonts) |
+| `OPTION 84 0` | a `/` in a file name read only as System/23 (`file/directory/drive`) | `1`: a name that could be either is tried both ways | [1.25](#option-84-slash) |
+
+- **Each may be set in `brconfig.sys` or with `CONFIG OPTION`**, and `STATUS CONFIG` shows it.
+- **A configuration file carried over from 4.3 is safe with all six.** `OPTION 6` was a no-op there
+  and now gives exactly the behaviour 4.3 had, and 4.3 had no use for the others, except
+  `OPTION 60`; it refused `OPTION 8`, a long-withdrawn number now reused. **A 4.3 configuration with `OPTION 60 ON` now saves level 38**, not the
+  4.18-and-earlier format it asked for there, which 5.0 no longer writes.
+- `OPTION 79` is a level, not a switch: `1` stops 6253 (*internal font resolution error*) being
+  reported, `2` stops 6251 (*requested print font is not available, a substitute was used*) as
+  well, and `3` stops 6249 (*invalid NWP font specification*) too.
+- `OPTION 81` implies no other option. `OPTION 68` keeps its own meaning inside it, as in 4.3.3.
+
+**Other new options** - new capabilities, with no earlier behaviour to restore:
+
+| Set | To get | See |
+|---|---|---|
+| `OPTION 78 a b` | grid and list selection backgrounds lightened by `a` when dark and darkened by `b` when light, each 0 to 127 (default is 40 for both) | |
+| `OPTION 80 ON` | for a large font, type at the size its pitch implies, with the line advance growing to fit - at fewer lines per page | [4](#printing-and-fonts) |
+| `OPTION 82 ON` | this session's windows parked off the display area | [1.18](#option-82-work-off-the-display-area) |
+| `OPTION 83 ON` | operating-system calls not asked about, and BR sessions this one starts not restricted. Configuration file only | [2.12](#option-83-for-an-application-that-starts-br-sessions) |
+
+**Retired:** `OPTION 55` (fixed-pitch alignment for NWP printing) is now refused in
+`brconfig.sys`, and `STATUS CONFIG` reports it as `OPTION 55 - no longer used`. Remove it from any
+configuration file before upgrading.
+
+<a id="dir-new-listing"></a>
+### 1.29 `DIR` has a new listing and new options (`OPTION 8`)
+
+**Please read this before upgrading if a program reads the output of `DIR`**, for instance with
+`DIR >file` or [`DIR >arr$`](#redirection-into-an-array): the layout has changed. `DIR -O`, or
+`OPTION 8 ON` for every `DIR`, gives the old listing exactly.
+
+A plain `DIR` now looks like this:
+
+```
+Directory of M:\qsmrp\data\*.*
+2026-10-20 23:36              7  "a,b.txt"
+2026-10-20 23:36      2,500,000  big.dat
+2026-10-20 23:36          <DIR>  sub
+2026-10-10 23:36             10  week.txt
+ 3 Files, 1 Folder, 2.4 MB Used, 59.2 GB Free
+```
+
+- **Dates** are `yyyy-mm-dd hh:mm`, with a four-digit year and a 24-hour clock.
+- **Sizes** are in bytes with commas, however large. They no longer switch to KB above 999,999
+  and MB above 999,999,999.
+- **Long names only.** The 8.3 name column is gone, and a name with a space or a comma in it is in
+  double quotes.
+- **Sorted by name.** Before, a listing came in the order the system gave it unless asked to sort.
+- **`.` and `..` are not listed.**
+- **The summary** counts files and folders separately, and gives space in KB, MB, GB or TB rather
+  than always in kilobytes.
+
+**The options:**
+
+| Option | Effect |
+|---|---|
+| `-T` | Sort by date and time, newest first |
+| `-S` | Sort by size, largest first |
+| `-R` | Reverse whichever order applies |
+| `-A` | Attributes. Windows: their names (`ReadOnly`, `Hidden`, `System`, `Archive`). Unix: the permission string, owner and group |
+| `-L` | The permission string as well. On Windows, the same as the default format |
+| `-N` | No `Directory of` heading |
+| `-B` | Names only, one per line, quoted as in the listing above |
+| `-W` | Names only, across the rows, in as many columns as the window holds |
+| `-C` | Names only, down the columns, sized the same way |
+| `-M` | Machine format, for programs (below) |
+| `-ddd` | Only entries changed *ddd* or fewer days ago: `-7` is today and the 7 days before it |
+| `+ddd` | Only entries changed *ddd* or more days ago. With `-ddd`, a range: `+7 -30` is entries changed from 7 to 30 days ago |
+| `-P` | Pause after each screenful, as before |
+| `-O` | The old listing, and the old meaning of every other option given with it |
+
+A tie in `-T` or `-S` order goes by name. **Days are calendar days**, by the date an entry changed
+and not its time: today is day 0 and yesterday day 1, so the same entries match whatever time of
+day `DIR` is run. **Both ends are inclusive**, so `+7 -30` takes in day 7 and day 30, and `-0` is
+today only.
+
+**`-M` - machine format.** One line per entry, with no heading and no summary, and every field but
+the name in the same column on every line:
+
+```
+        2500000,2026-10-20,23:36:39,F,---A,,,big.dat
+              7,2026-10-20,23:36:39,F,---A,,,"my file.txt"
+              0,2026-10-20,23:36:39,D,----,,,sub
+```
+
+The fields are `bytes,date,time,type,attributes,owner,group,name`. The size has no commas and is
+right-aligned in 15 characters. `type` is `D` for a folder and `F` for a file. The attributes are
+`RHSA` letters on Windows (`-` where absent) and `rwxr-x---` on Unix, and owner and group are empty
+on Windows. The name is last and quoted by the CSV rule, so the output reads as CSV, and a program
+can also take everything after the seventh comma as the name.
+
+**With a [glob](#dir-glob-patterns)**, each folder still gets its own heading. With `-N`, and
+always with `-M`, each name is given whole instead, since there is no heading to say which folder
+it is in.
+
+**What a program may notice:**
+
+- **Three options changed meaning.** `-A` was "archive bit set only" and now shows attributes; `-L`
+  showed the permission string in the old layout; `-N` suppressed all screen output and now
+  suppresses only the heading. `-U` (no long names) is gone, since the listing has no short ones.
+- **An unknown option is now error 1006**, *syntax error*. Before, `DIR` accepted options meant
+  for other commands, such as `-F` and `-V`, and ignored them. With `-O`, they are still accepted.
+- **A name that matches nothing is still error 4152**, *file not found*. A name that matches
+  something of which `-ddd` or `+ddd` leaves nothing is not an error: the listing is empty.
+
+**`-O` restores the old listing entirely**: the old layout, and the old meaning of every other
+option given with it. So an existing `DIR -O`, which used to mean "sorted", gives exactly the
+output it always did, and an old option string still works with `-O` added. **`OPTION 8 ON`** makes
+every `DIR` behave as if given `-O`. It may be set in `brconfig.sys` or with `CONFIG OPTION 8 ON`,
+and `STATUS CONFIG` shows it. The number is reused: it was once use old style loop counter for
+keyboard, long since withdrawn, and 4.3 refused it as a bad `OPTION`, so no working configuration
+file already has it.
+
+<a id="command-help"></a>
+### 1.30 `-?` lists a command's options
+
+Every command takes `-?` in place of its arguments and lists the forms and options it accepts,
+instead of running:
+
+```
+READY
+COPY -?
+COPY from to [options]
+  from may hold wildcards; to may be a folder.
+  -F           overwrite files that exist without asking
+  -V           ask before each file (y/n/all)
+  -N           show no messages
+  -P           pause after each screenful
+  -D           leave out deleted records (internal files)
+  -S           copy a file even when it is open for output
+  -nnn         give the copy a record length of nnn
+  PRINT        send the report to the printer
+  >file        write the report to a file; >>file appends
+  >name$       fill the string array name$, a line to an element
+```
+
+- **`-?` must be the whole of the arguments.** `COPY -?` lists; `COPY a.txt -?` is a `COPY` with
+  an option it does not know, which is a syntax error as before. So a file name or a `LIST` search
+  string that contains `-?` is never mistaken for it.
+- **Nothing is run.** The command does not start, so `RUN -?` loads nothing and `SYSTEM -?` does
+  not leave BR.
+- **A long list pauses after each screenful**; any key goes on and Ctrl-A stops it.
+- **`DIR -?` shows the options of the listing in use**: the 5.0 ones, or under
+  [`OPTION 8`](#dir-new-listing) the 4.x ones.
+- **Every command has it except `HELP`.** The file and directory commands, `LIST`, `DEL`,
+  `RENUM`, `AUTO`, `EDIT`, `LOAD`, `SAVE`, `REPLACE`, `MERGE`, `RUN`, `GO`, `CLEAR`, `PROC`,
+  `SUBPROC`, `PROCERR`, `SKIP`, `ALERT`, `STATUS`, `BREAK`, `DISPLAY`, `DEBUG`, `AI`, `CONFIG`,
+  `INDEX`, `SORT`, `SYSTEM`, `PROTECT`, `DATE`, `TIME` and `VERIFY`.
+
+Some of what it lists was never written down before - `PROTECT name READ|WRITE`, `EDIT -` and
+`EDIT ~`, `PROCERR REM`, `LIST CLAUSES` and `NOEJECT`, `INDEX VERIFY`, `SHR` and `BTREE`, and the
+`SYSTEM` shell flags among them. The text was written from each command's own parser.
+
+**And a digit at a `-P` pause.** `LIST -P` has always paused after each line and taken a digit
+there: `5` lists the next five lines before pausing again. **`TYPE -P` now takes it too**: at its
+pause, a digit from 2 to 9 shows the next that many lines, and any other key the next screenful as
+before.
+
+<a id="rename-folders-and-file-systems"></a>
+### 1.31 `RENAME` stays on one file system, and renames folders with `-D`
+
+**`RENAME` no longer moves a file to another drive.** On Windows, a `RENAME` to another drive or
+share used to copy the file there and delete the original, which for a large file was a slow copy
+under the name of a rename. Now a *to* on another drive, share or mounted file system is refused with
+error **4138**, and both names are left as they were; use `COPY` and then `FREE` to move a file
+there. Unix already refused this, with an unhelpful 4320; it now gives 4138 too. The 4138 message
+reads "can't rename from one file system to another, or between client and server", since a rename
+between the client (`@:`) and the server was already refused with it.
+
+**A forced rename no longer loses the target when it fails.** On Windows, `RENAME -F` deleted the
+existing target and then tried the rename, so a rename that failed afterwards left neither. The
+target is now replaced in the same step as the rename.
+
+**`RENAME from to -D` renames a folder**, with everything in it:
+
+```
+RENAME reports reports2025 -D       the folder reports is now reports2025
+RENAME reports archive -D           archive is a folder, so this is archive\reports
+```
+
+- *from* must be one folder, with no wildcards. If it is not a folder, the error is **4203**.
+- As with a file, a *to* that is an existing folder receives *from* under its own name.
+- Any other *to* that exists is refused with **4150** and never replaced, so `-F` has no effect.
+- `-V` asks `Rename? (y/n)`, and `-N` and the redirections work as for files.
+- Without `-D`, `RENAME` acts on files only, as before. The `-D` letter was already accepted by
+  `RENAME` and did nothing; for `COPY` it still means leave out deleted records.
+
 <a id="security"></a>
-## Security
+## 2. Security
 
 <a id="the-debugger-connection-is-now-encrypted-and-authenticated"></a>
-### The debugger connection is now encrypted and authenticated
+### 2.1 The debugger connection is now encrypted and authenticated
 
 **This changes how an existing debugger connects, and a debugger that has not been updated will no
 longer attach.** Please read this before upgrading if you use `DEBUG CONNECT` or `DEBUG LISTEN`.
@@ -484,7 +983,7 @@ A peer that connects and then says nothing is refused after a few seconds rather
 channel; BR carries on either way.
 
 <a id="the-debugger-port-no-longer-accepts-connections-from-the-network"></a>
-### The debugger port no longer accepts connections from the network
+### 2.2 The debugger port no longer accepts connections from the network
 
 `DEBUG LISTEN` used to bind every interface on the machine, so the debugger port was reachable from
 the network. Anything that connected to it was treated as the attached debugger, which carries the
@@ -527,7 +1026,7 @@ endpoint off the machine to reach at all, which is a stronger statement than any
 something has already connected.
 
 <a id="restricted-sessions"></a>
-### Restricted sessions
+### 2.3 Restricted sessions
 
 A session can be started **restricted** — see
 [Starting a disposable restricted session](#starting-a-disposable-restricted-session). It is
@@ -558,7 +1057,7 @@ restricted from before it reads its configuration file until it ends, and throug
   that such a session cannot report from a database, and a narrower rule is intended.
 
 <a id="the-restricted-session-read-list"></a>
-### Where a restricted session may be: the file list
+### 2.4 Where a restricted session may be: the file list
 
 A restricted session could always reach anything the account could. The rules above govern what it
 may **change**; a site that needs to govern what it may **see and touch at all** can now install a
@@ -672,7 +1171,7 @@ path, so an administrator can read back from the log exactly what the list was t
 The full reference is `AI-Restricted-Operations.md`, *Files: where the session may be*.
 
 <a id="ui-regression-scripts"></a>
-### UI regression scripts
+### 2.5 UI regression scripts
 
 `br_mcp_driver uitest` runs a plain text script against a running session, so a programmer who has
 changed a screen can say what should be on it and rerun that after the next change. One step a line:
@@ -745,7 +1244,7 @@ restricted — and so that a session that crashes cannot leave the mark behind f
 next reuses its number.
 
 <a id="starting-a-disposable-restricted-session"></a>
-### Starting a disposable restricted session
+### 2.6 Starting a disposable restricted session
 
 **New function `SPAWN_RESTRICTED(command$ [, config$ [, wait]])`.** It starts a new BR session on
 the same workstation ID — the next free session number — restricted from its first moment, and runs
@@ -777,7 +1276,7 @@ by hand: `--restricted`, `--restricted-log=<folder>` and `--restricted-wbserver=
 last two are accepted only with the first.
 
 <a id="calling-an-assistant-from-a-program"></a>
-### Calling an assistant from a program
+### 2.7 Calling an assistant from a program
 
 A program asks an assistant a question the way it asks a person: on the screen, with a field to
 answer in. The assistant — reading the screen over the AI harness channel, and holding the keyboard
@@ -795,7 +1294,7 @@ question and the field its answer goes in — and `br/docs/AI_ACCESS.md` (Track 
 full.
 
 <a id="an-assistant-no-longer-types-at-the-ready-prompt-by-default"></a>
-### An assistant no longer types at the `READY` prompt by default
+### 2.8 An assistant no longer types at the `READY` prompt by default
 
 An assistant holding the keyboard grant could type wherever BR was taking input, including the
 command line, where `FREE` or `SYSTEM` is one keystroke away from an assistant that misfires.
@@ -812,7 +1311,7 @@ which is what a development session wants, because there typing at the console i
 restricted session is refused that mode.
 
 <a id="both-windows-show-a-grant-and-a-restriction"></a>
-### Both windows show a grant and a restriction
+### 2.9 Both windows show a grant and a restriction
 
 **Changed 2026-10-08.** A session marks its title bar `[RESTRICTED]` while it is a restricted
 session, and `[AI Has Keyboard Access 4:37]` - with the time left - while an assistant holds the
@@ -831,7 +1330,7 @@ title is unaffected: the text it sets is kept apart from the marks, so neither i
 doubles when the other changes.
 
 <a id="an-assistant-cannot-extend-its-own-grant"></a>
-### An assistant cannot extend its own grant
+### 2.10 An assistant cannot extend its own grant
 
 **New 2026-10-09. New error 4166, `BREGRANTNOTRAISED`** - *the assistant's own commands may not
 raise the keyboard grant - only the person at the session may.*
@@ -862,7 +1361,7 @@ and anything that program calls. Your own commands are untouched: a `MSG("grant"
 one in a procedure of your own, behaves exactly as before. Every refusal is logged.
 
 <a id="a-turn-without-a-grant-asks-before-anything-destructive"></a>
-### A turn asks you before anything destructive
+### 2.11 A turn asks you before anything destructive
 
 **New 2026-10-09. New error 4167, `BREAINOTPERMITTED`** - *the operator did not permit this
 operation for the assistant.*
@@ -960,7 +1459,8 @@ is one question per program per connection, not one per command.
 The powerful `CONFIG` operations remain refused outright, with error 4168: those change what the
 session *is*, and there is no program to name in a question about them.
 
-### `OPTION 83` for an application that starts BR sessions
+<a id="option-83-for-an-application-that-starts-br-sessions"></a>
+### 2.12 `OPTION 83` for an application that starts BR sessions
 
 An application that spawns sessions of its own meets both halves of the new behaviour at once:
 every `SYSTEM` it issues stops to ask, and every session it starts comes up restricted. For those
@@ -1022,7 +1522,7 @@ until someone notices.
 Every question and answer is logged, and so is every operation refused for want of one.
 
 <a id="a-turn-needs-the-consent-of-whatever-is-running"></a>
-### A turn needs the consent of whatever is running
+### 2.13 A turn needs the consent of whatever is running
 
 **New 2026-10-13. New error 4169, `BREAITURNNOTPERMITTED`** - *a program or procedure is active:
 set `ENV$("AI_TURN_OK")` to `"Y"` before an AI command, or end what is running* - **and 4170,
@@ -1103,7 +1603,7 @@ refused from there too: the assistant already ends its turn by answering.
   than left waiting for a result.
 
 <a id="a-run-that-fails-now-says-so"></a>
-### A command from an assistant reports the error it died on
+### 2.14 A command from an assistant reports the error it died on
 
 **Fixed 2026-10-13.** A line the assistant asked to have run comes back with BR's error number, 0
 for success. An **untrapped run-time error** did not reach that report: `RUN` of a program that
@@ -1131,7 +1631,7 @@ BR's error table for something that is not there.
 A **bare `STOP` sets 0**, so a program that ended normally reports nothing extra.
 
 <a id="code-is-cleared-by-load-chain-and-clear"></a>
-### `CODE` is cleared by `LOAD`, `CHAIN` and `CLEAR`
+### 2.15 `CODE` is cleared by `LOAD`, `CHAIN` and `CLEAR`
 
 **Changed 2026-10-13.** `CODE` is the return code a program set with `STOP n` or `END n`. `CLEAR`
 has always zeroed it; `LOAD` and `CHAIN` now do too, so `CODE` cannot be read stale from a program
@@ -1152,7 +1652,7 @@ loop statement `EXIT DO`/`EXIT FOR` - and a procedure line reading `EXIT 3` rais
 *unidentified source remaining*, leaving `CODE` at 0. Measured, and the reference corrected.
 
 <a id="a-restricted-sessions-log-is-named-for-its-wsid"></a>
-### A restricted session's log is named for its WSID
+### 2.16 A restricted session's log is named for its WSID
 
 **Changed 2026-10-08.** Every restricted session now writes an audit log called
 **`restricted-<wsid>.log`**, and nothing outside BR chooses that name. A caller may choose only the
@@ -1205,7 +1705,7 @@ records what it is a log of: its first entry names the WSID and says whether the
 restricted because an assistant is connected or because it was started as a disposable one.
 
 <a id="a-program-can-tell-an-assistant-something-directly"></a>
-### A program can tell an assistant something directly
+### 2.17 A program can tell an assistant something directly
 
 ```
 LET X=MSG("notify", "report ready: t41list.txt")
@@ -1225,7 +1725,7 @@ channel closing — so an assistant waits to be told rather than asking over and
 sent to one that has not asked for it, and no message ever carries what was typed.
 
 <a id="a-program-can-be-given-a-whole-text-in-one-go"></a>
-### A program can be given a whole text in one go
+### 2.18 A program can be given a whole text in one go
 
 An assistant's only way into BR was the keyboard, under a grant, a character at a time. That is
 right for an answer a field holds, because BR's own field checks are then what hold it to its type
@@ -1265,7 +1765,7 @@ delivery is logged with its length and line count, beside the grants, so "where 
 come from" has an answer.
 
 <a id="ai-a-conversation-at-the-console"></a>
-### `AI` - a conversation at the console
+### 2.19 `AI` - a conversation at the console
 
 A new command. At the `READY` prompt, `AI` followed by what you want:
 
@@ -1306,7 +1806,7 @@ involves anything leaving this machine. Nothing is sent anywhere unless the tool
 conversation has been given an API key.
 
 <a id="the-client-refuses-a-server-certificate-that-was-replaced-in-transit"></a>
-### The client refuses a server certificate that was replaced in transit
+### 2.20 The client refuses a server certificate that was replaced in transit
 
 BRClient pins the server's certificate: it accepts Business Rules' own certificate and no other.
 That check now runs during the connection's handshake, so a substituted certificate is refused at
@@ -1330,7 +1830,7 @@ flicker for minutes and then a timeout, and the listener's log said nothing. Whe
 reach the user it was a generic "no shared cipher" text that was wrong for this case.
 
 <a id="new-error-codes-for-ai-and-restricted-sessions"></a>
-### New error codes for AI and restricted sessions
+### 2.21 New error codes for AI and restricted sessions
 
 Thirteen error codes are new in 5.0, all in the 41xx range. None of them exists in 4.3, so a
 program written against 4.3 can meet any of them for the first time here - which matters if it
@@ -1373,10 +1873,10 @@ print-dialog failures, and nothing lies between 4177 and 6201 - so a 61xx report
 is a wrong number rather than a code listed somewhere else.
 
 <a id="debugging-and-observation"></a>
-## Debugging and observation
+## 3. Debugging and observation
 
 <a id="watching-a-debugging-session-without-taking-it-over"></a>
-### Watching a debugging session without taking it over
+### 3.1 Watching a debugging session without taking it over
 
 BR allows one debugger at a time, and connecting to the debug socket takes that place. There was no
 way to watch a session someone else was debugging.
@@ -1402,7 +1902,7 @@ disconnects is noticed and dropped; nothing about the debugger's session changes
 This is not multi-client debugging: an observer watches, and only the debugger drives.
 
 <a id="a-log-of-what-appeared-on-the-screen"></a>
-### A log of what appeared on the screen
+### 3.2 A log of what appeared on the screen
 
 `DEBUG SCREENLOG <file>` writes a line for every screen write BR makes, and `DEBUG SCREENLOG OFF`
 stops it. Each line carries the time to the millisecond, the window's file number, what kind of
@@ -1422,14 +1922,13 @@ session: the log says what was commanded, the tee says what appeared. It is off 
 on — a full-screen repaint is many writes, and this stream is far larger than the event log. It
 records the character-cell screen, not a picture: text drawn by native controls is not in it.
 
-<a id="the-debugger-can-now-interrupt-a-running-program"></a>
-<a id="console-scrollback"></a>
-### Console scrollback
+<a id="console-history"></a>
+### 3.3 Console history
 
 The console now keeps what scrolls off the top of it. Previously the top line was overwritten and
 nothing kept it, so anything that scrolled past between one look and the next was gone.
 
-`CONSOLE SCROLLBACK <lines>` sets how much is kept, defaulting to **1000** lines. `0` switches it
+`CONSOLE HISTORY <lines>` sets how much is kept, defaulting to **1000** lines. `0` switches it
 off. The figure is a budget rather than a count: lines are stored without their trailing blanks, so
 a console printing short lines keeps considerably more than the figure names, and a screen using
 many different colours in one line keeps fewer. At 80 columns the default costs about 96K of
@@ -1447,6 +1946,15 @@ same lines would be worse than none. So the lines a listing draws are left out o
 everything among them — the commands you typed between two pages, and their output — is kept. A
 program loaded with `LOAD <file> SOURCE` *is* kept as it is echoed, because the listing recall does
 not reach those; `PROC NOECHO` suppresses them in the usual way.
+
+**What a prompt writes is kept when the program resumes.** At an ATTN, READY or ERROR prompt the
+console is shared with the program that was put aside, and when you `GO` or `RUN` the program
+paints its own screen over whatever the prompt left. Nothing scrolled that off, so it never reached
+the history: the commands you typed, the output of `STATUS` and anything else printed there simply
+vanished. BR now puts it into the history at that moment, so it is there to scroll back to. This
+covers what was **written to the console** at the prompt, with the same exception as everywhere
+else: lines drawn by `LIST` are not kept. The program's own screen, controls and the status line are
+not part of it.
 
 **To look at the history**, use any of:
 
@@ -1472,6 +1980,13 @@ scrolling all the way back down to the live screen, where the arrows still work 
 does nothing at all rather than disturbing the screen. Drag over the text to select it and press
 Ctrl+C, or right-click, to copy it; you can then return to the prompt and paste.
 
+**This is also how to copy what is on the console now.** The console itself takes no selection -
+outside the history the mouse belongs to the program - but the history view shows the live screen
+too, under the lines that went before it. Press **Shift+Up** once and everything on the console is
+there to select and copy, except its bottom row, the line you are typing on; for that, mark it with
+Shift and the arrows and press Ctrl+C as in any field. Selecting needs the view moved back at least
+that one line: scrolled all the way down, the live screen is the program's again.
+
 **Any other key leaves the history**, and the key you typed goes to the live prompt, so there is no
 mode to get stuck in. While you are reading, the screen does not repaint and the program's output
 is still being kept: coming back shows all of it.
@@ -1480,15 +1995,16 @@ Shift is needed to start scrolling with the wheel because BR already gives the p
 running program, and the arrows and paging keys are the listing's. Nothing a program sees changes
 until you ask for the history.
 
-An assistant connected to the user-level channel reads the same history with its `SCROLLBACK`
+An assistant connected to the user-level channel reads the same history with its `HISTORY`
 request, and can see what you are looking at with `SCROLLVIEW` — **but only with `GUI ON`.** With
 `GUI OFF` the application paints the console itself, so the history is not Console traffic but the
 session's own past screens, complete with the contents of their fields. An assistant reads the
-screen without needing permission to act, so with `GUI OFF` it is refused the history: `SCROLLBACK`
+screen without needing permission to act, so with `GUI OFF` it is refused the history: `HISTORY`
 answers an error and the rows `SCROLLVIEW` marks `HISTORY` come back blank. Your own use of the
 history is unaffected in either mode — scroll, select and copy exactly as above.
 
-### The debugger can now interrupt a running program
+<a id="the-debugger-can-now-interrupt-a-running-program"></a>
+### 3.4 The debugger can now interrupt a running program
 
 A debugger's break request was acknowledged and then had no effect until the program next waited
 for input of its own. A program in a loop, or in a `SLEEP`, simply carried on.
@@ -1498,7 +2014,7 @@ the debugger's break did not tell it. It now does, so a break takes effect while
 running — which is what it was always for.
 
 <a id="a-variable-watch-now-reports-the-value-not-just-the-name"></a>
-### A variable watch now reports the value, not just the name
+### 3.5 A variable watch now reports the value, not just the name
 
 `BREAK <variable>` stops the program when the variable changes. With a debugger attached, BR used
 to send only the variable's **name** — the value was worked out and displayed only when no debugger
@@ -1510,7 +2026,7 @@ and still sent, so a debugger that has not been updated behaves exactly as befor
 also written to the log.
 
 <a id="a-step-now-tells-the-debugger-where-it-stopped"></a>
-### A step now tells the debugger where it stopped
+### 3.6 A step now tells the debugger where it stopped
 
 When a program was stepped, the line went to the screen and the debugger was told only that a step
 had happened, so it had to ask where execution was after every step. BR now sends the line and
@@ -1522,7 +2038,7 @@ status that follows (step mode) and the absence of a breakpoint on that line tel
 `AI-Access-Protocol.md`, section 7.
 
 <a id="recording-what-a-debugger-submits"></a>
-### Recording what a debugger submits
+### 3.7 Recording what a debugger submits
 
 BR's log records commands as they are entered but not immediate statements such as `PRINT X` or
 `LET X=0`, whoever enters them. `DEBUG LOG COMMANDS <file>` — present before 5.0 but little known —
@@ -1531,7 +2047,7 @@ keep a full record of what an attached debugger, human or assistant, did at the 
 `AI-Access-Protocol.md` 7.6, *The `DEBUG` commands*.
 
 <a id="the-log-now-carries-the-clause-and-the-source-line"></a>
-### The log now carries the clause and the source line
+### 3.8 The log now carries the clause and the source line
 
 A log line used to identify a position by BR's line number alone:
 
@@ -1573,8 +2089,239 @@ line than `EXACT` would, and without the word there is nothing to say so.
 Anything reading these logs by splitting on `Line:` still finds it in the same place. The
 reference material is in `br/docs/LINES.md`.
 
+<a id="clear-proc-stop-and-end-at-a-halt-in-a-library-reload-that-library"></a>
+### 3.9 `CLEAR PROC`, `STOP` and `END` at a halt in a library reload that library
+
+**Changed 2026-10-18.** An ATTN or an error halt inside a library leaves that library as the program
+you are working in: `LIST` shows its lines and `PRINT` reads its variables. `CLEAR PROC`, `STOP` or
+`END` then ended the run, and ending a run puts the workspace back to the **top level** program, so
+the library you were looking at disappeared and had to be loaded again by hand.
+
+BR now notes which program had control when you issued one of those three at a halt, and once the
+stop is complete it **loads that program into the workspace**. It does this silently: nothing is
+echoed and nothing is added to the command log. A program saved as source (`.brs`) is loaded as
+source.
+
+- **Only when a library had control.** If the top level program was the one halted, the workspace
+  already goes back to it and nothing is loaded.
+- **Only at a halt.** `STOP` or `END` run by a program, and a run that simply finishes, behave as
+  before.
+- **`CLEAR ALL` and `CLEAR` are not changed.** They still leave the workspace empty.
+- **If the library cannot be loaded** (it was moved or deleted, say) BR reports the usual load
+  error and carries on.
+
+<a id="break-file-and-display-file-watch-opens-and-closes"></a>
+### 3.10 `BREAK FILE` and `DISPLAY FILE` watch OPENs and CLOSEs
+
+**Changed 2026-10-19.** Two new debugging commands report a file being opened or closed:
+
+```
+BREAK FILE name [OPEN | CLOSE]
+DISPLAY FILE name [OPEN | CLOSE]
+```
+
+`name` is a case-insensitive piece of the file's full name as BR holds it - `ORDERS` matches
+`M:\qsmrp\data\orders.dat`. Put it in quotes if it contains a blank. With neither `OPEN` nor `CLOSE`
+the watch is for both.
+
+- **`DISPLAY FILE`** says each match and carries on, in the form of a variable display:
+  `line 00080:01, OPEN #1 M:\qsmrp\context\zzwatch.txt`. `DISPLAY FILE name PRINT` sends it to the
+  printer.
+- **`BREAK FILE`** stops the program after the statement that opened or closed the file, at the next
+  line or clause, as a variable break stops after the statement that changed the variable.
+- **Every open and close counts**: the `OPEN` and `CLOSE` statements, the opens BR makes for itself,
+  and the closes at the end of a run. A file closed as the run ends is shown by `DISPLAY FILE` but
+  does not stop a `BREAK FILE`, because there is no program left to stop.
+- **`name OFF`** takes the watch away: `BREAK FILE orders OFF`. `BREAK FILE orders OPEN OFF` takes away
+  only the OPEN half. `BREAK ALL OFF` and `DISPLAY ALL OFF` clear the file watches of their kind.
+- **Watches are global**, not a program's: a file is opened from wherever the run happens to be, so
+  they are listed by `STATUS BREAKPOINTS` under `File watches:` and last until removed.
+- **No condition.** `IF`, `-p program` and a redirect are syntax errors on a file watch.
+
+<a id="break-takes-an-if-condition"></a>
+### 3.11 `BREAK` and `DISPLAY` take an `IF` condition
+
+**Changed 2026-10-18.** A break can now carry a condition, so it stops only when the condition is
+true:
+
+```
+BREAK IF cond              tested after every line of the program
+BREAK variable IF cond     tested when the variable changes
+BREAK line-ref IF cond     tested when the line is reached
+BREAK IF OFF               removes the every-line condition
+BREAK line-ref             turn condition test off
+BREAK variable             turn condition test off
+```
+
+The condition is the rest of the command and can be any valid BR condition, including function
+calls: `BREAK TOTAL IF FNOVERLIMIT(TOTAL)` or `BREAK 1200 IF FNNAME$ > NULL$`. A `-p program` option
+goes before the `IF`. Giving a break a new `IF` replaces its condition, and giving it none makes it
+unconditional again.
+
+`DISPLAY variable IF cond` does the same for a display: the change is shown only when the condition
+is true when the variable changes, and the run carries on either way - a display never halts the
+program. It needs a variable: `DISPLAY ALL IF` and `DISPLAY IF` with nothing to watch are syntax
+errors. An error evaluating the condition is the one thing that stops a display, so it is seen.
+
+**How it is evaluated.** A condition can call functions, so it is evaluated by BR itself at the
+break, the way `EXECUTE` runs a statement: the break halts as any break does, BR evaluates
+`LET BRKIF_RESULT=(condition)` without echoing it, and then either stays at the halt or carries on
+with a `GO`. When the condition is false nothing is displayed: a variable break's report of what
+changed, and the line shown at a halt, are held back until the condition is known. No break is
+checked while a condition is being evaluated.
+
+- **The condition is evaluated in the program that is running when the break is reached.**
+- **It is checked when you enter it.** A name the program does not have - a mistyped variable or
+  function - is an error, as it would be under `DIMONLY`, and so is a condition that does not
+  compile: the command is refused and the break or display it made is taken away. The check
+  compiles the condition and never runs it, so none of your functions are called by it. The
+  same rule applies each time the condition is evaluated, in case the program has been edited since.
+- **An error evaluating it stops the run** and shows the error - a division by zero, or a function
+  that fails.
+- **`BREAK IF` is slow.** It costs a round trip through the command processor after every line. A
+  break on a line or a variable is tested far less often.
+- **A numeric variable named `BRKIF_RESULT` is created** in the program the condition is evaluated
+  in. It will appear in `DISPLAY ALL` and in a listing of the program's variables.
+- **`STATUS BREAKPOINTS` shows the conditions**, for example `BREAK LINE 01200:01 IF X>5`,
+  `BREAK VARIABLE TOTAL IF TOTAL>100`, `BREAK IF X>5` and `DISPLAY VARIABLE TOTAL IF TOTAL>100`,
+  and persistent break points remember them, so a program loaded later has them applied.
+
+<a id="break-and-display-on-a-parameter-watch-the-variable-it-stands-for"></a>
+### 3.12 `BREAK` and `DISPLAY` on a parameter watch the variable it stands for
+
+**Changed 2026-10-18.** A parameter passed by reference is another name for the caller's
+variable. `BREAK x` and `DISPLAY x` used to watch the *name* `x` in the program they were typed in, so
+the watch stopped meaning anything once the function returned, and did not fire when the value was
+changed through any other name. When `x` is currently a parameter given by reference, BR now puts
+the watch on the variable it stands for. With `a` passed in as `x`, `BREAK x` means `BREAK a`:
+
+```
+BREAK P                      (P is V in the caller)
+line 00150:01, V, value = 2
+```
+
+- **It is the original that is watched, in its own program, under its own name.** The watch is
+  listed by `STATUS BREAKPOINTS` as `BREAK VARIABLE V`, reported as `V`, removed by `BREAK V OFF` or
+  `BREAK P OFF`, and recorded as `V` among the persistent break points.
+- **It keeps working after the function returns**, and fires when the variable is changed from the
+  caller, from a deeper call or from a library. Watches put on a variable this way are checked from
+  whichever program is running; every other watch is still tied to its own program.
+- **However many calls deep**, and across libraries, the original is found the same way `STATUS STACKS`
+  finds it - see [`STATUS STACKS` shows what a function's parameters really are](#status-stacks-shows-what-a-functions-parameters-really-are).
+- **A parameter bound to an array element** (`FNA(X(3))`) is watched as that element, `X(3)`.
+- **Not redirected:** a parameter passed by value, which has no caller variable behind it, and one
+  bound to a slice such as `X(2:4)`, which is only some of an array's elements. Those are watched by
+  their own name as before.
+
+<a id="status-shows-the-source-line"></a>
+### 3.13 `STATUS` shows the source line
+
+**Changed 2026-10-18.** `STATUS` and `STATUS STACKS` gave a position as a BR line number and a
+clause, as the log used to. They now add the line of the source file, as the log
+[already does](#the-log-now-carries-the-clause-and-the-source-line), after the clause:
+
+```
+Current Line=59008:03 3863
+ current  line 59008:03 3863, program M:\qsmrp\oap\ordera.br in function FNSELECT
+called by line 39318:02 1204, program M:\qsmrp\oap\ordera.br in function FNM
+called by line 07200:01 88, program M:\qsmrp\oap\ordera.br
+```
+
+It is on the `Current Line` row of `STATUS`, on the current line of `STATUS STACKS` and on every
+`called by` row. A call into a library shows the line in the library's own source, since each row is
+worked out from its own program.
+
+**It is the clause's line, not just the statement's.** One statement can span several physical lines
+with `!:`, and a clause on the third of them is on that line. A plain `:` between clauses does not
+start a new line. BR works this out from the one statement's stored source, so nothing is listed and
+the whole program is never loaded: a program saved with its source and loaded from the `.br` file
+has its source read from the file one statement at a time, only when `STATUS` asks. The status line
+at the bottom of the window now does the same, so its number is exact for such a program too
+rather than the statement's first line.
+
+**The number is left off when BR has none:**
+
+| | Shows |
+|---|---|
+| A program saved by 5.0, or loaded from source | the clause's line |
+| A program saved by an earlier BR, or with [`OPTION 60`](#option-60-save-in-the-42-43-object-format) | no number - the object keeps no source lines |
+| A program saved as object only | the **statement's** first line, which is the clause's line for a statement on one physical line |
+| A program edited since it was loaded | the line it would have if written out now, so the file no longer matches |
+
+Unlike the log, `STATUS` does not follow the number with `EDITED` or `BASE`. The log is read by
+tools that need to know how far to trust the number; `STATUS` is read by a person at the console. A
+program that shows no number here was saved without one: save it again with 5.0, without `OPTION
+60`.
+
+<a id="status-stacks-shows-what-a-functions-parameters-really-are"></a>
+### 3.14 `STATUS STACKS` shows what a function's parameters really are
+
+**Changed 2026-10-18.** A variable passed to a function by reference is renamed inside it, and the
+variable it was passed from may itself be a parameter of the function that called it, many calls
+deep. Finding the original used to mean reading back through the program. `STATUS STACKS` now says,
+ahead of the stack list, for the function the program is in:
+
+```
+Passed by reference: MYVAR -> X, VAR3$ -> Y$, D -> C
+ current  line 00090:01 10, program M:\qsmrp\oap\ordera.br in function FNB
+```
+
+Each parameter given by reference is shown with the **original** variable, however many levels it
+was handed down, and across calls into library programs. Only the current function is listed, and
+the line is left out when it has no by-reference parameters or the program is not in a function.
+
+- **An array element or a slice is named with its subscripts**, as the program writes it: `X(3)`,
+  `M(2,3)`, `A$(2)` or `X(2:4)`. The subscripts follow `OPTION BASE`.
+- **A scalar given to an array parameter** is shown as the scalar: `MAT P5 -> S`.
+- **A parameter that was passed by value, or an argument that is an expression**, is not listed.
+  There is no caller variable behind it. When a function passes one of its own by-value parameters
+  on by reference, the original is that parameter: `D -> C` above.
+- **A long list wraps** to continue on indented lines.
+
+The line is part of the output of `STATUS STACKS` only. It is not written to the log.
+
+<a id="status-dims-lengths"></a>
+### 3.15 `STATUS DIMS LENGTHS` shows how long strings really got
+
+```
+STATUS DIMS LENGTHS [ n ] [ > file | > A$ ]
+```
+
+lists each string variable that is dimensioned to **n bytes or more**, or has held a string of
+**n bytes or more**; `n` is 100 if it is not given. `LENGTHS` can be shortened to any part of it, such
+as `LEN` or `L`. For each variable there is one line:
+
+```
+A$ DIM: 18  USED: 142
+LINES$() DIM: 10  USED: 118
+```
+
+- **`DIM`** is the element length the program dimensioned, which is 18 for a string with no `DIM`.
+- **`USED`** is the longest string the variable has held. An array is one line, for the longest of
+  its elements, and its name is followed by `()`.
+- **Use it to size `DIM` statements.** A `DIM` that is much larger than `USED` can be smaller; a
+  `DIM` that is smaller than `USED` has grown at run time (see
+  [`SOFLOW-GROW`](#soflow-grow-a-string-can-grow-instead-of-overflowing)) and would overflow without it.
+  A program with nothing at or over `n` prints one line saying so.
+- **It runs while a program is running,** from `EXECUTE` or at a halt. It reads the variables and
+  changes nothing. The older `STATUS DIMS`, which reports duplicate, unreferenced and undimmed
+  variables, is unchanged.
+- **`>` takes an array.** `STATUS DIMS LENGTHS >R$` puts the lines in `R$`, as for any command that
+  redirects (see [`>` can send output into an array](#redirection-into-an-array)). The standard
+  `STATUS` header is not printed before the lines.
+
+**What `USED` means.** BR now clears the memory a string variable lives in when it is allocated.
+Shortening a string changes only its length, so the bytes after it keep what was stored, and the last
+byte that is not zero shows how long the longest string was. The number is kept when something would
+lose it: `MAT REDIM` to fewer elements, and the restart that frees a variable that grew or was
+redimensioned. It is **the longest string held since the variable's memory was allocated**, so it
+carries over from one `RUN` to the next, and it starts again from nothing after `CLEAR`.
+
+- A string that ends in null characters shows as shorter than it was.
+- A string padded with blanks counts its blanks.
+
 <a id="printing-and-fonts"></a>
-## Printing and fonts
+## 4. Printing and fonts
 
 Numerous changes have been made concerning PDF printing, including smart stretching of proportional
 fonts for proper vertical placement and better `FONTFAMILY` handling.
@@ -1598,10 +2345,31 @@ If a report's layout changed after upgrading, read `FONT_SELECTION.md` first to 
 is being chosen, then `FONT_MEASUREMENT.md` for how it is being sized.
 
 <a id="fixes"></a>
-## Fixes
+## 5. Fixes
+
+<a id="list-clause-counted-on-gosub-as-two-clauses"></a>
+### 5.1 `LIST ... CLAUSE` counted `ON ... GOSUB` as two clauses
+
+**Fixed 2026-10-18.** `LIST <line> CLAUSE` marks where each clause of a line begins with a backtick.
+For `ON x GOSUB a,b` and `ON x GOTO a,b` it marked two - one before `ON` and one before `GOSUB` or
+`GOTO` - although BR runs the statement as one clause and reports it as one in a clause number such
+as `99106:06`. Every clause after an `ON` on the line was therefore numbered one higher in the
+listing than in the stack, so a clause number from `STATUS STACKS` or an error pointed at the wrong
+tick, and the source line worked out from it for a continued statement was a line too early for each
+`ON` before it.
+
+```
+00100    `on 0 gosub L1 !:
+         `on X gosub L1,L2 !:
+         `print "after"
+```
+
+The listing now marks an `ON` statement once, so the ticks agree with the clause numbers BR reports.
+The other forms are unchanged: `IF ... THEN ... ELSE` is still marked as separate clauses, and
+`ON ERROR GOTO` and `ON ATTN GOSUB` are marked once.
 
 <a id="screen-chains-on-a-library-releasenofiles-return"></a>
-### Screen chains on a `LIBRARY RELEASE,NOFILES` return
+### 5.2 Screen chains on a `LIBRARY RELEASE,NOFILES` return
 
 Returning from a library with `LIBRARY RELEASE,NOFILES` clears that library's screen chain while it
 is still the current one — the only situation in which that happens. Two faults followed, both now
@@ -1621,7 +2389,7 @@ fixed:
 Programs that use `LIBRARY RELEASE,NOFILES` with screen I/O were the ones affected.
 
 <a id="dll-calls-no-longer-wait-100-ms-each"></a>
-### `DLL()` calls no longer wait 100 ms each
+### 5.3 `DLL()` calls no longer wait 100 ms each
 
 Every `DLL(...)` call took at least a tenth of a second, however little the DLL did: BR waited for
 the call in 100 ms steps and did not notice it had finished until the step was over. A call that
@@ -1631,7 +2399,7 @@ before. Programs that make many `DLL` calls in a loop will run noticeably faster
 never affected.
 
 <a id="protect-no-longer-repeats-forever-when-it-fails-on-windows"></a>
-### `PROTECT` no longer repeats forever when it fails on Windows
+### 5.4 `PROTECT` no longer repeats forever when it fails on Windows
 
 On Windows, if `PROTECT <file>,READ` or `PROTECT <file>,WRITE` could not change the file's
 attributes — for example on a file the user had no permission to change — BR ran the command again,
@@ -1639,7 +2407,7 @@ and again, without end, and the session had to be ended. The error is now report
 failed command. Other platforms were not affected.
 
 <a id="comment-lines-in-brconfig-sys-no-longer-hold-the-splash-screen"></a>
-### Comment lines in `brconfig.sys` no longer hold the splash screen
+### 5.5 Comment lines in `brconfig.sys` no longer hold the splash screen
 
 The splash screen waits for the first session on a workstation, and for any session whose startup
 produced configuration messages; sessions 2 to 9 otherwise start at once. Since comment-only lines
@@ -1652,7 +2420,7 @@ That wait is also now 2 seconds rather than 20 — see
 [The splash screen now waits 2 seconds, not 20](#the-splash-screen-now-waits-2-seconds-not-20).
 
 <a id="msg-state-now-checks-its-argument-count"></a>
-### `MSG("state")` now checks its argument count
+### 5.6 `MSG("state")` now checks its argument count
 
 The check was written so that it could never be true - it asked whether the count was both below
 three and above four - so `MSG("state")` accepted any number of arguments and then read two of
@@ -1660,7 +2428,7 @@ them regardless. Called with fewer, it read past the end of the arguments BR had
 accepts three or four, which is what it always documented and what its own body expects.
 
 <a id="the-client-no-longer-stops-with-bad-action-10129-while-connecting"></a>
-### The client no longer stops with "Bad action 10129" while connecting
+### 5.7 The client no longer stops with "Bad action 10129" while connecting
 
 If Windows reported an error BR has no name for while BRClient was still connecting, the client
 tried to pass it to a server it had not yet agreed a protocol version with, failed an internal
@@ -1668,7 +2436,7 @@ check, showed "brassertion (Bad action 10129 …" and exited. The error is now k
 the server's log once the connection is up, and the connection carries on.
 
 <a id="most-of-the-status-line-was-blank"></a>
-### Most of the status line was blank
+### 5.8 Most of the status line was blank
 
 **Fixed 2026-10-03.** On the graphical status line, five of the eight fields displayed nothing -
 the run state, the line number, the program name, the serial number and the row and column. The
@@ -1687,10 +2455,10 @@ is remeasured if the screen size changes. A value that still will not fit is now
 ellipsis rather than vanishing.
 
 <a id="debug-builds"></a>
-## Debug builds
+## 6. Debug builds
 
 <a id="memory-leak-reporting-at-exit"></a>
-### Memory leak reporting at exit
+### 6.1 Memory leak reporting at exit
 
 Debug builds ask the CRT debug heap to report what is still allocated when the process exits, and
 capture that report to a file instead of losing it to a debugger's output window — so a leak seen on
@@ -1721,7 +2489,7 @@ a heap report.
 This affects Debug builds only; Release builds are unchanged.
 
 <a id="the-harness-channels-ring-statistics-are-now-debug-only"></a>
-### The harness channel's ring statistics are now Debug-only
+### 6.2 The harness channel's ring statistics are now Debug-only
 
 When a connection on the user-level channel closes, BR logged two lines at level 10: why it closed,
 and a line of statistics about the queue it sends responses through — how many responses, how many

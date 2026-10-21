@@ -575,8 +575,8 @@ the map, not the definition.
 
 | Purpose | Tool | Harness request |
 |---|---|---|
-| the screen, and the scrollback with it | `read_view` | `SCROLLVIEW` |
-| what has scrolled off | `read_history` | `SCROLLBACK` |
+| the screen, and the history with it | `read_view` | `SCROLLVIEW` |
+| what has scrolled off | `read_history` | `HISTORY` |
 | colours and attributes | `attrs` | `ATTRS` |
 | the controls and their values | `controls` | `CONTROLS` |
 | a grid's cells | `grid` | `GRID` |
