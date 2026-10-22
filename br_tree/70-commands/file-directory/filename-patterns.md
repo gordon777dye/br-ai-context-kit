@@ -7,7 +7,7 @@ subcategory: 70-commands/file-directory
 kind: concept
 status: 2b
 related: [spec, ../editing/spec, ../program-management/spec, ../../30-io-file/file-model/spec, ../../00-configuration/config-directives/OPTION_(Config)]
-keywords: [DIR, COPY, RENAME, FREE, DROP, TYPE, LOAD, RUN, SAVE, REPLACE, MERGE, PROC, SUBPROC, CD, LIST, STATUS, DISPLAY, INDEX, MKDIR, RMDIR, CHDIR, glob, OPTION 84, Tab completion]
+keywords: [DIR, COPY, MOVE, RENAME, FREE, DROP, TYPE, LOAD, RUN, SAVE, REPLACE, MERGE, PROC, SUBPROC, CD, LIST, STATUS, DISPLAY, INDEX, MKDIR, RMDIR, CHDIR, glob, OPTION 84, Tab completion]
 ---
 
 # File name patterns and Tab completion
@@ -44,6 +44,7 @@ commands (`LOAD`, `RUN`, `SAVE`, `LIST <` …). The command syntax is in
 | `DIR` | the entries to list |
 | `COPY` | the files to copy (the source; the target is a name, a directory, or a name with `*`) |
 | `RENAME` | the files to rename |
+| `MOVE` | the files to move, and with `-R` the folders (the target as for `COPY`) |
 | `FREE`, `DROP` | the files to delete or empty |
 | `TYPE` | the files to show, one after the other |
 
@@ -154,12 +155,19 @@ in its first dot matches only names with no dot. A glob is taken as written:
   blank line between them, and one total at the end. `-B`, `-W`, `-C`, `-A`
   and `>` work as for any `DIR`; `-O` sorts within each directory.
   `DIR` lists directories that match as well as files.
-- `COPY`, `RENAME`, `FREE`, `DROP` and `TYPE` act on **files only**, never on a
+- `COPY`, `MOVE`, `RENAME`, `FREE`, `DROP` and `TYPE` act on **files only**, never on a
   matching directory. (`RENAME -D` renames one folder, and takes no pattern; see
-  [spec.md](spec.md#rename-folder).)
+  [spec.md](spec.md#rename-folder). With `-R`, `COPY`, `MOVE` and `FREE` match folders too,
+  and take a matching folder whole; see [spec.md](spec.md#copy-recursive).)
+- A name that ends with `\` or `/` matches **folders only**: `DIR src\*\` lists the
+  folders in `src`, `DIR src\**\` every folder below it, and `COPY src\*\ bak -R`
+  copies the folders in `src` and not its files. `DIR src\`, with no pattern before
+  the separator, lists what is in `src`; for `COPY`, `MOVE` and `FREE -R` it is the
+  folder `src`.
 - `COPY ... dir\` puts every file into the directory, **without its
   sub-directories**, so two files with the same name from different
-  directories overwrite each other. `RENAME` and `COPY` to a name with `*` apply
+  directories overwrite each other; with `-R` each file keeps its place below the
+  folders before the first pattern. `RENAME` and `COPY` to a name with `*` apply
   the `*` to each file's own name (`RENAME a{1,2}.txt *.bak`).
 - A pattern that matches nothing is error **4152**, file not found, as before.
 - Redirection (`> file`, `>> file`, `> A$`) works for the commands that had it.
@@ -197,6 +205,7 @@ name from the files that are there:
 |---|---|---|---|
 | `COPY` | `COP` | the first and second (source and target) | yes |
 | `RENAME` | `REN` | the first and second (from and to) | yes |
+| `MOVE` | `MO` | the first and second (from and to) | yes |
 | `FREE` | `FREE` | the first | yes |
 | `DROP` | `DR` | the first | yes |
 | `TYPE` | `TY` | the first | yes |

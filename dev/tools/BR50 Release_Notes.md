@@ -11,7 +11,7 @@ Deeper reference material stays in its own document; this page links to it rathe
 - [1. Behaviour changes](#behaviour-changes)
   - [1.1 `CLOSE ,FREE` and `CLOSE ,DROP` now require a file opened for output](#close-free-and-close-drop-now-require-a-file-opened-for-output)
   - [1.2 Debuggers must be updated in order to attach](#debuggers-must-be-updated-to-attach)
-  - [1.3 `MSG("send")` now types into BR only, and `MSG("kb")` is removed](#msg-send-now-types-into-br-only-and-msg-kb-is-removed)
+  - [1.3 `MSG("send")` types into BR ](#msg-send-types-into-br)
   - [1.4 `MSG("gettext", …)` has been removed](#msggettext--has-been-removed)
   - [1.5 The `MSG` pointer actions now move a pointer BR keeps itself](#the-msg-pointer-actions-now-move-a-pointer-br-keeps-itself)
   - [1.6 `SPAWN_RESTRICTED` is a new reserved word](#spawn-restricted-is-a-new-reserved-word)
@@ -23,7 +23,7 @@ Deeper reference material stays in its own document; this page links to it rathe
   - [1.12 `MSG` actions that return text no longer add a trailing null character](#msg-actions-that-return-text-no-longer-add-a-trailing-null)
   - [1.13 The serial number is no longer shown on the status line](#the-serial-number-is-no-longer-shown-on-the-status-line)
   - [1.14 Row and column are shown on the status line by default](#row-and-column-are-shown-on-the-status-line-by-default)
-  - [1.15 The OVERTYPE indicator is now teal](#the-insert-indicator-is-now-teal)
+  - [1.15 The OVERTYPE indicator is now teal](#the-overtype-indicator-is-now-teal)
   - [1.16 The command console is set aside rather than hidden](#the-command-console-is-set-aside-rather-than-hidden)
   - [1.17 `CONFIG CONSOLE` now defaults to `DATA_ONLY`](#config-console-now-defaults-to-data-only)
   - [1.18 `OPTION 82` - work off the display area](#option-82-work-off-the-display-area)
@@ -40,6 +40,8 @@ Deeper reference material stays in its own document; this page links to it rathe
   - [1.29 `DIR` has a new listing and new options (`OPTION 8`)](#dir-new-listing)
   - [1.30 `-?` lists a command's options](#command-help)
   - [1.31 `RENAME` stays on one file system, and renames folders with `-D`](#rename-folders-and-file-systems)
+  - [1.32 `COPY -R` and `FREE -R` take folders whole](#copy-free-recursive)
+  - [1.33 `MOVE` - rename when possible, otherwise copy and free](#move)
 - [2. Security](#security)
   - [2.1 The debugger connection is now encrypted and authenticated](#the-debugger-connection-is-now-encrypted-and-authenticated)
   - [2.2 The debugger port no longer accepts connections from the network](#the-debugger-port-no-longer-accepts-connections-from-the-network)
@@ -127,8 +129,8 @@ a switch to defer it: see
 under Security for what changed, what a debugger now has to do, and `DEBUG AUTH OFF` for working 
 the old way during the transition.
 
-<a id="msg-send-now-types-into-br-only-and-msg-kb-is-removed"></a>
-### 1.3 `MSG("send")` now types into BR only, and `MSG("kb")` is removed
+<a id="msg-send-types-into-br"></a>
+### 1.3 `MSG("send")` types into BR
 
 `MSG("send", …)` used to type through the operating system's keyboard input, which goes to whichever
 window has the focus — so a program could type into another application, a command prompt, or
@@ -141,10 +143,7 @@ What changes for a program that uses it:
 - **It no longer reaches other applications.** A program that used `MSG("send")` to drive another
   Windows program must find another way.
 - **`MSG("kb", …)` has been removed. Use `MSG("send", …)`,** which takes the same arguments and
-  behaves the same way. `kb` was only ever `send` with a check that BR's window was in front, and
-  once `send` could no longer leave BR there was nothing for that check to do. A call to `kb` now
-  raises 412 *invalid MSG action*. Error 413 (*target MSG window not on top*), which only `kb`
-  raised, is retired — the number stays reserved and nothing raises it.
+  behaves the same way. A call to `kb` now raises 412 *invalid MSG action*. 
 - **`MSG` returns at once, and the keys follow.** They are queued and fed into the session one at a
   time, `MSG("sleeptime", …)` apart, while the program runs and reads them — so `sleeptime` now
   paces what is seen typed, which is what it is for. A program must not expect every key to be
@@ -194,7 +193,7 @@ deliver the press into BR's own session.
   consults the display.
 - **A press can only be delivered to the character screen.** Over the menu, the status line, a
   native control, or outside the window, the click actions are refused.
-- **`MSG` returns before the press arrives.** It is queued with the keys from `send` and `kb`,
+- **`MSG` returns before the press arrives.** It is queued with the keys from `send`,
   behind any still waiting, and paced by `MSG("sleeptime", …)` — so typing and clicking keep the
   order the program wrote them in.
 - **Every delivered press is logged** at the security level: `MSG pressed button <key> at row
@@ -274,7 +273,7 @@ LET X=MSG("send",A$)      ! typed AB, then 28 characters of whatever
 ```
 
 A string **literal** was never affected, being exactly the size of its contents, which is why this
-went unnoticed: `MSG("send","AB")` always behaved. Affected actions were `send`, `kb` and `loop`.
+went unnoticed: `MSG("send","AB")` always behaved. Affected actions were `send` and `loop`.
 
 <a id="msgloop--now-copies-between-arrays-of-the-same-width"></a>
 ### 1.11 `MSG("loop", …)` now copies between arrays of the same width
@@ -334,25 +333,17 @@ The field is now sized from the screen, so a screen with more than ninety-nine r
 gets the extra digit it needs. Previously such a position was cut short - on a 132-column screen,
 column 105 was stored as `10:10`.
 
-<a id="the-insert-indicator-is-now-teal"></a>
+<a id="the-overtype-indicator-is-now-teal"></a>
 ### 1.15 The OVERTYPE indicator is now teal
 
 **Changed 2026-10-08, and reversed 2026-10-10.** The status line's `OVER` indicator is white on a
 teal background. `INSERT` keeps the status line's own attributes - or reverse video where the mode
 differs from the configured default - so a field in insert mode looks ordinary.
 
-Before 5.0 the indicator shared reverse video with every other status, which says *something is
-different* without saying which of insert and overtype is in force, and that is the one thing an
-operator needs to know before the next keystroke. A colour nothing else uses is recognised without
-being read.
-
-It was `INSERT` that carried the colour when this first shipped, and that was the wrong way round.
 `CONFIG INSERT` decides which mode a field comes up in, and it defaults to insert wherever data
-highlighting is on - so on such a site the status line sat teal nearly all the time and went plain
-for the exception. A colour that is almost always present marks nothing. Overtype is the departure
-there, so overtype is what carries it.
+highlighting is on. 
 
-A site that sets `CONFIG INSERT OFF` has it the other way about, with overtype as the resting state
+A site that sets `CONFIG INSERT OFF` has it the other way around, with overtype as the resting state
 and the colour present most of the time. The two remain distinguishable either way, which is the
 requirement; which of them is remarkable is the site's own business.
 
@@ -499,8 +490,7 @@ that is already running, except that `MAX=` takes effect at once.
 
 Everywhere else a string that would overflow behaves as it always did: assignment to a substring,
 a by-value parameter, `LINPUT` from the keyboard or at the READY prompt, print formatting, input
-fields, and every function that returns text. Redirecting output to an array is not available yet;
-when it is, it will grow.
+fields, and every function that returns text. 
 
 **Parameters passed by reference** grow the caller's own variable, or the caller's array. This
 holds across a library: a library function runs in **its own mode**, not the caller's, so what
@@ -616,9 +606,14 @@ where `*` is not in the last part.
   in a command line unless the name is quoted: `DIR "data\[!ab]*"`. `[^abc]` needs no quotes.
 - **A comma in braces belongs to the name.** `DIR *.{brs,prc}` is one name, not two. A comma that is
   not inside braces separates names, as it always did.
+- **A name that ends with `\` or `/` matches folders only.** `DIR src\*\` lists the folders in `src`,
+  and `DIR src\**\` every folder below it. `DIR src\`, with no pattern before the separator, lists
+  what is in `src`. For `COPY`, `MOVE` and `FREE`, which act on folders only with `-R`, `src\` is the
+  folder `src` itself and `src\*.brs\` the folders in `src` named `*.brs`; see
+  [1.32](#copy-free-recursive).
 - **Nothing matched** is error 4152, file not found.
 - **Depth.** `**` goes down at most 40 directories.
-- **The other file commands take them too.** `COPY`, `RENAME`, `FREE`, `DROP` and `TYPE` accept the
+- **The other file commands take them too.** `COPY`, `MOVE`, `RENAME`, `FREE`, `DROP` and `TYPE` accept the
   same patterns for the files they act on: `COPY src\**\*.cpp backup\`, `FREE tmp\*.{bak,old}`,
   `TYPE notes\[ab]*.txt`. The files are acted on directory by directory, in name order. A `**` pattern
   can bring files from several directories; with a directory as the target they all go into it, without
@@ -900,17 +895,12 @@ before.
 <a id="rename-folders-and-file-systems"></a>
 ### 1.31 `RENAME` stays on one file system, and renames folders with `-D`
 
-**`RENAME` no longer moves a file to another drive.** On Windows, a `RENAME` to another drive or
-share used to copy the file there and delete the original, which for a large file was a slow copy
-under the name of a rename. Now a *to* on another drive, share or mounted file system is refused with
-error **4138**, and both names are left as they were; use `COPY` and then `FREE` to move a file
-there. Unix already refused this, with an unhelpful 4320; it now gives 4138 too. The 4138 message
-reads "can't rename from one file system to another, or between client and server", since a rename
-between the client (`@:`) and the server was already refused with it.
+**`RENAME` works within one file system.** A *to* on another drive, share or mounted file system
+is refused with error **4138**, "can't rename from one file system to another, or between client
+and server", and both names are left as they are. To move a file there, use `COPY` and then `FREE`.
 
-**A forced rename no longer loses the target when it fails.** On Windows, `RENAME -F` deleted the
-existing target and then tried the rename, so a rename that failed afterwards left neither. The
-target is now replaced in the same step as the rename.
+**`RENAME -F`** gives the new name to the file being renamed, even when another file already has
+that name. The other file is removed only if the rename succeeds.
 
 **`RENAME from to -D` renames a folder**, with everything in it:
 
@@ -923,8 +913,81 @@ RENAME reports archive -D           archive is a folder, so this is archive\repo
 - As with a file, a *to* that is an existing folder receives *from* under its own name.
 - Any other *to* that exists is refused with **4150** and never replaced, so `-F` has no effect.
 - `-V` asks `Rename? (y/n)`, and `-N` and the redirections work as for files.
-- Without `-D`, `RENAME` acts on files only, as before. The `-D` letter was already accepted by
-  `RENAME` and did nothing; for `COPY` it still means leave out deleted records.
+- Without `-D`, `RENAME` acts on files only. For `COPY`, `-D` means leave out deleted records.
+
+<a id="copy-free-recursive"></a>
+### 1.32 `COPY -R` and `FREE -R` take folders whole
+
+`-R` lets the name match folders as well as files, and a folder that matches is taken whole, with
+everything in it at every level. The pattern decides what matches exactly as it does without `-R`:
+a `*` looks in one folder, and `**` (see [`DIR` takes glob patterns](#dir-glob-patterns))
+searches the folders below.
+
+**`COPY from to -R`.** Each file and folder keeps its place below the fixed part of *from* - the
+folders before the first pattern, or before the last part - and goes to that place below the
+folder *to*:
+
+```
+COPY src backup -R             the folder src, whole, as backup\src
+COPY src\* backup -R           everything in src, as backup\...
+COPY src\*.brs backup -R       the .brs files in src, and any folder in src named *.brs, whole
+COPY src\**\*.brs backup -R    every .brs file and *.brs folder below src: src\lib\b.brs
+                               is backup\lib\b.brs
+```
+
+- *to* is a folder. It and the folders below it are made as they are needed, and a folder copied
+  whole is made even when it is empty. A *to* that is a file is error **4150**. *to* takes no
+  wildcards (error **600**).
+- A *to* inside a folder being copied is error **4299**, as the copy would be among what it copies.
+- An entry inside a folder already taken is copied once, as part of that folder.
+- Each folder's entries are in name order, each folder before what is in it, down to 40 levels.
+- `-F`, `-V`, `-N`, `-P`, `-D`, `-S` and the record length apply to each file as for any `COPY`.
+  Without `-F`, a file that exists is asked about, and refused with **4150** in `UNATTENDED` mode.
+
+**`FREE name -R`** deletes what *name* matches, and a folder that matches is freed whole: its
+files, then its folders, deepest first. `FREE old -R` removes the folder `old` and everything in it;
+`FREE src\*.tmp -R` deletes the `.tmp` files in `src` and any folder there named `*.tmp`. Under `-V`
+each file is asked about, and a folder that still has a file in it is kept.
+
+`RENAME` and `DROP` do not take `-R`: given it, they stop with error **1006**.
+
+**A name that ends with `\` or `/` matches folders only** (see [1.23](#dir-glob-patterns)), so with
+`-R`, `COPY src\*\ backup -R` copies the folders in `src`, each whole, and not its files, and
+`FREE tmp\*\ -R` frees the folders in `tmp` and leaves its files. Without `-R` such a name matches
+nothing (4152), as these commands then act on files only.
+
+<a id="move"></a>
+### 1.33 `MOVE` - rename when possible, otherwise copy and free
+
+`MOVE from to` moves each file that *from* matches, and with `-R` each folder, to *to*. A file or
+folder is renamed when the system can do the whole of it in one step. When it cannot - *to* is on
+another drive, share or file system, or on the other side of the client (`@:`) and the server - it
+is copied and then freed.
+
+```
+MOVE reports\*.pdf archive          the .pdf files in reports, into the folder archive
+MOVE reports archive -R             the folder reports, as archive\reports
+MOVE reports\* E:\archive -R        everything in reports, copied to E:\archive and freed
+MOVE src\**\*.bak old -R            every .bak file below src, each keeping its place below old
+```
+
+- **What is moved, and where, is as for `COPY`.** *from* matches files, and with `-R` folders too,
+  each moved whole; `**` searches the folders below, and a name ending in `\` matches folders only.
+  Without `-R`, *to* is a folder the files go into, or a name for them (`*` in it as for `COPY`). With
+  `-R`, *to* is a folder, made as needed, and each file and folder keeps its place below the fixed
+  part of *from*, as in [1.32](#copy-free-recursive).
+- **One at a time.** Each file or folder is moved completely before the next: renamed, or copied
+  and freed. A folder that is being copied is moved entry by entry in the same way, so whatever
+  in it can still be renamed is renamed. An entry that has already gone with a folder moved before
+  it (`src\**\*` matches a folder and what is in it) is not moved again.
+- **Onto a folder that exists.** A folder moved onto one that is already there is merged into it:
+  each file and folder is moved in, and the folder left behind is removed once it is empty.
+- **Onto a file that exists.** As for `COPY`: asked about, replaced with `-F`, and refused with
+  **4150** in `UNATTENDED` mode. A file left where it is keeps its folder there too.
+- A folder moved into itself (`MOVE src src\old -R`) is error **4299**.
+- `-R`, `-F`, `-V` (`Move? (y/n/all)`), `-N`, `-P` and the redirections work as for `COPY`. 
+  `MOVE` refuses `-D`, `-S` and record length change, available in `COPY`, with error **1006**.
+- `MOVE` may be shortened to `MO`, and Tab completes its two names as it does for `COPY`.
 
 <a id="security"></a>
 ## 2. Security
@@ -1399,7 +1462,7 @@ The question is on the console, where you are already reading the conversation:
 ```
 [AI] the assistant asks permission to delete:
 [AI]   C:\ADS\myapp\CUSTMAST
-[AI] allow?  N = no, Y = this once, A = this turn, L = always, for this file:
+[AI] allow?  N = no, Y = this once, A = this turn, H = while the harness is attached:
 ```
 
 - **`N`** refuses it, and the operation fails as though the file were protected - error 4167, which
@@ -1412,7 +1475,7 @@ The question is on the console, where you are already reading the conversation:
 - **`A`** allows it and remembers it **until this turn ends**. Someone who has said "yes, the
   assistant may write to this report file" has said it; being asked six more times while it does
   that piece of work is noise, not safety.
-- **`L`** allows it and remembers it **until the assistant disconnects** - the file joins the list
+- **`H`** allows it and remembers it **until the assistant disconnects** - the file joins the list
   above.
 
 **There are two kinds of always because they are two different judgements.** Allowing a file for
@@ -1832,7 +1895,7 @@ reach the user it was a generic "no shared cipher" text that was wrong for this 
 <a id="new-error-codes-for-ai-and-restricted-sessions"></a>
 ### 2.21 New error codes for AI and restricted sessions
 
-Thirteen error codes are new in 5.0, all in the 41xx range. None of them exists in 4.3, so a
+Seventeen error codes are new in 5.0, all in the 41xx range. None of them exists in 4.3, so a
 program written against 4.3 can meet any of them for the first time here - which matters if it
 traps by number.
 

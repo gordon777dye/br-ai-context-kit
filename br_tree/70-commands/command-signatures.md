@@ -7,6 +7,7 @@ kind: reference
 related: [program-management, file-directory, information, editing]
 corrections:
   - "Brought into line with the 2026-10-21 corrections to the four command specs (from the BR 5.0 parsers; see br50 br/docs/FLAGS.md): a fifth reading rule for the `-?` command help; COPY/DROP/FREE lose -A, which BR accepts and ignores, and COPY gains -F; the record-length rule narrowed; TYPE gains -P; PROTECT gains READ and WRITE; EDIT gains its operands; BREAK and DISPLAY gain IF and FILE; PROCERR gains REM. brls reads these signatures through its generator, so it follows only once regenerated."
+  - "Brought into line with BR50 Release_Notes.md (dev/tools): AI and DEBUG gain signatures (1.30, 2.19, 2.1, 2.2, 3.1, 3.2, 3.7); DIR gains the 5.0 options -T -S -R -M -N -B and +ddd (1.29), with the old letters kept for -O and OPTION 8; LIST gains CLAUSES and NOEJECT (1.30). New operand kind <plusint>."
 ---
 
 # Command signatures
@@ -64,12 +65,14 @@ the tree speaks:
 - **`-?` alone is the command help** (BR 5.0). A line whose operands are exactly `-?` matches every
   command in BR's table except `HELP` and `LINK`: it lists the command's options and runs nothing
   ([command-help](program-management/spec.md#command-help)). `-?` among other operands is not this,
-  and is not an option either, since `?` is neither a letter nor a digit.
+  and is not an option either, since `?` is neither a letter nor a digit: it is error 1006, whatever
+  the command and wherever it stands after the command's keyword.
 
 | Operand | Accepts |
 |---|---|
 | `<int>` | digits only |
 | `<dashint>` | `-` followed by digits, as in `RENUM -245 -365` |
+| `<plusint>` | `+` followed by digits, as `DIR +7` (entries changed 7 or more days ago) |
 | `<word>` | any one word, including a quoted string |
 | `<path>` | a file or directory name: any one word |
 | `<string>` | a quoted string |
@@ -88,22 +91,24 @@ the tree speaks:
 AUTO     [<int>] [[','] <int>]
 RENUM    [<dashint>] [<dashint>] [<int>] [<int>] [LABELS_ONLY]
 DEL      <word> [<word>] [SOURCE]
-LIST     { <fromfile> [<int> [<int>]] | [<word>] [<word>] [<search>] [<search>] [<search>] [REPLACE <string>] [<redirect>] }
+LIST     { <fromfile> [<int> [<int>]] | [<word>] [<word>] [<search>] [<search>] [<search>] [REPLACE <string>] [{ CLAUSES | NOEJECT }*] [<redirect>] }
 EDIT     [{ '-' | '~' | <path> }]
 
 -- file-directory/spec.md#syntax
 CHDIR    [<path>] [<flags:N>]
 MKDIR    <path>
 RMDIR    <path>
-DIR      [<path>] [<flags:AOLPWUCB>] [<redirect>]
-COPY     <path> <path> [<flags:DFNPSV>] [<dashint>] [<redirect>]
+DIR      [<path>] { <flags:ABCLMNOPRSTUW> | <plusint> | <redirect> }*
+COPY     <path> <path> [<flags:DFNPRSV>] [<dashint>] [<redirect>]
 RENAME   <path> <path> [<flags:DNPVF>] [<redirect>]
+MOVE     <path> <path> [<flags:FNPRV>] [<redirect>]
 TYPE     <path> [<flags:P>] [<redirect>]
 DROP     <path> [<flags:NPV>] [<redirect>]
-FREE     <path> [<flags:NPV>] [<redirect>]
+FREE     <path> [<flags:NPRV>] [<redirect>]
 PROTECT  <path> ',' { RESERVE | RELEASE | READ | WRITE }
 
--- information/spec.md#syntax
+-- information/spec.md#syntax; BR50 Release_Notes 3.1-3.2, 3.7, 2.1-2.2 for DEBUG
+DEBUG    [{ AUTH [{ COOKIE | TOKEN <word> | OFF }] | LISTEN [<int>] | OBSERVE [{ <int> | OFF }] | SCREENLOG { <path> | OFF } | LOG <text> | CONNECT <text> | DISCONNECT [<text>] | CONSOLE [<text>] | INTERNAL [<text>] | PROFILE [<text>] | STEP [<text>] }]
 DATE     [<word>]
 TIME     [<word>]
 RUN      [<word>] [PROC] [STEP] [TRACE] [NORESTORE] [RESTORE]
@@ -123,6 +128,7 @@ GO       [RUN] [{ STEP | NOSTEP }] [{ TRACE [PRINT] | NOTRACE }] [<word>]
 PROC     [<text>]
 SUBPROC  <text>
 PROCERR  { STOP | RETURN | REM }
+AI       [{ NEW | <text> }]
 ALERT    <text>
 SKIP     <word> [IF <text>]
 
@@ -137,8 +143,7 @@ SORT     [<path>]
 ## Commands with no signature
 
 These are in BR's command table and are not documented in this tree, so nothing is stated about their
-operands and a line using them is not checked past the name: `AI`, `CONFIG`, `DEBUG`, `FRE`, `HELP`,
-`LINK`. (`FRE` is refused with error 1000; see [file-directory](file-directory/spec.md).)
+operands and a line using them is not checked past the name: `CONFIG`, `FRE`, `HELP`, `LINK`. (`FRE` is refused with error 1000; see [file-directory](file-directory/spec.md).)
 `LOGGING` is documented in [information](information/spec.md) but is not in BR's command table
 (`table1k`), so it has no signature here either.
 
@@ -159,3 +164,15 @@ operands and a line using them is not checked past the name: `AI`, `CONFIG`, `DE
 - **`INDEX`**: the work path is `<word>` and so also accepts a stray word that is not a keyword. The
   spec and INDEX.md disagree on how the work path is written (`[<work-path>]` against `[-<work path>]`).
 - **`STATUS`**: the spec lists topics with "…", so the topic is not checked.
+
+- **`DEBUG`**: the sub-options BR 5.0 documents are given their operands (`AUTH`, `LISTEN`, `OBSERVE`,
+  `SCREENLOG`); the others in BR's table (`LOG`, `CONNECT`, `DISCONNECT`, `CONSOLE`, `INTERNAL`,
+  `PROFILE`, `STEP`) are named and take `<text>`, since the release notes name them without giving
+  their operands. `DEBUG LISTEN` takes a port and nothing after it: anything more is error 1006
+  (release notes 2.2).
+- **`DIR`**: the letters are the union of the 5.0 options (`-T -S -R -A -L -N -B -W -C -M -P -O`) and
+  the 4.x ones kept under `-O` and `OPTION 8` (adding `-U`). Which set applies depends on `-O` and
+  `OPTION 8`, which a signature cannot see, so the letters are not checked (options stand anywhere).
+  `-ddd` is an option word; `+ddd` is `<plusint>`.
+- **`AI`**: `AI NEW` starts a fresh conversation; any other text is the question. The assistant is not
+  itself allowed to use it (error 4171).

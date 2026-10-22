@@ -8,8 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree fold (LOAD modes, CHAIN passing, CLEAR variants, GO form, MERGE, express procs); CHAIN/Procedure_files retained; no conflicts
 recovered-fold: REPLACE (folded+pruned — source-vs-object/.BRS/.BRO rules, .BAK + OPTION 26, default-extension; verbatim retained on the BR wiki)
 related: [file-directory, information, editing]
-keywords: [RUN, LOAD, SAVE, REPLACE, MERGE, CLEAR, GO, EXECUTE, CHAIN, PROC, SYSTEM, LOGOFF, ALL, SUBPROC, PROCERR, ALERT, FILES, ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP, NOTRACE]
+keywords: [AI, RUN, LOAD, SAVE, REPLACE, MERGE, CLEAR, GO, EXECUTE, CHAIN, PROC, SYSTEM, LOGOFF, ALL, SUBPROC, PROCERR, ALERT, FILES, ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP, NOTRACE]
 corrections:
+  - "AI added to the frontmatter keywords, with the AI section (BR 5.0: BR50 Release_Notes.md 2.19, 2.13). The command had no page in this tree."
   - "Added the command-help section: `-?` as the whole of a command's arguments lists what the command takes (BR 5.0, wbosCommandHelp() in wbos.cpp, called from cmdproc() in commandc.cpp). In the same pass, from the BR 5.0 parsers (see br50 br/docs/FLAGS.md): SKIP's label is written without its colon - the BNF said `SKIP n|:label`, which never matches, while this page's own example used `SKIP BUSY` - and a label search wraps to the top of the procedure (command0.cpp SKIP_CMD); PROCERR REM documented (command0.cpp PROCERR, command.cpp proc_comment); SYSTEM -W and +n are accepted and ignored, -W setting SHC_WINDOWS only under BR_V4, and SYSTEM ONQ is no longer special (command7.cpp SYSTEM_CMD); CLEAR name clears a resident program without RESIDENT, and CLEAR ... STATUS demotes only while a program is halted (command7.cpp CLEAR). From source reading, not yet confirmed by a run. 2026-10-21."
   - "SAVE / REPLACE now states which object format is written: level 39 in BR 5.0, level 38 in 4.2/4.3, an older BR refusing level 39 with error 2240, and OPTION 60 selecting level 38. The page described source-versus-object and said nothing about the format level, which an upgrade has to know. From BR 5.0 source: brexe.cpp (SAVE_LEVEL, processNewSaveFile, loadExeFile's level test), config.cpp case 60. Confirmed on brserver 5.0 x64 Debug: a default SAVE wrote level 39 and BR 4.33c refused it with 2240; with OPTION 60 it wrote level 38 and 4.33c loaded it."
   - "SYSTEM LOGOFF was one line (`log the BR client off`). Now documents `SYSTEM LOGOFF [ALL]` in the system-logoff subsection: it is an exit form (exit code 0, error 2108 if keyed while a program is active), what the client clears at exit, and that ALL widens only the session-table clear from this session's slot to all nine. Also the parse rules: ALL is a whole word, and nothing else after LOGOFF is read. LOGOFF and ALL added to keywords. From BR source in context/lsp/brls/brs: command7.cpp SYSTEM_CMD (the LOGOFF/ALL parse and the CLIENT_LOGOFF_ASYNC call), remoteargs.cpp (sets g_logoffAtExit and g_logoffAllSessions), brterm.cpp (runs logoffClient at client exit), term.cpp logoffClient, session.cpp clearSessionID/clearSessionIDs, brlistener.cpp logoffSession. Confirmed on brserver 5.0 x64 Debug over a live client/server link: with eight slots occupied, plain SYSTEM LOGOFF cleared only this session's slot and left the other seven; SYSTEM LOGOFF ALL zeroed all nine; SYSTEM LOGOFF ALLOCATE behaved as plain SYSTEM LOGOFF. All three forms cleared AutoLogin, Remember me, the saved Windows credential and the ClientServer persistent-login id for the listener port."
@@ -213,6 +214,27 @@ before line 5280 clause 2; a bare `GO .` reuses the last temp breakpoint; `GO` w
 it). After an error, `GO` retries the failing statement. In STEP mode, Shift+F1–F5 step with
 widening scope (into-clause / over-clause / into-line / over-line / to `RETURN`|`FNEND`).
 **`GO END`** terminates the interrupted program and closes all files.
+
+<a id="ai"></a>
+## AI (BR 5.0)
+
+```bnf
+AI NEW
+AI <text>
+```
+
+At the `READY` prompt, `AI` followed by what you want opens a conversation with an assistant attached to the
+session's channel. The reply prints in the `HILITE` colour; the commands the assistant asks to have run are
+marked `[AI] >`. `AI NEW` starts a fresh conversation. With no assistant listening the command stops at
+once with error 4158.
+
+- **A turn is the person's to open.** It needs an open turn, not the keyboard grant; anything destructive
+  stops and asks. The assistant itself may not use `AI` (error 4171).
+- **A running program or procedure must consent**: set `ENV$("AI_TURN_OK")` to `"Y"` first
+  (`LET X=SETENV("AI_TURN_OK","Y")`), or `AI` is refused with error 4169. `AI NEW` needs no flag.
+- A break key halts the wait at `READY` with the turn still open, and `GO` resumes it; `CLEAR PROC` and
+  `CLEAR ALL` end a turn.
+- `AI=5` still assigns to a variable called `AI`; only `AI` followed by a space is the command.
 
 <a id="execute"></a>
 ## EXECUTE — run a command from code

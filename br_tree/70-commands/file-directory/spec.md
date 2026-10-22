@@ -8,10 +8,12 @@ kind: spec
 status: 2b           # reference base + br_tree fold (full -options, TYPE/PROTECT, CHDIR nav, client-server @:, abbreviations); no conflicts
 recovered-fold: MkDir, RENAME (2 redirect-collision pages folded from re-fetched source — RENAME full -NPVF options + PRINT/redirect, MKDIR naming rules; verbatim retained on the BR wiki)
 related: [program-management, information]
-keywords: [DIR, COPY, RENAME, MKDIR, RMDIR, CHDIR, FREE, PROTECT, DROP, TYPE]
+keywords: [DIR, COPY, MOVE, RENAME, MKDIR, RMDIR, CHDIR, FREE, PROTECT, DROP, TYPE]
 corrections:
   - "From the BR 5.0 parsers (see br50 br/docs/FLAGS.md), 2026-10-21, source reading not yet confirmed by a run: COPY, FREE and DROP `-A` removed from the BNF and described as accepted with no effect - findSources() collects every file whatever its archive bit and nothing clears it (wbos.cpp); COPY's BNF gains `-F`, already documented in the overwrite section; the `-<n>` must-be-last rule narrowed to a combined option word (options(), the default case), which is how QSMRP's `COPY a b -124 -d -n` works; TYPE gains `-P` and, new in 5.0, a digit at its pause (processTypeFile()); PROTECT gains READ and WRITE (command0.cpp PROTECT); and the intro points at the new `-?` command help. Later the same day COPY `-C` (prompt for another diskette on a full disk) was removed from BR 5.0, and is removed here from the BNF, the options and the example."
   - "BR 5.0, 2026-10-21, from the source change (confirmed headless with a proc: a folder renamed, a folder moved into an existing folder, and a file and a folder refused on E: with both left in place): RENAME gains `-D` to rename a folder (wbos.cpp, RENAME_CMD), and RENAME refuses a target on another file system with 4138, whose message now covers both cases (renameFile() in file_os.cpp, MoveFileEx without MOVEFILE_COPY_ALLOWED; EXDEV on Unix). Added the rename-folder and rename-filesystem paragraphs and `-D` in the BNF."
+  - "BR 5.0, 2026-10-21, from the source change (confirmed headless with a test program against a three-level tree): COPY and FREE gain `-R`: the name matches folders too and a matched folder is taken whole, each entry keeping its place below the name's fixed part; `**` alone searches below (wbos.cpp: expandFolders(), fixedLength(), makeFoldersFor(); findSources() and globCollect() take a folders flag). RENAME and DROP refuse it with 1006. Added the copy-recursive paragraph and table, FREE -R in drop-free, and `R` in both BNF lines."
+  - "BR 5.0, 2026-10-21, from the source change (confirmed headless against test trees, including a move to another drive): new command MOVE (wbos.cpp moveFiles() and moveEntry(); MOVE_CMD and T1_MOVE in bascmd.h, tblcmd.cpp, commandc.cpp, wbserver.cpp; Tab completion in fields.h), and a name ending in a separator matches folders only (globSplit(), sourcesWanted(), keepFolderSlash()). Added the move paragraph, its BNF line, the trailing-separator rule, and MOVE to the keywords."
   - "TYPE added to the frontmatter keywords. `TYPE <file>` is in this page's BNF and its semantics, and was not declared. Found in brls phase 13."
   - "FREE's abbreviation `FR` removed: FREE has none, so only `FREE` in full deletes a file. `FRE` is refused with error 1000 (unidentified source remaining), and in 5.0 `FR` goes to the same refusal (it had reached calculator mode, where a bare `FR` printed a variable). `F <file>` also ends in error 1000; a bare `F` is still an expression. Confirmed by running `FR <file>`, `fr <file>`, `FR` and `F <file>` headless: error 1000 each time and the file kept; `FREE <file>` deleted it. 2026-10-20."
 ---
@@ -34,11 +36,12 @@ CHDIR [<drive>':'] ['\']<path> [-N]     -- CD / CH; no arg = show current dir
 MKDIR [<drive>':']<path>                -- MK
 RMDIR [<drive>':']<path>                -- RM; directory must be empty
 DIR  [<drive>':'][<path>][<filename> | <glob>] [-AOLPWUCB] [PRINT | '>'['>'] <file>]   -- DI
-COPY   <from> { <to> | PRN: | AUX: } [-DFNPSV] [-<new_recl>] [PRINT | '>'['>'] <file>]  -- COP
+COPY   <from> { <to> | PRN: | AUX: } [-DFNPRSV] [-<new_recl>] [PRINT | '>'['>'] <file>]  -- COP; -R the folders below
+MOVE   <from> <to> [-FNPRV] [PRINT | '>'['>'] <file>]  -- MO; renames when it can, else copies and frees
 RENAME <from> <to> [-DNPVF] [PRINT | '>'['>'] <file>]  -- REN; renames or moves (wildcards ok); -D a folder
 TYPE   <file> [-P] [PRINT | '>'['>'] <file>] -- TY; dump a file to screen/printer/file
 DROP <file-ref> [-NPV] [PRINT | '>'['>'] <file>]   -- DR; empties contents, keeps the name (size→0)
-FREE <file-ref> [-NPV] [PRINT | '>'['>'] <file>]   -- no abbreviation; deletes the file (unrecoverable)
+FREE <file-ref> [-NPRV] [PRINT | '>'['>'] <file>]  -- no abbreviation; deletes the file (unrecoverable); -R the folders below
 PROTECT <file-ref> ',' { RESERVE | RELEASE | READ | WRITE }   -- PROT; reserve a path / set read-only
 ```
 
@@ -111,10 +114,14 @@ the listing is sorted as one. Under `-O`, `-O` sorts within each directory. Rule
   unclosed `[` or `{`, and `{}` with no comma, are literal, and a file named exactly as the pattern is
   still found.
 - A comma inside braces is part of the name (`DIR *.{brs,prc}`); outside braces it separates names.
+- A name that ends with `\` or `/` matches folders only: `DIR src\*\` lists the folders in `src`,
+  `DIR src\**\` every folder below it. `DIR src\`, with no pattern before the separator, lists what is
+  in `src`. For `COPY`, `MOVE` and `FREE`, which take folders only with `-R`, `src\` is the folder
+  `src` itself; without `-R` such a name matches nothing.
 - `**` descends at most 40 levels. No match is error **4152**.
 - `COPY`, `RENAME`, `FREE`, `DROP` and `TYPE` take the same patterns for the files they act on, directory
   by directory in name order. With a directory target, files from several directories (`**`) all go into
-  it without their sub-directories. `MKDIR`, `RMDIR` and `CHDIR` take no pattern.
+  it without their sub-directories; with [`COPY -R`](#copy-recursive) each keeps its place. `MKDIR`, `RMDIR` and `CHDIR` take no pattern.
 
 <a id="copy"></a>**COPY** duplicates one or more files (same/different disk, or rename-in-place with
 a new name), and can copy to a device. Options: `-D` omit deleted records (internal files — **rebuild indexes after**), `-N`
@@ -132,6 +139,40 @@ extension, `dest\*.*` keeps one dot, `dest\*.*.*` keeps two — prefer a bare `d
 *Client/server:* `@:` denotes the client (`COPY file @:file` sends to the client's current
 directory; `@:file file` pulls from it; `@::` for client absolute paths).
 
+<a id="copy-recursive"></a>**`COPY <from> <to> -R` (BR 5.0)** lets *from* match folders as well as
+files, and copies a folder that matches whole, with everything in it at every level. What matches is
+decided as without `-R`: `*` looks in one folder, `**` searches the folders below
+([glob patterns](#dir-glob)). Each file and folder keeps its place below the fixed part of *from* -
+the folders before the first pattern, or before the last part - and goes to that place below the
+folder *to*:
+
+| Command | Copies |
+|---|---|
+| `COPY src backup -R` | the folder `src`, whole, as `backup\src` |
+| `COPY src\* backup -R` | everything in `src`, as `backup\...` |
+| `COPY src\*.brs backup -R` | the `.brs` files in `src`, and any folder in `src` named `*.brs`, whole |
+| `COPY src\**\*.brs backup -R` | every `.brs` file and `*.brs` folder below `src`; `src\lib\b.brs` is `backup\lib\b.brs` |
+
+*to* is a folder, made with the folders below it as they are needed; a folder copied whole is made
+even when empty. A *to* that is a file is **4150**, a *to* with a wildcard **600**, and a *to*
+inside a folder being copied **4299**. An entry inside a folder already taken is copied once, as
+part of it. Entries come in name order, each folder before what is in it, down to 40 levels. The
+other options and the [overwrite](#overwrite) rules apply to each file as without `-R`. `RENAME` and
+`DROP` refuse `-R` with **1006**.
+
+<a id="move"></a>**`MOVE <from> <to>` (BR 5.0)** moves each file *from* matches, and with `-R` each
+folder, to *to*: renamed when the system can do the whole of it in one step, otherwise - *to* on
+another drive, share or file system, or across the client (`@:`) and the server - copied and then
+freed. What matches and where it goes are as for [`COPY`](#copy) and [`COPY -R`](#copy-recursive):
+without `-R` files only, into a folder or under a name; with `-R` a matched folder is moved whole and
+each entry keeps its place below the fixed part of *from*. Each match is moved completely before the
+next; a folder being copied is moved entry by entry the same way, so what in it can be renamed is. A
+folder moved onto one that exists is merged into it, and the one left behind is removed once empty.
+A file onto one that exists follows the [overwrite](#overwrite) rules, and a file left where it is
+keeps its folder there. A folder moved into itself is **4299**. Options `-R`, `-F`, `-V`
+(`Move? (y/n/all)`), `-N`, `-P` and the redirections; `-D`, `-S` and a record length are refused with
+**1006**. Abbreviation `MO`.
+
 <a id="rename"></a>**RENAME** renames or moves one or more files (wildcards ok — `RENAME C:*.*
 C:\DIR\*.*` moves a whole group keeping each original name). Options: `-N` (no action log), `-P`
 (pause per screen), `-V` (verify each rename), **`-F`** (force-delete an existing target when needed to
@@ -142,15 +183,13 @@ it. *from* is one folder, with no wildcards; a *from* that is not a folder is er
 with a file, a *to* that is a folder already gets *from* put inside it under its own name; any other
 *to* that exists is refused with **4150** and never replaced, so `-F` does nothing with `-D`. A *to*
 that is the folder itself under another name (a change of case) renames it, rather than putting it
-inside itself. `-V` asks `Rename? (y/n)`. Without `-D`, `RENAME` acts on files only, as before.
+inside itself. `-V` asks `Rename? (y/n)`. Without `-D`, `RENAME` acts on files only.
 
-<a id="rename-filesystem"></a>**One file system only (BR 5.0).** `RENAME` never copies. A *to* on
-another drive, share or mounted file system is refused with error **4138** and both names are left
-as they were; use `COPY` and then `FREE`. This holds for files and for `-D`. Before 5.0 a file renamed
-to another drive on Windows was copied there and the original deleted (Unix refused it), and a
-forced rename deleted the existing target before trying, so a rename that then failed lost it; in 5.0
-the target is replaced in the same step. A rename between the client (`@:`) and the server was, and
-is, refused with the same **4138**.
+<a id="rename-filesystem"></a>**One file system only (BR 5.0).** A *to* on another drive, share
+or mounted file system, or on the other side of the client (`@:`) and the server, is refused with
+error **4138**, and both names are left as they are; use `COPY` and then `FREE`. This holds for
+files and for `-D`. With `-F`, a file that already has the new name is removed only if the rename
+succeeds.
 
 <a id="overwrite"></a>**Onto a file that exists (BR 5.0).** `COPY` and `RENAME` ask before replacing
 one: `Overwrite <full target name>? (y/n/all)` on a line of its own. `Y` overwrites, `N` leaves that
@@ -174,7 +213,11 @@ name may exist under different parent directories.
 <a id="drop-free"></a>**DROP** empties a file's contents — freeing all allocated space and leaving
 only the header record for internal files — but keeps the name (size→0). **FREE** deletes the
 file(s) outright (unrecoverable). Both take `-N`/`-P`/`-V` and accept wildcards (use `-V` to
-verify); `-A` is accepted and has no effect, as on `COPY`. A procedure can `FREE` itself as its last line; a `.$$$`-named procedure self-deletes
+verify); `-A` is accepted and has no effect, as on `COPY`. **`FREE <name> -R`** (BR 5.0) deletes
+what *name* matches, as [`COPY -R`](#copy-recursive) reads *from*, and frees a folder that matches
+whole: its files, then its folders, deepest first. `FREE old -R` removes the folder `old` and
+everything in it. Under `-V` each file is asked about, and a folder that still has a file in it is
+kept. A procedure can `FREE` itself as its last line; a `.$$$`-named procedure self-deletes
 after running. *(The same-named `DROP`/`FREE` **CLOSE parameters** inside a program are a separate
 file operation — [30-io-file/statements](../../30-io-file/statements/spec.md#close).)*
 

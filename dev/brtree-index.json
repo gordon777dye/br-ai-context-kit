@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-10-20",
+  "generated": "2026-10-21",
   "source": "br_tree/",
-  "source_sha256": "7438a0055184c9f04672dafbc1b051e846b8de2f5501003ec91a3d35b34bf2fa",
+  "source_sha256": "6214a3c495ecad79d6d4c0b2e2fb15d73d3c239a7eaa207507e86fc0e10acb54",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -14,6 +14,9 @@
     ],
     "ABS": [
       "10-language/data-manipulation/system-functions"
+    ],
+    "AI": [
+      "70-commands/program-management"
     ],
     "AIDX": [
       "10-language/data-manipulation/assignment",
@@ -44,6 +47,12 @@
     "ATTRIBUTE": [
       "00-configuration/config-directives"
     ],
+    "ATTRIBUTES": [
+      "70-commands/information"
+    ],
+    "AUTH": [
+      "00-configuration/installation-tooling"
+    ],
     "AUTO": [
       "70-commands/editing"
     ],
@@ -72,6 +81,9 @@
       "20-io-screen/windows-cursor"
     ],
     "BREAK": [
+      "70-commands/information"
+    ],
+    "BREAKPOINTS": [
       "70-commands/information"
     ],
     "BRERR$": [
@@ -142,6 +154,9 @@
     "CL": [
       "20-io-screen/fields-attributes"
     ],
+    "CLAUSES": [
+      "70-commands/editing"
+    ],
     "CLEAR": [
       "70-commands/program-management"
     ],
@@ -167,6 +182,9 @@
     "COLLATE": [
       "00-configuration/config-directives",
       "10-language/data-manipulation/declaration"
+    ],
+    "COLORS": [
+      "70-commands/information"
     ],
     "COM": [
       "30-io-file/serial-comm"
@@ -294,6 +312,9 @@
     "DIM": [
       "10-language/data-manipulation/declaration"
     ],
+    "DIMS": [
+      "70-commands/information"
+    ],
     "DIR": [
       "70-commands/file-directory"
     ],
@@ -340,6 +361,9 @@
     ],
     "ENCRYPT$": [
       "10-language/data-manipulation/system-functions"
+    ],
+    "ENCRYPTION": [
+      "70-commands/information"
     ],
     "END": [
       "10-language/flow-control/other-flow"
@@ -469,6 +493,9 @@
     ],
     "GRID": [
       "20-io-screen/controls"
+    ],
+    "GROW": [
+      "10-language/flow-control/error-handling"
     ],
     "GU": [
       "20-io-screen/fields-attributes"
@@ -610,12 +637,18 @@
       "70-commands/editing",
       "70-commands/information"
     ],
+    "LISTEN": [
+      "00-configuration/installation-tooling"
+    ],
     "LOAD": [
       "50-libraries/library-facility",
       "70-commands/program-management"
     ],
     "LOCKED": [
       "10-language/flow-control/error-handling"
+    ],
+    "LOCKS": [
+      "70-commands/information"
     ],
     "LOG": [
       "10-language/data-manipulation/system-functions"
@@ -664,6 +697,9 @@
     "MAX$": [
       "10-language/data-manipulation/system-functions"
     ],
+    "MEMORY": [
+      "70-commands/information"
+    ],
     "MENU": [
       "20-io-screen/controls"
     ],
@@ -685,6 +721,9 @@
     ],
     "MOD": [
       "10-language/data-manipulation/system-functions"
+    ],
+    "MOVE": [
+      "70-commands/file-directory"
     ],
     "MSG": [
       "10-language/data-manipulation/system-functions"
@@ -711,6 +750,9 @@
     ],
     "NOECHO": [
       "70-commands/program-management"
+    ],
+    "NOEJECT": [
+      "70-commands/editing"
     ],
     "NOFILES": [
       "50-libraries/library-facility"
@@ -755,6 +797,9 @@
     ],
     "OBJECT": [
       "70-commands/program-management"
+    ],
+    "OBSERVE": [
+      "00-configuration/installation-tooling"
     ],
     "ODBC": [
       "00-configuration/installation-tooling",
@@ -1010,6 +1055,9 @@
     "SCREEN": [
       "00-configuration/config-directives"
     ],
+    "SCREENLOG": [
+      "00-configuration/installation-tooling"
+    ],
     "SCR_FREEZE": [
       "10-language/data-manipulation/system-functions"
     ],
@@ -1193,6 +1241,9 @@
     ],
     "USERID$": [
       "10-language/data-manipulation/system-functions"
+    ],
+    "USERS": [
+      "70-commands/information"
     ],
     "USING": [
       "30-io-file/form-spec",
@@ -1492,7 +1543,11 @@
         "DEBUG",
         "PROFILE",
         "CONNECT",
-        "CONSOLE"
+        "CONSOLE",
+        "AUTH",
+        "LISTEN",
+        "OBSERVE",
+        "SCREENLOG"
       ],
       "related": [
         "config-directives",
@@ -1883,6 +1938,7 @@
       "category": "10-language",
       "status": "2b",
       "keywords": [
+        "GROW",
         "ON ERROR",
         "ERROR",
         "IOERR",
@@ -1918,6 +1974,7 @@
         "system-variables",
         "levels",
         "conditions",
+        "soflow-grow",
         "recovery",
         "modes",
         "os-errors",
@@ -2777,7 +2834,9 @@
         "AUTO",
         "RENUM",
         "DEL",
-        "SOURCE"
+        "SOURCE",
+        "CLAUSES",
+        "NOEJECT"
       ],
       "related": [
         "program-management",
@@ -2790,6 +2849,7 @@
         "renum",
         "del",
         "list",
+        "list-options",
         "list-input",
         "edit",
         "builtin-keys",
@@ -2808,6 +2868,7 @@
       "keywords": [
         "DIR",
         "COPY",
+        "MOVE",
         "RENAME",
         "MKDIR",
         "RMDIR",
@@ -2828,13 +2889,18 @@
         "dir",
         "dir-glob",
         "copy",
+        "copy-recursive",
+        "move",
         "rename",
+        "rename-folder",
+        "rename-filesystem",
+        "overwrite",
         "drop-free",
         "protect",
         "examples",
         "see-also"
       ],
-      "summary": "OS-level file and directory operations, runnable interactively or from a procedure / EXECUTE. For opening files inside a program see 30-io-file/statements. Each command has a short abbreviation (in parentheses below). Options follow a leading dash and may be combined (-AW); a -<n> record length, when combined, must come last."
+      "summary": "OS-level file and directory operations, runnable interactively or from a procedure / EXECUTE. For opening files inside a program see 30-io-file/statements. Each command has a short abbreviation (in parentheses below). Options follow a leading dash and may be combined (-AW); a -<n> record length, when combined into one word, must come last in it (-D124, not -124D) — as a word of its own it may stand anywhere (-124 -D). In BR 5.0 each command lists its own options when given -? alone (COPY -?)."
     },
     {
       "path": "70-commands/information",
@@ -2856,7 +2922,15 @@
         "FONTS",
         "NORESTORE",
         "DEBUG_STR",
-        "PROGRAM$"
+        "PROGRAM$",
+        "ATTRIBUTES",
+        "BREAKPOINTS",
+        "COLORS",
+        "DIMS",
+        "ENCRYPTION",
+        "LOCKS",
+        "MEMORY",
+        "USERS"
       ],
       "related": [
         "program-management",
@@ -2888,6 +2962,7 @@
       "category": "70-commands",
       "status": "2b",
       "keywords": [
+        "AI",
         "RUN",
         "LOAD",
         "SAVE",
@@ -2920,6 +2995,7 @@
       ],
       "anchors": [
         "command-vs-statement",
+        "command-help",
         "entry-exit",
         "system",
         "system-logoff",
@@ -2929,6 +3005,7 @@
         "replace",
         "clear",
         "go",
+        "ai",
         "execute",
         "chain",
         "procedures",

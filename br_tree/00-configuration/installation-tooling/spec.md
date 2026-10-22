@@ -8,8 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment
 recovered-fold: AutoIt, BRListenerInstaller.exe, BRSerial.dat (3 redirect-collision pages folded from re-fetched source — AutoIt automation note + EditNN/R99C999, installer service-register, brserial.dat license/UserID$/version-rename; verbatim retained on the BR wiki)
 related: [config-directives, platform]
-keywords: [ODBC, PDF, Lexi, DLL, PEM, AutoIt, DEBUG, PROFILE, CONNECT, CONSOLE]
+keywords: [ODBC, PDF, Lexi, DLL, PEM, AutoIt, DEBUG, PROFILE, CONNECT, CONSOLE, AUTH, LISTEN, OBSERVE, SCREENLOG]
 corrections:
+  - "AUTH, LISTEN, OBSERVE and SCREENLOG added to the frontmatter keywords, with the debugger-channel bullet in Diagnostics (BR 5.0: BR50 Release_Notes.md 2.1, 2.2, 3.1, 3.2, 3.7). Nothing here is new beyond what the release notes state."
   - "CONNECT and CONSOLE added to the frontmatter keywords: this page's Diagnostics section now
     names `DEBUG CONNECT` and `DEBUG CONSOLE OFF` (added when Profiler.md and Debugger.md were
     split out as their own backing pages under this folder, consolidated from several thin pages
@@ -149,6 +150,17 @@ and `vcdlltest.exe` in its directory.
 - **Debugger** — a third-party tool attaching over `DEBUG CONNECT`, plus the separate debug build of
   BR32.exe used by BRC beta testers and the `DEBUG CONSOLE OFF`/`DEBUG CONNECT` command family. Full
   detail: [Debugger](Debugger.md).
+- **Debugger channel (BR 5.0).** `DEBUG LISTEN [port]` binds the loopback interface only (default port
+  9555, moved from 8556); anything after the port is a syntax error (1006). `DEBUG CONNECT` dials out to
+  a debugger the operator names. The connection runs over TLS 1.3 with a shared token, set with
+  `DEBUG AUTH` — `DEBUG AUTH` alone reports the mode; `COOKIE` is the default (a fresh token per session,
+  in `%LOCALAPPDATA%\ADS\brdebug.token`); `TOKEN <64 hex>` supplies one for a debugger on another host;
+  `OFF` restores the unencrypted, unauthenticated old behaviour and is logged as a security event. A
+  debugger built for an earlier release cannot attach until updated.
+  `DEBUG OBSERVE [port | OFF]` (default port 9556, loopback) accepts a read-only observer that receives a
+  copy of what the debugger is sent. `DEBUG SCREENLOG <file>` logs every screen write, with the time to
+  the millisecond, until `DEBUG SCREENLOG OFF`. `DEBUG LOG COMMANDS <file>` records every line a debugger
+  submits, statements included.
 - **REGCLEAN** (`regclean.exe`) — repairs BR SDK DCOM (311) errors, e.g. an unregistered SQL Mod.
   `regclean -q all` lists registered projects + paths; `regclean -d <project|all>` removes entries;
   re-register by running the project exe (`dcomkey`, `sql`). The `fix.cmd` batch
