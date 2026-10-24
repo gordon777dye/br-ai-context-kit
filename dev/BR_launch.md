@@ -19,8 +19,33 @@ never hand-edited.
 | **`brconfig.ai_util`** | `$BR_AI_UTIL` | AI Utility — headless (`UNATTENDED`) |
 | **`brconfig.ai_user`** | `$BR_AI_USER` | AI User — interactive, for testing user interfaces |
 | **`brls.exe`** | `$BRLS_EXE` | Standalone syntax pre-check (optional semantic pass via `-check -sema`) — does **not** invoke BR (§6.1) |
+| **Kit folder** | `$BR_CONTEXT_KIT` | This kit's `context/` folder, absolute. The harness reads it ([below](#harness-launch)) |
+| **App root** | `$APP_ROOT` | The folder holding `context/`, absolute |
+
+**Onboarding sets all eight for you.** STEP 1 of
+[`app/ONBOARDING.md`](../app/ONBOARDING.md) writes two scripts:
+
+- **`context\app\env.cmd`** sets the variables with absolute paths, built from the script's own
+  location. In cmd, `call` it once. From PowerShell or Bash, run it in the **same command** as the
+  program that needs the variables, because they disappear when that cmd process ends:
+  ```
+  cmd /c "context\app\env.cmd && context\dev\ai_access\br_mcp_driver.exe start"
+  ```
+  This works because the program reads the variables itself. Don't write `%BR_EXE%` in that line:
+  cmd expands it when it reads the line, before `env.cmd` has run, so it comes out empty. Use
+  `cmd /v:on /c "context\app\env.cmd && !BR_EXE! …"` instead.
+- **`context\app\onboarding\setx.cmd`** saves the same values in the user's Windows profile with
+  `setx`, so every program started afterwards has them. Onboarding runs it once, unless the user
+  says the kit will be used in more than one repo on this machine: the values apply to every
+  program the user runs, so a second kit would pick up the first one's. Only programs started
+  later see the values, so close every VS Code window and start it again. Re-run it if the kit moves; to remove a
+  value, `reg delete HKCU\Environment /v <NAME> /f`.
+
+The snippets below set the same variables for one shell session. Run them from the app root.
 
 ```powershell
+$env:BR_CONTEXT_KIT = (Resolve-Path "context").Path
+$env:APP_ROOT       = (Get-Location).Path
 $env:BR_EXE        = "context\dev\tools\brserver-x64-Release.exe"
 $env:BR_MCP_DRIVER = "context\dev\ai_access\br_mcp_driver.exe"
 $env:BR_CONFIG     = "context\dev\tools\brconfig.sys"
@@ -30,6 +55,8 @@ $env:BRLS_EXE      = "context\dev\tools\brls.exe"
 ```
 
 ```bash
+export BR_CONTEXT_KIT="$PWD/context"
+export APP_ROOT="$PWD"
 export BR_EXE="context/dev/tools/brserver-x64-Release.exe"
 export BR_MCP_DRIVER="context/dev/ai_access/br_mcp_driver.exe"
 export BR_CONFIG="context/dev/tools/brconfig.sys"
@@ -213,9 +240,9 @@ string.
 channel is opened only by the procedure the driver starts BR on (below), so a session started by
 any invocation earlier in this file has no channel to attach to.
 
-**The one variable you may still need** is `$BR_CONTEXT_KIT`, and only when this kit is not at
-`C:\ADS\qsmrp\context`, which is the default the driver compiles in. It is how `get_reference`
-and `get_layout` answer at all. *Measured: with the kit found, `guide` comes back carrying the
+**The driver also reads `$BR_CONTEXT_KIT`**, which `env.cmd` and `setx.cmd` set. Without it the
+driver uses `C:\ADS\qsmrp\context`, the default compiled into it, so it matters wherever the kit
+is anywhere else. It is how `get_reference` and `get_layout` answer at all. *Measured: with the kit found, `guide` comes back carrying the
 catalogue (49 reference topics and every data-dictionary file name), and
 `get_reference print-fields` returns this kit's own `PRINT FIELDS` section.*
 
