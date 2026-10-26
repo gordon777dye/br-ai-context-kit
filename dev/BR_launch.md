@@ -211,7 +211,7 @@ variable or a flag (below).
 | `br_mcp_driver.exe` (`$BR_MCP_DRIVER`) | `ai_access/` | you — it is the launcher and the MCP server | `br/mcpdriver/build.ps1` |
 | `brls.exe` | `ai_access/` | the `check_source` tool, which the driver finds beside itself | the brls tree's own `build.ps1` |
 | `brserver-x64-Release.exe` (`$BR_EXE`) | `tools/` | the driver, through `--br`, `$BRSERVER` or `$BR_EXE` | `br/winbuild/dllbuild/bld.ps1` |
-| `brclientdll500-x64-Release-gui.dll` | `tools/` | BR, which loads it from its own directory | the same, with the server |
+| `brclientdll501-x64-Release-gui.dll` | `tools/` | BR, which loads it from its own directory | the same, with the server |
 | `brclient-x64-Release.exe` | `tools/` | a person starting a client by hand | the same, with the server |
 
 **Each is deployed by whatever builds it, on every build**, with an up-to-date check so that
