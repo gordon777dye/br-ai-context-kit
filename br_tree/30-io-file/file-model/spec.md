@@ -109,6 +109,11 @@ share restrictions. Code these even in single-user programs (it's far cheaper th
 - **SHRI** — others may open **INPUT only** (good during batch update / SORT).
 - **SHR** — full sharing; records lock individually during OUTIN update. Conflicts raise
   **error 4148**.
+- **Releases before 5.01** — never have a file open while BR 5.01 has it, whatever the share-spec:
+  whichever opens it second gets **error 4149** (an earlier release on Windows with `OPTION 33 31`
+  or `32` gets **4175**). 5.01 adds a record past the end of the file and writes it after letting go
+  of the file's lock, and an earlier release would write over it. They can use the file one after
+  the other.
 
 <a id="locking"></a>
 ### Record & file-name locking

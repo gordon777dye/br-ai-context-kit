@@ -160,6 +160,7 @@ _775 entries._
 | [0626](0626.md) | attempt to use advanced file IO features with a DEBUG file or a client side file. |
 | [0630](0630.md) | Invalid row or column for window |
 | [0632](0632.md) | Problem with Index File |
+| [0633](0633.md) | Btree2 index made before 5.01 |
 | [0634](0634.md) | Socket API error |
 | [0635](0635.md) | Error using SSL socket. Available as of BR! 4.30. |
 | [0636](0636.md) | real printer used with PRINTER_TYPE<nowiki>=</nowiki> |

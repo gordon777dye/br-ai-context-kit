@@ -8,12 +8,13 @@ related: [HTTP=CLIENT, Open Display, FILE$, web]
 keywords: [HTTP=SERVER, HTTPS, CONFIG HTTP, CONFIG HTTPS, PAGE-URL, POST-VAR, PAGE-FLUSH, REDIRECT-TO, URL_BASE, CERT, PHRASE, "CHUNK=", "PROXY=", "BIND=", "THREADS=", BR_NODE, X-Forwarded-For, reverse proxy, NGINX]
 corrections:
   - "Rewritten 2026-10-22 against the BR 5.0 source (br/brs/http.cpp, bopen.cpp, config.cpp, strfunct.cpp, primop1b.cpp) and its test runs, replacing a version written from GoAhead-era source. Changed: the read timeout is the LINPUT's WAIT=, or the OPEN's WAIT= (default 15 s) when the LINPUT has none; URL_BASE= and CERT= take an operating-system path or a BR path; OPTION 66 is the passphrase when PHRASE= is not given; a renewed certificate is used without a restart; error 757 is not raised; response framing, HEAD and PAGE-FLUSH streaming added."
+  - "2026-10-26: brought current with web_server.br 2.17 (was 2.03), checked against its source. It writes one header block per response (2.03 followed every page with an empty one) and corrects the Content-Length of page files that bring their own headers; its HTTPS redirect drops the request's port and adds the HTTPS port unless 443, none behind a proxy (2.03 kept the plain-HTTP port); sessions, relogin data and the data store are on disk, so a proxy needs no stickiness for logins and a restart loses nothing (2.03 held sessions in memory); a urlencoded body is split before decoding, and a JSON body is passed whole. History: brweb's old\\CHANGE_LOG.md."
 ---
 # HTTP=SERVER — BR's built-in web server
 
 A BR program becomes a web server by opening a DISPLAY file with `HTTP=SERVER`. BR runs the
 server on its own threads. It serves static files by itself, and queues every request meant for
-the program until the program reads it. `WEB_SERVER.BR` (`web_server.br.brs`, version 2.03) is
+the program until the program reads it. `WEB_SERVER.BR` (`web_server.br.brs`, version 2.17) is
 the standard program written to this interface. This page documents the interface between such
 a program and BR, how to set up HTTPS, and how to run several BR processes behind a reverse
 proxy (§4).
@@ -137,7 +138,9 @@ On a channel that is not `HTTP=SERVER` these raise **742**. With no current requ
   itself ends with **error 4270 (EOF)**, so the program treats 4270 as "request received" and
   goes on to `FILE$(n,"PAGE-URL")`. Both programs do this.
 - A request with a body returns the raw body, still urlencoded, to `LINPUT`. Use `POST-VAR-` for
-  decoded values. A chunked request body arrives reassembled.
+  decoded values. A chunked request body arrives reassembled. `web_server.br` splits a urlencoded
+  body (and the query string) on `&` and `=` first, then decodes each name and value, so an
+  encoded `&` is data. It passes a body with `Content-Type: application/json` on whole.
 - Reads after the body is used up keep returning 4270. The **next** request is not fetched until
   the program has printed something or closed the channel, so answer every request.
 - A body over **64 MB** is refused with **413** before the program sees it. A request that
@@ -153,10 +156,15 @@ blank line, then the body. The server adds only what keeps the connection usable
 
 | What the program wrote | What the client receives |
 |---|---|
-| Headers with a `Content-Length` | As written. **Nothing past that length is sent** - the server log notes `<n> bytes written past the Content-Length of <url> were not sent`. (`web_server.br` follows every page with a second, empty header block, which is dropped this way.) |
+| Headers with a `Content-Length` | As written. **Nothing past that length is sent** - the server log notes `<n> bytes written past the Content-Length of <url> were not sent`. |
 | Headers without a `Content-Length` | The server adds one. |
 | No status line and no headers | A `200` page with `Content-Type: text/html` and a length. For anything else - JSON, another status, cookies, cache control - write the headers yourself. |
 | Anything, to a `HEAD` request | The headers only. |
+
+`web_server.br` writes one header block per response. A page file that begins with its own
+status line and headers (its redirect page and login challenges) is sent with its
+`Content-Length` set to the length of its body as sent, after the `^placeholder` replacements;
+with no `Content-Length` in the file, the server adds one.
 
 **Streaming with `PAGE-FLUSH`.** Without it, nothing goes out until the response is finished (at
 the next read or `CLOSE`), so a page of any size is held whole and then sent with a length - a
@@ -323,7 +331,9 @@ passes `brls -check -sema` but has not been run.
    Every certificate of the chain should be listed, and `Verify return code: 0 (ok)`.
 7. **Redirect plain HTTP if you need to.** BR does not do it for you. `web_server.br` does it
    itself when login is required (`FILE$(n,"PROTOCOL") == "http"`): it sends a page that
-   redirects to `https://` + `FILE$(n,"HOST")` + the URL. A program of your own can use
+   redirects (`303`) to `https://` + `FILE$(n,"HOST")` without its port + the HTTPS port (the
+   first `PORT=`, left out when it is 443) + the URL. Behind a proxy it adds no port, which means
+   the proxy's 443. A program of your own can use
    `FILE$(n,"REDIRECT-TO-https://…")`.
 8. **Plan renewal.** Replace the `.crt` and `.key` files; **no restart is needed**. At most once a
    minute, during a connection, BR checks whether either file has changed, and loads and checks
@@ -402,13 +412,15 @@ HTTP 8081-8084 BIND=127.0.0.1 PROXY=127.0.0.1 URL_BASE=NONE LOG=httpserver[WSID]
 **Each answer names its process.** When a request came through the proxy, BR adds
 `Set-Cookie: BR_NODE=<port>; Path=/; HttpOnly; SameSite=Lax` (`; Secure` behind HTTPS) to the
 response, unless the request already carries that cookie. The proxy routes on it, so a browser
-keeps reaching the process that answered it first. This keeps logins working: `web_server.br`
-holds sessions in the memory of the process that created them. A process that restarts loses its
-sessions, and their users log in again.
+keeps reaching the process that answered it first. `web_server.br` does not depend on this: it
+keeps each session on disk (`sessions\sess<g>.dat`), with its relogin data (`sesx<g>.dat`) and its
+data store (`sesd<g>.dat`), and holds nothing in memory between requests. So any process can
+answer any request of a session, and a process that restarts loses no logins and no stored
+objects.
 
 ### 4.2 `web_server.br` behind a proxy
 
-`web_server.br` 2.03 issues the line above itself when `Web_Server.INI` has a `PROXY=` line:
+`web_server.br` issues the line above itself when `Web_Server.INI` has a `PROXY=` line:
 
 ```
 URL_BASE= <BR path of the site>
@@ -421,8 +433,9 @@ DEBUGFILE= webdebug[WSID].txt
 
 No `CERT=` is needed and no `.phrase` file is read: the proxy serves HTTPS. Start the same
 `web_server` as often as the range has ports, all from the same folder; each keeps its work files
-apart (`web_server<wsid>.tmp`). Its HTTPS redirect works unchanged, because `"PROTOCOL"` reports
-what the proxy received.
+apart (`web_server<wsid>.tmp`), and they share the sessions in `sessions\`. Its HTTPS redirect
+works unchanged, because `"PROTOCOL"` reports what the proxy received. It names no port, so it
+assumes the proxy serves HTTPS on 443.
 
 **With login, the proxy must not serve the site's files.** `web_server.br` with login (`,AUTH`)
 checks the session before every page, files included; a proxy that serves files directly skips

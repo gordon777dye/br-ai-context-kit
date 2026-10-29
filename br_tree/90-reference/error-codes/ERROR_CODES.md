@@ -272,6 +272,8 @@ This contain a list of operating system errors, and operating system error codes
 {{:0630}}
 ===0632===
 {{:0632}}
+===0633===
+{{:0633}}
 
 ===0641===
 {{:0641}}

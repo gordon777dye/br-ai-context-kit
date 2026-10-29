@@ -81,7 +81,7 @@ The above program produces the following output:
  OPTION 26 is OFF - suppress creation of .BAK files
  OPTION 29 is ON - save programs as .WB files
  OPTION 33 is 64 - locking position for large file support
- OPTION 49 is OFF - use relative path for spool file
+ OPTION 49 is OFF - omit spoolfile path - pass filename only
  OPTION 51 is OFF - do not reuse deleted records
  SPOOLCMD prt.bat [SPOOLFILE] [COPIES] [PRINTER]
  Server File: :c:\wbserver.dat
@@ -104,7 +104,7 @@ This uses both the sub-keywords and the search string to filter the output which
  OPTION 26 is OFF - suppress creation of .BAK files
  OPTION 29 is ON - save programs as .WB files
  OPTION 33 is 64 - locking position for large file support
- OPTION 49 is OFF - use relative path for spool file
+ OPTION 49 is OFF - omit spoolfile path - pass filename only
  OPTION 51 is OFF - do not reuse deleted records 
 
 Note that while sub-keywords are case insensitive, they must be completely specified, whereas search strings are more “friendly”. For a complete list of valid keywords, issue the command:

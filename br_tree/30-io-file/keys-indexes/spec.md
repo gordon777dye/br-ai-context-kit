@@ -42,6 +42,14 @@ clause returns records **in key order** (a free sort).
   kind in its header and is opened as that kind whatever the option says. One master may have Btree
   and Btree2 indexes open and updated together. `INDEX … REPLACE` converts an index to the kind the
   option asks for.
+- **Btree2 locking (5.01)**: a shared Btree2 index has no lock for the whole of it; each index
+  record has its own. A read holds each record it passes through only until it has the next one, an
+  update only the records it changes (usually one), so sessions wait only for one using the same
+  part of the index. `NOSHR` takes no locks. **Version 3:** 5.01 makes Btree2 indexes version 3
+  (each index record ends in a 4-byte link for its free lists). A version 2 index, made by an
+  earlier release, is read but not updated: error [0633](../../90-reference/error-codes/0633.md)
+  until `INDEX ... REPLACE` (or `REORG`, which rebuilds it) makes it version 3. Earlier releases
+  refuse version 3 with error 4124, so rebuild Btree2 indexes and upgrade every engine together.
 - **Primary vs overflow area**: `INDEX … REORG` sorts the overflow (recently added/changed) into
   the sorted primary area.
 
@@ -66,15 +74,19 @@ INDEX <master-file> <key-file> <key-positions> <key-lengths> [<work-path>]
 - **Btree2: `VERIFY` and `REORG`.** `VERIFY` runs while programs use the index (no exclusive
   access). It checks key order, that no record is reached twice, that every live master record's
   key is present, and that no update was left unfinished. Anything that looks wrong is rechecked
-  under the index lock, so updates in progress are not reported. Clean: no error, and an old
+  once any update of that part has finished, so updates in progress are not reported. Clean: no error, and an old
   `<index file>.flaws` is deleted. Otherwise error **9401**, the flaws are written to
   `<index file>.flaws` (one per line, kind first: `OUT_OF_RANGE`, `STALE_REF`, `SEPARATOR`,
   `MISSING`, `INTERRUPTED`, `STRUCTURE`), and the index is marked as needing repair. Freed index
-  records are not reused until it is repaired. `REORG` needs the index to itself. It checks the
-  ranges `.flaws` names (or everything, master file included, without one), repairs them in place,
-  adds missing keys, puts unused records on the free list, shortens the file,
-  then clears the mark and deletes `.flaws`. When the index cannot be repaired (`STRUCTURE`), it
-  rebuilds it from the master file as `REPLACE` does.
+  records are set aside, not reused, until it is repaired. `REORG` also runs while programs use
+  the index. It checks the ranges `.flaws` names (or everything, master file included, without
+  one), repairs them in place (locking only the index records it changes; a missing key under its
+  master record's lock), adds missing keys, puts the records set aside on the free list, then
+  clears the mark and deletes `.flaws`. Records that stay locked: error `0061`, mark and `.flaws`
+  kept for a later `REORG`. It does not shorten the file; `REPLACE` rebuilds an index at its
+  smallest. When the index cannot be repaired (`STRUCTURE`), it rebuilds it from the master file
+  as `REPLACE` does, which needs the index to itself (a file-sharing error while it is open
+  elsewhere).
 - `INDEX` performs an implicit `CLEAR` (unless a program is active), runs from READY mode / a
   procedure / `EXECUTE`, can be interrupted with `Ctrl-A` and resumed with `GO`; `-N` suppresses the
   action log.
@@ -103,6 +115,13 @@ master name; consistent share params).
 ### Keyed I/O
 - `READ #n, KEY=k$: … NOKEY <ref>` — fetch by key.
 - `RESTORE #n, KEY>=k$:` / `SEARCH>=…` — position for a sequential keyed scan.
+- A sequential read (forward or `PRIOR`) goes on from the last key it read. That holds even when
+  other sessions, or another channel of the same program, have added or deleted keys since. On a
+  **Btree2** index it stays in key order, gives each key once, and misses none that was there
+  throughout. A key added or deleted meanwhile is met or not, according to where it falls. A next
+  key that points at the record just read is passed over, as a deleted record's key is, so the
+  same record is never read twice in a row. An index update stopped part way can leave a key in two
+  places until `INDEX ... REORG` repairs it.
 - `REWRITE` without `KEY=` updates the last record read (fast); with `KEY=` it searches first
   (slower). **Changing the key field value is allowed** — BR automatically updates all related key
   files opened as a group (the old error 0059 is deprecated).
