@@ -71,7 +71,7 @@ INDEX <master-file> <key-file> <key-positions> <key-lengths> [<work-path>]
   you write the master). It **fully rebuilds** only when the index is absent, isn't an index file,
   or the stored key positions/lengths differ from those given. For a Btree2 index, `REORG` repairs
   instead (below).
-- **Btree2: `VERIFY` and `REORG`.** `VERIFY` runs while programs use the index (no exclusive
+- <a id="verify"></a>**Btree2: `VERIFY` and `REORG`.** `VERIFY` runs while programs use the index (no exclusive
   access). It checks key order, that no record is reached twice, that every live master record's
   key is present, and that no update was left unfinished. Anything that looks wrong is rechecked
   once any update of that part has finished, so updates in progress are not reported. Clean: no error, and an old

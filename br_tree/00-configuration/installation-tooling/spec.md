@@ -142,7 +142,7 @@ and `vcdlltest.exe` in its directory.
 ## Diagnostics & utilities
 
 - **Profiler** (Luis Gomez / Vertican; `/Dll_Distr/profiler` on the FTP site). Capture with
-  `DEBUG PROFILE SAMPLED <file>` / `DEBUG PROFILE TIMED <file>` / `DEBUG PROFILE STOP`
+<a id="debug"></a>  `DEBUG PROFILE SAMPLED <file>` / `DEBUG PROFILE TIMED <file>` / `DEBUG PROFILE STOP`
   (see [70-commands/information](../../70-commands/information/spec.md)), then render the log with
   `profiler.exe <file> [raw]`. The binary output format (network byte order; record types for
   module mapping, current line, time-in-line, backtrace, function name, GOSUB, …) is in

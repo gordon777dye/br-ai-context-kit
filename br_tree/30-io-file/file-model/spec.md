@@ -119,7 +119,7 @@ share restrictions. Code these even in single-user programs (it's far cheaper th
 ### Record & file-name locking
 - With `SHR,OUTIN`, a record **locks automatically on READ** and stays locked until another record
   is read, it is rewritten, `RELEASE`/`RESTORE` is used, or the file closes.
-- `RESERVE` keeps existing locks while reading more records (multi-record updates; must be repeated
+- <a id="reserve"></a>`RESERVE` keeps existing locks while reading more records (multi-record updates; must be repeated
   on each I/O); `RELEASE` reads without locking / drops locks. `WAIT=<seconds>` (default 15) before
   **error 0061** on a locked record.
 - **Lock zone & file size** — BR locks not the record itself but a byte in a reserved zone keyed to the

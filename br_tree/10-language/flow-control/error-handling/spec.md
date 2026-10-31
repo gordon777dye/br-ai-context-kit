@@ -82,7 +82,7 @@ places. A name in one is not necessarily in the other.
 everywhere the others are and traps nothing, in either roster.
 
 The clauses **repeat with no delimiter between them** — `… NOKEY 910 EOF 900` is two clauses, not
-one clause and a syntax error. A `line-ref` may also be `IGNORE` or `SYSTEM`, which are actions
+one clause and a syntax error. <a id="ignore"></a>A `line-ref` may also be `IGNORE` or `SYSTEM`, which are actions
 rather than branch targets (`… ERROR IGNORE`).
 
 **Order matters when several are listed**, because each of these traps a superset of the one before:
@@ -206,8 +206,8 @@ CONTINUE             -- resume at the statement *after* the one that caused it
 `CONTINUE FOR`, and no secondary operation of any kind on either — `syn.txt`
 carries a two-branch tree for `CONTINUE` that BR does not implement.
 
-- **`RETRY`** re-executes the statement (clause) that caused the most recent error — analogous to
-  `RETURN` at the end of a subroutine; **`CONTINUE`** instead resumes at the *next* statement (common
+- <a id="retry"></a>**`RETRY`** re-executes the statement (clause) that caused the most recent error — analogous to
+  `RETURN` at the end of a subroutine; <a id="continue"></a>**`CONTINUE`** instead resumes at the *next* statement (common
   with `PAGEOFLOW`). Caveats: with no outstanding error (or one suppressed by `ON … IGNORE`) `RETRY`
   itself errors; a **second error before `RETRY` loses the first return address** — so handlers often do
   `ON ERROR SYSTEM` on entry and reinstate their traps just before `RETRY` to avoid loops. The

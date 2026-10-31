@@ -281,7 +281,7 @@ A **procedure** is an ASCII (DISPLAY) text file of commands run in order — one
 makes it **self-deleting** after execution.
 
 <a id="proc"></a>**Starting**: `PROC {name|*name|ECHO|NOECHO}` (runs it; `*` suppresses F2 logging;
-NOECHO hides lines). `SUBPROC file` runs a **nested** procedure (up to 9 deep) then resumes.
+NOECHO hides lines). <a id="subproc"></a>`SUBPROC file` runs a **nested** procedure (up to 9 deep) then resumes.
 From code: `CHAIN "PROC=…"` / `CHAIN "SUBPROC=…"` (ends program) or `EXECUTE "PROC …"` (keeps
 program running). `RUN PROC` feeds procedure lines to a program's `INPUT`/`LINPUT`.
 
@@ -311,8 +311,8 @@ RUN PROC                     ! ... then run what is in memory with proc-fed inpu
 **Flow & errors**: `SKIP n|label [IF <cond>]` branches — the label is written **without** its
 colon (`SKIP BUSY` goes to the line `:BUSY`; `SKIP :BUSY` never matches), and a label search that
 reaches the end of the procedure carries on from the top, so a skip may go backward;
-`PROCERR STOP` (default) halts on error, `PROCERR RETURN` continues (sets `ERR`), and
-`PROCERR REM`, with `RETURN`, keeps a program line that fails to load as a `REM`; `ALERT msg` pauses for the operator (`GO` resumes; under
+<a id="procerr"></a>`PROCERR STOP` (default) halts on error, `PROCERR RETURN` continues (sets `ERR`), and
+`PROCERR REM`, with `RETURN`, keeps a program line that fails to load as a `REM`; <a id="alert"></a>`ALERT msg` pauses for the operator (`GO` resumes; under
 `PROC NOECHO` the message shows but the operator must press F2/F3 to see the *command* — bracket
 `ALERT` with `PROC ECHO`…`PROC NOECHO`); `CLEAR PROC` / `CLEAR ALL` close procedures.
 

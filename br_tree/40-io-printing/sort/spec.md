@@ -10,6 +10,7 @@ related: [statements, keys-indexes]
 keywords: [SORT]
 ---
 
+<a id="sort"></a>
 # SORT facility
 
 Produces sorted output from an internal file via a **sort control file** of specifications.
