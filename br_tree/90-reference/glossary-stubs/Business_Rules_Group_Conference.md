@@ -50,7 +50,7 @@ The **2011 Business Rules Group Conference** was be held `April 28`, `2011` to `
 - [BR Forum Thread](http://brforum.brulescorp.com/viewtopic.php?t=360&start=0&postdays=0&postorder=asc&highlight=&sid=d35dcd26a712e9290d3800c62a6a9b9e)
 
 ```
-[http://brforum.brulescorp.com//files/2010_conference_announcment_330.pdf PDF Announcement]
+[PDF Announcement](http://brforum.brulescorp.com//files/2010_conference_announcment_330.pdf)
 ```
 
 The **2010 Business Rules Group Conference** will be held `April 22`, `2010` to `April 24`, `2010` in Boston, Massachusetts at the Embassy Suites hotel near the Boston-Logan airport. You will NOT want to miss this one! It will be truly special for many reasons. 

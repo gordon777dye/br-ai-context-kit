@@ -2,7 +2,7 @@
 
 Every BR numeric error code, one file each. See the table below for fast lookup.
 
-_775 entries._
+_776 entries._
 
 | Code | Description |
 |---|---|
@@ -124,7 +124,7 @@ _775 entries._
 | [0432](0432.md) | The given clause number is invalid |
 | [0434](0434.md) | Line number too long during Edit ~ |
 | [0436](0436.md) | Bad flags for MAT2STR or STR2MAT. Available as of BR! 4.30. |
-| [0438](0438.md) | Input String not valid UTF-8 format.<br> |
+| [0438](0438.md) | Input String not valid UTF-8 format. |
 | [0440](0440.md) | MSG answer is not a number and the result variable is numeric |
 | [0501](0501.md) | Not enough data for INPUT |
 | [0520](0520.md) | The given PEM property does not exist |
@@ -160,7 +160,7 @@ _775 entries._
 | [0626](0626.md) | attempt to use advanced file IO features with a DEBUG file or a client side file. |
 | [0630](0630.md) | Invalid row or column for window |
 | [0632](0632.md) | Problem with Index File |
-| [0633](0633.md) | Btree2 index made before 5.01 |
+| [0633](0633.md) | BTREE2 index made before 5.01: rebuild it with INDEX ... REPLACE |
 | [0634](0634.md) | Socket API error |
 | [0635](0635.md) | Error using SSL socket. Available as of BR! 4.30. |
 | [0636](0636.md) | real printer used with PRINTER_TYPE= |
@@ -188,7 +188,7 @@ _775 entries._
 | [0727](0727.md) | DEPRECATED ERROR (as of 4.3) FORM Variable not referenced |
 | [0731](0731.md) | Invalid Seek method or position |
 | [0737](0737.md) | attempt to set readonly mode for existing Combobox |
-| [0738](0738.md) | SELECT should be a trailing attribute.<br> |
+| [0738](0738.md) | SELECT should be a trailing attribute. |
 | [0740](0740.md) | The HTTP server is already running. |
 | [0742](0742.md) | Request not valid because this is not an HTTP server |
 | [0744](0744.md) | Request not valid because this is not an HTTP client |
@@ -365,7 +365,7 @@ _775 entries._
 | [3022](3022.md) | Database not connected |
 | [3024](3024.md) | Duplicate open on connection |
 | [3031](3031.md) | DEPRECATED ERROR as of 4.30: 0 bytes available on disk |
-| [4.1](4.1.md) | :Category:Release 4.18|4.18 is the last release of 4.1. 4.18 is stable and is no longer receiving active development. |
+| [4.1](4.1.md) | 4.18 is the last release of 4.1. 4.18 is stable and is no longer receiving active development. |
 | [4002](4002.md) | SQL create statement failed |
 | [4003](4003.md) | SQL free statement failed |
 | [4004](4004.md) | SQL prepare failed |
@@ -756,14 +756,14 @@ _775 entries._
 | [Chapter_3](Chapter_3.md) | Now that you've learned the basics about running, saving, loading and editing programs, you're ready to learn more about writing programs… |
 | [Chapter_6](Chapter_6.md) | Mistakes! This chapter won’t teach you how to avoid them, but it should help make discovering them a lot easier. |
 | [CONTINUE](CONTINUE.md) | The Continue (CO) statement transfers control to the first executable statement following the one causing the most recent error. |
-| [Couldn't_'lock_in_progress'](Couldn't_'lock_in_progress'.md) | '''Couldn't lock in progress''' |
-| [Couldn't_get_lock_offset](Couldn't_get_lock_offset.md) | When launching Business Rules! a '''Couldn't get lock offset. messagebox with a caption of Error''' is displayed. |
-| [Delayed_write_failed](Delayed_write_failed.md) | [http://www.ehow.com/info_12169268_8-common-causes-delayed-write-failed-errors.html 8 common causes]… |
+| [Couldn't_'lock_in_progress'](Couldn't_'lock_in_progress'.md) | This is a problem accessing the WBServer.dat. This lock is retried several times as other locks are. |
+| [Couldn't_get_lock_offset](Couldn't_get_lock_offset.md) | When launching Business Rules! a Couldn't get lock offset. messagebox with a caption of Error is displayed. |
+| [Delayed_write_failed](Delayed_write_failed.md) | 8 common causes BR Forum thread on the subject |
 | [Error-Cond_Line-Ref](Error-Cond_Line-Ref.md) | The "error-cond line-ref" parameter is replaced with one or more pairs of specifications. |
 | [ERROR](ERROR.md) | Errors happen. They come in many different flavors. |
 | [Error_after](Error_after.md) | Part of the Client Server Reconnect configuration statement which generates a BR error and awaits for reconnection (default is 120 seconds). |
 | [ERROR_CODES](ERROR_CODES.md) | During your execution of your Business Rules! programs, if something goes wrong, you will probably receive an Error Code. |
-| [Error_Handling_Statements](Error_Handling_Statements.md) | ;Continue (CO) Used at the end of an error processing routine to transfer control to the first executable statement following the statement… |
+| [Error_Handling_Statements](Error_Handling_Statements.md) | Used at the end of an error processing routine to transfer control to the first executable statement following the statement causing the… |
 | [EXIT](EXIT.md) | The Exit (EXI) statement provides a short-cut method for coding several repetitions of the "error-cond line-ref" parameter into a single… |
 | [EXIT_Error_Cond](EXIT_Error_Cond.md) | See also Exit(disambiguation) |
 | [FKey_Error_Cond](FKey_Error_Cond.md) | The FKEY error condition is available for use only with the ON error statement. |
