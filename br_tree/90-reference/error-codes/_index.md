@@ -152,7 +152,7 @@ _775 entries._
 | [0611](0611.md) | Invalid BAUD rate |
 | [0614](0614.md) | Shr attempted for display file output |
 | [0615](0615.md) | Illegal open for display file |
-| [0616](0616.md) | Open #0 with TAB<nowiki>=</nowiki> |
+| [0616](0616.md) | Open #0 with TAB= |
 | [0618](0618.md) | Illegal OPEN for printer |
 | [0620](0620.md) | DEPRECATED ERROR: Duplicate OPEN for standard printer output |
 | [0622](0622.md) | user canceled during file dialog |
@@ -163,12 +163,12 @@ _775 entries._
 | [0633](0633.md) | Btree2 index made before 5.01 |
 | [0634](0634.md) | Socket API error |
 | [0635](0635.md) | Error using SSL socket. Available as of BR! 4.30. |
-| [0636](0636.md) | real printer used with PRINTER_TYPE<nowiki>=</nowiki> |
+| [0636](0636.md) | real printer used with PRINTER_TYPE= |
 | [0641](0641.md) | DEPRECATED ERROR: Missing protection device |
 | [0642](0642.md) | Parent Window Number Does Not Specify an Open Window |
 | [0701](0701.md) | Page overflow (See also: PAGEOFLOW or BRConfig.sys#PAGEOFLOW) |
 | [0702](0702.md) | File not open Keyed or Linked |
-| [0703](0703.md) | Illegal access by <nowiki>REC=</nowiki> |
+| [0703](0703.md) | Illegal access by REC= |
 | [0704](0704.md) | File handle not open |
 | [0706](0706.md) | Illegal file handle no access to 8087 chip |
 | [0707](0707.md) | Line referenced is not FORM |
