@@ -14,5 +14,4 @@ related: [Network error processing authentication]
 - `:category:Error Conditions|Error Conditions`
 - Error is the title of a messagebox stating: `Network error processing authentication`
 - Error is the title of a messagebox stating: `Couldn't open wbserver`...
-- Error is the title of a messagebox stating: `Client-Server error 10054 receiving data.`
 - Error is the title of a messagebox stating: `The requested Workstation ID (WSID) is already in use by (UserName)`

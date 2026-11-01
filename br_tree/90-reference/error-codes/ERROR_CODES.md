@@ -13,10 +13,6 @@ During your execution of your `Business Rules!` programs, if something goes wron
 
 This contain a list of operating system errors, and operating system error codes as returned by `BR!`, Novel error codes, as well as printer error codes. It has a small section on error codes no longer in use.
 
-### 0001
-
-[0001](0001.md)
-
 ### 0002
 
 [0002](0002.md)
@@ -171,14 +167,6 @@ This contain a list of operating system errors, and operating system error codes
 
 ## DLL Defined (0311 - 0364)
 
-### 0311
-
-[0311](0311.md)
-
-### 0312
-
-[0312](0312.md)
-
 ### 0315
 
 [0315](0315.md)
@@ -186,10 +174,6 @@ This contain a list of operating system errors, and operating system error codes
 ### 0320
 
 [0320](0320.md)
-
-### 0321
-
-[0321](0321.md)
 
 ### 0322
 
@@ -243,143 +227,7 @@ This contain a list of operating system errors, and operating system error codes
 
 [0334](0334.md)
 
-### 0335
-
-[0335](0335.md)
-
-### 0336
-
-[0336](0336.md)
-
-### 0337
-
-[0337](0337.md)
-
-### 0338
-
-[0338](0338.md)
-
-### 0339
-
-[0339](0339.md)
-
-### 0340
-
-[0340](0340.md)
-
-### 0341
-
-[0341](0341.md)
-
-### 0342
-
-[0342](0342.md)
-
-### 0343
-
-[0343](0343.md)
-
-### 0344
-
-[0344](0344.md)
-
-### 0345
-
-[0345](0345.md)
-
-### 0346
-
-[0346](0346.md)
-
-### 0347
-
-[0347](0347.md)
-
-### 0348
-
-[0348](0348.md)
-
-### 0349
-
-[0349](0349.md)
-
-### 0350
-
-[0350](0350.md)
-
-### 0351
-
-[0351](0351.md)
-
-### 0352
-
-[0352](0352.md)
-
-### 0353
-
-[0353](0353.md)
-
-### 0354
-
-[0354](0354.md)
-
-### 0355
-
-[0355](0355.md)
-
-### 0356
-
-[0356](0356.md)
-
-### 0357
-
-[0357](0357.md)
-
-### 0358
-
-[0358](0358.md)
-
-### 0359
-
-[0359](0359.md)
-
-### 0360
-
-[0360](0360.md)
-
-### 0361
-
-[0361](0361.md)
-
-### 0362
-
-[0362](0362.md)
-
-### 0363
-
-[0363](0363.md)
-
-### 0364
-
-[0364](0364.md)
-
 ## Section after DLL defined errors (0365 - ???)
-
-### 0365
-
-[0365](0365.md)
-
-### 0366
-
-[0366](0366.md)
-
-### 0367
-
-[0367](0367.md)
-
-### 0368
-
-[0368](0368.md)
 
 ### 0402
 
@@ -469,7 +317,7 @@ This contain a list of operating system errors, and operating system error codes
 
 ### 0606
 
-[0606](0606.md)
+[0606](606.md)
 
 ### 0607
 
@@ -638,10 +486,6 @@ This contain a list of operating system errors, and operating system error codes
 ### 0812
 
 [0812](0812.md)
-
-### 0813
-
-[0813](0813.md)
 
 ### 0816
 
@@ -826,10 +670,6 @@ This contain a list of operating system errors, and operating system error codes
 ### 1006
 
 [1006](1006.md)
-
-### 1007
-
-[1007](1007.md)
 
 ### 1011
 
@@ -1047,10 +887,6 @@ This contain a list of operating system errors, and operating system error codes
 
 [2130](2130.md)
 
-### 2160
-
-[2160](2160.md)
-
 ### 2198
 
 [2198](2198.md)
@@ -1066,10 +902,6 @@ This contain a list of operating system errors, and operating system error codes
 ### 2240
 
 [2240](2240.md)
-
-### 2250
-
-[2250](2250.md)
 
 ### 2260
 
@@ -1281,17 +1113,9 @@ This contain a list of operating system errors, and operating system error codes
 
 [4172](4172.md)
 
-### 4173
-
-[4173](4173.md)
-
 ### 4175
 
 [4175](4175.md)
-
-### 4176
-
-[4176](4176.md)
 
 ### 4177
 
@@ -1324,10 +1148,6 @@ This contain a list of operating system errors, and operating system error codes
 ### 4196
 
 [4196](4196.md)
-
-### 4197
-
-[4197](4197.md)
 
 ## OS Errors
 
@@ -1865,14 +1685,6 @@ This contain a list of operating system errors, and operating system error codes
 
 [4399](4399.md)
 
-### 4412
-
-[4412](4412.md)
-
-### 4433
-
-[4433](4433.md)
-
 ### 4500
 
 [4500](4500.md)
@@ -2029,18 +1841,6 @@ This contain a list of operating system errors, and operating system error codes
 
 [6201](6201.md)
 
-### 6210
-
-[6210](6210.md)
-
-### 6211
-
-[6211](6211.md)
-
-### 6212
-
-[6212](6212.md)
-
 ### 6213
 
 [6213](6213.md)
@@ -2137,17 +1937,9 @@ This contain a list of operating system errors, and operating system error codes
 
 [6236](6236.md)
 
-### 6237
-
-[6237](6237.md)
-
 ### 6240
 
 [6240](6240.md)
-
-### 6241
-
-[6241](6241.md)
 
 ### 6242
 
@@ -2180,10 +1972,6 @@ This contain a list of operating system errors, and operating system error codes
 ### 6270
 
 [6270](6270.md)
-
-### 6298
-
-[6298](6298.md)
 
 ### 7600
 

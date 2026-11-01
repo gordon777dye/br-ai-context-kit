@@ -13,7 +13,7 @@ kept separate from coding specifications.** Each folder has its own `_index.md`.
 - **[50-libraries/](50-libraries/_index.md)** (27 docs) — Reusable library facility and the shipped function packs.
 - **[60-integration/](60-integration/_index.md)** (7 docs) — Web & data-exchange integration — JSON/data store and BR as a web server.
 - **[70-commands/](70-commands/_index.md)** (11 docs) — Executive/console commands. Integral to coding because they are runnable from program code via `EXECUTE "<cmd>"`.
-- **[90-reference/](90-reference/_index.md)** (857 docs) — Lookup-only reference material — not authoring specifications.
+- **[90-reference/](90-reference/_index.md)** (828 docs) — Lookup-only reference material — not authoring specifications.
 
 ## Where do I look for…
 

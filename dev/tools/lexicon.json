@@ -303,6 +303,7 @@
       "LOAD",
       "MERGE",
       "MKDIR",
+      "MOVE",
       "PROC",
       "PROCERR",
       "PROTECT",

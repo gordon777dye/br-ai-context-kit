@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; section_index maps each statement, READY command and system function to the spec section(s) (anchor) that cover it, each with a kind - command, function, statement or reference - saying what that section documents the word as; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-10-31",
+  "generated": "2026-11-01",
   "source": "br_tree/",
-  "source_sha256": "4057ea94645ca29209c8d3d2ecf5e8a27c68afa55ea1446481062d7b1be4a324",
+  "source_sha256": "e06d94f113fe8277d2f0eef0eb87ee3418e3d37d1771718241ca7a03eb3752d0",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -392,7 +392,8 @@
       "10-language/flow-control/error-handling"
     ],
     "EXECUTE": [
-      "70-commands/program-management"
+      "70-commands/program-management",
+      "70-commands/sort"
     ],
     "EXISTS": [
       "10-language/data-manipulation/system-functions"
@@ -1133,7 +1134,7 @@
       "10-language/flow-control/error-handling"
     ],
     "SORT": [
-      "40-io-printing/sort"
+      "70-commands/sort"
     ],
     "SOURCE": [
       "70-commands/editing",
@@ -1204,6 +1205,7 @@
       "10-language/data-manipulation/system-functions"
     ],
     "SYSTEM": [
+      "10-language/flow-control/error-handling",
       "70-commands/program-management"
     ],
     "ScreenIO": [
@@ -1478,7 +1480,7 @@
       {
         "spec": "40-io-printing/statements",
         "anchor": "bell",
-        "kind": "statement"
+        "kind": "clause"
       }
     ],
     "BREAK": [
@@ -1513,7 +1515,7 @@
       {
         "spec": "10-language/data-manipulation/system-functions",
         "anchor": "call",
-        "kind": "function"
+        "kind": "deprecated"
       }
     ],
     "CEIL": [
@@ -1534,7 +1536,7 @@
       {
         "spec": "70-commands/program-management",
         "anchor": "chain",
-        "kind": "command"
+        "kind": "statement"
       }
     ],
     "CHDIR": [
@@ -1811,7 +1813,7 @@
       {
         "spec": "30-io-file/statements",
         "anchor": "drop",
-        "kind": "statement"
+        "kind": "clause"
       },
       {
         "spec": "70-commands/file-directory",
@@ -1863,7 +1865,7 @@
       {
         "spec": "70-commands/program-management",
         "anchor": "execute",
-        "kind": "command"
+        "kind": "statement"
       }
     ],
     "EXISTS": [
@@ -1922,7 +1924,7 @@
       {
         "spec": "10-language/flow-control/error-handling",
         "anchor": "ignore",
-        "kind": "statement"
+        "kind": "clause"
       }
     ],
     "FNEND": [
@@ -1957,7 +1959,7 @@
       {
         "spec": "30-io-file/statements",
         "anchor": "free",
-        "kind": "statement"
+        "kind": "clause"
       },
       {
         "spec": "70-commands/file-directory",
@@ -1976,7 +1978,7 @@
       {
         "spec": "10-language/data-manipulation/system-functions",
         "anchor": "get$",
-        "kind": "function"
+        "kind": "deprecated"
       }
     ],
     "GO": [
@@ -2004,14 +2006,14 @@
       {
         "spec": "10-language/flow-control/error-handling",
         "anchor": "grow",
-        "kind": "statement"
+        "kind": "clause"
       }
     ],
     "HELP": [
       {
         "spec": "10-language/flow-control/error-handling",
         "anchor": "ignore",
-        "kind": "statement"
+        "kind": "clause"
       }
     ],
     "HELP$": [
@@ -2039,7 +2041,7 @@
       {
         "spec": "10-language/flow-control/error-handling",
         "anchor": "ignore",
-        "kind": "statement"
+        "kind": "clause"
       }
     ],
     "INDEX": [
@@ -2074,7 +2076,7 @@
       {
         "spec": "10-language/data-manipulation/system-functions",
         "anchor": "invoke$",
-        "kind": "function"
+        "kind": "deprecated"
       }
     ],
     "IP": [
@@ -2328,6 +2330,13 @@
         "kind": "function"
       }
     ],
+    "MOVE": [
+      {
+        "spec": "70-commands/file-directory",
+        "anchor": "move",
+        "kind": "command"
+      }
+    ],
     "MSG": [
       {
         "spec": "10-language/data-manipulation/system-functions",
@@ -2358,7 +2367,7 @@
       {
         "spec": "40-io-printing/statements",
         "anchor": "newpage",
-        "kind": "statement"
+        "kind": "clause"
       }
     ],
     "NEXT": [
@@ -2558,7 +2567,7 @@
       {
         "spec": "30-io-file/statements",
         "anchor": "rec",
-        "kind": "statement"
+        "kind": "clause"
       }
     ],
     "RELEASE": [
@@ -2757,7 +2766,7 @@
       {
         "spec": "10-language/data-manipulation/system-functions",
         "anchor": "set$",
-        "kind": "function"
+        "kind": "deprecated"
       }
     ],
     "SETENV": [
@@ -2783,7 +2792,7 @@
       {
         "spec": "10-language/data-manipulation/system-functions",
         "anchor": "shift",
-        "kind": "function"
+        "kind": "deprecated"
       }
     ],
     "SIN": [
@@ -2809,9 +2818,9 @@
     ],
     "SORT": [
       {
-        "spec": "40-io-printing/sort",
+        "spec": "70-commands/sort",
         "anchor": "sort",
-        "kind": "reference"
+        "kind": "command"
       }
     ],
     "SPAWN_RESTRICTED": [
@@ -2906,6 +2915,11 @@
       }
     ],
     "SYSTEM": [
+      {
+        "spec": "10-language/flow-control/error-handling",
+        "anchor": "system",
+        "kind": "clause"
+      },
       {
         "spec": "70-commands/program-management",
         "anchor": "system",
@@ -3058,6 +3072,212 @@
         "anchor": "xlate$",
         "kind": "function"
       }
+    ]
+  },
+  "statement_keywords": {
+    "CASE": [],
+    "CHAIN": [
+      "FILES"
+    ],
+    "CLOSE": [
+      "WAITEQ",
+      "FREE",
+      "DROP",
+      "RELEASE"
+    ],
+    "CONTINUE": [
+      "DO",
+      "FOR"
+    ],
+    "DATA": [],
+    "DEF": [],
+    "DELETE": [
+      "KEY=",
+      "RESERVE",
+      "RELEASE",
+      "LINK=",
+      "REC=",
+      "PRIOR",
+      "LAST",
+      "FIRST",
+      "NEXT",
+      "SAME"
+    ],
+    "DIM": [],
+    "DISPLAY": [
+      "BUTTONS",
+      "MENU",
+      "TEXT",
+      "DATA",
+      "STATUS"
+    ],
+    "DO": [
+      "WHILE",
+      "UNTIL"
+    ],
+    "END": [
+      "SELECT"
+    ],
+    "EXECUTE": [],
+    "EXIT": [
+      "FOR",
+      "SELECT"
+    ],
+    "FNEND": [],
+    "FOR": [
+      "TO",
+      "STEP"
+    ],
+    "FORM": [],
+    "GOSUB": [],
+    "GOTO": [],
+    "IF": [
+      "THEN"
+    ],
+    "INPUT": [
+      "WAITEQ",
+      "FIELDS",
+      "ATTR",
+      "HELP",
+      "SELECT",
+      "MENU",
+      "TEXT",
+      "DATA",
+      "STATUS"
+    ],
+    "LET": [],
+    "LIBRARY": [
+      "NOFILES",
+      "RELEASE"
+    ],
+    "LINPUT": [
+      "WAITEQ"
+    ],
+    "LOOP": [
+      "WHILE",
+      "UNTIL"
+    ],
+    "MAT": [],
+    "NEXT": [],
+    "ON": [
+      "ERROR",
+      "CONV",
+      "IOERR",
+      "PAGEOFLOW",
+      "SOFLOW",
+      "OFLOW",
+      "HELP",
+      "ZDIV",
+      "ATTN",
+      "LOCKED",
+      "EVENT",
+      "FKEY",
+      "FNKEY"
+    ],
+    "OPEN": [
+      "DISPLAY",
+      "INPUT",
+      "SEQUENTIAL",
+      "OUTPUT",
+      "OUTIN",
+      "EXTERNAL",
+      "RELATIVE",
+      "INTERNAL",
+      "KEYED",
+      "SQL"
+    ],
+    "OPTION": [],
+    "PAUSE": [],
+    "PRINT": [
+      "FIELDS",
+      "HELP",
+      "USING",
+      "WAITEQ",
+      "BORDER"
+    ],
+    "RANDOMIZE": [],
+    "READ": [
+      "USING",
+      "POS=",
+      "WAITEQ",
+      "RESERVE",
+      "RELEASE",
+      "KEY=",
+      "KEYONLY",
+      "KEY>=",
+      "SEARCH=",
+      "SEARCH>=",
+      "LINK=",
+      "REC=",
+      "PRIOR",
+      "LAST",
+      "FIRST",
+      "SAME",
+      "NEXT"
+    ],
+    "RELEASE": [],
+    "REM": [],
+    "REREAD": [
+      "USING",
+      "RESERVE",
+      "RELEASE"
+    ],
+    "RESERVE": [],
+    "RESTORE": [
+      "POS=",
+      "RESERVE",
+      "RELEASE",
+      "KEY=",
+      "KEY>=",
+      "SEARCH=",
+      "SEARCH>=",
+      "LINK=",
+      "REC=",
+      "PRIOR",
+      "FIRST",
+      "END",
+      "NEXT",
+      "SAME",
+      "LAST"
+    ],
+    "RETRY": [],
+    "RETURN": [],
+    "REWRITE": [
+      "USING",
+      "POS=",
+      "KEY=",
+      "LINK=",
+      "REC=",
+      "LAST",
+      "FIRST",
+      "PRIOR",
+      "NEXT",
+      "SAME",
+      "RESERVE",
+      "RELEASE"
+    ],
+    "RINPUT": [
+      "WAITEQ",
+      "FIELDS",
+      "ATTR",
+      "HELP",
+      "SELECT"
+    ],
+    "SELECT": [],
+    "STOP": [],
+    "TRACE": [
+      "PRINT",
+      "OFF",
+      "ON"
+    ],
+    "USE": [],
+    "WRITE": [
+      "USING",
+      "REC=",
+      "POS=",
+      "WAITEQ",
+      "RESERVE",
+      "RELEASE"
     ]
   },
   "specs": [
@@ -3758,7 +3978,8 @@
         "OFLOW",
         "PAGEOFLOW",
         "TIMEOUT",
-        "IGNORE"
+        "IGNORE",
+        "SYSTEM"
       ],
       "related": [
         "other-flow",
@@ -3769,6 +3990,7 @@
         "levels",
         "conditions",
         "ignore",
+        "system",
         "soflow-grow",
         "grow",
         "recovery",
@@ -4396,33 +4618,6 @@
       "summary": "Rich printer formatting beyond plain PRINT USING: fonts, color, positioning, images, and boxes/shading — emitted as escape sequences (\\E…) or PRINTER.SYS substitution tags ([NAME]) inside PRINT #255: output. The plain print statements are in statements; the tag definitions live in PRINTER.SYS under 00-configuration."
     },
     {
-      "path": "40-io-printing/sort",
-      "name": "sort",
-      "file": "br_tree/40-io-printing/sort/spec.md",
-      "title": "SORT facility",
-      "category": "40-io-printing",
-      "status": "2b",
-      "keywords": [
-        "SORT"
-      ],
-      "related": [
-        "statements",
-        "keys-indexes"
-      ],
-      "anchors": [
-        "sort",
-        "syntax",
-        "semantics",
-        "file",
-        "alts",
-        "record",
-        "mask",
-        "examples",
-        "see-also"
-      ],
-      "summary": "Produces sorted output from an internal file via a sort control file of specifications. For ordered access without a separate sort, an index (30-io-file/keys-indexes) reads records in key order."
-    },
-    {
       "path": "40-io-printing/statements",
       "name": "statements",
       "file": "br_tree/40-io-printing/statements/spec.md",
@@ -4844,6 +5039,35 @@
         "see-also"
       ],
       "summary": "Loading, saving, running, and chaining programs, plus procedure files (command scripts). Commands run immediately (no line number) and — crucially — from program code via EXECUTE. Line-editing commands are in editing; file/dir commands in file-directory."
+    },
+    {
+      "path": "70-commands/sort",
+      "name": "sort",
+      "file": "br_tree/70-commands/sort/spec.md",
+      "title": "SORT command and facility",
+      "category": "70-commands",
+      "status": "2b",
+      "keywords": [
+        "SORT",
+        "EXECUTE"
+      ],
+      "related": [
+        "statements",
+        "keys-indexes"
+      ],
+      "anchors": [
+        "sort",
+        "syntax",
+        "semantics",
+        "sort-command",
+        "file",
+        "alts",
+        "record",
+        "mask",
+        "examples",
+        "see-also"
+      ],
+      "summary": "Produces sorted output from an internal file via a sort control file of specifications. For ordered access without a separate sort, an index (30-io-file/keys-indexes) reads records in key order."
     }
   ]
 }

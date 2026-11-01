@@ -27,7 +27,7 @@ corrections:
     it and from functions.json's existing FKEY/FNKEY entries, not from a new source."
   - "HELP added to the frontmatter keywords, reversing the exclusion recorded above. The reason for it was sound when it was written and stopped being so: a name-only router hands a spelling's every sense the same specs, so declaring HELP here would once have told the *command* sense that the error-handling roster documents it. brls has since grown a disambiguation table (cmd/gendata, `ambiguities`) that narrows a sense to named routes, which is how DROP, FREE and INPUT are handled, and HELP now has a row naming the three specs that document the clause — this one for the error condition, 20-io-screen/input-output for `INPUT/RINPUT FIELDS … HELP <line-ref>`, and 20-io-screen/windows-cursor, which documents the field-help clause *and* the console HELP command. So both senses now reach pages about themselves, where the exclusion left both reaching nothing: HELP was the one member of this page's own 17-word roster that routed to no spec at all, and langdata.TestEveryExitClauseIsDocumented carried an unexplained `continue` for it. That skip is gone. IGNORE added at the same time — it is in this page's BNF at all four trapping levels as an action rather than a branch target, and was declared nowhere. Found in brls phase 13."
 related: [other-flow, conditionals]
-keywords: [GROW, ON ERROR, ERROR, IOERR, RETRY, CONTINUE, EXIT, ERR, LINE, SOFLOW, ZDIV, ATTN, CONV, DUPREC, EOF, EVENT, FKEY, FNKEY, HELP, LOCKED, NOKEY, NONE, NOREC, OFLOW, PAGEOFLOW, TIMEOUT, IGNORE]
+keywords: [GROW, ON ERROR, ERROR, IOERR, RETRY, CONTINUE, EXIT, ERR, LINE, SOFLOW, ZDIV, ATTN, CONV, DUPREC, EOF, EVENT, FKEY, FNKEY, HELP, LOCKED, NOKEY, NONE, NOREC, OFLOW, PAGEOFLOW, TIMEOUT, IGNORE, SYSTEM]
 ---
 
 # Error handling
@@ -83,7 +83,7 @@ places. A name in one is not necessarily in the other.
 everywhere the others are and traps nothing, in either roster.
 
 The clauses **repeat with no delimiter between them** — `… NOKEY 910 EOF 900` is two clauses, not
-one clause and a syntax error. <a id="ignore"></a>A `line-ref` may also be `IGNORE` or `SYSTEM`, which are actions
+one clause and a syntax error. <a id="ignore"></a>A `line-ref` may also be `IGNORE` or <a id="system"></a>`SYSTEM`, which are actions
 rather than branch targets (`… ERROR IGNORE`). `ON SOFLOW` has a third such action, `GROW`, which takes no line
 number: see [ON SOFLOW GROW](#grow).
 

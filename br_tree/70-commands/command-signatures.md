@@ -136,7 +136,7 @@ SKIP     <word> [IF <text>]
 -- 30-io-file/keys-indexes/spec.md#index and INDEX.md (SHR, BTREE, ISAM)
 INDEX    <path> <path> <word> <word> [<word>] { REPLACE | REORG | VERIFY | DUPKEYS | LISTDUPKEYS | BADKEYS | LISTBADKEYS | NATIVE | SHR | BTREE | ISAM | <redirect> }*
 
--- 40-io-printing/sort/spec.md#syntax
+-- 70-commands/sort/spec.md#syntax
 SORT     [<path>]
 ```
 

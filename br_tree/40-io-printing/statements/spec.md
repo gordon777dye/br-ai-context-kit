@@ -145,7 +145,7 @@ In **client-server** mode: output prints on the *client* by default. `OPTION 30`
 ## See also
 
 - [pcl-pdf](../pcl-pdf/spec.md) — NWP/PCL escape sequences, fonts, color, boxes, images
-- [sort](../sort/spec.md) — sorting records for reports
+- [sort](../../70-commands/sort/spec.md) — sorting records for reports (the SORT command)
 - [30-io-file/form-spec](../../30-io-file/form-spec/spec.md) — canonical FORM field codes
 - [20-io-screen/input-output](../../20-io-screen/input-output/spec.md) — on-screen `PRINT FIELDS`
 - Printer **spooling / PRINTER.SYS config** → [00-configuration/config-directives](../../00-configuration/config-directives/spec.md)

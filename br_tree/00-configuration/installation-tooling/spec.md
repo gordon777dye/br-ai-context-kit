@@ -161,7 +161,7 @@ and `vcdlltest.exe` in its directory.
   copy of what the debugger is sent. `DEBUG SCREENLOG <file>` logs every screen write, with the time to
   the millisecond, until `DEBUG SCREENLOG OFF`. `DEBUG LOG COMMANDS <file>` records every line a debugger
   submits, statements included.
-- **REGCLEAN** (`regclean.exe`) — repairs BR SDK DCOM (311) errors, e.g. an unregistered SQL Mod.
+- **REGCLEAN** (`regclean.exe`) — repairs BR SDK DCOM errors, e.g. an unregistered SQL Mod.
   `regclean -q all` lists registered projects + paths; `regclean -d <project|all>` removes entries;
   re-register by running the project exe (`dcomkey`, `sql`). The `fix.cmd` batch
   (`regclean -d all` / `dcomkey` / `sql` / `regclean -q all`) automates the full reset.

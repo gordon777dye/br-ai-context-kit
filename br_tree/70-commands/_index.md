@@ -16,4 +16,5 @@ _1 entries._
 - [editing/](editing/_index.md) — In-editor commands available in interactive/runnable form.
 - [file-directory/](file-directory/_index.md) — File and directory commands: CHDIR, DIR, COPY, MOVE, FREE, drop options.
 - [information/](information/_index.md) — Status/info and console commands: Command Console, Display, DEBUG, MSG.
+- [sort/](sort/_index.md) — The SORT command and its control file: report sorting, sort order.
 - [program-management/](program-management/_index.md) — Run and manage programs: RUN, LOAD, MERGE, LIST, CHAIN, PROC, GO.

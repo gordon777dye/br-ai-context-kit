@@ -345,7 +345,7 @@ but there is **no `DLM$` function**) — or, as of **4.3**, a `MAT` of delimiter
 | <a id="set$"></a>`SET$("#f,r,c",assign$)` | set a control property, `"prop=value"` (dotted paths allowed, e.g. `"address.city=…"`) |
 | <a id="invoke$"></a>`INVOKE$("#f,r,c",method$,MAT args$)` | invoke a control method (`method$` must be a full entry from `INPUT FIELDS … METHOD_NAMES`) |
 | <a id="call"></a>`CALL` | ⚠️ **reserved keyword — no function implementation**: it is in the numeric function name table (`table7k`) but the compiler rejects `CALL(…)` as an expression (no `CALL_FN` handler in `numfunct.cpp`). Not usable as a function |
-| <a id="dll"></a>`DLL(a$,b$[,arg\|arg$…])` | call a client-side DLL command — **≥2 args, first two strings**; dispatched to the client via `callClientDictCommand` (errors 0321–0327) — see [00-configuration/installation-tooling](../../../00-configuration/installation-tooling/spec.md#dotnet) |
+| <a id="dll"></a>`DLL(a$,b$[,arg\|arg$…])` | call a client-side DLL command — **≥2 args, first two strings**; dispatched to the client via `callClientDictCommand` (errors 0322–0327) — see [00-configuration/installation-tooling](../../../00-configuration/installation-tooling/spec.md#dotnet) |
 
 <a id="msgbox"></a>
 ### Message box (Windows)
