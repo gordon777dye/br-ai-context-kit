@@ -162,6 +162,7 @@
       "FORM",
       "GOSUB",
       "GOTO",
+      "GROW",
       "IF",
       "IGNORE",
       "INPUT",

@@ -1,8 +1,8 @@
 {
-  "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; section_index maps each statement, READY command and system function to the spec section(s) (anchor) that cover it; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
+  "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; section_index maps each statement, READY command and system function to the spec section(s) (anchor) that cover it, each with a kind - command, function, statement or reference - saying what that section documents the word as; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
   "generated": "2026-10-31",
   "source": "br_tree/",
-  "source_sha256": "e2e04a5969d65acd69ed01caa386699010fb7af912555974280f8faf5802c488",
+  "source_sha256": "4057ea94645ca29209c8d3d2ecf5e8a27c68afa55ea1446481062d7b1be4a324",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -69,6 +69,7 @@
       "30-io-file/serial-comm"
     ],
     "BELL": [
+      "10-language/data-manipulation/system-functions",
       "40-io-printing/statements"
     ],
     "BH": [
@@ -268,6 +269,7 @@
       "00-configuration/environment"
     ],
     "DATE": [
+      "10-language/data-manipulation/system-functions",
       "20-io-screen/fields-attributes",
       "30-io-file/form-spec"
     ],
@@ -326,7 +328,8 @@
       "30-io-file/form-spec"
     ],
     "DLL": [
-      "00-configuration/installation-tooling"
+      "00-configuration/installation-tooling",
+      "10-language/data-manipulation/system-functions"
     ],
     "DO": [
       "10-language/flow-control/other-flow"
@@ -379,6 +382,7 @@
       "30-io-file/statements"
     ],
     "ERR": [
+      "10-language/data-manipulation/system-functions",
       "10-language/flow-control/error-handling"
     ],
     "ERROR": [
@@ -621,6 +625,7 @@
       "50-libraries/screenio"
     ],
     "LINE": [
+      "10-language/data-manipulation/system-functions",
       "10-language/flow-control/error-handling"
     ],
     "LINES": [
@@ -710,6 +715,7 @@
       "70-commands/information"
     ],
     "MENU": [
+      "10-language/data-manipulation/system-functions",
       "20-io-screen/controls"
     ],
     "MENU$": [
@@ -750,6 +756,7 @@
       "10-language/data-manipulation/declaration"
     ],
     "NEWPAGE": [
+      "10-language/data-manipulation/system-functions",
       "20-io-screen/windows-cursor",
       "40-io-printing/statements"
     ],
@@ -970,6 +977,7 @@
       "30-io-file/statements"
     ],
     "REC": [
+      "10-language/data-manipulation/system-functions",
       "30-io-file/statements"
     ],
     "RELATIVE": [
@@ -980,6 +988,7 @@
       "50-libraries/library-facility"
     ],
     "REM": [
+      "10-language/data-manipulation/system-functions",
       "10-language/syntax"
     ],
     "RENAME": [
@@ -1096,7 +1105,8 @@
     ],
     "SETENV": [
       "00-configuration/config-directives",
-      "00-configuration/environment"
+      "00-configuration/environment",
+      "10-language/data-manipulation/system-functions"
     ],
     "SETFONT": [
       "40-io-printing/pcl-pdf"
@@ -1427,1341 +1437,1626 @@
     "ABS": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "abs",
+        "kind": "function"
       }
     ],
     "AIDX": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "array-functions"
+        "anchor": "aidx",
+        "kind": "function"
       }
     ],
     "ALERT": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "alert"
+        "anchor": "alert",
+        "kind": "command"
       }
     ],
     "ATN": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "atn",
+        "kind": "function"
       }
     ],
     "AUTO": [
       {
         "spec": "70-commands/editing",
-        "anchor": "auto"
+        "anchor": "auto",
+        "kind": "command"
       }
     ],
     "BELL": [
       {
+        "spec": "10-language/data-manipulation/system-functions",
+        "anchor": "bell",
+        "kind": "function"
+      },
+      {
         "spec": "40-io-printing/statements",
-        "anchor": "bell"
+        "anchor": "bell",
+        "kind": "statement"
       }
     ],
     "BREAK": [
       {
         "spec": "70-commands/information",
-        "anchor": "break"
+        "anchor": "break",
+        "kind": "command"
       }
     ],
     "BRERR$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "brerr$",
+        "kind": "function"
       }
     ],
     "BR_DATE$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "date-functions"
+        "anchor": "br_date$",
+        "kind": "function"
       }
     ],
     "BR_FILENAME$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "br_filename$",
+        "kind": "function"
       }
     ],
     "CALL": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "integration-functions"
+        "anchor": "call",
+        "kind": "function"
       }
     ],
     "CEIL": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "ceil",
+        "kind": "function"
       }
     ],
     "CFORM$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "conversion-functions"
+        "anchor": "cform$",
+        "kind": "function"
       }
     ],
     "CHAIN": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "chain"
+        "anchor": "chain",
+        "kind": "command"
       }
     ],
     "CHDIR": [
       {
         "spec": "70-commands/file-directory",
-        "anchor": "chdir"
+        "anchor": "chdir",
+        "kind": "command"
       }
     ],
     "CHR$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "chr$",
+        "kind": "function"
       }
     ],
     "CLEAR": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "clear"
+        "anchor": "clear",
+        "kind": "command"
       }
     ],
     "CLOSE": [
       {
         "spec": "30-io-file/statements",
-        "anchor": "close"
+        "anchor": "close",
+        "kind": "statement"
       }
     ],
     "CMDKEY": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "cmdkey",
+        "kind": "function"
       }
     ],
     "CNT": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "cnt",
+        "kind": "function"
       }
     ],
     "CNVRT$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "conversion-functions"
+        "anchor": "cnvrt$",
+        "kind": "function"
       }
     ],
     "CODE": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "code",
+        "kind": "function"
       }
     ],
     "CONFIG": [
       {
         "spec": "00-configuration/client-server",
-        "anchor": "config"
+        "anchor": "config",
+        "kind": "reference"
       },
       {
         "spec": "00-configuration/config-directives",
-        "anchor": "config"
+        "anchor": "config",
+        "kind": "reference"
       }
     ],
     "CONTINUE": [
       {
         "spec": "10-language/flow-control/error-handling",
-        "anchor": "continue"
+        "anchor": "continue",
+        "kind": "statement"
       }
     ],
     "COPY": [
       {
         "spec": "70-commands/file-directory",
-        "anchor": "copy"
+        "anchor": "copy",
+        "kind": "command"
       }
     ],
     "COS": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "cos",
+        "kind": "function"
       }
     ],
     "CURCOL": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "curcol",
+        "kind": "function"
       }
     ],
     "CURFLD": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "curfld",
+        "kind": "function"
       }
     ],
     "CURPOS": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "curpos",
+        "kind": "function"
       }
     ],
     "CURROW": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "currow",
+        "kind": "function"
       }
     ],
     "CURTAB": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "curtab",
+        "kind": "function"
       }
     ],
     "CURWINDOW": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "curwindow",
+        "kind": "function"
       }
     ],
     "DATA": [
       {
         "spec": "10-language/data-manipulation/assignment",
-        "anchor": "data-table"
+        "anchor": "data-table",
+        "kind": "statement"
       }
     ],
     "DATE": [
       {
+        "spec": "10-language/data-manipulation/system-functions",
+        "anchor": "date",
+        "kind": "function"
+      },
+      {
         "spec": "20-io-screen/fields-attributes",
-        "anchor": "format-codes"
+        "anchor": "format-codes",
+        "kind": "reference"
       },
       {
         "spec": "30-io-file/form-spec",
-        "anchor": "format-codes"
+        "anchor": "format-codes",
+        "kind": "reference"
       }
     ],
     "DATE$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "date-functions"
+        "anchor": "date$",
+        "kind": "function"
       }
     ],
     "DAYS": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "date-functions"
+        "anchor": "days",
+        "kind": "function"
       }
     ],
     "DEBUG": [
       {
         "spec": "00-configuration/installation-tooling",
-        "anchor": "debug"
+        "anchor": "debug",
+        "kind": "reference"
       }
     ],
     "DEBUG_STR": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "debug_str",
+        "kind": "function"
       },
       {
         "spec": "70-commands/information",
-        "anchor": "debug-str"
+        "anchor": "debug-str",
+        "kind": "command"
       }
     ],
     "DECRYPT$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "encryption"
+        "anchor": "decrypt$",
+        "kind": "function"
       }
     ],
     "DEF": [
       {
         "spec": "10-language/flow-control/functions-udf",
-        "anchor": "def"
+        "anchor": "def",
+        "kind": "statement"
       }
     ],
     "DEG": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "deg",
+        "kind": "function"
       }
     ],
     "DEL": [
       {
         "spec": "70-commands/editing",
-        "anchor": "del"
+        "anchor": "del",
+        "kind": "command"
       }
     ],
     "DELETE": [
       {
         "spec": "30-io-file/statements",
-        "anchor": "delete"
+        "anchor": "delete",
+        "kind": "statement"
       }
     ],
     "DIDX": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "array-functions"
+        "anchor": "didx",
+        "kind": "function"
       }
     ],
     "DIM": [
       {
         "spec": "10-language/data-manipulation/declaration",
-        "anchor": "dim"
+        "anchor": "dim",
+        "kind": "statement"
       }
     ],
     "DIR": [
       {
         "spec": "70-commands/file-directory",
-        "anchor": "dir"
+        "anchor": "dir",
+        "kind": "command"
       }
     ],
     "DISPLAY": [
       {
         "spec": "70-commands/information",
-        "anchor": "display"
+        "anchor": "display",
+        "kind": "command"
       }
     ],
     "DLL": [
       {
         "spec": "00-configuration/installation-tooling",
-        "anchor": "catalog"
+        "anchor": "catalog",
+        "kind": "reference"
+      },
+      {
+        "spec": "10-language/data-manipulation/system-functions",
+        "anchor": "dll",
+        "kind": "function"
       }
     ],
     "DO": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "do-loop"
+        "anchor": "do-loop",
+        "kind": "statement"
       }
     ],
     "DROP": [
       {
         "spec": "30-io-file/statements",
-        "anchor": "drop"
+        "anchor": "drop",
+        "kind": "statement"
       },
       {
         "spec": "70-commands/file-directory",
-        "anchor": "drop"
+        "anchor": "drop",
+        "kind": "command"
       }
     ],
     "EDIT": [
       {
         "spec": "70-commands/editing",
-        "anchor": "edit"
+        "anchor": "edit",
+        "kind": "command"
       }
     ],
     "ENCRYPT$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "encryption"
+        "anchor": "encrypt$",
+        "kind": "function"
       }
     ],
     "END": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "end"
+        "anchor": "end",
+        "kind": "statement"
       }
     ],
     "ENV$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "env$",
+        "kind": "function"
       }
     ],
     "ERR": [
       {
+        "spec": "10-language/data-manipulation/system-functions",
+        "anchor": "err",
+        "kind": "function"
+      },
+      {
         "spec": "10-language/flow-control/error-handling",
-        "anchor": "system-variables"
+        "anchor": "system-variables",
+        "kind": "function"
       }
     ],
     "EXECUTE": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "execute"
+        "anchor": "execute",
+        "kind": "command"
       }
     ],
     "EXISTS": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "exists",
+        "kind": "function"
       }
     ],
     "EXIT": [
       {
         "spec": "10-language/flow-control/error-handling",
-        "anchor": "conditions"
+        "anchor": "conditions",
+        "kind": "statement"
       },
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "exit"
+        "anchor": "exit",
+        "kind": "statement"
       }
     ],
     "EXP": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "exp",
+        "kind": "function"
       }
     ],
     "FILE": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "file",
+        "kind": "function"
       }
     ],
     "FILE$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "file$",
+        "kind": "function"
       }
     ],
     "FILENUM": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "filenum",
+        "kind": "function"
       }
     ],
     "FKEY": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "fkey",
+        "kind": "function"
       },
       {
         "spec": "10-language/flow-control/error-handling",
-        "anchor": "ignore"
+        "anchor": "ignore",
+        "kind": "statement"
       }
     ],
     "FNEND": [
       {
         "spec": "10-language/flow-control/functions-udf",
-        "anchor": "fnend"
+        "anchor": "fnend",
+        "kind": "statement"
       }
     ],
     "FOR": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "for-next"
+        "anchor": "for-next",
+        "kind": "statement"
       }
     ],
     "FORM": [
       {
         "spec": "30-io-file/form-spec",
-        "anchor": "when-a-form-is-compiled"
+        "anchor": "when-a-form-is-compiled",
+        "kind": "reference"
       }
     ],
     "FP": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "fp",
+        "kind": "function"
       }
     ],
     "FREE": [
       {
         "spec": "30-io-file/statements",
-        "anchor": "free"
+        "anchor": "free",
+        "kind": "statement"
       },
       {
         "spec": "70-commands/file-directory",
-        "anchor": "free"
+        "anchor": "free",
+        "kind": "command"
       }
     ],
     "FREESP": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "freesp",
+        "kind": "function"
       }
     ],
     "GET$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "integration-functions"
+        "anchor": "get$",
+        "kind": "function"
       }
     ],
     "GO": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "go"
+        "anchor": "go",
+        "kind": "command"
       }
     ],
     "GOSUB": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "gosub"
+        "anchor": "gosub",
+        "kind": "statement"
       }
     ],
     "GOTO": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "goto"
+        "anchor": "goto",
+        "kind": "statement"
+      }
+    ],
+    "GROW": [
+      {
+        "spec": "10-language/flow-control/error-handling",
+        "anchor": "grow",
+        "kind": "statement"
       }
     ],
     "HELP": [
       {
         "spec": "10-language/flow-control/error-handling",
-        "anchor": "ignore"
+        "anchor": "ignore",
+        "kind": "statement"
       }
     ],
     "HELP$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "help$",
+        "kind": "function"
       }
     ],
     "HEX$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "conversion-functions"
+        "anchor": "hex$",
+        "kind": "function"
       }
     ],
     "IF": [
       {
         "spec": "10-language/data-manipulation/conditionals",
-        "anchor": "if"
+        "anchor": "if",
+        "kind": "statement"
       }
     ],
     "IGNORE": [
       {
         "spec": "10-language/flow-control/error-handling",
-        "anchor": "ignore"
+        "anchor": "ignore",
+        "kind": "statement"
       }
     ],
     "INDEX": [
       {
         "spec": "30-io-file/keys-indexes",
-        "anchor": "index"
+        "anchor": "index",
+        "kind": "reference"
       }
     ],
     "INF": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "inf",
+        "kind": "function"
       }
     ],
     "INPUT": [
       {
         "spec": "20-io-screen/input-output",
-        "anchor": "select"
+        "anchor": "select",
+        "kind": "statement"
       }
     ],
     "INT": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "int",
+        "kind": "function"
       }
     ],
     "INVOKE$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "integration-functions"
+        "anchor": "invoke$",
+        "kind": "function"
       }
     ],
     "IP": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "ip",
+        "kind": "function"
       }
     ],
     "KLN": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "kln",
+        "kind": "function"
       }
     ],
     "KPS": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "kps",
+        "kind": "function"
       }
     ],
     "KREC": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "krec",
+        "kind": "function"
       }
     ],
     "KSTAT$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "kstat$",
+        "kind": "function"
       }
     ],
     "LEN": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "len",
+        "kind": "function"
       }
     ],
     "LET": [
       {
         "spec": "10-language/data-manipulation/assignment",
-        "anchor": "let"
+        "anchor": "let",
+        "kind": "statement"
       }
     ],
     "LIBRARY": [
       {
         "spec": "50-libraries/library-facility",
-        "anchor": "library"
+        "anchor": "library",
+        "kind": "statement"
       }
     ],
     "LINE": [
       {
+        "spec": "10-language/data-manipulation/system-functions",
+        "anchor": "line",
+        "kind": "function"
+      },
+      {
         "spec": "10-language/flow-control/error-handling",
-        "anchor": "system-variables"
+        "anchor": "system-variables",
+        "kind": "function"
       }
     ],
     "LINES": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "lines",
+        "kind": "function"
       }
     ],
     "LINESPP": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "linespp",
+        "kind": "function"
       }
     ],
     "LINESTATUS$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "linestatus$",
+        "kind": "function"
       }
     ],
     "LINPUT": [
       {
         "spec": "20-io-screen/input-output",
-        "anchor": "linput"
+        "anchor": "linput",
+        "kind": "statement"
       }
     ],
     "LIST": [
       {
         "spec": "70-commands/editing",
-        "anchor": "list"
+        "anchor": "list",
+        "kind": "command"
       }
     ],
     "LOAD": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "program-commands"
+        "anchor": "program-commands",
+        "kind": "command"
       }
     ],
     "LOG": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "log",
+        "kind": "function"
       }
     ],
     "LOGIN_NAME$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "login_name$",
+        "kind": "function"
       }
     ],
     "LOOP": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "do-loop"
+        "anchor": "do-loop",
+        "kind": "statement"
       }
     ],
     "LPAD$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "lpad$",
+        "kind": "function"
       }
     ],
     "LREC": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "lrec",
+        "kind": "function"
       }
     ],
     "LTRM$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "ltrm$",
+        "kind": "function"
       }
     ],
     "LWRC$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "lwrc$",
+        "kind": "function"
       }
     ],
     "MAT": [
       {
         "spec": "10-language/data-manipulation/assignment",
-        "anchor": "mat"
+        "anchor": "mat",
+        "kind": "statement"
       },
       {
         "spec": "10-language/data-manipulation/declaration",
-        "anchor": "redimensioning"
+        "anchor": "redimensioning",
+        "kind": "statement"
       }
     ],
     "MAT2STR": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "array-functions"
+        "anchor": "mat2str",
+        "kind": "function"
       }
     ],
     "MAX": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "max",
+        "kind": "function"
       }
     ],
     "MAX$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "max$",
+        "kind": "function"
       }
     ],
     "MENU": [
       {
+        "spec": "10-language/data-manipulation/system-functions",
+        "anchor": "menu",
+        "kind": "function"
+      },
+      {
         "spec": "20-io-screen/controls",
-        "anchor": "menu"
+        "anchor": "menu",
+        "kind": "reference"
       }
     ],
     "MENU$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "menu$",
+        "kind": "function"
       },
       {
         "spec": "20-io-screen/controls",
-        "anchor": "menus"
+        "anchor": "menus",
+        "kind": "reference"
       }
     ],
     "MERGE": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "merge"
+        "anchor": "merge",
+        "kind": "command"
       }
     ],
     "MIN": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "min",
+        "kind": "function"
       }
     ],
     "MIN$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "min$",
+        "kind": "function"
       }
     ],
     "MKDIR": [
       {
         "spec": "70-commands/file-directory",
-        "anchor": "mkdir"
+        "anchor": "mkdir",
+        "kind": "command"
       }
     ],
     "MOD": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "mod",
+        "kind": "function"
       }
     ],
     "MSG": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "msg",
+        "kind": "function"
       }
     ],
     "MSG$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "msg$",
+        "kind": "function"
       }
     ],
     "MSGBOX": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "msgbox"
+        "anchor": "msgbox",
+        "kind": "function"
       }
     ],
     "NEWPAGE": [
       {
+        "spec": "10-language/data-manipulation/system-functions",
+        "anchor": "newpage",
+        "kind": "function"
+      },
+      {
         "spec": "40-io-printing/statements",
-        "anchor": "newpage"
+        "anchor": "newpage",
+        "kind": "statement"
       }
     ],
     "NEXT": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "for-next"
+        "anchor": "for-next",
+        "kind": "statement"
       }
     ],
     "NXTCOL": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "nxtcol",
+        "kind": "function"
       }
     ],
     "NXTFLD": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "nxtfld",
+        "kind": "function"
       }
     ],
     "NXTROW": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "nxtrow",
+        "kind": "function"
       }
     ],
     "ON": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "on-goto"
+        "anchor": "on-goto",
+        "kind": "statement"
       }
     ],
     "OPEN": [
       {
         "spec": "30-io-file/database",
-        "anchor": "open"
+        "anchor": "open",
+        "kind": "reference"
       },
       {
         "spec": "30-io-file/file-model",
-        "anchor": "file-ref"
+        "anchor": "file-ref",
+        "kind": "reference"
       },
       {
         "spec": "30-io-file/statements",
-        "anchor": "open"
+        "anchor": "open",
+        "kind": "statement"
       }
     ],
     "OPTION": [
       {
         "spec": "10-language/data-manipulation/declaration",
-        "anchor": "option"
+        "anchor": "option",
+        "kind": "statement"
       }
     ],
     "ORD": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "ord",
+        "kind": "function"
       }
     ],
     "OS_FILENAME$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "os_filename$",
+        "kind": "function"
       }
     ],
     "PAUSE": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "pause"
+        "anchor": "pause",
+        "kind": "statement"
       }
     ],
     "PI": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "pi",
+        "kind": "function"
       }
     ],
     "PIC$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "conversion-functions"
+        "anchor": "pic$",
+        "kind": "function"
       }
     ],
     "POS": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "pos",
+        "kind": "function"
       },
       {
         "spec": "30-io-file/form-spec",
-        "anchor": "format-codes"
+        "anchor": "format-codes",
+        "kind": "reference"
       }
     ],
     "PRINT": [
       {
         "spec": "40-io-printing/statements",
-        "anchor": "print"
+        "anchor": "print",
+        "kind": "statement"
       }
     ],
     "PRINTER_LIST": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "printer_list",
+        "kind": "function"
       }
     ],
     "PROC": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "proc"
+        "anchor": "proc",
+        "kind": "command"
       }
     ],
     "PROCERR": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "procerr"
+        "anchor": "procerr",
+        "kind": "command"
       }
     ],
     "PROCIN": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "procin",
+        "kind": "function"
       }
     ],
     "PROCLVL": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "proclvl",
+        "kind": "function"
       }
     ],
     "PROGRAM$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "program$",
+        "kind": "function"
       }
     ],
     "PROTECT": [
       {
         "spec": "70-commands/file-directory",
-        "anchor": "protect"
+        "anchor": "protect",
+        "kind": "command"
       }
     ],
     "RAD": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "rad",
+        "kind": "function"
       }
     ],
     "RANDOMIZE": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "randomize"
+        "anchor": "randomize",
+        "kind": "statement"
       }
     ],
     "READ": [
       {
         "spec": "10-language/data-manipulation/assignment",
-        "anchor": "data-table"
+        "anchor": "data-table",
+        "kind": "statement"
       },
       {
         "spec": "30-io-file/statements",
-        "anchor": "read"
+        "anchor": "read",
+        "kind": "statement"
       }
     ],
     "REC": [
       {
+        "spec": "10-language/data-manipulation/system-functions",
+        "anchor": "rec",
+        "kind": "function"
+      },
+      {
         "spec": "30-io-file/statements",
-        "anchor": "rec"
+        "anchor": "rec",
+        "kind": "statement"
       }
     ],
     "RELEASE": [
       {
         "spec": "50-libraries/library-facility",
-        "anchor": "clearing"
+        "anchor": "clearing",
+        "kind": "statement"
       }
     ],
     "REM": [
       {
+        "spec": "10-language/data-manipulation/system-functions",
+        "anchor": "rem",
+        "kind": "function"
+      },
+      {
         "spec": "10-language/syntax",
-        "anchor": "comments"
+        "anchor": "comments",
+        "kind": "statement"
       }
     ],
     "RENAME": [
       {
         "spec": "70-commands/file-directory",
-        "anchor": "rename"
+        "anchor": "rename",
+        "kind": "command"
       }
     ],
     "RENUM": [
       {
         "spec": "70-commands/editing",
-        "anchor": "renum"
+        "anchor": "renum",
+        "kind": "command"
       }
     ],
     "REPLACE": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "replace"
+        "anchor": "replace",
+        "kind": "command"
       }
     ],
     "REREAD": [
       {
         "spec": "30-io-file/statements",
-        "anchor": "positioning-per-statement"
+        "anchor": "positioning-per-statement",
+        "kind": "statement"
       }
     ],
     "RESERVE": [
       {
         "spec": "30-io-file/file-model",
-        "anchor": "reserve"
+        "anchor": "reserve",
+        "kind": "reference"
       }
     ],
     "RESTORE": [
       {
         "spec": "10-language/data-manipulation/assignment",
-        "anchor": "data-table"
+        "anchor": "data-table",
+        "kind": "statement"
       },
       {
         "spec": "30-io-file/statements",
-        "anchor": "restore"
+        "anchor": "restore",
+        "kind": "statement"
       }
     ],
     "RETRY": [
       {
         "spec": "10-language/flow-control/error-handling",
-        "anchor": "retry"
+        "anchor": "retry",
+        "kind": "statement"
       }
     ],
     "RETURN": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "gosub"
+        "anchor": "gosub",
+        "kind": "statement"
       }
     ],
     "REWRITE": [
       {
         "spec": "30-io-file/statements",
-        "anchor": "rewrite"
+        "anchor": "rewrite",
+        "kind": "statement"
       }
     ],
     "RINPUT": [
       {
         "spec": "20-io-screen/input-output",
-        "anchor": "select"
+        "anchor": "select",
+        "kind": "statement"
       }
     ],
     "RLN": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "rln",
+        "kind": "function"
       }
     ],
     "RMDIR": [
       {
         "spec": "70-commands/file-directory",
-        "anchor": "rmdir"
+        "anchor": "rmdir",
+        "kind": "command"
       }
     ],
     "RND": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "rnd",
+        "kind": "function"
       }
     ],
     "ROUND": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "round",
+        "kind": "function"
       }
     ],
     "RPAD$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "rpad$",
+        "kind": "function"
       }
     ],
     "RPT$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "rpt$",
+        "kind": "function"
       }
     ],
     "RTRM$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "rtrm$",
+        "kind": "function"
       }
     ],
     "RUN": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "program-commands"
+        "anchor": "program-commands",
+        "kind": "command"
       }
     ],
     "SAVE": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "replace"
+        "anchor": "replace",
+        "kind": "command"
       }
     ],
     "SCR_FREEZE": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "scr_freeze",
+        "kind": "function"
       }
     ],
     "SCR_THAW": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "screen-query"
+        "anchor": "scr_thaw",
+        "kind": "function"
       }
     ],
     "SELECT": [
       {
         "spec": "20-io-screen/input-output",
-        "anchor": "select"
+        "anchor": "select",
+        "kind": "statement"
       }
     ],
     "SERIAL": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "serial",
+        "kind": "function"
       }
     ],
     "SESSION$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "session$",
+        "kind": "function"
       }
     ],
     "SET$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "integration-functions"
+        "anchor": "set$",
+        "kind": "function"
       }
     ],
     "SETENV": [
       {
         "spec": "00-configuration/environment",
-        "anchor": "setenv"
+        "anchor": "setenv",
+        "kind": "reference"
+      },
+      {
+        "spec": "10-language/data-manipulation/system-functions",
+        "anchor": "setenv",
+        "kind": "function"
       }
     ],
     "SGN": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "sgn",
+        "kind": "function"
       }
     ],
     "SHIFT": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "shift",
+        "kind": "function"
       }
     ],
     "SIN": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "sin",
+        "kind": "function"
       }
     ],
     "SKIP": [
       {
         "spec": "30-io-file/form-spec",
-        "anchor": "skip"
+        "anchor": "skip",
+        "kind": "reference"
       }
     ],
     "SLEEP": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "sleep",
+        "kind": "function"
       }
     ],
     "SORT": [
       {
         "spec": "40-io-printing/sort",
-        "anchor": "sort"
+        "anchor": "sort",
+        "kind": "reference"
       }
     ],
     "SPAWN_RESTRICTED": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "spawn_restricted",
+        "kind": "function"
       }
     ],
     "SQL_DATE$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "date-functions"
+        "anchor": "sql_date$",
+        "kind": "function"
       }
     ],
     "SQR": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "sqr",
+        "kind": "function"
       }
     ],
     "SRCH": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "array-functions"
+        "anchor": "srch",
+        "kind": "function"
       }
     ],
     "SREP$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "srep$",
+        "kind": "function"
       }
     ],
     "STATUS": [
       {
         "spec": "70-commands/information",
-        "anchor": "status"
+        "anchor": "status",
+        "kind": "command"
       }
     ],
     "STOP": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "stop"
+        "anchor": "stop",
+        "kind": "statement"
       }
     ],
     "STR$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "conversion-functions"
+        "anchor": "str$",
+        "kind": "function"
       }
     ],
     "STR2MAT": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "array-functions"
+        "anchor": "str2mat",
+        "kind": "function"
       }
     ],
     "SUBPROC": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "subproc"
+        "anchor": "subproc",
+        "kind": "command"
       }
     ],
     "SUM": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "array-functions"
+        "anchor": "sum",
+        "kind": "function"
       }
     ],
     "SYSERR": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "syserr",
+        "kind": "function"
       }
     ],
     "SYSERR$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "syserr$",
+        "kind": "function"
       }
     ],
     "SYSTEM": [
       {
         "spec": "70-commands/program-management",
-        "anchor": "system"
+        "anchor": "system",
+        "kind": "command"
       }
     ],
     "TAN": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "tan",
+        "kind": "function"
       }
     ],
     "TIME": [
       {
         "spec": "70-commands/information",
-        "anchor": "time"
+        "anchor": "time",
+        "kind": "command"
       }
     ],
     "TIME$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "date-functions"
+        "anchor": "time$",
+        "kind": "function"
       }
     ],
     "TIMER": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "timer",
+        "kind": "function"
       }
     ],
     "TRACE": [
       {
         "spec": "10-language/flow-control/other-flow",
-        "anchor": "trace"
+        "anchor": "trace",
+        "kind": "statement"
       }
     ],
     "TRIM$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "trim$",
+        "kind": "function"
       }
     ],
     "TRUNC": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "numeric-functions"
+        "anchor": "trunc",
+        "kind": "function"
       }
     ],
     "TYPE": [
       {
         "spec": "70-commands/file-directory",
-        "anchor": "type"
+        "anchor": "type",
+        "kind": "command"
       }
     ],
     "UDIM": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "array-functions"
+        "anchor": "udim",
+        "kind": "function"
       }
     ],
     "UNHEX$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "conversion-functions"
+        "anchor": "unhex$",
+        "kind": "function"
       }
     ],
     "UPRC$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "uprc$",
+        "kind": "function"
       }
     ],
     "USERID$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "userid$",
+        "kind": "function"
       }
     ],
     "VAL": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "conversion-functions"
+        "anchor": "val",
+        "kind": "function"
       }
     ],
     "VARIABLE$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "variable$",
+        "kind": "function"
       }
     ],
     "VERIFY": [
       {
         "spec": "30-io-file/keys-indexes",
-        "anchor": "verify"
+        "anchor": "verify",
+        "kind": "reference"
       }
     ],
     "VERSION": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "file-query"
+        "anchor": "version",
+        "kind": "function"
       }
     ],
     "WBPLATFORM$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "wbplatform$",
+        "kind": "function"
       }
     ],
     "WBVERSION$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "wbversion$",
+        "kind": "function"
       }
     ],
     "WRITE": [
       {
         "spec": "30-io-file/statements",
-        "anchor": "write"
+        "anchor": "write",
+        "kind": "statement"
       }
     ],
     "WSID$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "system-info"
+        "anchor": "wsid$",
+        "kind": "function"
       }
     ],
     "XLATE$": [
       {
         "spec": "10-language/data-manipulation/system-functions",
-        "anchor": "string-functions"
+        "anchor": "xlate$",
+        "kind": "function"
       }
     ]
   },
@@ -3256,7 +3551,17 @@
         "DEBUG_STR",
         "PRINTER_LIST",
         "INF",
-        "SERIAL"
+        "SERIAL",
+        "BELL",
+        "ERR",
+        "LINE",
+        "NEWPAGE",
+        "REC",
+        "REM",
+        "DATE",
+        "MENU",
+        "SETENV",
+        "DLL"
       ],
       "related": [
         "expressions",
@@ -3271,18 +3576,149 @@
         "mat-qualifier",
         "tables",
         "string-functions",
+        "chr$",
+        "ord",
+        "lwrc$",
+        "uprc$",
+        "trim$",
+        "ltrm$",
+        "rtrm$",
+        "lpad$",
+        "rpad$",
+        "rpt$",
+        "len",
+        "pos",
+        "srep$",
+        "xlate$",
+        "login_name$",
         "conversion-functions",
+        "str$",
+        "val",
+        "cnvrt$",
+        "cform$",
+        "hex$",
+        "unhex$",
+        "pic$",
         "numeric-functions",
+        "int",
+        "fp",
+        "ip",
+        "ceil",
+        "round",
+        "trunc",
+        "abs",
+        "sgn",
+        "sqr",
+        "mod",
+        "rem",
+        "max",
+        "min",
+        "max$",
+        "min$",
+        "atn",
+        "cos",
+        "sin",
+        "tan",
+        "deg",
+        "rad",
+        "exp",
+        "log",
+        "pi",
+        "inf",
+        "rnd",
         "accepted-and-ignored",
         "date-functions",
+        "date$",
+        "time$",
+        "days",
+        "date",
+        "br_date$",
+        "sql_date$",
         "array-functions",
+        "udim",
+        "sum",
+        "srch",
+        "aidx",
+        "didx",
+        "str2mat",
+        "mat2str",
         "str2mat-delimiter",
         "file-query",
+        "file$",
+        "file",
+        "filenum",
+        "freesp",
+        "exists",
+        "br_filename$",
+        "os_filename$",
+        "kps",
+        "lrec",
+        "rec",
+        "rln",
+        "version",
+        "linestatus$",
+        "lines",
+        "linespp",
+        "kln",
+        "krec",
         "screen-query",
+        "kstat$",
+        "nxtfld",
+        "nxtcol",
+        "nxtrow",
+        "curtab",
+        "curpos",
+        "scr_freeze",
+        "scr_thaw",
+        "curcol",
+        "currow",
+        "curfld",
+        "curwindow",
+        "cmdkey",
+        "fkey",
+        "menu",
+        "menu$",
         "system-info",
+        "err",
+        "line",
+        "cnt",
+        "brerr$",
+        "env$",
+        "code",
+        "procin",
+        "wsid$",
+        "userid$",
+        "serial",
+        "session$",
+        "proclvl",
+        "timer",
+        "setenv",
+        "variable$",
+        "wbversion$",
+        "wbplatform$",
+        "syserr",
+        "syserr$",
+        "shift",
+        "msg$",
+        "msg",
+        "sleep",
+        "spawn_restricted",
+        "help$",
+        "program$",
+        "debug_str",
+        "printer_list",
+        "newpage",
+        "bell",
         "integration-functions",
+        "get$",
+        "set$",
+        "invoke$",
+        "call",
+        "dll",
         "msgbox",
         "encryption",
+        "encrypt$",
+        "decrypt$",
         "examples",
         "see-also"
       ],
@@ -3334,6 +3770,7 @@
         "conditions",
         "ignore",
         "soflow-grow",
+        "grow",
         "recovery",
         "retry",
         "continue",
