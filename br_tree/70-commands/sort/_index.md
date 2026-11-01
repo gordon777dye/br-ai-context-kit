@@ -1,6 +1,6 @@
 # 70-commands/sort
 
-The SORT command and the sort control file: report sorting, sort order.
+The SORT command and its control file: report sorting, sort order.
 
 **📄 Guide → [spec.md](spec.md)** _(status: 2b)_ — Produces sorted output from an internal file via a sort control file of specifications.
 

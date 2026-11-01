@@ -48,7 +48,7 @@ PURPOSE={
 "40-io-printing":"Printing authoring (coding side only; spool/printer config lives under 00-configuration).",
 "40-io-printing/statements":"Print statements and page control: PRINT (printer), PAGEOFLOW, page breaks, borders.",
 "40-io-printing/pcl-pdf":"Printer languages and formats: PCL, PDF, PJL, barcodes, pictures.",
-"40-io-printing/sort":"Report sorting: SORT, AIDX/DIDX usage, sort order.",
+"70-commands/sort":"The SORT command and its control file: report sorting, sort order.",
 "50-libraries":"Reusable library facility and the shipped function packs.",
 "60-integration":"Web & data-exchange integration — JSON/data store and BR as a web server.",
 "60-integration/json-datastore":"In-memory object/data store and JSON build/parse/serve functions.",
@@ -67,7 +67,6 @@ PURPOSE={
 "90-reference/keyboard-shortcuts":"Key bindings (Ctrl+*, control keys) — not runnable via EXECUTE.",
 "90-reference/limits-constants":"Numeric limits and built-in constants (max integer, PI, ...).",
 "90-reference/glossary-stubs":"Disambiguation pages and single-letter stubs quarantined from the authoring docs.",
-"99-examples":"Multi-topic tutorials and course material (Fast Track, Chapters). Single-topic tutorials were co-located into their topic folder.",
 }
 
 def split_fm(text):

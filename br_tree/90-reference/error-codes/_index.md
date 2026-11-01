@@ -2,7 +2,7 @@
 
 Every BR numeric error code, one file each. See the table below for fast lookup.
 
-_746 entries._
+_783 entries._
 
 | Code | Description |
 |---|---|
@@ -137,7 +137,7 @@ _746 entries._
 | [0711](0711.md) | Unable to restore |
 | [0714](0714.md) | Read beyond end of record |
 | [0715](0715.md) | Illegal sequence |
-| [0716](0716.md) | HTTP sequence error |
+| [0716](0716.md) | `PRINT` to an HTTP server file before a request was read |
 | [0717](0717.md) | Error deleting record from BTREE2 file. As of 4.30 |
 | [0718](0718.md) | Key length (KLn) conflict |
 | [0719](0719.md) | File driver error |
@@ -150,18 +150,55 @@ _746 entries._
 | [0731](0731.md) | Invalid Seek method or position |
 | [0737](0737.md) | attempt to set readonly mode for existing Combobox |
 | [0738](0738.md) | SELECT should be a trailing attribute. |
-| [0740](0740.md) | The HTTP server is already running. |
+| [0740](0740.md) | This BR already has an `HTTP=SERVER` file open |
 | [0742](0742.md) | Request not valid because this is not an HTTP server |
 | [0744](0744.md) | Request not valid because this is not an HTTP client |
-| [0746](0746.md) | There isn't an active inquiry |
+| [0746](0746.md) | No current HTTP request - read one with `LINPUT` first |
 | [0748](0748.md) | Bad keyword in HTTP control file. |
-| [0750](0750.md) | Could not start HTTP server |
-| [0752](0752.md) | Could not bind to HTTP port |
+| [0750](0750.md) | Could not start the HTTP server |
+| [0752](0752.md) | HTTP port is in use by another program or BR session |
 | [0754](0754.md) | Failed to process path information for the http server log file |
 | [0756](0756.md) | Failed to open the http server log file |
 | [0757](0757.md) | Http server failed to assign (via rename) specified filename |
 | [0760](0760.md) | Picture does not exist |
 | [0762](0762.md) | Image spec had syntax errors. |
+| [0763](0763.md) | HTTP= must be SERVER or CLIENT |
+| [0764](0764.md) | An HTTP file must be opened DISPLAY |
+| [0765](0765.md) | HTTP=SERVER must be opened OUTIN |
+| [0766](0766.md) | CHUNK= must be 256 to 16777216 |
+| [0767](0767.md) | CHUNK= is valid only with HTTP=SERVER |
+| [0768](0768.md) | This BR license does not include HTTP |
+| [0769](0769.md) | An uploaded file could not be stored |
+| [0770](0770.md) | Unknown word on CONFIG HTTP or HTTPS - quote a value containing spaces |
+| [0771](0771.md) | CONFIG HTTP or HTTPS needs a port from 1 to 65535 |
+| [0772](0772.md) | HTTP port range must run low to high, at most 100 ports |
+| [0773](0773.md) | CONFIG HTTP or HTTPS keyword has no value |
+| [0774](0774.md) | THREADS= must be 1 to 1000 |
+| [0775](0775.md) | BIND= is not a valid address |
+| [0776](0776.md) | PROXY= must be numeric IP addresses separated by commas |
+| [0777](0777.md) | CONFIG HTTP or HTTPS value is too long or has an unmatched quote |
+| [0778](0778.md) | The folder for the HTTP LOG= file does not exist |
+| [0779](0779.md) | HTTP LOG= names a folder, not a file |
+| [0780](0780.md) | HTTP URL_BASE= folder does not exist |
+| [0781](0781.md) | HTTP URL_BASE= names a file, not a folder |
+| [0782](0782.md) | HTTPS needs CERT= naming `<base>` for `<base>.crt` and `<base>.key` |
+| [0783](0783.md) | HTTPS certificate file not found - CERT= is the name without .crt |
+| [0784](0784.md) | HTTPS certificate file cannot be read |
+| [0785](0785.md) | HTTPS certificate file is not a PEM certificate |
+| [0786](0786.md) | HTTPS certificate file is binary (DER or PFX) - convert it to PEM |
+| [0787](0787.md) | HTTPS .crt file holds a private key - are .crt and .key swapped? |
+| [0788](0788.md) | HTTPS private key file not found - `<base>.key` must sit beside `<base>.crt` |
+| [0789](0789.md) | HTTPS private key file cannot be read |
+| [0790](0790.md) | HTTPS .key file is not a PEM private key |
+| [0791](0791.md) | HTTPS private key is encrypted - give PHRASE= or OPTION 66 |
+| [0792](0792.md) | HTTPS private key passphrase is wrong |
+| [0793](0793.md) | HTTPS private key does not belong to the certificate |
+| [0794](0794.md) | HTTPS .crt must list the server certificate first, then intermediates |
+| [0795](0795.md) | TLS refused the certificate or key - see SYSERR$ |
+| [0796](0796.md) | The system denied this BR the HTTP port |
+| [0797](0797.md) | HTTP BIND= address is not on this machine |
+| [0798](0798.md) | A request body was over 64 MB and was refused |
+| [0799](0799.md) | A client was refused: all HTTP licenses are in use |
 | [0801](0801.md) | Invalid syntax for Form Variable |
 | [0802](0802.md) | PIC syntax error |
 | [0803](0803.md) | Missing format spec |
@@ -712,7 +749,7 @@ _746 entries._
 | [9985](9985.md) | DEPRECATED ERROR as of 4.3: Work file missing |
 | [9987](9987.md) | No source exists for the given file. |
 | [9988](9988.md) | DEPRECATED ERROR as of 4.3: Source line too large |
-| [9990](9990.md) | Build was made without HTTP support. This version was made without HTTP support |
+| [9990](9990.md) | This version was made without HTTP support |
 | [9992](9992.md) | Def statement compiler error |
 | [9994](9994.md) | Line reference indicates library, but no libraries active |
 | [9995](9995.md) | Deprecated error as of 4.3: RPN stack failure. SysErr and it always seems to want to kick you out of BR! |

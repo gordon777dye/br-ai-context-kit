@@ -2,7 +2,7 @@
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; section_index maps each statement, READY command and system function to the spec section(s) (anchor) that cover it, each with a kind - command, function, statement or reference - saying what that section documents the word as; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
   "generated": "2026-11-01",
   "source": "br_tree/",
-  "source_sha256": "e06d94f113fe8277d2f0eef0eb87ee3418e3d37d1771718241ca7a03eb3752d0",
+  "source_sha256": "9460af8944898d2a5c47ea80543c91cf316230e5ef21d7e3d5e0a3a85a398a0c",
   "count": 38,
   "keyword_index": {
     "!:": [
