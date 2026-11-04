@@ -50,6 +50,11 @@ tooling at whatever BR codebase you're on. There are three published parts:
   (none when BR starts in the app root). (completed in ONBOARDING STEP 1; see
   `dev/BR_launch.md#start-folder`)
 
+- The BR environment variables are ___________ (saved in the Windows user profile, or not
+  saved, because the kit is used in more than one repo on this machine). When they are not
+  saved, run every command that needs them as `cmd /c "context\app\env.cmd && <command>"`.
+  (completed in ONBOARDING STEP 1; see `dev/BR_launch.md#br-launch-environment`)
+
 ## Installation
 
 Note: This context kit itegrates with any BR app. 
