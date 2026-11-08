@@ -16,6 +16,9 @@ interactive program, a screen, a form that is waiting for input. The difference 
 facility called the **harness**: a side channel a session opens on its own account, which an
 assistant reads and types through while the program runs.
 
+To *test* a changed program, rather than watch it, start with [`BR_testing.md`](BR_testing.md),
+which picks the way and gives a repeatable screen test.
+
 > **Everything below marked *measured* was run on this machine against BR 5.0 and the output
 > kept.** Everything else is cited to the authority that states it. Nothing here is inferred
 > from how it ought to work — see [AI Model Rules](../README.md) on guessing.
@@ -125,7 +128,8 @@ rather than copying it. A second assistant is told `another assistant is already
 
 Moved to [`BR_launch.md` — Starting the session](BR_launch.md#harness-launch):
 `"$BR_MCP_DRIVER" start`, what `start` and `start --user` each give you
-(`DEVELOP` mode or user mode, and no grant or an hour's), and how to end it.
+(`DEVELOP` mode with the keyboard and no expiry, or user mode with the keyboard for an hour),
+and how to end it.
 
 ---
 
@@ -421,13 +425,14 @@ In the order you should reach for them:
 | what the facility is, for a reader who is not implementing it | [`ai_access/AI-Access-Summary.md`](ai_access/AI-Access-Summary.md) |
 | what a restricted session may and may not do | [`ai_access/AI-Restricted-Operations.md`](ai_access/AI-Restricted-Operations.md) |
 | compiling, running a program headlessly, and launching a harness session | [`BR_launch.md`](BR_launch.md), [Live sessions](BR_launch.md#harness-launch) |
+| testing a changed program, including a repeatable screen test with `uitest` | [`BR_testing.md`](BR_testing.md) |
 | BR's two GUI modes | [`br_tree`](../br_tree/20-io-screen/windows-cursor/spec.md#gui-console) |
 | ScreenIO: building, compiling, dispatching | [`screenio-guide.md`](screenio-guide.md), [`br_tree/50-libraries/screenio/`](../br_tree/50-libraries/screenio/) |
 
-**The copies under [`ai_access/`](ai_access/) are copies.** The authority is `br/docs/` and
-`br/mcpdriver/` in the BR source tree, and a copy here can fall behind one — if something in
-them contradicts what a tool actually does, the tool is right and the copy is stale. Say so in
-[`ERRORS.md`](../ERRORS.md).
+**The three `AI-Access-*.md` files in [`ai_access/`](ai_access/) are copies** of `br/docs/` in
+the BR source tree, and can fall behind it. [`ai_access/README.md`](ai_access/README.md) is this
+kit's own, written for testing BR programs. If anything in them contradicts what a tool actually
+does, the tool is right. Say so in [`ERRORS.md`](../ERRORS.md).
 
 Found anything in this file that is wrong, or ambiguous? Put it in
 [`ERRORS.md`](../ERRORS.md) and tell the user, so it can be forwarded to ADS.

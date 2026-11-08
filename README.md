@@ -83,6 +83,10 @@ All of this should be done by AI at your direction. Just tell your AI agent (one
 and watch a program while it runs: its screen, its fields, its listviews, a picture of its
 window. This is the only way to see an interactive program or a ScreenIO screen.
 
+**→ [`dev/BR_testing.md`](dev/BR_testing.md)** — How to **test a changed program**: which way
+to use (a check, a headless run, a repeatable screen script, a live session or a restricted
+run), and the commands for each.
+
 **→ [`dev/APP-DEV-GUIDE.md`](dev/APP-DEV-GUIDE.md)** — After completing the onboarding, this
 becomes your AI task entry point. Its *"Start here — by task type"* preamble routes your 
 agent by what you desire to accomplish (interpret/debug · code · design · test).

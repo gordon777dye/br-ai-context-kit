@@ -281,8 +281,9 @@ harness claimed on port 8720, protocol 5
 serving \\.\pipe\br_mcp_driver.Gordon.requests and .replies, holding the harness on port 8720
 ```
 
-`BR_report.prc` is different and needs no copying: the `run_report` tool writes it and its
-loader into the directory it is told to run in.
+`BR_report.prc` goes in the folder `run_report` runs in: its `dir` argument, or the folder the
+driver runs in when `dir` is not given. The tool writes only `loader.prc` there, and refuses to
+run if `BR_report.prc` is missing.
 
 ### The configuration file
 
@@ -360,7 +361,7 @@ It launches BR on a standard procedure, claims the channel that procedure opens,
 
 | Command | Procedure | Session | Grant |
 |---|---|---|---|
-| `start` | `BR_dev.prc` | **`DEVELOP` mode** | none given |
+| `start` | `BR_dev.prc` | **`DEVELOP` mode** | the keyboard, with no expiry (`MSG("grant",-1)`) |
 | `start --user` | `BR_user.prc` | user mode | the keyboard, for an hour |
 
 **`DEVELOP` mode is what you want for development work**, and it is chosen by the procedure's
@@ -374,9 +375,11 @@ a flag here and not a tool. It buys two things:
   unrestricted and can write the application's own files. A user-mode session raises it, and
   every session started while it is up is restricted to files it created itself.
 
-What `start` does **not** do: set `DEVELOP` mode (above), and give a grant. `BR_dev.prc`
-deliberately gives none, because a development session usually wants an assistant that reads.
-To let it type, somebody at the session types `LET X=MSG("grant",600)`.
+What `start` does **not** do: set `DEVELOP` mode (above), and give a grant. The procedures
+give the grant. `BR_dev.prc` gives the keyboard with no expiry, because in a development
+session the assistant is meant to type. To take it back, somebody at the session types
+`LET X=MSG("grant",0)`; to lend it for ten minutes instead, take it back and then type
+`LET X=MSG("grant",600)`.
 
 `--config` names the configuration **file** in full: BR reads the text after the dash as that
 name, so `--config mine` asks for a file called `mine`.
