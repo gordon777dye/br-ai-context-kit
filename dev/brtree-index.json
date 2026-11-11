@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; section_index maps each statement, READY command and system function to the spec section(s) (anchor) that cover it, each with a kind - command, function, statement or reference - saying what that section documents the word as; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-11-01",
+  "generated": "2026-11-10",
   "source": "br_tree/",
-  "source_sha256": "9460af8944898d2a5c47ea80543c91cf316230e5ef21d7e3d5e0a3a85a398a0c",
+  "source_sha256": "d8a3922d8c85410379edc9ad204c213eaa2f84d8484a0bd0ff4720907787a6cf",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -321,6 +321,7 @@
       "70-commands/file-directory"
     ],
     "DISPLAY": [
+      "20-io-screen/controls",
       "30-io-file/file-model",
       "70-commands/information"
     ],
@@ -1784,6 +1785,11 @@
       }
     ],
     "DISPLAY": [
+      {
+        "spec": "20-io-screen/controls",
+        "anchor": "display",
+        "kind": "statement"
+      },
       {
         "spec": "70-commands/information",
         "anchor": "display",
@@ -3936,6 +3942,8 @@
         "call",
         "dll",
         "msgbox",
+        "msgbox-buttons",
+        "msgbox-icons",
         "encryption",
         "encrypt$",
         "decrypt$",
@@ -4029,6 +4037,7 @@
         "def",
         "fnend",
         "parameters",
+        "call-matching",
         "local-variables",
         "examples",
         "see-also"
@@ -4154,7 +4163,8 @@
         "BUTTON",
         "BUTTONS",
         "BUTTONROWS",
-        "MENU$"
+        "MENU$",
+        "DISPLAY"
       ],
       "related": [
         "input-output",
@@ -4167,6 +4177,7 @@
         "combo",
         "radio",
         "check",
+        "display",
         "buttons",
         "text",
         "date-picker",

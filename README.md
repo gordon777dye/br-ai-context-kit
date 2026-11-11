@@ -55,6 +55,10 @@ tooling at whatever BR codebase you're on. There are three published parts:
   saved, run every command that needs them as `cmd /c "context\app\env.cmd && <command>"`.
   (completed in ONBOARDING STEP 1; see `dev/BR_launch.md#br-launch-environment`)
 
+- Test data is `context/app/test/` (`context/app/test/`, or the main data when STEP 9 was skipped, which
+  a customer site must not do). (completed in ONBOARDING STEP 9; tests are in `context/app/tests/`,
+  STEP 10)
+
 ## Installation
 
 Note: This context kit itegrates with any BR app. 
@@ -71,6 +75,10 @@ The rest is done by AI.
 - delete br_tree/ and dev/ from your context/ folder
 - **move the br_tree/ and dev/ folders from the update into context/**
 - restore your config files into dev/tools/
+- copy `dev/ai_access/prc/BR_dev.prc` and `BR_user.prc` into BR's start folder again, over the old
+  ones (`dev/BR_launch.md#the-procedure-has-to-sit-in-brs-start-folder`); BR runs those copies
+- run the screen tests, and write any baseline that fails on its borders again with
+  `--update-baselines`
 
 
 ## Start here
@@ -81,7 +89,9 @@ All of this should be done by AI at your direction. Just tell your AI agent (one
 
 **→ [`dev/BR_harness.md`](dev/BR_harness.md)** — How to run **BR 5.0 with an assistant attached**
 and watch a program while it runs: its screen, its fields, its listviews, a picture of its
-window. This is the only way to see an interactive program or a ScreenIO screen.
+window. This is the way to see an interactive program or a ScreenIO screen; from a shell with no
+MCP connection, `read screen` and `send keys` do the looking and typing one command at a time
+([`dev/BR_testing.md` §5](dev/BR_testing.md#live-shell)).
 
 **→ [`dev/BR_testing.md`](dev/BR_testing.md)** — How to **test a changed program**: which way
 to use (a check, a headless run, a repeatable screen script, a live session or a restricted

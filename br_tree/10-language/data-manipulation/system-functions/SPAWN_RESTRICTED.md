@@ -5,9 +5,9 @@ category: 10-language
 subcategory: 10-language/data-manipulation/system-functions
 kind: function
 since: BR 5.0
-related: [internal function, restricted session, PROC, SLEEP, WSID$, SESSION$, 4154, 4155, 4156, 4157]
+related: [internal function, restricted session, PROC, SLEEP, WSID$, SESSION$, DEBUG_STR, LOGGING, audit log, 4154, 4155, 4156, 4157]
 ---
-`SPAWN_RESTRICTED(command$ [, config$ [, wait]])`
+`SPAWN_RESTRICTED(command$ [, config$ [, wait [, label$]]])`
 
 Starts a **new BR session on this workstation ID** — the next free session number — restricted from
 its first moment, and runs `command$` as that session's startup command, typically `PROC <file>`.
@@ -22,6 +22,7 @@ session is restricted and disposable; the one that called it is neither.
 | `command$` | the new session's startup command, e.g. `"PROC report.prc"` |
 | `config$` | its configuration file; defaults to **this session's** |
 | `wait` | seconds to wait for it to finish; omitted or `0` means do not wait |
+| `label$` | what the session is for, in a few words. It opens the new session's audit log and is in this session's own record of starting it, so a reader can tell several children apart. Control characters become spaces, a double quote becomes a single one, and it is cut to 200 characters |
 
 ## What it returns
 
@@ -51,17 +52,31 @@ point: `config$` is the *caller's* choice, so the configuration operations a res
 refuses are refused **in that file**, not applied and then locked.
 
 Since `LOGGING` and `WBSERVER` are among them, the new session is handed the **current session's**
-log and `wbserver.dat` instead, and logs to the same file.
+`wbserver.dat`, and the **folder** of the current session's log. It writes its own audit log there,
+`restricted-<SESSION$>.log` (for example `restricted-012.log` for WSID 01, session 2), at level 8;
+when the current session is not logging, it goes in `%LOCALAPPDATA%\ADS`. The log's first entry
+says why the session is restricted and, when `label$` was given, what it was started for:
+
+```text
+Restricted-session audit log for session 012, started for "C1 order check": this session may ...
+```
+
+The new session can add notes of its own with [`DEBUG_STR`](spec.md#debug_str). In a restricted
+session they are written as `Program note: <text>`, on one line, at level 5 or above, so they cannot
+pass for BR's own entries.
 
 ## Example
 
 ```text
 00100    LET PID = SPAWN_RESTRICTED("PROC "&REPORT$)           ! start it, carry on
 00110    LET RC  = SPAWN_RESTRICTED("PROC "&REPORT$, "", 300)  ! or wait 5 minutes
+00115    LET RC  = SPAWN_RESTRICTED("PROC "&REPORT$, "", 300, "month-end report")  ! labelled
 00120    IF RC <> 0 THEN PRINT "the report ended with "; RC
 ```
 
 ## See also
 
 - [system-functions](spec.md#system-info) — `WSID$`, `SESSION$`, `SLEEP`
+- [LOGGING in a restricted session](../../../00-configuration/config-directives/LOGGING.md#restricted-session) — the audit log, its name, its level and the program's notes
 - [90-reference/error-codes](../../../90-reference/error-codes/_index.md) — 4154 to 4157
+- [BRRESTRICT.SYS](../../../00-configuration/config-directives/BRRESTRICT.SYS.md) — the file list, which bounds the new session as it bounds every session

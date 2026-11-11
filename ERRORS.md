@@ -2,3 +2,48 @@
 
 Please record any context kit errors here that are found in the course of its use.
 ---
+
+## 2026-11-09 — ONBOARDING STEP 9 rebuilds ISAM key files as B-tree
+
+**Where:** [`app/ONBOARDING.md`](app/ONBOARDING.md) STEP 9, "Rebuild every key file of the data
+file … with BR's `INDEX` command", and the procedure it produced,
+`context/scratch/step9/index.prc`.
+
+**What is wrong:** the step gives `INDEX` the positions, lengths and modifiers of the production
+key file but not its **type**. `INDEX` builds a B-tree unless it is given `ISAM` (or `OPTION 5` is
+on), so every production ISAM key file came out B-tree in the test area. In QSMRP that was 4 of
+439: `ard\taxmast.key`, `cnd\terms.key`, `cod\element.key`, `ind\prodclas.key`. The type is byte 8
+of the key file's header: 4 is ISAM, 7 is B-tree.
+
+**What it breaks, silently:** a program that opens such a file with `ISAM` in its open string fails
+the open. `arp\arinq` opens `TERMS` through its own `FNOPEN_KEYED`, whose open string ends `Isam,
+Shr` and whose `error` clause swallows the failure, so `TERMS` stays 0 and the next keyed read of
+it is error 702 at line 56506, shown in the house `Trap:` window. Found by a `uitest` of `arinq`;
+the same program works against the data `subs.txt` redirects.
+
+**Fixed in the test area** (2026-11-09): the four were rebuilt with `INDEX … REPLACE DUPKEYS ISAM`,
+under a configuration without `include subs.txt` and the test area's own paths, as STEP 9 ran.
+All 31 ISAM key files now match their originals' type. `index.prc` lines 67, 193, 276 and 277 now
+carry `ISAM`.
+
+**Suggested fix to the step:** read each production key file's type along with its positions, and
+add `ISAM` to the `INDEX` line when it is 4.
+
+## 2026-11-09 — `brls -check -sema` passes a comparison BR will not load
+
+**Where:** `dev/tools/brls.exe` (`brls -version` for the build).
+
+**What is wrong:** `brls -check -sema` reports no error for
+
+```
+00010    let M$="B"
+00020    let P=12+(M$="B")
+```
+
+and BR 5.0's `LOAD … source` rejects line 20 with **error 1026, "invalid expression"**, reported at
+`line 0`, so nothing points at the line. Outside `IF`/`WHILE`/`UNTIL`, `=` is assignment, and a
+string assignment inside a numeric expression does not parse; the comparison is `==`
+(`12+(M$=="B")`), which is how QSMRP's own code writes it (`glp\fy_calcs`: `(METHOD$=="B")`).
+Found while writing `context\app\tests\fy_calcs.test.brs`. A one-line reproduction:
+`context\scratch\brtest\mini\m1.brs`. The two neighbouring forms tried at the same time load
+in BR and pass in brls, correctly: `if P<>1 or not P then …` and `fnX(B=0)` as an argument.

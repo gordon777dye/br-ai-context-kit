@@ -53,6 +53,13 @@ node_modules/
 !/dev/ai_access/brls.exe
 !/dev/ai_access/prc/
 !/dev/ai_access/prc/*.prc
+# the worked test examples BR_testing.md runs: program, procedure, script.
+# *.brs is ignored everywhere above, so these need their own exception.
+!/dev/ai_access/examples/
+/dev/ai_access/examples/*
+!/dev/ai_access/examples/*.prc
+!/dev/ai_access/examples/*.uis
+!/dev/ai_access/examples/*.brs
 # allow access to the folder
 !/dev/tools/
 # but block unspecified content

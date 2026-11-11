@@ -156,7 +156,11 @@ and `vcdlltest.exe` in its directory.
   `DEBUG AUTH` — `DEBUG AUTH` alone reports the mode; `COOKIE` is the default (a fresh token per session,
   in `%LOCALAPPDATA%\ADS\brdebug.token`); `TOKEN <64 hex>` supplies one for a debugger on another host;
   `OFF` restores the unencrypted, unauthenticated old behaviour and is logged as a security event. A
-  debugger built for an earlier release cannot attach until updated.
+  debugger built for an earlier release cannot attach until updated. The token file is one per
+  Windows account and is **locked from `DEBUG LISTEN` or `DEBUG CONNECT` until a debugger attaches**,
+  then deleted: no other session can delete or overwrite it while the channel waits, and another
+  session's `DEBUG LISTEN` or `DEBUG CONNECT` in that time fails with
+  [4176](../../90-reference/error-codes/4176.md).
   `DEBUG OBSERVE [port | OFF]` (default port 9556, loopback) accepts a read-only observer that receives a
   copy of what the debugger is sent. `DEBUG SCREENLOG <file>` logs every screen write, with the time to
   the millisecond, until `DEBUG SCREENLOG OFF`. `DEBUG LOG COMMANDS <file>` records every line a debugger

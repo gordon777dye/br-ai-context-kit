@@ -330,10 +330,10 @@ but there is **no `DLM$` function**) — or, as of **4.3**, a `MAT` of delimiter
 | <a id="msg$"></a>`MSG$("text")` | display text in the 2nd box of the command console |
 | <a id="msg"></a>`MSG(action$[,arg\|arg$…])` | twenty-five actions (Windows / Client-Server): `MSG("send",keys$)` types into **this session** — the keys go into BR's own buffer, so they reach no other window and need no focus — with special keys in pipes, e.g. `"|CTRL+|c|CTRL-|"`; `MSG("sleeptime",ms)` sets the delay between them in milliseconds. **`MSG("kb")` was removed in BR 5.0 and raises 0412.** Full action list: [70-commands/information/MSG.md](../../../70-commands/information/MSG.md) |
 | <a id="sleep"></a>`SLEEP(seconds)` | pause; fractional seconds, ms resolution (3.83h+) |
-| <a id="spawn_restricted"></a>`SPAWN_RESTRICTED(command$[,config$[,wait]])` | **BR 5.0.** Start a disposable **restricted** session on this WSID — the next free session number — running `command$` as its startup command, typically `PROC <file>`. `config$` defaults to this session's. No `wait` or `0` returns the new process id at once; a `wait` in seconds yields as `SLEEP` does and returns the session's **exit code**. See [SPAWN_RESTRICTED](SPAWN_RESTRICTED.md) for the errors and the ordering that makes the restriction hold |
+| <a id="spawn_restricted"></a>`SPAWN_RESTRICTED(command$[,config$[,wait[,label$]]])` | **BR 5.0.** Start a disposable **restricted** session on this WSID — the next free session number — running `command$` as its startup command, typically `PROC <file>`. `config$` defaults to this session's. No `wait` or `0` returns the new process id at once; a `wait` in seconds yields as `SLEEP` does and returns the session's **exit code**. `label$` says what the session is for, and opens its audit log. See [SPAWN_RESTRICTED](SPAWN_RESTRICTED.md) for the errors and the ordering that makes the restriction hold |
 | <a id="help$"></a>`HELP$([*]kw$[,mark\|anchor$])` | enter HELP mode / show a topic (see [windows-cursor §help](../../../20-io-screen/windows-cursor/spec.md#help-facility)). Two arguments at most. The second is a numeric `mark` for the `.wbh` help (OPTION 85 ON) or a string `anchor$` for the br_tree help (OPTION 85 OFF, the default); the compiler accepts either, and the one that does not suit OPTION 85 raises error 9505 when it runs |
 | <a id="program$"></a>`PROGRAM$` | full path of the loaded program — handy in shared error routines (see [information](../../../70-commands/information/spec.md#procin-program)) |
-| <a id="debug_str"></a>`DEBUG_STR(level,str$)` | write `str$` to the debug log at `level` (4.3+; see [information](../../../70-commands/information/spec.md#debug-str)) |
+| <a id="debug_str"></a>`DEBUG_STR(level,str$)` | write `str$` to the debug log at `level` (4.3+; see [information](../../../70-commands/information/spec.md#debug-str)). In a restricted session it is written as `Program note: <str$>`, on one line, at level 5 or above |
 | <a id="printer_list"></a>`PRINTER_LIST(MAT a$)` | redimensions `a$` to the active Windows printer names (see [information](../../../70-commands/information/spec.md#printer-list)) |
 | <a id="newpage"></a>`NEWPAGE` | a char that form-feeds the printer / clears the screen and **zeroes the line counter** (`LINES`/`KREC`); `PRINT #255: NEWPAGE` no longer emits a trailing CR — avoid it immediately before `TAB(x)` in an *unformatted* `PRINT` |
 | <a id="bell"></a>`BELL` / `TAB(x)` | sound the tone / tab to column `x` within a `PRINT` list |
@@ -349,20 +349,62 @@ but there is **no `DLM$` function**) — or, as of **4.3**, a `MAT` of delimiter
 | <a id="dll"></a>`DLL(a$,b$[,arg\|arg$…])` | call a client-side DLL command — **≥2 args, first two strings**; dispatched to the client via `callClientDictCommand` (errors 0322–0327) — see [00-configuration/installation-tooling](../../../00-configuration/installation-tooling/spec.md#dotnet) |
 
 <a id="msgbox"></a>
-### Message box (Windows)
+### Message box
 | Function | Returns |
 |---|---|
 | `MSGBOX(prompt$[,title$[,buttons$[,icon$]]])` | the chosen button, also in `CNT` |
 
-`MSGBOX` pops a Windows message box and **returns the chosen
-button in `CNT`** (and as the function value). Only `prompt$` is required. `buttons$` ∈
-`OK`(default)/`YN`/`OKC`/`YNC`, and the **capitalized** letter is the default (Enter) button (`Yn`→Yes,
-`yN`→No); `icon$` ∈ `INF`/`ERR`/`EXCL`/`QST`. Return values: `0` error (rare), `1` OK, `2` Yes, `3` No,
-`4` Cancel/Esc. Force a line break in the text with `CHR$(13)` or `HEX$("0D0A")` (two in a row = a blank
-line).
+`MSGBOX` shows the platform's own message box and **returns the chosen button in `CNT`** (and as
+the function value). Only `prompt$` is required. Force a line break in the text with `CHR$(13)` or
+`HEX$("0D0A")` (two in a row = a blank line).
 ```business-rules
 00060 IF MSGBOX('Are the labels aligned?','Check Printer','Yn','Qst')><2 THEN GOTO ALIGN
 ```
+
+<a id="msgbox-buttons"></a>
+**`buttons$`**, which is not case sensitive except for choosing the default button:
+
+| `buttons$` | Buttons, left to right | Default (Enter) button |
+|---|---|---|
+| `OK` (the default) | OK | OK |
+| `OKC` | OK, Cancel | OK |
+| `YN` | Yes, No | the capital letter: `Yn` Yes, `yN` No |
+| `YNC` | Yes, No, Cancel | the same as `YN` |
+| `YNAC` | Yes, No, All, Cancel | the capital letter: `ynaC` Cancel, `yNac` No, otherwise Yes. All cannot be the default |
+
+**`^` anywhere in `buttons$`** (`"YN^"`, `"^"` for OK) adds a **Don't ask again** checkbox. A
+ticked checkbox adds 10 to the answer.
+
+| Answer | Returns | With Don't ask again ticked |
+|---|---|---|
+| OK | `1` | `11` |
+| Yes | `2` | `12` |
+| No | `3` | `13` |
+| Cancel | `4` | `14` |
+| All | `5` | `15` |
+
+`0` is returned on an error (rare). A program that does not use `^` never sees a value over 5.
+
+**Escape and the close box** answer Cancel on a box that has a Cancel button, and OK on the `OK`
+box. A `YN` box has neither, so the operator must choose Yes or No.
+
+**Ctrl-A on the box is an interrupt, not an answer.** The box closes, the program halts with ATTN at
+the `MSGBOX` (an `ON ATTN` handler takes it as usual), and **`GO` runs the `MSGBOX` again**, showing
+the box anew.
+
+<a id="msgbox-icons"></a>
+**`icon$`**: the icon is the platform's own.
+
+| `icon$` | Windows shows | Use it for |
+|---|---|---|
+| `INF` (the default) | a blue circle with a white **i** | information |
+| `ERR` | a red circle with a white **X** | an error |
+| `EXCL` | a yellow triangle with a black **!** | a warning |
+| `QST` | **no icon** | a question |
+
+`QST` shows no icon on Windows because the Windows task dialog, which BR uses for message boxes, has
+none for questions; Microsoft's guidance is that routine questions carry no icon. Linux shows the
+desktop theme's information, error, warning and question icons for the four values.
 
 <a id="encryption"></a>
 ### Encryption (4.30+) — deep reference in [Encryption](Encryption.md)

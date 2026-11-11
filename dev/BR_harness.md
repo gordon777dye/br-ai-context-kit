@@ -121,6 +121,10 @@ Two things to do about it:
 The harness has a single event queue per connection, and `wait_for_event` *takes* an event
 rather than copying it. A second assistant is told `another assistant is already attached`.
 
+An assistant with a shell and no MCP connection reaches the same session one command at a time,
+with `read screen` and `send keys` ([`BR_testing.md` §5](BR_testing.md#live-shell)); those are
+refused while an MCP assistant is attached, for the same reason.
+
 ---
 
 <a id="starting"></a>
@@ -159,7 +163,7 @@ session and which you can neither raise nor extend.
 
 | Tool | Grant | What it answers |
 |---|---|---|
-| `read_view` | no | what is on the glass, row by row, each marked `LIVE` or `HISTORY`. Reports where the view sits **without moving it** when called with no offset |
+| `read_view` | no | what is on the glass, row by row, each marked `LIVE` or `HISTORY`, then BR's status line as a `STATUSLINE` record: an error that stopped the program is shown there and on no row. Reports where the view sits **without moving it** when called with no offset |
 | `controls` | no | every field, button and control: index, type, position, size, protected, which has input, and the scancode that presses it — **the index every other control tool uses** |
 | `grid` | no | the cells of a `GRID` (type 11), 200 rows a page |
 | `list` | no | the rows of a `LIST` (type 13) — a list box, or a dropped combo |
@@ -313,9 +317,10 @@ watching one run.
 <a id="typing"></a>
 ## 7. Typing into a screen
 
-Typing needs a grant. **A grant is permission, not delivery**: keys go in only while a program
-is waiting for input, and queue until one is — except in `DEVELOP` mode, where the console takes
-them at `READY` too. `pending` says how many of yours are still waiting, and a non-zero count is
+Typing needs a grant. **A grant is permission, not delivery**: keys go in only while a program is
+waiting for input, and queue until one is. At BR's command prompt - `READY`, an ATTN halt or an
+error - they queue too, unless the session opened its channel in `DEVELOP` mode, where a line typed
+there runs as a command, as the person's own would. `pending` says how many of yours are still waiting, and a non-zero count is
 the normal resting state, not a fault.
 
 - **`keys`** for printable text.
@@ -362,10 +367,12 @@ running program unless that program consented by setting `AI_TURN_OK` to `"Y"`; 
 set that flag nor ask for it. Inside a turn, `CLEAR PROC` **ends your turn** and comes back
 as `-1`.
 
-**In a `GUI OFF` session, a question put to the person goes into a modal message box, and a
-modal box stops BR's event loop and the harness channel with it.** Nothing you send will be
-read until somebody answers it. If the channel goes silent in a `GUI OFF` session, that is the
-first thing to suspect — not a crash.
+**A modal message box stops BR's event loop and the harness channel with it**, in `GUI OFF` and
+in `GUI ON`. In a `GUI OFF` session, a question BR puts to the person is such a box, and so is
+a program's own `MSGBOX` in either mode. Nothing you send will be read until somebody answers
+it. If the channel goes silent, a message box is the first thing to suspect, not a crash.
+*Measured under `GUI ON`*: a library's `MSGBOX` at startup left a request unanswered for its
+whole 10-second timeout.
 
 The 14 harness error numbers are in `guide`. The ones you will actually meet:
 

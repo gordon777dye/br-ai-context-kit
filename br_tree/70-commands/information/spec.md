@@ -85,7 +85,11 @@ Each of these commands lists its forms and options when given
 - **LOGGING** writes a level-filtered log (0 major-error … 5 minor-event … 9 debugging).
   <a id="debug-str"></a>**`DEBUG_STR(level, str$)`** (function, BR 4.3+) emits `str$` to the log
   (when `level` ≤ the active log level) and to the debugger, or to the command console if no
-  debugger is attached and GUI is ON (levels >10 clamp to 10).
+  debugger is attached and GUI is ON (levels >10 clamp to 10). **In a restricted session** it is
+  how a program says what it is in its audit log, and the line is marked as the program's: it reads
+  `Program note: <str$>`, control characters become spaces so it stays on one line, it is cut to
+  200 characters, and a `level` below 5 is logged at 5, so a note cannot pass for one of BR's own
+  entries or errors. See [LOGGING in a restricted session](../../00-configuration/config-directives/LOGGING.md#restricted-session).
 - <a id="status-verify"></a><a id="status"></a>**STATUS** (`ST`) reports system state by topic; with none, the
   general status (program, active procedures, …). Topics, any of which may be abbreviated:
   `ALL`, `ATTRIBUTES`, `BREAKPOINTS`, `BTREE_VERIFY`, `COLORS`, `CONFIG`, `DATABASE`,

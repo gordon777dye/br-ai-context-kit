@@ -127,7 +127,11 @@ Linux/MAC files be addressed with Windows-style names).
 | `WBCmd.wbh` | first `DRIVE` location |
 | `BRServer.dat` | `BRSERVER` config statement, else first `DRIVE` location |
 | `BRSerial.dat` / `WBTerm.out` | BR executable dir |
+| `brrestrict.sys` | BR executable dir only — read after `BRConfig.sys`; see [BRRESTRICT.SYS](BRRESTRICT.SYS.md) |
 | initial current directory | first `DRIVE` location |
+
+**`brrestrict.sys`**, when installed, limits every session to the folders and files it lists — see
+[BRRESTRICT.SYS](BRRESTRICT.SYS.md).
 
 <a id="appearance"></a>
 ### Screen appearance

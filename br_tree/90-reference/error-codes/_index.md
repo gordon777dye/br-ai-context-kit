@@ -436,7 +436,7 @@ _783 entries._
 | [4162](4162.md) | A process belonging to another user tried to reach the assistant channel |
 | [4163](4163.md) | No assistant connected to the channel in time and it has been closed |
 | [4164](4164.md) | This session is in user mode and cannot change to DEVELOP mode |
-| [4165](4165.md) | Restricted session: brrestrict.sys does not permit this file |
+| [4165](4165.md) | brrestrict.sys does not permit this file |
 | [4166](4166.md) | The assistant's own commands may not raise the keyboard grant - only the person at the session may |
 | [4167](4167.md) | The operator did not permit this operation for the assistant |
 | [4168](4168.md) | The session reached for the operating system while an assistant was attached |
@@ -444,8 +444,10 @@ _783 entries._
 | [4170](4170.md) | A line the assistant sent tried to set AI_TURN_OK |
 | [4171](4171.md) | A line the assistant sent used the AI command |
 | [4172](4172.md) | This OPTION may be set only in the configuration file, never with a CONFIG command |
+| [4173](4173.md) | Another session's assistant channel is waiting for its assistant; a channel can open once that one is claimed or closes |
 | [4174](4174.md) | Attempted file reservation on non-local file. |
 | [4175](4175.md) | Multiple WBServer.dat files |
+| [4176](4176.md) | Another session's debug channel is waiting for its debugger; a debug channel can open once that one is attached or closes |
 | [4177](4177.md) | DEPRECATED ERROR, as of 4.30: No command provided. Windows shell call without command |
 | [4179](4179.md) | Failed to lock in progress byte in WBServer.dat (formerly Share.exe not loaded) |
 | [4180](4180.md) | Drive start. Bad drive statement |
