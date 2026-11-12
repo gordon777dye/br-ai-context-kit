@@ -18,6 +18,8 @@
 # only the kit's templates; STEP 1's config backups here are app-private.
 # A new template needs its own line or it is silently ignored.
 /app/onboarding/*
+!/app/onboarding/legacy.sys
+!/app/onboarding/qsmrp-brls.cmd
 !/app/onboarding/context-kit-always-load.md
 !/app/onboarding/copilot-instructions.md
 

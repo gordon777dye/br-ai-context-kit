@@ -177,7 +177,7 @@ folder, so it loads the program from where the application keeps it, and the run
 files from the kit root:
 
 ```
-"$BR_MCP_DRIVER" uitest --start context\app\tests\trial_bal.prc context\app\tests\trial_bal.uis
+"$BR_MCP_DRIVER" uitest --start context\app\tests\trial_bal.prc context\app\tests\trial_bal.uis --config context\dev\tools\brconfig.ai_test
 ```
 
 Do not confuse the two folders: `context\app\test\` is the test **data** (onboarding STEP 9), and
@@ -260,7 +260,7 @@ answered from a script: `answer` fails with error 18, and `press BREAK` interrup
 `context\app\tests`, and run them all, each in a BR of its own:
 
 ```
-"$BR_MCP_DRIVER" uitest --suite --restore context\app\test
+"$BR_MCP_DRIVER" uitest --suite --restore context\app\test --config context\dev\tools\brconfig.ai_test
 ```
 
 Each test has 300 seconds unless `--timeout` says otherwise. The results, with each test's output
@@ -294,14 +294,21 @@ Four things an application's programs do that the kit's small examples don't, me
 **A program that ends by chaining to the menu never ends the session.** The menu waits for
 input, or for the login that a normal start sets up, so BR does not end and the run fails. Give
 the tests a configuration that turns that chain into a stub that ends the session:
-`brconfig.ai_test` in `context\dev\tools\` is `brconfig.ai_user` plus one line,
+`brconfig.ai_test` in `context\dev\tools\` is `brconfig.ai_user` plus what a scripted run needs:
 
 ```
 SUBSTITUTE menu/cnp context\app\tests\endtest
+PRINTDIR context\scratch\print +CHANNEL RAW
+SUBSTITUTE preview: DIRECT:
+SUBSTITUTE /select /default
 ```
 
-where `endtest` is a program of one statement, `execute "system"`. Name it with `--config`, or
-in `$BR_AI_USER` for the run. Like the other two AI configurations, regenerate it when
+The first line is the stub: `endtest` is a program of one statement, `execute "system"`. The rest
+send print to files a test can compare and never to a window it cannot answer: `PRINTDIR` keeps a
+copy of every print file, and the two `SUBSTITUTE`s turn print preview and the printer-selection
+dialog into plain printing. **Every test of the application's own programs names it with
+`--config`**, as the commands above do; a program that prints, run on `brconfig.ai_user`, stops at
+the dialog and the run hangs. Like the other two AI configurations, regenerate it when
 `brconfig.sys` changes.
 
 **Check the records, not only the screen.** `record customer key "CH620   BT"

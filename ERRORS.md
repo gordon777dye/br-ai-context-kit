@@ -47,3 +47,24 @@ string assignment inside a numeric expression does not parse; the comparison is 
 Found while writing `context\app\tests\fy_calcs.test.brs`. A one-line reproduction:
 `context\scratch\brtest\mini\m1.brs`. The two neighbouring forms tried at the same time load
 in BR and pass in brls, correctly: `if P<>1 or not P then …` and `fnX(B=0)` as an argument.
+
+## 2026-11-10 — `BR_testing.md` describes `brconfig.ai_test` as one line, and its app-test command omits it
+
+**Where:** [`dev/BR_testing.md`](dev/BR_testing.md) §4.2 ("`brconfig.ai_test` … is
+`brconfig.ai_user` plus one line") and §4, the command for an application's own test
+(`uitest --start context\app\tests\trial_bal.prc context\app\tests\trial_bal.uis`).
+
+**What is wrong:** `context/dev/tools/brconfig.ai_test` is `brconfig.ai_user` plus **four**
+directives: the `SUBSTITUTE menu/cnp` stub, and also `PRINTDIR context\scratch\print +CHANNEL RAW`,
+`SUBSTITUTE preview: DIRECT:` and `SUBSTITUTE /select /default`. The last three are what let a
+report test run at all: without them QSMRP's `Prn:/10`–`/60` classes go to print preview or a
+printer-selection dialog, which no script can answer, and `expect print` finds no capture.
+
+**Why it matters:** the §4 command for an app test gives no `--config`, so it runs on
+`$BR_AI_USER`. A model writing a report test from §4 and §4.3 adds `CONFIG PRINTDIR` to the
+procedure as §4.3 says, and the run still stops at the preview window. `context/app/tests/custlist`
+passes only because the suite is run with `--config context\dev\tools\brconfig.ai_test`
+(ONBOARDING STEP 10), which `BR_testing.md` never shows for a single test.
+
+**Suggested fix:** list all four lines in §4.2, and put `--config context\dev\tools\brconfig.ai_test`
+in every `context\app\tests\` command in `BR_testing.md`.
