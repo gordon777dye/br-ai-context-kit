@@ -25,7 +25,7 @@ rem
 rem ---- BR 5.01 ---------------------------------------------------------------
 option 51 on ! new records are added at the end; deleted records are not reused (5.01 default: reuse) - 5.01 notes 1.2
 option 22 on ! INDEX and OPEN KFNAME= create Btree indexes, not Btree2 - 5.01 notes 1.6
-rem   NOTE: OPTION 22 is reversed between releases. Before 5.01, OPTION 22 ON gave
+rem   NOTE: OPTION 22 IS REVERSED BETWEEN RELEASES. Before 5.01, OPTION 22 ON gave
 rem   Btree2; from 5.01 it gives Btree. A configuration shared with an earlier
 rem   release means opposite things to each.
 rem
