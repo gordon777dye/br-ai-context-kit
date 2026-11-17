@@ -77,3 +77,5 @@ node_modules/
 !/dev/tools/*.md
 !/dev/tools/*.json
 !/dev/tools/*.ps1
+!/dev/tools/*fileio*
+!/dev/tools/*screenio*

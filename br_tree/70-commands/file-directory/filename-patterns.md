@@ -170,7 +170,10 @@ in its first dot matches only names with no dot. A glob is taken as written:
   folders before the first pattern. `RENAME` and `COPY` to a name with `*` apply
   the `*` to each file's own name (`RENAME a{1,2}.txt *.bak`).
 - A pattern that matches nothing is error **4152**, file not found, as before.
-- Redirection (`> file`, `>> file`, `> A$`) works for the commands that had it.
+- Redirection (`> file`, `>> file`, `> A$`) works for the commands that had it. Into an array,
+  `>` and `>>` alike add elements for more lines. A longer line makes the elements longer when
+  the command is given at the console; under `EXECUTE` the program's `SOFLOW` setting decides
+  (grow, cut under `ON SOFLOW IGNORE`, else error 58).
 
 <a id="slash"></a>
 ## 2. `/` in a file name
@@ -223,13 +226,14 @@ name from the files that are there:
 | `STATUS` | `ST` | none | yes |
 | `DISPLAY` | `DIS` | none | yes |
 | `INDEX` | `I` | none | yes |
+| `BREAK` | `B` | none | yes |
 
 **The `>` column** is the output redirection. On these commands a word that
 begins with `>` or `>>` is a file name wherever it is on the line, and Tab
-completes the name written straight after the `>` or `>>`, leaving them in
-place: `DIR *.brs >li` becomes `DIR *.brs >list.txt`, `STATUS >>lo` becomes
-`STATUS >>log.txt`. These are the commands that read a redirection
-themselves. `GO` and `BREAK` refuse one, so Tab does not complete it there,
+completes the name written after the `>` or `>>`, straight after them or after
+blanks, leaving them in place: `DIR *.brs >li` becomes `DIR *.brs >list.txt`,
+`STATUS >> lo` becomes `STATUS >> log.txt`. These are the commands that read a redirection
+themselves. `GO` refuses one, so Tab does not complete it there,
 nor on `LOAD`, `SAVE` and the others with no mark in the column. A
 redirection to a string array of the running program (`> A$`) names no file,
 and Tab offers files only.

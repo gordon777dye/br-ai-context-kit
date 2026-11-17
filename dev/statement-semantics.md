@@ -1011,7 +1011,7 @@ Control-file specification types (in this order):
 **Semantics:**
 - **Control file, not inline** — `SORT` is driven by a `.SRT` control file of up to six spec types in a fixed order: `FILE` (required, first), `ALTS`, `RECORD`, `SUM`, `MASK` (required, last)
 - **Invoked from code** — `EXECUTE "SORT CUSTOMER.SRT"` runs it from a program; it also runs from READY or a PROC
-- **FILE** — input, output, and work paths; output style `R` (full records), `A` (address-out PD3, ≤99,999 recs) or `B` (address-out B4, ≤2.147 billion); native/alternate collating; plus `REPLACE` and a share-spec
+- **FILE** — eleven positional parameters, then keywords: `<in-name>,<in-path>,<in-drive>,<out-name>,<out-path>,<out-drive>,<work-name>,<work-path>,<work-drive>,<file-spec>,<collating>[,REPLACE][,<share>]`. Empty positions take defaults, but keep their commas. File-spec `R` (full records, default), `A` (address-out PD 3, ≤99,999 recs), `B` (address-out B 4, ≤2.147 billion), `3` (S/36 B 3, record number less one), `I` (index-out: an ISAM index of the input, keyed on the `MASK` fields, which must all be ascending). Collating `N`/`A` overrides the configuration's `COLLATE`; blank takes it. `REPLACE` overwrites an existing output file (otherwise it must be empty). Share `NOSHR`, `SHRI` (default) or `SHR`/`SHRU` applies to the input. One `FILE` per sort; a control file may hold several sorts. See br_tree `70-commands/sort#file`
 - **ALTS** — reorder or equate collating (e.g. make upper match lower, sort digits equal)
 - **RECORD** — include (`I`) / omit (`O`) records by a field's value range; chain with `AND`/`OR`
 - **MASK** — up to **10** sort fields, each `<pos>,<len>,<form>,{A|D}`; max total key length **32,767 bytes**; append `Y` for BASEYEAR Y2K dates

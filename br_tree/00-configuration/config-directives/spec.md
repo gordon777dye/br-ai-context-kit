@@ -42,12 +42,12 @@ SPOOLPATH [@[:][:]] <directory>
 SUBSTITUTE <from-string> { ',' | ' ' } { <to-string> | CLEAR }   -- see #substitute-matching
 WORKPATH <path> 
 ```
-- `DRIVE` maps a logical drive to physical paths (env variables allowed). 
+- <a id="drive"></a>`DRIVE` maps a logical drive to physical paths (env variables allowed). 
    Subsequent filename references beginning with `@:` target the client, a second colon 
   (`@::C:\path` or `@::.\path`) makes the client path drive-independent (client OS paths). 
   Server filenames that begin with a colon also become drive independent (the colon is dropped). 
-- `FILENAMES` controls the case of newly created files (+ case-insensitive `SEARCH` on  Linux/MAC). 
-- `INCLUDE` pulls in another config file (nestable to 10 levels; relative to the *parent* file in 
+- <a id="filenames"></a>`FILENAMES` controls the case of newly created files (+ case-insensitive `SEARCH` on  Linux/MAC). 
+- <a id="include"></a>`INCLUDE` pulls in another config file (nestable to 10 levels; relative to the *parent* file in 
   BRConfig.sys, but to the *current directory* when run as a `CONFIG` command; combine with 
   `%USER%` for per-user config).
 
@@ -86,9 +86,9 @@ To keep some paths out of a broad entry, rename them first and restore them last
 (`SUBSTITUTE st@nd@rd\ standard\`). Pick placeholder text that no real name contains. Probes:
 `context/scratch/step9/subprobe*.brs`; a worked scheme is in `context/app/ONBOARDING.md` STEP 9.5.
 
-<a id="spool-work"></a>**`SPOOLPATH`** sets where print spool files (and PDFs) are staged; it
+<a id="spoolpath"></a><a id="spool-work"></a>**`SPOOLPATH`** sets where print spool files (and PDFs) are staged; it
 defaults to a `SPOOL\` dir off the first `DRIVE`'s BR root and is auto-created. 
-**`WORKPATH` and `BRSERVER`** default to the BR root. 
+<a id="workpath"></a><a id="brserver"></a>**`WORKPATH` and `BRSERVER`** default to the BR root. 
 
 **`DRIVE` rules** — abstracts physical/network storage so applications stay portable (and lets
 Linux/MAC files be addressed with Windows-style names).
@@ -150,19 +150,19 @@ MIN_FONTSIZE <h>x<w>                                -- min console font in px; s
 SCREEN C [<attr-name>]                              -- command-console fg/bg colors
 SCREEN <type> [<attr-name>], …                      -- N/U/R/B/H base attributes
 ```
-  SCREEN has 3 variants: 1) define standard sigle character attributes, 2) define open #0 
+<a id="screen"></a>  SCREEN has 3 variants: 1) define standard sigle character attributes, 2) define open #0 
   (main console) default vaules, and 3) define command console attributes. 
-- **`APPLICATION_NAME`** is displayed at the top of the main (#0) application window. 
+- <a id="application_name"></a>**`APPLICATION_NAME`** is displayed at the top of the main (#0) application window. 
 - **`ATTRIBUTE`** defines named attributes/fonts referenced from
   [20-io-screen/fields-attributes](../../20-io-screen/fields-attributes/spec.md#subattributes).
   Attribute names may be up to **12 chars** (`[hilite_text]`), can carry a `font=name:slant:max`
   clause, and include help-screen colors `[HPROMPT]`/`[HTEXT]`/`[HLIGHTBAR]`/`[HMENU]`. 
-- **`COLOR`** assigns a six hex digit value to a name; Color aliases may also be asigned.
+- <a id="color"></a>**`COLOR`** assigns a six hex digit value to a name; Color aliases may also be asigned.
 - **`CORNERS`** sets two characters BR uses to build character based window/field-help borders.
-- **`DATAHILITE ON`** (Windows default) reverse-videos each input field as it is entered and parks the
+- <a id="datahilite"></a>**`DATAHILITE ON`** (Windows default) reverse-videos each input field as it is entered and parks the
   cursor at the end of the data; `CONFIG DATAHILITE OFF` instead applies the user's Windows
   *selected-text* colors. `OFF` disables the Windows style highlighting. 
-- `FILTER_DELIMITERS` When GRID and LIST are in use, a SEARCH or FILTER field can be specified. 
+- <a id="filter_delimiters"></a>`FILTER_DELIMITERS` When GRID and LIST are in use, a SEARCH or FILTER field can be specified. 
   Different types of searching can be performed, some of which are word oriented. Such searches use delimiters to identify words within text. The default delimiters are ` \"\\\t\r\n,.;:(){}[]!@#$%^&*-_=+/?|~<>`. FILTER_DELIMITERS supports specification of a replacement list of separator characters.
 - **`FONT`/`SCREEN OPENDFLT FONT=…`** set the GUI fonts (default = the user's Windows default): 
   
@@ -183,14 +183,14 @@ SCREEN <type> [<attr-name>], …                      -- N/U/R/B/H base attribut
   respecified. `STATUS FONTS` lists usable installed fonts; the legacy `FONTSIZE=99x99` works 
   only with `GUI OFF`. Full reference: [Font](Font.md).
 
-- **`FORCE VISIBILITY`** makes a newly opened GUI window copy in underlying labels/text 
+- <a id="force"></a>**`FORCE VISIBILITY`** makes a newly opened GUI window copy in underlying labels/text 
   Legacy console see-through emulation — not for new development; no effect on GRID/LISTVIEW; 
   `CLOSE FREE` does the reverse — copies the child window's labels/text/buttons, but not pictures, 
   back onto the parent. 
-- **`GUI ON`** uses true Windows objects; `GUI OFF` ("console mode") is fixed-font legacy
+- <a id="gui"></a>**`GUI ON`** uses true Windows objects; `GUI OFF` ("console mode") is fixed-font legacy
   compatibility (no grids/combos, PRINT scrolls). Programs may switch mid-run (`PRINT NEWPAGE` when
   toggling). 
-- **`MIN_FONTSIZE <h>x<w>`** sets the smallest GUI/command-console font in pixels; shrinking the 
+- <a id="min_fontsize"></a>**`MIN_FONTSIZE <h>x<w>`** sets the smallest GUI/command-console font in pixels; shrinking the 
   window below it shows **scroll bars** instead of further shrinking the font (default `0x0` = off; change takes effect on the next resize/restore/maximize). 
 - **`SCREEN C [<attr-name>]`** colors the command console — define an attribute then apply it, 
   e.g. `CONFIG ATTRIBUTE [CMD_CONSOLE]/#HRGB:R` then `CONFIG SCREEN C [CMD_CONSOLE]`. The full 
@@ -225,50 +225,50 @@ RD <0-15>                       -- numeric-comparison rounding tolerance (defaul
 SETENV <name> '<value>'         -- (CONFIG) simulate an OS env var for the session → ENV$()
 STYLE [INDENT <n> <n>] {KEYWORD|LABEL|EXPRESSION [MIXED|UPPER|LOWER]} ...
 ```
-- **`BASEYEAR`** underlies the [date functions](../../10-language/data-manipulation/system-functions/spec.md#date-functions):
+- <a id="baseyear"></a>**`BASEYEAR`** underlies the [date functions](../../10-language/data-manipulation/system-functions/spec.md#date-functions):
   a 2-digit year ≥ its last two digits takes `BASEYEAR`'s century, else the next (dates before
   `BASEYEAR` can't be entered M/D/Y; the logical `DAYS` value is unchanged).
-- **`BREAK <lines>`** sets how often (default 8 program lines) BR polls for `Ctrl-A`/`ON FKEY`.
-- **`CHAINDFLT O`** flips the  `CHAIN`/`LOAD` extension search to `.BRO`-first.
-- **`COLLATE NATIVE`** = ASCII order (digits<upper<lower); `COLLATE ALTERNATE` moves digits 
+- <a id="break"></a>**`BREAK <lines>`** sets how often (default 8 program lines) BR polls for `Ctrl-A`/`ON FKEY`.
+- <a id="chaindflt"></a>**`CHAINDFLT O`** flips the  `CHAIN`/`LOAD` extension search to `.BRO`-first.
+- <a id="collate"></a>**`COLLATE NATIVE`** = ASCII order (digits<upper<lower); `COLLATE ALTERNATE` moves digits 
   *above* letters (EBCDIC-like, for legacy logic) — affects [keyed](../../30-io-file/keys-indexes/spec.md)/SORT order. 
-- **`CONSOLE`** determines when the command console appears concurrently with the application window. 
+- <a id="console"></a>**`CONSOLE`** determines when the command console appears concurrently with the application window. 
   DATA_ONLY indicates diplay when not vacant.
-- **`DATABASE`** defines an SQL connection by `DSN=`, `CONNECTSTRING=`, or `ODBC-MANAGER`
+- <a id="database"></a>**`DATABASE`** defines an SQL connection by `DSN=`, `CONNECTSTRING=`, or `ODBC-MANAGER`
   (with `USER=` / `PASSWORD=`| encrypted `PASSWORDD=`).
 - **`DATAHILITE`** (default ON) use Windows current field highlighting
-- **`DECIMAL REQUIRED`** forces the operator to type the decimal point on fractional `N x.x` fields
+- <a id="decimal"></a>**`DECIMAL REQUIRED`** forces the operator to type the decimal point on fractional `N x.x` fields
   (default `ASSUMED` infers it).
-- **`EDITOR`** names the external program the [`EDIT` command](../../70-commands/editing/spec.md#edit) 
+- <a id="editor"></a>**`EDITOR`** names the external program the [`EDIT` command](../../70-commands/editing/spec.md#edit) 
   launches to edit `.brs`/`.wbs` editable source. `REMOVE` deletes the source workfile once editing completes;
   `NOWAIT` skips the Enter-to-merge wait. Source-capable editors include Notepad, Notepad++, PFE32,
   TextPad, MyEditBR, Source Edit, EditPad Pro, UltraEdit, JEdit, Crimson Editor, Epsilon, ConTEXT,
   WinHighlight, Editra, and Cursor.
-- **`EXECUTE`** specifies a command to be executed upon BR initialization.
-- **`FIELDBREAK`** splits an input field into sub-controls at n+ consecutive
+- <a id="execute"></a>**`EXECUTE`** specifies a command to be executed upon BR initialization.
+- <a id="fieldbreak"></a>**`FIELDBREAK`** splits an input field into sub-controls at n+ consecutive
   blanks (`, UNDERSCORE OFF` excludes underscores from whitespace count).
-- **`FLOWSTACK`/`FORSTACK`** size the GOSUB/function-return and FOR/NEXT stacks (both default **100**);
+- <a id="flowstack"></a><a id="forstack"></a>**`FLOWSTACK`/`FORSTACK`** size the GOSUB/function-return and FOR/NEXT stacks (both default **100**);
   The FOR stack counts loop variables by *name* — one slot per distinct variable no matter how many 
   `FOR` loops reuse it. Both are **BRConfig.sys-only — not valid as a `CONFIG` command; `STATUS STACKS` shows current settings. (`RPNSTACK`/`WORKSTACK` similarly size the expression and work stacks.)
-- **`HELPDFLT <keyword> <filename>`** sets the
+- <a id="helpdflt"></a>**`HELPDFLT <keyword> <filename>`** sets the
   default help topic and file shown when the **HELP key (Ctrl-Y)** is pressed during `RUN`/`INPUT` mode,
   and the default file for the [`HELP$`](../../10-language/data-manipulation/system-functions/spec.md)
   function (runtime-only; overridable via `CONFIG`). With no `HELPDFLT`, the HELP key does nothing
   outside INPUT mode (`ON HELP SYSTEM` behaves as `ON HELP IGNORE`) and `HELP$` requires an explicit
   filename; help files are searched current dir → base node of the first `DRIVE` → BR start dir.
-- `INSERT` sets overtype/insert persistence scope (default `ON PERSISTENT`; overridden 
+- <a id="insert"></a>`INSERT` sets overtype/insert persistence scope (default `ON PERSISTENT`; overridden 
   by `DATAHILITE`). Persistent means remember the last operator setting. `MIN_LENGTH` specifies a second setting for fields => specified length. NON_PESISTENT - reset upon field exit; SESSION_PERSISTENT - reset upon exiting Business Rules; PERSISTENT - keep operator setting across BR exits.
-- `KEYBOARD` builds keystroke macros from BR scancodes (`CON KEYBOARD [<scancode>] CLEAR` removes them); 
+- <a id="keyboard"></a>`KEYBOARD` builds keystroke macros from BR scancodes (`CON KEYBOARD [<scancode>] CLEAR` removes them); 
 - `LOGGING` filters by level 0 (major-error) … 15 (obnoxious detail); commands entered log at 8, `TRACE`/`DISPLAY` at 12, and console `PRINT` output is never logged; `UNATTENDED` runs headless and exits on input; 
   `+CONSOLE` echoes `DEBUG_STR` messages to the console (GUI ON; automatic at level ≥ 11). Full level table: [LOGGING](LOGGING.md).
-- `MAXRECALL` sizes F2 command recall (default 200). 
-- `MAX_SORT_MEMORY` default is 8 MB; range is 2 - 512 MB.
-- `PICTURE` Default `CACHE_ON` caches images by image filename.
+- <a id="maxrecall"></a>`MAXRECALL` sizes F2 command recall (default 200). 
+- <a id="max_sort_memory"></a>`MAX_SORT_MEMORY` default is 8 MB; range is 2 - 512 MB.
+- <a id="picture"></a>`PICTURE` Default `CACHE_ON` caches images by image filename.
 - `RD` sets how many decimal digits are significant in numeric `IF`/`FOR` comparisons, 
   `AIDX`/`DIDX`, `INT`/`IP`/`STR$`, SORT `RECORD`, and default `PRINT` (default 6; internal math is always 15-digits). Deep precision tables: [RD](RD.md).
 - **`SETENV`** simulates an OS environment variable for the rest of the BR session 
   so [`ENV$("<name>")`](../environment/spec.md) returns it, shadowing any real variable of that name for the session's duration. **Printer-init strings** may be up to **64 bytes**.
-- `STYLE` sets `LIST` formatting. The first number is indentation increment size; the second number is comment indentation position.
+- <a id="style"></a>`STYLE` sets `LIST` formatting. The first number is indentation increment size; the second number is comment indentation position.
 
 <a id="printer"></a>
 ### Printer & spooling

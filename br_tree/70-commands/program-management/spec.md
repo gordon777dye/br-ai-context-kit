@@ -52,6 +52,46 @@ A **command** executes immediately when typed (no line number) and manages the e
 Any statement can be run immediately as a command; a bare expression is an implied `PRINT`
 (`6+4`→`10`). Commands can't appear in a program **except** via `EXECUTE` or inside a `PROC`.
 
+<a id="print-redirect"></a>
+## `PRINT ... | > file` — console output to a file or array (BR 5.0)
+
+A `PRINT` given at the command line — typed at `READY`, in a procedure, or run by
+[`EXECUTE`](#execute) — can send what it would show on the console to a file or a string array:
+
+```bnf
+PRINT [<print-list>] | > { <file> | <array$> }     -- create or replace the file; empty the array
+PRINT [<print-list>] | >> { <file> | <array$> }    -- add to the end of the file or array
+```
+
+```
+PRINT MAT CUST$ | > cust.txt
+PRINT USING "form pos 3,c 10": NAME$ | >> names.txt
+PRINT MAT A | > LINES$
+```
+
+- **It is the console output that is redirected.** The lines are exactly what the console would
+  have shown, wrapped and zoned at the console's width as they would be there, and nothing goes to
+  the screen. `PRINT USING` is redirected the same way. A `PRINT #n:` writes to its file as usual;
+  it produces no console output, so its target is created or emptied and receives nothing.
+- **`|` comes after the whole print list**, and the target is the last thing on the line (a `!`
+  comment may follow it). Blanks between `|`, `>` and the name are optional: `|>out.txt` and
+  `| > out.txt` are the same.
+- **`<array$>`** is a one-dimensional string array of the program the command is given in, one
+  line to an element, as with `LIST > A$` and `DISPLAY ... > A$`. A name ending in `$` is always
+  an array: if the program has none by that name it is made, as `A$(1)` would make it, and starts
+  empty even with `>>`. A file whose name ends in `$` is written in quotes: `| > "A$"`.
+  It is redimensioned to the lines it holds. A line longer than its elements makes them that long
+  when the `PRINT` is given at the console; under `EXECUTE` the program's `SOFLOW` setting decides
+  (grow, cut under `ON SOFLOW IGNORE`, else error 58). Growing stops at `SOFLOW-GROW MAX=`. It is written when the `PRINT` is done, so a `PRINT`
+  may print the array it fills: `PRINT MAT A$ | >> A$` adds a copy of `A$` to its end.
+- **A line a `PRINT` leaves unfinished** (ending in `;` or `,`) is written without a line end.
+- The file is opened before the statement runs and closed when it ends, whether it ends normally
+  or with an error. An error opening it stops the statement before anything runs.
+- **Only on a command line.** In a numbered program line `|` is not an operator, and the line is a
+  syntax error. A single `|` is never an operator (`||` is OR), so nothing else is read
+  differently.
+- A missing name, or anything other than a comment after it, is error **1006**.
+
 <a id="command-help"></a>
 ## `-?` — what a command takes (BR 5.0)
 

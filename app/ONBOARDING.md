@@ -9,6 +9,38 @@ Please document any errors in ERRORS.md. This includes any inaccuracies *or ambi
 
 ---
 
+## Contents
+
+- [Prerequisite — the only thing YOU have to do](#prerequisite)
+- [Instructions to AI — the principle: add a layer, don't edit the language](#principle)
+- [Target shape when finished](#target-shape)
+- [Procedure](#procedure)
+  - [STEP 1 — BR launch entries](#step-1)
+  - [STEP 2 — Audit source currency](#step-2)
+  - [STEP 3 — Locate or create `filelay/`](#step-3)
+  - [STEP 4 — Data model](#step-4)
+  - [STEP 5 — Blessed exemplars](#step-5)
+  - [STEP 6 — Conventions sheet](#step-6)
+  - [STEP 7 — Architecture map](#step-7)
+  - [STEP 8 — Wire the app layer into the entry point](#step-8)
+  - [STEP 9 — Build a test data environment](#step-9)
+  - [STEP 10 — Build the application's test suite](#step-10)
+  - [STEP 11 — Survey brls vs real BR](#step-11)
+- [Done criteria](#done-criteria)
+- [The feedback loop (why this works)](#feedback-loop)
+- [Maintenance](#maintenance)
+- [Appendix A — the `filelay` file format](#appendix-a)
+  - [Anatomy](#filelay-anatomy)
+  - [Header lines](#filelay-header)
+  - [Divider](#filelay-divider)
+  - [Field definition lines](#filelay-fields)
+  - [Comments, blanks, and end-of-file](#filelay-comments)
+  - [Subscript numbers](#filelay-subscripts)
+  - [Conversion checklist (other dictionary → filelay)](#filelay-conversion)
+
+---
+
+<a id="prerequisite"></a>
 ## Prerequisite - The only thing YOU have to do
 
 **The user should place a copy** of the application's `brconfig.sys` into context/`dev/tools/`. The resulting 
@@ -26,6 +58,7 @@ best done by an AI model.
 
 ---
 
+<a id="principle"></a>
 ## Instructions to AI -The principle: add a layer, don't edit the language
 
 `context/` ships in three layers. **Only the third is app-specific; leave the other two alone.**
@@ -57,6 +90,7 @@ brevity as it ascends. (Language facts still ascend into `topics.json`; app fact
 
 ---
 
+<a id="target-shape"></a>
 ## Target shape when finished
 
 ```
@@ -84,6 +118,7 @@ language keyword router.
 
 ---
 
+<a id="procedure"></a>
 ## Procedure
 
 Do them in order. Each step's prerequisites come before it:
@@ -101,6 +136,7 @@ Do them in order. Each step's prerequisites come before it:
 The data model (STEP 4) and exemplars (STEP 5) deliver most of the value: correct file I/O and
 demonstrated style.
 
+<a id="step-1"></a>
 ### STEP 1 — BR launch entries (fully automated)
 Create 2 of the 4 files to be used by AI for application development.
 
@@ -281,6 +317,7 @@ either way) and STEP 6 below (record it in `conventions.md` if confirmed).
 
 When STEP 1 regenerates brconfig.ai_user and brconfig.ai_util from a changed brconfig.sys, append the include subs.txt line from step 9 to them again, and make brconfig.ai_test again from the new brconfig.ai_user (STEP 10).
 
+<a id="step-2"></a>
 ### STEP 2 — Audit source currency (`.brs` vs `.br` and `.wbs` vs `.wb` ) ◆ automated; no user decision
 Typically AI models have trouble with this one because they don't understand how BR DRIVE statements work. 
 Get familiar with the DRIVE statement, examine the first drive statement and thereby learn what 
@@ -324,6 +361,7 @@ If decompiling: After identifying a missing or stale .brs file refresh it by run
 
 Or put the LIST commands into a procedure (batch) file and execute it with "PROC <batch-file-pathname>". 
 
+<a id="step-3"></a>
 ### STEP 3 — Locate or create `filelay/` ◆ prerequisite for STEP 4
 STEP 4 does **not** inspect the app's actual data files to learn their layout. `extract-schema.exe`
 only parses the plain-text **`filelay/`** directory (described in Appendix A): one 
@@ -363,6 +401,7 @@ key composition of every field. If `filelay/`doesn't exist, STEP 4 has nothing t
    stop and report the discrepancy to the user. A solid `filelay/` folder is required to proceed. If
    the user tells you to ignore the discrepancy then do so.
 
+<a id="step-4"></a>
 ### STEP 4 — Data model (automated) ◆ highest ROI
 The LLM cannot write valid `OPEN` / `READ…USING` / `KEY=` without the real field layouts and key
 composition. This step is deterministic.
@@ -390,6 +429,7 @@ path STEP 3 found or created.
   list of problems otherwise).
 - **Re-run both** whenever `filelay/` changes — they are generated, never hand-edited.
 
+<a id="step-5"></a>
 ### STEP 5 — Blessed exemplars ◆ the real way style is learned
 An LLM learns style far better from a few gold-standard *real programs* than from prose about style.
 
@@ -402,6 +442,7 @@ An LLM learns style far better from a few gold-standard *real programs* than fro
 3. Choose files that are **minimal but complete** and genuinely typical — not the biggest or most
    clever. These are few-shot examples; their style is what the model will imitate.
 
+<a id="step-6"></a>
 ### STEP 6 — Conventions sheet (derived, not guessed)
 A 1–2 page `context/app/conventions.md` that **names** the rules the exemplars embody, so the model can
 apply them to code it hasn't seen.
@@ -418,11 +459,13 @@ apply them to code it hasn't seen.
 > library function names into a "standard API" list — that manufactures a surface the model will
 > call incorrectly. Teach usage by whole-file exemplar instead.
 
+<a id="step-7"></a>
 ### STEP 7 — Architecture map/res
 `context/app/architecture.md` — the directory taxonomy, entry points, and 2–3 **core data flows**
 (e.g. order → allocation → ship → EDI). Make them short, like a module table in 
 your AI agent's memory file (`CLAUDE.md` or `AGENTS.md`).
 
+<a id="step-8"></a>
 ### STEP 8 — Wire the app layer into the entry point and update either CLAUDE.md or AGENTS.md
 
 1. Go to the app root and run the /init command to be sure either 
@@ -437,6 +480,7 @@ your AI agent's memory file (`CLAUDE.md` or `AGENTS.md`).
 6. Advise the user that the first prompt after onboarding and restarting should be: 
   "Which documents did you read in full during initialization?"
 
+<a id="step-9"></a>
 ### STEP 9 — Build a test data environment ◆ optional on a developer's copy; required at a customer site
 
 **Ask the user first whether to build it.** It takes the longest of any step, and on a
@@ -688,6 +732,7 @@ the application reaching its programs or data. A file holding only `WORK` lines 
 [`dev/ai_access/AI-Restricted-Operations.md`](../dev/ai_access/AI-Restricted-Operations.md#work-trees).
 The file is the site administrator's: ask the user before writing it.
 
+<a id="step-10"></a>
 ### STEP 10 — Build the application's test suite ◆ needs the user to choose programs and check drafts
 
 This step gives the application tests of its own, in `context/app/tests/`, that one command runs
@@ -846,6 +891,7 @@ each test's whole output and a picture at each failure, are in `context\app\test
 Run it again after a change to a program, a library or the configuration; it is meant to be run
 often.
 
+<a id="step-11"></a>
 ### STEP 11 — Survey brls vs real BR ⏱ typically long-running (30–60 minutes)
 
 brls's own diagnostic rejections (which findings mean "BR will actually reject this") are calibrated
@@ -908,6 +954,7 @@ If the counts already match, no `ERRORS.md` entry is needed for this step.
 
 ---
 
+<a id="done-criteria"></a>
 ## Done criteria
 
 - [ ] `context/app/env.cmd`, `context/app/env.ps1` and `context/app/onboarding/setx.cmd` written (STEP 1). The user was
@@ -945,11 +992,13 @@ If the counts already match, no `ERRORS.md` entry is needed for this step.
       counts were compared, and any discrepancy is recorded in `context/ERRORS.md` (not silently
       fixed or ignored).
 
+<a id="feedback-loop"></a>
 ## The feedback loop (why this works)
 With STEP 4 (real schema) plus a compile pass in BR itself (`.brs` → `.br`), generated code is
 **verifiable**: it can be checked against the actual files and the grammar before it ships. "Style"
 then includes "compiles against our data model," not just "looks right."
 
+<a id="maintenance"></a>
 ## Maintenance
 - If a data file is added or its layout changes, update `filelay/` (STEP 3) first, then re-run STEP 4.
 - Re-run STEP 4 after any `filelay/` change.
@@ -961,6 +1010,7 @@ then includes "compiles against our data model," not just "looks right."
 
 ---
 
+<a id="appendix-a"></a>
 # Appendix A — the `filelay` file format
 
 STEP 4 consumes a **`filelay/`** directory: one plain-text layout file per data file, describing its
@@ -968,6 +1018,7 @@ keys and field record layout. If your application's data dictionary is in some o
 to this format and place the results in `filelay/`. This appendix is the complete spec.
 (Source: FileIO Library, `br_tree/50-libraries/fileio/`.)
 
+<a id="filelay-anatomy"></a>
 ## Anatomy
 
 Each layout file has three parts in order: a **header** (data file + keys + optional `recl`), a
@@ -992,12 +1043,13 @@ recl=127                                   ← optional record length (column 1)
 
  ! comment lines start with ! and are ignored anywhere
  COST,           Default Cost,                BH 3.2,              ,53 -  55, 2
- EFFDATE,        Effective Date,              BH 3,    Date(julian),56 -  58, 3
+ EFFDATE,        Effective Date,              BH 3,    Date(days)  ,56 -  58, 3
  DESCRIPTION$,   Description of Price Rule,   C 30,                ,59 -  88, 4 $
  #eof#                                         ← optional; everything after is ignored
  additional comments...
 ```
 
+<a id="filelay-header"></a>
 ## Header lines
 
 **Line 1 — `<data-file>, <PREFIX_>, <version>`**
@@ -1016,8 +1068,21 @@ recl=127                                   ← optional record length (column 1)
   - A single field → simple key.
   - Multiple fields joined by **`/`** → composite key, concatenated in the given order. FileIO derives
     the BR `KPS=`/`KLN=` (position/length) from the fields' positions, so order matters.
-  - Suffix **`-{U|B|P|Y}`** on a field name → that segment is **case-insensitive** (BR's `U` 
-    or `BY` key modifier). Example: VendorName(1:8)-U/FiscalYear-BY
+  - A suffix on a field name sets that segment's BR key modifier, which FileIO carries into `KLN=`:
+    - **`-U`** → the segment is **case-insensitive**: BR keeps it upper-cased in the index. The only
+      suffix that also changes the key FileIO builds for a read.
+    - **`-Y`** → the field starts with a **two-digit year**, which BR compares using `BASEYEAR`.
+    - **`-YB`** or **`-YP`** → the same, for a year stored as a number: **`B`** for a binary (`BH`)
+      field, **`P`** for packed decimal (`PD`). `B` and `P` are not suffixes on their own; they go
+      with `Y`. (BR accepts either alone, but all it does then is exempt the segment from the file's
+      `COLLATE` translation.) BR takes the date's format from the field's length: `PD 2` or `BH 1` is YY;
+      `PD 3` or `BH 2` is YYMM; `PD 4`, `BH 3`, `BH 4`, `DT 3`, `DT 4`, `DL 4` or `DH 4` is YYMMDD.
+    - BR reads these letters in any order and either case, so `-BY` and `-PY` are the same as `-YB`
+      and `-YP`; this app writes `-YB`.
+    - A `-Y` segment without `B` or `P` is a text date: it must hold digits, `/` or spaces, or BR
+      gives error 4120 ("invalid data for year 2000 key").
+    - Example: `VendorName(1:8)-U/FiscalYear-YB`. (Sources: `br_tree/30-io-file/keys-indexes/`,
+      `INDEX.md` and `Index_Facility.md`; BR's own source, `getkeyflags` and `process_key_flags`.)
   - Subscript name may be followed by `(<start>:<end>)` to denote a BR substring.
 - As many keys as you like; parsing stops at the first non-key header line.
 
@@ -1025,6 +1090,7 @@ recl=127                                   ← optional record length (column 1)
 computed from the field FORM specs. Start it in column 1, for the reason given under
 [Divider](#divider).
 
+<a id="filelay-divider"></a>
 ## Divider
 
 A line of `=` characters separates the header from the fields. The line itself is skipped, but it is
@@ -1040,6 +1106,7 @@ routine) test the first characters as they stand:
 every such layout on its `indented recl=/divider` output line so it can be fixed. An indented divider
 also gives `total fields: 0` and a `no-field-parse` entry.
 
+<a id="filelay-fields"></a>
 ## Field definition lines
 
 One line per field, in **on-disk order**. Comma-separated columns.
@@ -1050,11 +1117,12 @@ Note that only the first 3 columns are required.
 | 1 | **Subscript name** | Append `$` for string fields; nothing for numeric. Gets the header `PREFIX_` in code. Must be unique and stable (see versioning). |
 | 2 | **Description** | Human label; also DataCrawler column heading and ScreenIO default caption. Keep ≤ ~80 chars. |
 | 3 | **FORM spec** | A BR FORM type + size, e.g. `C 4`, `BH 3.2`, `PD 5`, `N 6`. Type **`X`** = filler: the field is ignored except that its length still advances the disk position of later fields. Full FORM type list: `br_tree/30-io-file/form-spec/`. |
-| 4 | **Disk date format** *(optional)* | `DATE(Julian)`, `DATE(cymd)`, `DATE(ymd)`, `DATE(mdy)`, etc. — marks the field as a date in that storage format (enables DataCrawler/ScreenIO/CSV date handling; your program still unpacks it). **Any col-4 text that isn't `DATE(...)` is treated as a comment and ignored.** **`Julian` here means a BR day number** — the value `DAYS()` returns — not an astronomical Julian day number and not a `YYDDD` ordinal date. `DATE(days)` means the same with this kit's FileIO, but ScreenIO recognizes only `Julian`, so use `DATE(Julian)` for any field a ScreenIO screen shows. `DATE(serial)` is **not** a day number here. Any other text inside `DATE(...)` is taken as a `DAYS()` mask. Details: [FileIO — Disk date formats](../br_tree/50-libraries/fileio/spec.md#disk-date-formats). |
+| 4 | **Disk date format** *(optional)* | `DATE(days)`, `DATE(cymd)`, `DATE(ymd)`, `DATE(mdy)`, etc. — marks the field as a date in that storage format (enables DataCrawler/ScreenIO/CSV date handling; your program still unpacks it). **Any col-4 text that isn't `DATE(...)` is treated as a comment and ignored.** The `DAYS()` specification refers to BR's DAYS() system function, which returns the number of days since December 31, 1899; not a `YYDDD` ordinal date. `DATE(days)` means the same with this kit's FileIO or Screenio. `DATE(serial)` is **not** a day number here. Any other text inside `DATE(...)` is taken as a `DAYS()` mask. Details: [FileIO — Disk date formats](../br_tree/50-libraries/fileio/spec.md#disk-date-formats). |
 | 5 | **Positions** *(recommended)* | `start - end`, the 1-based inclusive byte range of the field in the record, e.g. `13 - 49`. Documentation for humans and for cross-checking the FORM sizes; it is one of the "comments" columns the parser ignores. **Column 4 must be present (empty if the field is not a date) so this lands in column 5.** |
 | 6 | **Subscript** *(recommended)* | The subscript number FileIO assigns to the field on OPEN, followed by ` $` for a string field, e.g. `4 $` or `2` — see [Subscript numbers](#subscript-numbers). **Gap rows (`X`) have none.** Also documentation only. |
 | 7+ | **Comments** | Ignored. |
 
+<a id="filelay-comments"></a>
 ## Comments, blanks, and end-of-file
 
 - A line whose first non-space character is **`!`** is a comment — allowed anywhere, ignored.
@@ -1062,6 +1130,7 @@ Note that only the first 3 columns are required.
 - An optional **`#eof#`** line after the last field ends parsing; anything below it is ignored (free
   space for notes).
 
+<a id="filelay-subscripts"></a>
 ## Subscript numbers
 
 Column 6 records the subscript number FileIO assigns each named field when the file is OPENed, so
@@ -1084,6 +1153,7 @@ migrated to the FileIO subscript names.
   column carries the subscript numbers the existing code uses, not the FileIO-assigned ones, because
   its purpose is interpreting that code. Say so in such a file when you do this.
 
+<a id="filelay-conversion"></a>
 ## Conversion checklist (other dictionary → filelay)
 
 1. One file per data file, in a `filelay/` directory; header first.

@@ -35,11 +35,12 @@ single-stepping, breakpoints, variable display, and logging.
 ```bnf
 DATE [<mm-dd-yy>|<mm/dd/yy>]   TIME [<hh:mm:ss>]   -- DA/TI; show/set session date & time (this terminal)
 RUN [STEP] [TRACE] [NORESTORE|RESTORE]             -- step / trace execution (resume with GO → program-management)
-BREAK [-p <prog>] { <line>[:<clause>] | <label>: | <var> | FN<name> | BEGIN } [IF <cond>] [OFF]   -- ST mode triggers
+BREAK [-p <prog>] { <line>[:<clause>] | <label>: | <var> | FN<name> | BEGIN } [OFF | '>'['>'] { <file> | <array$> }] [IF <cond>]   -- ST mode triggers
 BREAK IF <cond> | BREAK IF OFF                      -- test <cond> after every line (5.0)
 BREAK FILE <name> [OPEN|CLOSE] [OFF]                -- stop when the file is opened or closed (5.0)
 BREAK ALL OFF                                       -- clear every breakpoint
-DISPLAY [-p <prog>] { <var> | MAT <array> | ALL } [IF <cond>] [OFF | PRINT | '>'['>'] <file>]
+DISPLAY [-p <prog>] { <var> | MAT <array> | ALL } [OFF | PRINT | '>'['>'] { <file> | <array$> }] [IF <cond>]
+                                                    -- IF <cond> is last on BREAK and DISPLAY: it takes the rest of the line
 DISPLAY FILE <name> [OPEN|CLOSE] [OFF] [PRINT]      -- report the file's OPENs and CLOSEs (5.0)
 LIST [<range>] [~]{ "<str>" | '<str>' }[…3x] [REPLACE "<new>"] [PRINT | '>'['>'] <file>]   -- search/replace
 LOGGING <level> ',' <logfile> [',' UNATTENDED] [',' +CONSOLE]
@@ -65,7 +66,13 @@ Each of these commands lists its forms and options when given
 - <a id="break"></a>**BREAK** drops a program into STEP mode when its target is hit: a `line`
   (must be an executable line — flow/assignment/I-O; not comments, `DATA`, or `DIM`), a `label:`,
   a changed `variable`/array/array-element (e.g. `BREAK CUSTOMER$(6)`, as of 4.16), a `FNname`, or
-  `BEGIN` (on entry). `BREAK var` also implies `DISPLAY var`. `OFF` clears one setting, `ALL OFF`
+  `BEGIN` (on entry). `BREAK var` also implies `DISPLAY var`. A redirection (`> file`,
+  `>> file`, `> A$`, as for [DISPLAY](#display)) does not change the break itself, but the line
+  that implied display shows for a changed variable goes there instead of the screen
+  (`BREAK TOTAL >> TRACE$`); with `OFF` it is refused (1006). **The redirection must come before
+  `IF`**: `IF` takes the rest of the command as its condition, so `BREAK TOTAL > T$ IF TOTAL>100`
+  works, while in `BREAK TOTAL IF TOTAL>100 > T$` the condition is `TOTAL>100 > T$`, which is not
+  a valid expression (error 1026 when the break is reached). `OFF` clears one setting, `ALL OFF`
   clears all; `-p <prog>` masks which program/libraries it applies to. **Conditional** breakpoints
   (BR 5.0): `IF <cond>` after a target stops only when the condition is true, and `BREAK IF <cond>`
   with no target tests it after every line (`BREAK IF OFF` ends that). Before 5.0 the way was a
@@ -74,7 +81,18 @@ Each of these commands lists its forms and options when given
 - <a id="display"></a>**DISPLAY** monitors variables as they change, printing
   `line  var  new-value`. It takes whole arrays (`DISPLAY MAT CUSTOMER$`) and single elements
   (`DISPLAY CUSTOMER$(5)`); `-p <prog>` masks programs; `OFF` stops it. `IF <cond>` (BR 5.0)
-  reports a change only when the condition is true, and takes a variable of its own. `DISPLAY FILE
+  reports a change only when the condition is true, and takes a variable of its own. **The
+  redirection must come before `IF`**, which takes the rest of the command as its condition:
+  `DISPLAY TOTAL > T$ IF TOTAL>100`, not `DISPLAY TOTAL IF TOTAL>100 > T$`.
+  `PRINT` sends the lines to the printer and `> file` to a file (`>>` adds to it). `> A$` sends
+  them into a one-dimensional string array of the program the command is given in, one line to
+  an element: `>` empties it first, `>>` keeps what it holds, and it is redimensioned as each
+  line is written. A line longer than the elements makes them all that long when the command was
+  given at the console; when an `EXECUTE` gave it, the program's `SOFLOW` setting at that time
+  decides (grow, cut under `ON SOFLOW IGNORE`, else error 58). Growing stops at
+  `SOFLOW-GROW MAX=`. A display does not watch the array it fills: `DISPLAY ALL > A$` leaves `A$`
+  out, and `DISPLAY MAT A$ > A$` (or an element of it) is refused (1006). If the program or the
+  array is gone when a line is written, the line goes to the screen. `DISPLAY FILE
   <name>` reports the file's OPENs and CLOSEs. In STEP/error mode, just typing a variable name prints
   its current value.
 - <a id="list-search"></a>**LIST "str"** searches the program (and `REPLACE "new"` replaces):

@@ -160,6 +160,7 @@ _783 entries._
 | [0754](0754.md) | Failed to process path information for the http server log file |
 | [0756](0756.md) | Failed to open the http server log file |
 | [0757](0757.md) | Http server failed to assign (via rename) specified filename |
+| [0758](0758.md) | HTTP URL_BASE= is not in BR's current folder or below it |
 | [0760](0760.md) | Picture does not exist |
 | [0762](0762.md) | Image spec had syntax errors. |
 | [0763](0763.md) | HTTP= must be SERVER or CLIENT |

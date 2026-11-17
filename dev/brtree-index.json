@@ -1,8 +1,8 @@
 {
-  "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; section_index maps each statement, READY command and system function to the spec section(s) (anchor) that cover it, each with a kind - command, function, statement or reference - saying what that section documents the word as; each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-11-10",
+  "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; section_index maps each statement, READY command and system function to the spec section(s) (anchor) that cover it, each with a kind - command, function, statement or reference - saying what that section documents the word as; config_index maps each configuration statement (BRConfig.sys, CONFIG) to where it is defined: a page of its own (file) or a section (anchor); each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
+  "generated": "2026-11-16",
   "source": "br_tree/",
-  "source_sha256": "d8a3922d8c85410379edc9ad204c213eaa2f84d8484a0bd0ff4720907787a6cf",
+  "source_sha256": "cee12585b7450bb28a6c86bbc437c933b8ee67a77c10b35ca5c907cce31dbf56",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -1605,7 +1605,7 @@
       {
         "spec": "00-configuration/config-directives",
         "anchor": "config",
-        "kind": "reference"
+        "kind": "command"
       }
     ],
     "CONTINUE": [
@@ -3286,6 +3286,588 @@
       "RELEASE"
     ]
   },
+  "config_index": {
+    "ANONYMOUS": [
+      {
+        "spec": "00-configuration/client-server",
+        "anchor": "config"
+      }
+    ],
+    "APPLICATION_NAME": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "application_name"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "appearance"
+      }
+    ],
+    "ATTRIBUTE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "file": "Attribute_(Config).md"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "appearance"
+      }
+    ],
+    "BACKWARD_COMPATIBILITY": [
+      {
+        "spec": "00-configuration/platform",
+        "file": "Backward_Compatibility.md"
+      }
+    ],
+    "BASEYEAR": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "baseyear"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "BR": [
+      {
+        "spec": "00-configuration/client-server",
+        "anchor": "config"
+      }
+    ],
+    "BREAK": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "break"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "BRSERVER": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "brserver"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "paths"
+      }
+    ],
+    "CAPTION": [
+      {
+        "spec": "00-configuration/client-server",
+        "anchor": "config"
+      }
+    ],
+    "CHAINDFLT": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "chaindflt"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "CLIENT_CURRENT_DIR": [
+      {
+        "spec": "00-configuration/environment",
+        "anchor": "client-current-dir"
+      },
+      {
+        "spec": "00-configuration/environment",
+        "anchor": "syntax"
+      }
+    ],
+    "CLIENT_SERVER": [
+      {
+        "spec": "00-configuration/client-server",
+        "anchor": "reconnect"
+      }
+    ],
+    "COLLATE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "collate"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "COLOR": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "color"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "appearance"
+      }
+    ],
+    "CONFIG": [
+      {
+        "spec": "00-configuration/client-server",
+        "anchor": "config"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "config"
+      }
+    ],
+    "CONSOLE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "console"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "CORNERS": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "appearance"
+      }
+    ],
+    "DATABASE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "database"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "DATAHILITE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "datahilite"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "appearance"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "DEBUGGER": [
+      {
+        "spec": "00-configuration/installation-tooling",
+        "file": "Debugger.md"
+      }
+    ],
+    "DECIMAL": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "decimal"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "DLL": [
+      {
+        "spec": "00-configuration/config-directives",
+        "file": "Dll.md"
+      }
+    ],
+    "DRIVE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "drive"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "paths"
+      }
+    ],
+    "EDITOR": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "editor"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      },
+      {
+        "spec": "00-configuration/installation-tooling",
+        "anchor": "editors"
+      }
+    ],
+    "EXECUTE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "execute"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "config"
+      }
+    ],
+    "FIELDBREAK": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "fieldbreak"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "FILENAMES": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "filenames"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "paths"
+      }
+    ],
+    "FILTER_DELIMITERS": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "filter_delimiters"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "appearance"
+      }
+    ],
+    "FLOWSTACK": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "flowstack"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "FONT": [
+      {
+        "spec": "00-configuration/config-directives",
+        "file": "Font.md"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "appearance"
+      }
+    ],
+    "FORCE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "force"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "appearance"
+      }
+    ],
+    "FORSTACK": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "forstack"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "GUI": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "gui"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "appearance"
+      }
+    ],
+    "HELPDFLT": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "helpdflt"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "INCLUDE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "include"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "paths"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "printer"
+      }
+    ],
+    "INSERT": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "insert"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "INVP": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "KEYBOARD": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "keyboard"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "LET": [
+      {
+        "spec": "00-configuration/environment",
+        "anchor": "syntax"
+      }
+    ],
+    "LEXI": [
+      {
+        "spec": "00-configuration/installation-tooling",
+        "file": "Lexi.md"
+      },
+      {
+        "spec": "00-configuration/installation-tooling",
+        "anchor": "lexi"
+      }
+    ],
+    "LOGGING": [
+      {
+        "spec": "00-configuration/config-directives",
+        "file": "LOGGING.md"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "LOGIN_NAME": [
+      {
+        "spec": "00-configuration/environment",
+        "anchor": "login_name"
+      },
+      {
+        "spec": "00-configuration/environment",
+        "anchor": "syntax"
+      }
+    ],
+    "MAXRECALL": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "maxrecall"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "MAX_SORT_MEMORY": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "max_sort_memory"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "MIN_FONTSIZE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "min_fontsize"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "appearance"
+      }
+    ],
+    "MULTISESSION": [
+      {
+        "spec": "00-configuration/client-server",
+        "anchor": "config"
+      }
+    ],
+    "ODBC": [
+      {
+        "spec": "00-configuration/installation-tooling",
+        "file": "ODBC.md"
+      },
+      {
+        "spec": "00-configuration/installation-tooling",
+        "anchor": "odbc"
+      }
+    ],
+    "OPTION": [
+      {
+        "spec": "00-configuration/config-directives",
+        "file": "OPTION_(Config).md"
+      }
+    ],
+    "PICTURE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "picture"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "PRINTDIR": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "printdir"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "paths"
+      }
+    ],
+    "PRINTER": [
+      {
+        "spec": "00-configuration/config-directives",
+        "file": "PRINTER.md"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "printer"
+      }
+    ],
+    "PROFILER": [
+      {
+        "spec": "00-configuration/installation-tooling",
+        "file": "Profiler.md"
+      }
+    ],
+    "PROFILER_FILE_LAYOUT": [
+      {
+        "spec": "00-configuration/installation-tooling",
+        "file": "Profiler_File_Layout.md"
+      }
+    ],
+    "RD": [
+      {
+        "spec": "00-configuration/config-directives",
+        "file": "RD.md"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "SCREEN": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "screen"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "appearance"
+      }
+    ],
+    "SETENV": [
+      {
+        "spec": "00-configuration/environment",
+        "anchor": "setenv"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      },
+      {
+        "spec": "00-configuration/environment",
+        "anchor": "syntax"
+      }
+    ],
+    "SPOOLCMD": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "printer"
+      }
+    ],
+    "SPOOLPATH": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "spoolpath"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "paths"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "printer"
+      }
+    ],
+    "STDERR": [
+      {
+        "spec": "00-configuration/client-server",
+        "anchor": "config"
+      }
+    ],
+    "STYLE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "style"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "SUBSTITUTE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "substitute"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "paths"
+      }
+    ],
+    "WORKPATH": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "workpath"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "paths"
+      }
+    ]
+  },
   "specs": [
     {
       "path": "00-configuration/client-server",
@@ -3355,12 +3937,45 @@
       "anchors": [
         "semantics",
         "paths",
+        "drive",
+        "filenames",
+        "include",
         "printdir",
         "substitute",
         "substitute-matching",
+        "spoolpath",
         "spool-work",
+        "workpath",
+        "brserver",
         "appearance",
+        "screen",
+        "application_name",
+        "color",
+        "datahilite",
+        "filter_delimiters",
+        "force",
+        "gui",
+        "min_fontsize",
         "behavior",
+        "baseyear",
+        "break",
+        "chaindflt",
+        "collate",
+        "console",
+        "database",
+        "decimal",
+        "editor",
+        "execute",
+        "fieldbreak",
+        "flowstack",
+        "forstack",
+        "helpdflt",
+        "insert",
+        "keyboard",
+        "maxrecall",
+        "max_sort_memory",
+        "picture",
+        "style",
         "printer",
         "config",
         "examples",
@@ -3392,6 +4007,7 @@
         "semantics",
         "env-substitution",
         "path-resolution",
+        "login_name",
         "setenv",
         "env-read",
         "client-current-dir",
@@ -5025,6 +5641,7 @@
       ],
       "anchors": [
         "command-vs-statement",
+        "print-redirect",
         "command-help",
         "entry-exit",
         "system",
@@ -5069,9 +5686,11 @@
       "anchors": [
         "sort",
         "syntax",
+        "control-file",
         "semantics",
         "sort-command",
         "file",
+        "index-out",
         "alts",
         "record",
         "mask",

@@ -113,7 +113,7 @@ DEBUG    [{ AUTH [{ COOKIE | TOKEN <word> | OFF }] | LISTEN [<int>] | OBSERVE [{
 DATE     [<word>]
 TIME     [<word>]
 RUN      [<word>] [PROC] [STEP] [TRACE] [NORESTORE] [RESTORE]
-BREAK    { ALL OFF | IF <text> | FILE <word> [{ OPEN | CLOSE }] [OFF] | ['-p' <word>] <word> [OFF] [IF <text>] }
+BREAK    { ALL OFF | IF <text> | FILE <word> [{ OPEN | CLOSE }] [OFF] | ['-p' <word>] <word> [{ OFF | <redirect> }] [IF <text>] }
 DISPLAY  { FILE <word> [{ OPEN | CLOSE }] [OFF] [PRINT] | ['-p' <word>] { ALL | MAT <word> | <word> } [{ OFF | <redirect> }] [IF <text>] }
 STATUS   [<status-topic>] [<text>]
 VERIFY
