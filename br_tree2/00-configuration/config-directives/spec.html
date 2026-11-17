@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BRConfig.sys directives — BR reference</title>
+<meta name="keywords" content="CONFIG, DRIVE, OPTION, DATABASE, SUBSTITUTE, STYLE, PRINTER, FONT, COLLATE, LOGGING, WORKPATH, PRINTDIR, SPOOLCMD, INCLUDE, SETENV, ATTRIBUTE, KEYBOARD, SCREEN, RD, STACKS">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+<nav class="crumbs"><a href="../../_index.html">BR reference</a> <span>/</span> <a href="../_index.html">00-configuration</a> <span>/</span> <a href="_index.html">config-directives</a></nav>
+<main>
+<h1 id="brconfigsys-directives">BRConfig.sys directives</h1>
+<p>The start-up configuration file (<code>BRConfig.sys</code>) — holds environmental settings read by
+BR at launch (800 chars/line). <strong>Configuration, not coding.</strong> BR loads it at start-up,
+falling back to the legacy<code>WBConfig.sys</code> if <code>BRConfig.sys</code> is absent. Lines containing
+errors are <strong>listed on screen at start-up and then ignored</strong> (their defaults apply) so a bad
+directive never halts start-up. Environment-variable handling is in
+<a href="../environment/spec.html">environment</a>; client-server settings in
+<a href="../client-server/spec.html">client-server</a>. Almost every directive can also be applied at runtime via
+the <a href="#config"><code>CONFIG</code> command</a> (and conditioned per-user with a leading <code>@&quot;login&quot;</code>). A <code>REM</code> line
+(or <code>!</code> after a space) is a comment.</p>
+<a id="semantics"></a>
+<h2 id="directives-by-area">Directives by area</h2>
+<a id="paths"></a>
+<h3 id="drives-files--paths">Drives, files &amp; paths</h3>
+<pre><code class="language-bnf">BRSERVER &lt;path&gt;
+DRIVE &lt;letter&gt;[:], &lt;server-path&gt;, [&lt;client-path&gt;], [&lt;subdir&gt;]
+FILENAMES {UPPER_CASE|LOWER_CASE|MIXED_CASE} [SEARCH]
+INCLUDE &lt;filename&gt;            -- nest up to 10 deep
+PRINTDIR &lt;path&gt; [+DATE][+TIME][+LOGIN_NAME][+CHANNEL][\LOGIN_NAME][RAW]
+SPOOLPATH [@[:][:]] &lt;directory&gt;   
+SUBSTITUTE &lt;from-string&gt; { ',' | ' ' } { &lt;to-string&gt; | CLEAR }   -- see #substitute-matching
+WORKPATH &lt;path&gt; 
+</code></pre>
+<ul>
+<li><a id="drive"></a><code>DRIVE</code> maps a logical drive to physical paths (env variables allowed).
+Subsequent filename references beginning with <code>@:</code> target the client, a second colon
+(<code>@::C:\path</code> or <code>@::.\path</code>) makes the client path drive-independent (client OS paths).
+Server filenames that begin with a colon also become drive independent (the colon is dropped).</li>
+<li><a id="filenames"></a><code>FILENAMES</code> controls the case of newly created files (+ case-insensitive <code>SEARCH</code> on  Linux/MAC).</li>
+<li><a id="include"></a><code>INCLUDE</code> pulls in another config file (nestable to 10 levels; relative to the <em>parent</em> file in
+BRConfig.sys, but to the <em>current directory</em> when run as a <code>CONFIG</code> command; combine with
+<code>%USER%</code> for per-user config).</li>
+</ul>
+<p><a id="printdir"></a><strong><code>PRINTDIR &lt;path&gt;</code></strong> (4.3+) drops a <strong>copy</strong> of every spooled print file into <code>&lt;path&gt;</code>,
+named <code>&lt;active-program&gt;.&lt;channel&gt;</code> (channel defaults to <strong>255</strong>). Each keyword is separate and must be
+space-separated: <code>+DATE</code>/<code>+TIME</code>/<code>+LOGIN_NAME</code> append to the output base filename; <code>+CHANNEL</code> replaces
+the <code>.prt</code> suffix with the OPEN channel number; <code>\LOGIN_NAME</code> files the copy under a per-user
+subdirectory of <code>&lt;path&gt;</code>; and <code>RAW</code> stores it <strong>untranslated</strong> so it can later be re-<code>TYPE</code>d to any
+destination with that device's own printer translation (e.g. <code>TYPE file PRINTER_TYPE=NWP &gt;disk</code> or
+<code>TYPE file &gt;DIRECT:/HP</code>). Also settable via <code>CONFIG</code>. (E.g. <code>OPEN #40: &quot;Name=PRN:/LASER2,Recl=133&quot;</code>
+in program <code>PRREG</code> archives a copy as <code>&lt;path&gt;\PRREG.40</code>.)</p>
+<p><a id="substitute"></a><strong><code>SUBSTITUTE &lt;from&gt;,&lt;to&gt;</code></strong> replaces all/part of any file or path name in
+commands and <code>OPEN</code> statements before execution — the core mechanism for redirecting <strong>printer
+classes</strong> (<code>PRN:/nn</code>) to real devices/files, mapping <code>COM1:</code>→<code>/dev/ttyXX</code>, etc.
+<code>SUBSTITUTE &lt;from&gt;,CLEAR</code> removes one entry; <code>CONFIG SUBSTITUTE CLEAR</code> clears all (except <code>[WSID]</code>).
+<code>STATUS SUBSTITUTE</code> lists active entries; <code>FILE$(n)</code> shows what a channel actually opened.</p>
+<p><a id="substitute-matching"></a><strong>How entries match</strong> (confirmed on 4.33c with <code>FILE$</code> and the
+LOGGING file):</p>
+<ul>
+<li><strong>The from-text matches anywhere in the name</strong>, not only at its start or at a folder boundary.
+With <code>SUBSTITUTE ard\ x\ard\</code>, <code>reports\standard\inv.docx</code> becomes <code>reports\standx\ard\inv.docx</code>.
+It also matches the start of a longer name: <code>SUBSTITUTE bcp\unibarf …</code> redirects
+<code>bcp\unibarfm.br</code> too. (The <code>PRN:</code> → <code>PRN:/11/12</code> trap in
+<a href="Multi-spooled_printers.html">Multi-spooled printers</a> is the same rule.)</li>
+<li><strong>Every matching entry is applied, in the order the entries were defined, each to the previous
+entry's output.</strong> With entries for <code>cod\</code> and then <code>his\</code>, <code>cod\his\x</code> gets both. An identity
+entry (<code>SUBSTITUTE standard\ standard\</code>) does not protect a name from a later entry.</li>
+<li><strong>Matching ignores case</strong>: <code>ARD\CUSTOMER</code> matches an <code>ard\</code> entry.</li>
+<li>The <code>name/dir</code> file form is matched like any other text: a <code>/ard</code> entry redirects <code>customer/ard</code>,
+and an <code>ard\</code> entry does not.</li>
+<li><code>&lt;from&gt;</code> and <code>&lt;to&gt;</code> may be separated by a space instead of the comma (<code>SUBSTITUTE ard\ x\ard\</code>).</li>
+</ul>
+<p>To keep some paths out of a broad entry, rename them first and restore them last: protect
+(<code>SUBSTITUTE standard\ st@nd@rd\</code>), then the redirects, then restore
+(<code>SUBSTITUTE st@nd@rd\ standard\</code>). Pick placeholder text that no real name contains. Probes:
+<code>context/scratch/step9/subprobe*.brs</code>; a worked scheme is in <code>context/app/ONBOARDING.md</code> STEP 9.5.</p>
+<p><a id="spoolpath"></a><a id="spool-work"></a><strong><code>SPOOLPATH</code></strong> sets where print spool files (and PDFs) are staged; it
+defaults to a <code>SPOOL\</code> dir off the first <code>DRIVE</code>'s BR root and is auto-created.
+<a id="workpath"></a><a id="brserver"></a><strong><code>WORKPATH</code> and <code>BRSERVER</code></strong> default to the BR root.</p>
+<p><strong><code>DRIVE</code> rules</strong> — abstracts physical/network storage so applications stay portable (and lets
+Linux/MAC files be addressed with Windows-style names).</p>
+<ul>
+<li>
+<p>Parameters: <code>&lt;letter&gt;</code> (A–Z, optional colon), <code>&lt;server-path&gt;</code> (OS full path; UNC <code>\\server\share</code>
+<strong>runs faster</strong> than a mapped letter), optional <code>&lt;client-path&gt;</code> (client working dir), optional
+<code>&lt;subdir&gt;</code> (an implied startup <code>CD</code>, preceded by <code>\</code>; case-sensitive). <strong>Four parameters are
+required</strong> — the 3rd may be null; a lone <code>\</code> in the 4th starts up in the 2nd-param OS directory.</p>
+</li>
+<li>
+<p>The <strong>first <code>DRIVE</code></strong> sets the initial current directory; <strong>at least one is required</strong>; <code>DRIVE</code> is
+valid <strong>only in BRConfig.sys</strong>, never the <code>CONFIG</code> command.</p>
+</li>
+<li>
+<p><strong>Drive-relative vs drive-absolute references</strong> — a filename that names a drive letter is resolved
+through that drive's mapping, and whether a backslash <em>immediately</em> follows the colon changes where
+it lands:</p>
+<ul>
+<li><strong><code>X:\path</code></strong> (leading <code>\</code>) — <strong>absolute</strong> from the drive's base, i.e. the 2nd parameter alone
+(the 4th-param startup <code>&lt;subdir&gt;</code> is <em>not</em> applied).</li>
+<li><strong><code>X:path</code></strong> (no leading <code>\</code>) — <strong>relative</strong> to the drive's <em>current directory</em>, which starts at
+base + the 4th-param <code>&lt;subdir&gt;</code> and then moves with <code>CD</code>.</li>
+</ul>
+<p>So whenever a <code>DRIVE</code> defines a startup <code>&lt;subdir&gt;</code> (or a <code>CD</code> has since run), <code>X:name</code> and <code>X:\name</code>
+point to <strong>different</strong> places — they coincide only when no subdir/CD is in effect. With
+<code>DRIVE M:,C:\ads,,\app</code>: <code>M:rpt\x</code> → <code>C:\ads\app\rpt\x</code>, but <code>M:\rpt\x</code> → <code>C:\ads\rpt\x</code>
+(a frequent source of &quot;file not found&quot; / error 4203 when a leading <code>\</code> is added out of habit).</p>
+</li>
+<li>
+<p>Undefined drives are assumed to be the root of that letter, but get <strong>no record/file locking</strong> and
+are not reported by <code>STATUS</code>; <code>PROTECT RESERVE</code> only works on DRIVE-defined drives.</p>
+</li>
+<li>
+<p>Case: the <code>&lt;server-path&gt;</code> is case-sensitive on Linux/Mac, insensitive on Windows; backslashes
+separate directories even on Linux, where program filenames are forced lowercase unless
+<a href="#paths"><code>FILENAMES</code></a> overrides.</p>
+</li>
+<li>
+<p><strong>Colon escape</strong> — pathnames in <em>other</em> BRConfig.sys statements are translated through preceding
+<code>DRIVE</code> definitions; prefix a path with <code>:</code> to use a literal OS path instead (the <code>:</code> is stripped).</p>
+</li>
+</ul>
+<p><strong>BR file-search order at startup / <code>OPEN</code>:</strong></p>
+<table>
+<thead>
+<tr>
+<th>file</th>
+<th>found via</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BR executable</td>
+<td>OS working/current dir when BR is invoked (treated as the executable dir)</td>
+</tr>
+<tr>
+<td><code>BRConfig.sys</code></td>
+<td>command-line parameter, else BR executable dir</td>
+</tr>
+<tr>
+<td><code>WBCmd.wbh</code></td>
+<td>first <code>DRIVE</code> location</td>
+</tr>
+<tr>
+<td><code>BRServer.dat</code></td>
+<td><code>BRSERVER</code> config statement, else first <code>DRIVE</code> location</td>
+</tr>
+<tr>
+<td><code>BRSerial.dat</code> / <code>WBTerm.out</code></td>
+<td>BR executable dir</td>
+</tr>
+<tr>
+<td><code>brrestrict.sys</code></td>
+<td>BR executable dir only — read after <code>BRConfig.sys</code>; see <a href="BRRESTRICT.SYS.html">BRRESTRICT.SYS</a></td>
+</tr>
+<tr>
+<td>initial current directory</td>
+<td>first <code>DRIVE</code> location</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>brrestrict.sys</code></strong>, when installed, limits every session to the folders and files it lists — see
+<a href="BRRESTRICT.SYS.html">BRRESTRICT.SYS</a>.</p>
+<a id="appearance"></a>
+<h3 id="screen-appearance">Screen appearance</h3>
+<pre><code class="language-bnf">APPLICATION_NAME &lt;name&gt;   
+ATTRIBUTE [&lt;name&gt;] &lt;attributes&gt; [&lt;defined-name&gt;]   -- reusable attribute combos ([E],[I],[M],[W],…)
+COLOR [&lt;label&gt;] &lt;#hex|name&gt;
+CORNERS &lt;top-left-char&gt; &lt;bottom-right-char&gt; 
+DATAHILITE {ON|OFF}
+FILTER_DELIMITERS &quot;&lt;chars&gt;&quot;
+FONT [ASPECT=n/d] [&lt;fontname&gt;] [3DFONT=&lt;fontname&gt;]
+SCREEN OPENDFLT FONT=…, FONT.TEXT=…, FONT.LABELS=…, FONT.BUTTONS=…
+FORCE VISIBILITY {ON|OFF}                           -- copy underlying labels/text into opened window
+GUI {ON|OFF}
+MIN_FONTSIZE &lt;h&gt;x&lt;w&gt;                                -- min console font in px; scroll bars when less
+SCREEN C [&lt;attr-name&gt;]                              -- command-console fg/bg colors
+SCREEN &lt;type&gt; [&lt;attr-name&gt;], …                      -- N/U/R/B/H base attributes
+</code></pre>
+<p><a id="screen"></a>  SCREEN has 3 variants: 1) define standard sigle character attributes, 2) define open #0
+(main console) default vaules, and 3) define command console attributes.</p>
+<ul>
+<li>
+<p><a id="application_name"></a><strong><code>APPLICATION_NAME</code></strong> is displayed at the top of the main (#0) application window.</p>
+</li>
+<li>
+<p><strong><code>ATTRIBUTE</code></strong> defines named attributes/fonts referenced from
+<a href="../../20-io-screen/fields-attributes/spec.html#subattributes">20-io-screen/fields-attributes</a>.
+Attribute names may be up to <strong>12 chars</strong> (<code>[hilite_text]</code>), can carry a <code>font=name:slant:max</code>
+clause, and include help-screen colors <code>[HPROMPT]</code>/<code>[HTEXT]</code>/<code>[HLIGHTBAR]</code>/<code>[HMENU]</code>.</p>
+</li>
+<li>
+<p><a id="color"></a><strong><code>COLOR</code></strong> assigns a six hex digit value to a name; Color aliases may also be asigned.</p>
+</li>
+<li>
+<p><strong><code>CORNERS</code></strong> sets two characters BR uses to build character based window/field-help borders.</p>
+</li>
+<li>
+<p><a id="datahilite"></a><strong><code>DATAHILITE ON</code></strong> (Windows default) reverse-videos each input field as it is entered and parks the
+cursor at the end of the data; <code>CONFIG DATAHILITE OFF</code> instead applies the user's Windows
+<em>selected-text</em> colors. <code>OFF</code> disables the Windows style highlighting.</p>
+</li>
+<li>
+<p><a id="filter_delimiters"></a><code>FILTER_DELIMITERS</code> When GRID and LIST are in use, a SEARCH or FILTER field can be specified.
+Different types of searching can be performed, some of which are word oriented. Such searches use delimiters to identify words within text. The default delimiters are <code> \&quot;\\\t\r\n,.;:(){}[]!@#$%^&amp;*-_=+/?|~&lt;&gt;</code>. FILTER_DELIMITERS supports specification of a replacement list of separator characters.</p>
+</li>
+<li>
+<p><strong><code>FONT</code>/<code>SCREEN OPENDFLT FONT=…</code></strong> set the GUI fonts (default = the user's Windows default):</p>
+<p><code>FONT fontname 3DFONT=fontname</code> runs two fonts at once (background/captions vs input
+fields).</p>
+<p><code>SCREEN OPENDFLT FONT=, FONT.TEXT=, FONT.LABELS=, FONT.BUTTONS=</code> set separate
+fonts for text/labels/buttons, and these are the OPEN #0 defaults that child windows (and controls)
+inherit.</p>
+<p>A font spec may carry colon separated qualifiers — <strong>family</strong> (Decor/Roman/Script/Swiss/Modern),
+<strong>boldness</strong>  (Light/Bold), <strong>style</strong> (Ital/Slant), <strong>underline</strong> (Under), <strong>size</strong>
+(Small/Medium/Large/Max, by height) — and a  width-fit qualifier (<code>Width</code>/<code>Width+</code>/<code>Width-</code>/<code>NoWidth</code>)
+that shrinks text to fit the field, e.g. <code>FONT.LABELS=Terminal:bold:slant</code>.</p>
+<p>Window reopen- Font <em>size</em> is <strong>not</strong> reset by opening a window (so user resizing  sticks);
+typeface/family changes in an <code>OPEN</code> revert boldness/style/underline to defaults unless
+respecified. <code>STATUS FONTS</code> lists usable installed fonts; the legacy <code>FONTSIZE=99x99</code> works
+only with <code>GUI OFF</code>. Full reference: <a href="Font.html">Font</a>.</p>
+</li>
+<li>
+<p><a id="force"></a><strong><code>FORCE VISIBILITY</code></strong> makes a newly opened GUI window copy in underlying labels/text
+Legacy console see-through emulation — not for new development; no effect on GRID/LISTVIEW;
+<code>CLOSE FREE</code> does the reverse — copies the child window's labels/text/buttons, but not pictures,
+back onto the parent.</p>
+</li>
+<li>
+<p><a id="gui"></a><strong><code>GUI ON</code></strong> uses true Windows objects; <code>GUI OFF</code> (&quot;console mode&quot;) is fixed-font legacy
+compatibility (no grids/combos, PRINT scrolls). Programs may switch mid-run (<code>PRINT NEWPAGE</code> when
+toggling).</p>
+</li>
+<li>
+<p><a id="min_fontsize"></a><strong><code>MIN_FONTSIZE &lt;h&gt;x&lt;w&gt;</code></strong> sets the smallest GUI/command-console font in pixels; shrinking the
+window below it shows <strong>scroll bars</strong> instead of further shrinking the font (default <code>0x0</code> = off; change takes effect on the next resize/restore/maximize).</p>
+</li>
+<li>
+<p><strong><code>SCREEN C [&lt;attr-name&gt;]</code></strong> colors the command console — define an attribute then apply it,
+e.g. <code>CONFIG ATTRIBUTE [CMD_CONSOLE]/#HRGB:R</code> then <code>CONFIG SCREEN C [CMD_CONSOLE]</code>. The full
+attribute/help-color reference is retained: <a href="Attribute_(Config).html">Attribute_(Config)</a>.</p>
+</li>
+<li>
+<p><strong><code>SCREEN</code></strong> statements may reference them (<code>SCREEN N [normal]</code>). <code>W</code> in an attribute = current Windows color.</p>
+</li>
+</ul>
+<a id="behavior"></a>
+<h3 id="language--io-behavior">Language &amp; I/O behavior</h3>
+<pre><code class="language-bnf">BASEYEAR &lt;year&gt;                 -- 100-year window for DAYS (1900-2399; default 1900)
+BREAK &lt;lines&gt;   
+CHAINDFLT O                     -- letter O - search .BRO before .BR for CHAIN/LOAD
+COLLATE {NATIVE|ALTERNATE}      
+CONSOLE {ON|OFF|DATA_ONLY}
+DATABASE &lt;db-ref&gt; { DSN=… | CONNECTSTRING=&quot;…&quot; | ODBC-MANAGER } [,USER=…] [{,PASSWORD=… | PASSWORDD=…}]
+DATAHILITE {ON|OFF}
+DECIMAL {ASSUMED|REQUIRED} 
+EDITOR &quot;&lt;path&gt;&quot; [REMOVE] [NOWAIT]   
+EXECUTE &quot;&lt;command&gt;&quot;
+FIELDBREAK MIN_SPACES &lt;n&gt; [, UNDERSCORE OFF]
+FLOWSTACK &lt;size&gt;   
+FORSTACK &lt;size&gt;   
+HELPDFLT &lt;keyword&gt; &lt;filename&gt;
+INSERT {ON|OFF} [MIN_LENGTH &lt;0-99&gt; | NON_PERSISTENT | SESSION_PERSISTENT | PERSISTENT]
+INVP   -- (European comma/period swap)
+KEYBOARD &lt;scancode&gt;,&lt;sequence&gt;  
+LOGGING &lt;max-level&gt;, &lt;logfile&gt; [, UNATTENDED] [, DEBUG_LOG_LEVEL=&lt;n&gt;] [, +CONSOLE]
+MAXRECALL &lt;1-300&gt;    
+MAX_SORT_MEMORY &lt;n&gt; MB
+PICTURE {CACHE_ON|CACHE_OFF}    
+RD &lt;0-15&gt;                       -- numeric-comparison rounding tolerance (default 6)
+SETENV &lt;name&gt; '&lt;value&gt;'         -- (CONFIG) simulate an OS env var for the session → ENV$()
+STYLE [INDENT &lt;n&gt; &lt;n&gt;] {KEYWORD|LABEL|EXPRESSION [MIXED|UPPER|LOWER]} ...
+</code></pre>
+<ul>
+<li><a id="baseyear"></a><strong><code>BASEYEAR</code></strong> underlies the <a href="../../10-language/data-manipulation/system-functions/spec.html#date-functions">date functions</a>:
+a 2-digit year ≥ its last two digits takes <code>BASEYEAR</code>'s century, else the next (dates before
+<code>BASEYEAR</code> can't be entered M/D/Y; the logical <code>DAYS</code> value is unchanged).</li>
+<li><a id="break"></a><strong><code>BREAK &lt;lines&gt;</code></strong> sets how often (default 8 program lines) BR polls for <code>Ctrl-A</code>/<code>ON FKEY</code>.</li>
+<li><a id="chaindflt"></a><strong><code>CHAINDFLT O</code></strong> flips the  <code>CHAIN</code>/<code>LOAD</code> extension search to <code>.BRO</code>-first.</li>
+<li><a id="collate"></a><strong><code>COLLATE NATIVE</code></strong> = ASCII order (digits&lt;upper&lt;lower); <code>COLLATE ALTERNATE</code> moves digits
+<em>above</em> letters (EBCDIC-like, for legacy logic) — affects <a href="../../30-io-file/keys-indexes/spec.html">keyed</a>/SORT order.</li>
+<li><a id="console"></a><strong><code>CONSOLE</code></strong> determines when the command console appears concurrently with the application window.
+DATA_ONLY indicates diplay when not vacant.</li>
+<li><a id="database"></a><strong><code>DATABASE</code></strong> defines an SQL connection by <code>DSN=</code>, <code>CONNECTSTRING=</code>, or <code>ODBC-MANAGER</code>
+(with <code>USER=</code> / <code>PASSWORD=</code>| encrypted <code>PASSWORDD=</code>).</li>
+<li><strong><code>DATAHILITE</code></strong> (default ON) use Windows current field highlighting</li>
+<li><a id="decimal"></a><strong><code>DECIMAL REQUIRED</code></strong> forces the operator to type the decimal point on fractional <code>N x.x</code> fields
+(default <code>ASSUMED</code> infers it).</li>
+<li><a id="editor"></a><strong><code>EDITOR</code></strong> names the external program the <a href="../../70-commands/editing/spec.html#edit"><code>EDIT</code> command</a>
+launches to edit <code>.brs</code>/<code>.wbs</code> editable source. <code>REMOVE</code> deletes the source workfile once editing completes;
+<code>NOWAIT</code> skips the Enter-to-merge wait. Source-capable editors include Notepad, Notepad++, PFE32,
+TextPad, MyEditBR, Source Edit, EditPad Pro, UltraEdit, JEdit, Crimson Editor, Epsilon, ConTEXT,
+WinHighlight, Editra, and Cursor.</li>
+<li><a id="execute"></a><strong><code>EXECUTE</code></strong> specifies a command to be executed upon BR initialization.</li>
+<li><a id="fieldbreak"></a><strong><code>FIELDBREAK</code></strong> splits an input field into sub-controls at n+ consecutive
+blanks (<code>, UNDERSCORE OFF</code> excludes underscores from whitespace count).</li>
+<li><a id="flowstack"></a><a id="forstack"></a><strong><code>FLOWSTACK</code>/<code>FORSTACK</code></strong> size the GOSUB/function-return and FOR/NEXT stacks (both default <strong>100</strong>);
+The FOR stack counts loop variables by <em>name</em> — one slot per distinct variable no matter how many
+<code>FOR</code> loops reuse it. Both are **BRConfig.sys-only — not valid as a <code>CONFIG</code> command; <code>STATUS STACKS</code> shows current settings. (<code>RPNSTACK</code>/<code>WORKSTACK</code> similarly size the expression and work stacks.)</li>
+<li><a id="helpdflt"></a><strong><code>HELPDFLT &lt;keyword&gt; &lt;filename&gt;</code></strong> sets the
+default help topic and file shown when the <strong>HELP key (Ctrl-Y)</strong> is pressed during <code>RUN</code>/<code>INPUT</code> mode,
+and the default file for the <a href="../../10-language/data-manipulation/system-functions/spec.html"><code>HELP$</code></a>
+function (runtime-only; overridable via <code>CONFIG</code>). With no <code>HELPDFLT</code>, the HELP key does nothing
+outside INPUT mode (<code>ON HELP SYSTEM</code> behaves as <code>ON HELP IGNORE</code>) and <code>HELP$</code> requires an explicit
+filename; help files are searched current dir → base node of the first <code>DRIVE</code> → BR start dir.</li>
+<li><a id="insert"></a><code>INSERT</code> sets overtype/insert persistence scope (default <code>ON PERSISTENT</code>; overridden
+by <code>DATAHILITE</code>). Persistent means remember the last operator setting. <code>MIN_LENGTH</code> specifies a second setting for fields =&gt; specified length. NON_PESISTENT - reset upon field exit; SESSION_PERSISTENT - reset upon exiting Business Rules; PERSISTENT - keep operator setting across BR exits.</li>
+<li><a id="keyboard"></a><code>KEYBOARD</code> builds keystroke macros from BR scancodes (<code>CON KEYBOARD [&lt;scancode&gt;] CLEAR</code> removes them);</li>
+<li><code>LOGGING</code> filters by level 0 (major-error) … 15 (obnoxious detail); commands entered log at 8, <code>TRACE</code>/<code>DISPLAY</code> at 12, and console <code>PRINT</code> output is never logged; <code>UNATTENDED</code> runs headless and exits on input;
+<code>+CONSOLE</code> echoes <code>DEBUG_STR</code> messages to the console (GUI ON; automatic at level ≥ 11). Full level table: <a href="LOGGING.html">LOGGING</a>.</li>
+<li><a id="maxrecall"></a><code>MAXRECALL</code> sizes F2 command recall (default 200).</li>
+<li><a id="max_sort_memory"></a><code>MAX_SORT_MEMORY</code> default is 8 MB; range is 2 - 512 MB.</li>
+<li><a id="picture"></a><code>PICTURE</code> Default <code>CACHE_ON</code> caches images by image filename.</li>
+<li><code>RD</code> sets how many decimal digits are significant in numeric <code>IF</code>/<code>FOR</code> comparisons,
+<code>AIDX</code>/<code>DIDX</code>, <code>INT</code>/<code>IP</code>/<code>STR$</code>, SORT <code>RECORD</code>, and default <code>PRINT</code> (default 6; internal math is always 15-digits). Deep precision tables: <a href="RD.html">RD</a>.</li>
+<li><strong><code>SETENV</code></strong> simulates an OS environment variable for the rest of the BR session
+so <a href="../environment/spec.html"><code>ENV$(&quot;&lt;name&gt;&quot;)</code></a> returns it, shadowing any real variable of that name for the session's duration. <strong>Printer-init strings</strong> may be up to <strong>64 bytes</strong>.</li>
+<li><a id="style"></a><code>STYLE</code> sets <code>LIST</code> formatting. The first number is indentation increment size; the second number is comment indentation position.</li>
+</ul>
+<a id="printer"></a>
+<h3 id="printer--spooling">Printer &amp; spooling</h3>
+<pre><code class="language-bnf">PRINTER [&lt;type&gt;] INIT [HP] [LPP &lt;n&gt;], &quot;&lt;escape&gt;&quot; 
+PRINTER [&lt;type&gt;] RESET, &quot;&lt;init&gt;&quot;
+PRINTER [&lt;type&gt;] [&lt;mode&gt;], &quot;&lt;escape&gt;&quot;
+PRINTER TYPE &lt;type&gt; SELECT &lt;substring&gt;
+SPOOLCMD [@] [-w] &lt;command&gt; [SPOOLFILE] [COPIES] [PRINTQUEUE]
+SPOOLPATH [@:] &lt;directory&gt;
+&lt;escape&gt; ::= { &lt;hex-value-string&gt; | &quot;&lt;char-string&gt;&quot; }
+INCLUDE PRINTER.SYS
+</code></pre>
+<p>Configures printer escape sequences and spooling (the <code>@</code>/<code>@:</code> forms target the client in
+client-server).
+<code>INIT</code> indicates that the succeeding <escape> value should be sent whenever the specified printer is opened.
+<code>PRINTER xxx INIT HP &lt;hex-values&gt;</code> prepends laser keywords legacy codes.
+<code>PRINTER TYPE</code> assigns a printer type to a specific printer; <substring> is a case sensitive OS printer name substring.
+<strong><code>PRINTER.SYS</code></strong> is a shareable BRConfig.sys of named PCL/NWP mode substitutions (<code>[LANDSCAPE]</code>, <code>[LETTER]</code>, <code>[BOLD]</code>, <code>[BOX]</code>, <code>[FONT]</code>, <code>[COLOR]</code>, <code>[PICTURE]</code>…) — the full catalog is the retained <a href="PRINTER.SYS.html">PRINTER.SYS</a> reference. The printer <em>statements</em> are in <a href="../../40-io-printing/statements/spec.html">40-io-printing/statements</a>.
+Standard escape codes are in <a href="../../40-io-printing/pcl-pdf/spec.html">40-io-printing/pcl-pdf</a>.</p>
+<a id="config"></a>
+<h2 id="applying--overriding--the-config-command">Applying &amp; overriding — the <code>CONFIG</code> command</h2>
+<p>Most directives can be changed after launch, without editing BRConfig.sys:</p>
+<pre><code class="language-bnf">CONFIG &lt;keyword&gt; &lt;spec&gt;                 -- as a command (CON); STATUS CONFIG lists current settings
+EXECUTE &quot;CONFIG &lt;keyword&gt; &lt;spec&gt;&quot;       -- the same, from program code
+</code></pre>
+<p><code>CONFIG</code> overrides the BRConfig.sys value for the rest of the session (e.g.
+<code>CONFIG SUBSTITUTE COM1:,/dev/ttyll</code>, <code>CONFIG OPTION 51 ON</code>, <code>CONFIG BASEYEAR 1950</code>). Unlike the
+file, the <code>CONFIG</code> command <strong>accepts keyword abbreviations</strong>; both accept <code>%env-var%</code> substitution.
+Supported keywords include <code>APPLICATION_NAME</code>, <code>ATTRIBUTE</code>, <code>BASEYEAR</code>, <code>BREAK</code>, <code>CHAINDFLT</code>,
+<code>COLLATE</code>, <code>COLOR</code>, <code>CONSOLE</code>, <code>CURSOR</code>, <code>DATABASE</code>, <code>DATAHILITE</code>, <code>DECIMAL</code>, <code>DIMONLY</code>, <code>DRIVE</code>
+<em>(file only)</em>, <code>EDITOR</code>, <code>FIELDBREAK</code>, <code>FILENAMES</code>, <code>FONT</code>, <code>FORCE VISIBILITY</code>, <code>GUI</code>, <code>HELPDFLT</code>,
+<code>INSERT</code>, <code>KEYBOARD</code>, <code>LOGGING</code>, <code>MAX_SORT_MEMORY</code>, <code>MAXRECALL</code>, <code>MIN_FONTSIZE</code>, <code>OPTION</code>, <code>PAGEOFLOW</code>,
+<code>PICTURE</code>, <code>PRINTDIR</code>, <code>RD</code>, <code>SCREEN</code>, <code>SETENV</code>, <code>SPOOLCMD</code>, <code>STYLE</code>, <code>SUBSTITUTE</code>, <code>WORKPATH</code>, <code>WSID</code>,
+… (<code>DRIVE</code>, <code>FLOWSTACK</code>, <code>FORSTACK</code> and <code>S/23-DRIVES</code> are <strong>BRConfig.sys-only</strong>). A <code>CONFIG</code> line &gt;128 chars
+raises error 1060. <code>EDITOR &quot;&lt;path&gt;&quot; [REMOVE][NOWAIT]</code> names the external editor used by the
+<a href="../../70-commands/editing/spec.html#edit"><code>EDIT</code> command</a> (<code>REMOVE</code> deletes the <code>.brs</code> workfile after
+merge; <code>NOWAIT</code> skips the Enter-to-merge wait).</p>
+<a id="examples"></a>
+<h2>Examples</h2>
+<pre><code class="language-text">DRIVE C:,F:\MYAPP,SERVER-2,\PRL
+DRIVE E:,%USERPROFILE%\BR_DATA,,
+SUBSTITUTE PRN:/20,COM2:           ! route the &quot;letter-quality&quot; class to a real port
+ATTRIBUTE [ERROR]R/RGB:R
+FONT Arial
+BASEYEAR 1950
+FILENAMES LOWER_CASE SEARCH
+INSERT ON MIN_LENGTH 10
+PRINTER HPLASER INIT LPP 66, &quot;\E&amp;k2G\E(s10H\E&amp;l6D\E&amp;l0O&quot;
+SPOOLPATH @::C:\BR\SPOOL
+EDITOR &quot;C:\Program Files\Notepad++\notepad++.exe&quot; NOWAIT
+LOGGING 5, debug.log
+</code></pre>
+<pre><code class="language-business-rules">00010 EXECUTE &quot;CONFIG OPTION 51 ON&quot;    ! override a BRConfig.sys OPTION at runtime
+</code></pre>
+<a id="see-also"></a>
+<h2>See also</h2>
+<ul>
+<li><a href="../environment/spec.html">environment</a> — <code>%VAR%</code> substitution, <code>DRIVE</code> with env vars</li>
+<li><a href="../client-server/spec.html">client-server</a> — <code>@</code>/<code>@:</code> client-side directives, <code>OPTION 30</code>, module layout</li>
+<li><a href="../installation-tooling/spec.html">installation-tooling</a> — external editors, DLLs</li>
+<li><a href="../../20-io-screen/fields-attributes/spec.html">20-io-screen/fields-attributes</a> — using <code>[name]</code> attributes/fonts</li>
+<li><a href="../../70-commands/editing/spec.html#edit">70-commands/editing</a> — the <code>EDIT</code> command that uses <code>EDITOR</code></li>
+<li><a href="../../70-commands/information/spec.html">70-commands/information</a> — <code>STATUS</code>/<code>CONFIG</code>/<code>LOGGING</code> at the console</li>
+<li>Backing keyword pages retained (deep reference): <a href="OPTION_(Config).html">OPTION_(Config)</a> (full 0-99
+table), <a href="PRINTER.SYS.html">PRINTER.SYS</a> (PCL/NWP substitutions), <a href="Multi-spooled_printers.html">Multi-spooled_printers</a>
+(SUBSTITUTE/printer-class scheme), <a href="LOGGING.html">LOGGING</a> (level table), <a href="RD.html">RD</a> (precision tables),
+<a href="Attribute_(Config).html">Attribute_(Config)</a> (attribute/help-color reference), <a href="Font.html">Font</a>
+(FONT/<code>SCREEN OPENDFLT</code> fonts, qualifiers &amp; width-fit — added from the BR wiki in 2b), <a href="Dll.html">Dll</a>
+(module/adjunctive-file layout). <em>(The <code>.NET</code>/PEM controls page was relocated to
+<a href="../../20-io-screen/controls/spec.html#see-also">20-io-screen/controls</a> — it documents GUI controls, not config.)</em></li>
+</ul>
+<p><em>(The other ~50 backing pages were folded into this spec and pruned.
+The 8 redirect-collision pages re-fetched in 2b — <code>PrintDir</code>, <code>DATAHILITE</code>, <code>FIELDBREAK</code>, <code>FLOWSTACK</code>,
+<code>FORSTACK</code>, <code>HELPDFLT</code>, <code>Min_FontSize</code>, <code>BRConfig.sys</code> — were folded here and pruned; their verbatim
+wikitext remains on the BR wiki.)</em></p>
+</main>
+<footer>Generated from <a href="../../../br_tree/00-configuration/config-directives/spec.md">br_tree/00-configuration/config-directives/spec.md</a>. Edit the source, not this page.</footer>
+</body>
+</html>

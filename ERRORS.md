@@ -68,3 +68,18 @@ passes only because the suite is run with `--config context\dev\tools\brconfig.a
 
 **Suggested fix:** list all four lines in §4.2, and put `--config context\dev\tools\brconfig.ai_test`
 in every `context\app\tests\` command in `BR_testing.md`.
+
+## 2026-11-16 — Broken link in the `PRINTER` config-directive page
+
+**Where:** [`br_tree/00-configuration/config-directives/PRINTER.md`](br_tree/00-configuration/config-directives/PRINTER.md)
+line 134, the "br_tree audit" note.
+
+**What is wrong:** the link is written `(<../br_tree/40-io-printing/statements/PRINTER.md>)`, as
+if the page sat one folder below `context/`. From `00-configuration/config-directives/` it
+resolves to `00-configuration/br_tree/40-io-printing/…`, which does not exist. The page it means
+does exist, at `br_tree/40-io-printing/statements/PRINTER.md`.
+
+**Suggested fix:** `(../../40-io-printing/statements/PRINTER.md)`.
+
+**Found by:** `dev/tools/gen_brtree_html.exe`, whose link check reports it as the only link or
+`#anchor` in br_tree that does not resolve.
