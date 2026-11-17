@@ -206,6 +206,22 @@ ON HELP {GOTO <line-ref> | SYSTEM | IGNORE}    -- SYSTEM=HELPDFLT (default), IGN
 00900 LET X$ = HELP$("HOURS.ENTRY", CURFLD): RETRY
 ```
 
+<a id="br-tree-help"></a>
+**br_tree help (OPTION 85 off, the default).** F1, Ctrl-Y and the `HELP` command at the command
+line show the br_tree topic for the word at the cursor:
+
+- **In the person's own web browser** when br_tree2, the HTML edition, is found
+  ([`HELPTREE2`](../../00-configuration/config-directives/spec.md#helptree2)). The client opens
+  one help tab and moves it to each new topic; a tab that is behind other windows changes page
+  without coming forward, and the status line says *Help is open in your browser*. The pages come
+  from the BR server through the client, so a client on another machine works the same.
+- **On the console** otherwise: the page in 23 rows, with the arrow keys, Page Up/Down and
+  Home/End to move and F2 or Esc to leave.
+
+`HELP$(folder$, anchor$, "BROWSE")` shows a topic the same way from a program
+([system-functions](../../10-language/data-manipulation/system-functions/spec.md#help$)).
+A program's field help (`INPUT FIELDS … HELP`) is not br_tree's and is unchanged.
+
 <a id="examples"></a>
 ## Examples
 

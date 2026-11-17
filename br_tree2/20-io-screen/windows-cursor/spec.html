@@ -210,6 +210,21 @@ attributes via <code>|U…|</code>; topics can return a scancode or a <code>*pro
 <pre><code class="language-business-rules">00400 INPUT FIELDS MAT FLD$: HRS, OT, DT HELP 900
 00900 LET X$ = HELP$(&quot;HOURS.ENTRY&quot;, CURFLD): RETRY
 </code></pre>
+<p><a id="br-tree-help"></a>
+<strong>br_tree help (OPTION 85 off, the default).</strong> F1, Ctrl-Y and the <code>HELP</code> command at the command
+line show the br_tree topic for the word at the cursor:</p>
+<ul>
+<li><strong>In the person's own web browser</strong> when br_tree2, the HTML edition, is found
+(<a href="../../00-configuration/config-directives/spec.html#helptree2"><code>HELPTREE2</code></a>). The client opens
+one help tab and moves it to each new topic; a tab that is behind other windows changes page
+without coming forward, and the status line says <em>Help is open in your browser</em>. The pages come
+from the BR server through the client, so a client on another machine works the same.</li>
+<li><strong>On the console</strong> otherwise: the page in 23 rows, with the arrow keys, Page Up/Down and
+Home/End to move and F2 or Esc to leave.</li>
+</ul>
+<p><code>HELP$(folder$, anchor$, &quot;BROWSE&quot;)</code> shows a topic the same way from a program
+(<a href="../../10-language/data-manipulation/system-functions/spec.html#help$">system-functions</a>).
+A program's field help (<code>INPUT FIELDS … HELP</code>) is not br_tree's and is unchanged.</p>
 <a id="examples"></a>
 <h2>Examples</h2>
 <pre><code class="language-business-rules">00110 OPEN #1: &quot;SROW=5,SCOL=10,EROW=15,ECOL=60,BORDER=S,CAPTION=Data Entry&quot;, DISPLAY, OUTIN

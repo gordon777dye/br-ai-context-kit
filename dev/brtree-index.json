@@ -1,6 +1,6 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; section_index maps each statement, READY command and system function to the spec section(s) (anchor) that cover it, each with a kind - command, function, statement or reference - saying what that section documents the word as; config_index maps each configuration statement (BRConfig.sys, CONFIG) to where it is defined: a page of its own (file) or a section (anchor); each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-11-16",
+  "generated": "2026-11-17",
   "source": "br_tree/",
   "source_sha256": "cee12585b7450bb28a6c86bbc437c933b8ee67a77c10b35ca5c907cce31dbf56",
   "count": 38,
@@ -3607,6 +3607,26 @@
         "anchor": "behavior"
       }
     ],
+    "HELPTREE": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "helptree"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
+    "HELPTREE2": [
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "helptree2"
+      },
+      {
+        "spec": "00-configuration/config-directives",
+        "anchor": "behavior"
+      }
+    ],
     "INCLUDE": [
       {
         "spec": "00-configuration/config-directives",
@@ -3970,6 +3990,8 @@
         "flowstack",
         "forstack",
         "helpdflt",
+        "helptree",
+        "helptree2",
         "insert",
         "keyboard",
         "maxrecall",
@@ -4923,6 +4945,7 @@
         "gui-console",
         "parent-none",
         "help-facility",
+        "br-tree-help",
         "examples",
         "see-also"
       ],

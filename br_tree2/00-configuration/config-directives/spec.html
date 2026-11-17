@@ -261,6 +261,8 @@ FIELDBREAK MIN_SPACES &lt;n&gt; [, UNDERSCORE OFF]
 FLOWSTACK &lt;size&gt;   
 FORSTACK &lt;size&gt;   
 HELPDFLT &lt;keyword&gt; &lt;filename&gt;
+HELPTREE {&lt;folder&gt; | CLEAR}      -- where br_tree (the Markdown reference) is
+HELPTREE2 {&lt;folder&gt; | CLEAR}     -- where br_tree2 (its HTML edition) is
 INSERT {ON|OFF} [MIN_LENGTH &lt;0-99&gt; | NON_PERSISTENT | SESSION_PERSISTENT | PERSISTENT]
 INVP   -- (European comma/period swap)
 KEYBOARD &lt;scancode&gt;,&lt;sequence&gt;  
@@ -304,6 +306,17 @@ and the default file for the <a href="../../10-language/data-manipulation/system
 function (runtime-only; overridable via <code>CONFIG</code>). With no <code>HELPDFLT</code>, the HELP key does nothing
 outside INPUT mode (<code>ON HELP SYSTEM</code> behaves as <code>ON HELP IGNORE</code>) and <code>HELP$</code> requires an explicit
 filename; help files are searched current dir → base node of the first <code>DRIVE</code> → BR start dir.</li>
+<li><a id="helptree"></a><strong><code>HELPTREE &lt;folder&gt;</code></strong> says where br_tree is, for the help key, the <code>HELP</code>
+command and <code>HELP$</code> with <code>OPTION 85</code> off. The folder is br_tree itself or one holding it. Without
+it, BR looks at <code>ENV$(&quot;BR_TREE&quot;)</code>, then for <code>br_tree</code> or <code>context\br_tree</code> in BR's current folder
+and the two above it, then the same around the folder BR was started in and BR's own folder.
+<code>CLEAR</code> puts back that search. Error 9503 says br_tree was not found.</li>
+<li><a id="helptree2"></a><strong><code>HELPTREE2 &lt;folder&gt;</code></strong> says where br_tree2, the HTML edition of br_tree,
+is. The folder is br_tree2 itself or one holding it. Without it, BR looks at <code>ENV$(&quot;BR_TREE2&quot;)</code>,
+then beside br_tree. With br_tree2 found, help opens in the person's own web browser
+(<a href="../../20-io-screen/windows-cursor/spec.html#help-facility">windows-cursor §help</a>); without it, help
+is shown on the console. <code>CLEAR</code> puts back the search.
+Both are refused in a restricted session.</li>
 <li><a id="insert"></a><code>INSERT</code> sets overtype/insert persistence scope (default <code>ON PERSISTENT</code>; overridden
 by <code>DATAHILITE</code>). Persistent means remember the last operator setting. <code>MIN_LENGTH</code> specifies a second setting for fields =&gt; specified length. NON_PESISTENT - reset upon field exit; SESSION_PERSISTENT - reset upon exiting Business Rules; PERSISTENT - keep operator setting across BR exits.</li>
 <li><a id="keyboard"></a><code>KEYBOARD</code> builds keystroke macros from BR scancodes (<code>CON KEYBOARD [&lt;scancode&gt;] CLEAR</code> removes them);</li>

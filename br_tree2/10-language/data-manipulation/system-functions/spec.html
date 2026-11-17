@@ -602,8 +602,8 @@ added in <strong>4.3</strong>.</li>
 <td><strong>BR 5.0.</strong> Start a disposable <strong>restricted</strong> session on this WSID — the next free session number — running <code>command$</code> as its startup command, typically <code>PROC &lt;file&gt;</code>. <code>config$</code> defaults to this session's. No <code>wait</code> or <code>0</code> returns the new process id at once; a <code>wait</code> in seconds yields as <code>SLEEP</code> does and returns the session's <strong>exit code</strong>. <code>label$</code> says what the session is for, and opens its audit log. See <a href="SPAWN_RESTRICTED.html">SPAWN_RESTRICTED</a> for the errors and the ordering that makes the restriction hold</td>
 </tr>
 <tr>
-<td><a id="help$"></a><code>HELP$([*]kw$[,mark|anchor$])</code></td>
-<td>enter HELP mode / show a topic (see <a href="../../../20-io-screen/windows-cursor/spec.html#help-facility">windows-cursor §help</a>). Two arguments at most. The second is a numeric <code>mark</code> for the <code>.wbh</code> help (OPTION 85 ON) or a string <code>anchor$</code> for the br_tree help (OPTION 85 OFF, the default); the compiler accepts either, and the one that does not suit OPTION 85 raises error 9505 when it runs</td>
+<td><a id="help$"></a><code>HELP$([*]kw$[,mark|anchor$[,&quot;BROWSE&quot;]])</code></td>
+<td>enter HELP mode / show a topic (see <a href="../../../20-io-screen/windows-cursor/spec.html#help-facility">windows-cursor §help</a>). The second argument is a numeric <code>mark</code> for the <code>.wbh</code> help (OPTION 85 ON) or a string <code>anchor$</code> for the br_tree help (OPTION 85 OFF, the default); the compiler accepts either, and the one that does not suit OPTION 85 raises error 9505 when it runs. With OPTION 85 off, <code>HELP$(folder$,anchor$)</code> returns where in br_tree the topic is, and a third argument <code>&quot;BROWSE&quot;</code> also shows it as the help key does: in the person's web browser when br_tree2 is found, else on the console. Any other third argument is error 410; a third argument with OPTION 85 on is error 9505</td>
 </tr>
 <tr>
 <td><a id="program$"></a><code>PROGRAM$</code></td>

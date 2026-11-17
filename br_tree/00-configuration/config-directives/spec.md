@@ -214,6 +214,8 @@ FIELDBREAK MIN_SPACES <n> [, UNDERSCORE OFF]
 FLOWSTACK <size>   
 FORSTACK <size>   
 HELPDFLT <keyword> <filename>
+HELPTREE {<folder> | CLEAR}      -- where br_tree (the Markdown reference) is
+HELPTREE2 {<folder> | CLEAR}     -- where br_tree2 (its HTML edition) is
 INSERT {ON|OFF} [MIN_LENGTH <0-99> | NON_PERSISTENT | SESSION_PERSISTENT | PERSISTENT]
 INVP   -- (European comma/period swap)
 KEYBOARD <scancode>,<sequence>  
@@ -256,6 +258,17 @@ STYLE [INDENT <n> <n>] {KEYWORD|LABEL|EXPRESSION [MIXED|UPPER|LOWER]} ...
   function (runtime-only; overridable via `CONFIG`). With no `HELPDFLT`, the HELP key does nothing
   outside INPUT mode (`ON HELP SYSTEM` behaves as `ON HELP IGNORE`) and `HELP$` requires an explicit
   filename; help files are searched current dir → base node of the first `DRIVE` → BR start dir.
+- <a id="helptree"></a>**`HELPTREE <folder>`** says where br_tree is, for the help key, the `HELP`
+  command and `HELP$` with `OPTION 85` off. The folder is br_tree itself or one holding it. Without
+  it, BR looks at `ENV$("BR_TREE")`, then for `br_tree` or `context\br_tree` in BR's current folder
+  and the two above it, then the same around the folder BR was started in and BR's own folder.
+  `CLEAR` puts back that search. Error 9503 says br_tree was not found.
+- <a id="helptree2"></a>**`HELPTREE2 <folder>`** says where br_tree2, the HTML edition of br_tree,
+  is. The folder is br_tree2 itself or one holding it. Without it, BR looks at `ENV$("BR_TREE2")`,
+  then beside br_tree. With br_tree2 found, help opens in the person's own web browser
+  ([windows-cursor §help](../../20-io-screen/windows-cursor/spec.md#help-facility)); without it, help
+  is shown on the console. `CLEAR` puts back the search.
+  Both are refused in a restricted session.
 - <a id="insert"></a>`INSERT` sets overtype/insert persistence scope (default `ON PERSISTENT`; overridden 
   by `DATAHILITE`). Persistent means remember the last operator setting. `MIN_LENGTH` specifies a second setting for fields => specified length. NON_PESISTENT - reset upon field exit; SESSION_PERSISTENT - reset upon exiting Business Rules; PERSISTENT - keep operator setting across BR exits.
 - <a id="keyboard"></a>`KEYBOARD` builds keystroke macros from BR scancodes (`CON KEYBOARD [<scancode>] CLEAR` removes them); 
