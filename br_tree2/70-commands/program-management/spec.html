@@ -80,7 +80,7 @@ SYSTEM [&lt;flags&gt;] &quot;&lt;os-command&gt;&quot;                      -- ru
 <a href="#execute"><code>EXECUTE</code></a> or a <code>PROC</code>. Three forms:</p>
 <ul>
 <li><strong>Exit</strong> — bare <code>SYSTEM</code> (<code>SY</code>) closes files and returns to the OS; <code>SYSTEM &lt;n&gt;</code> returns <code>&lt;n&gt;</code> as the
-process <strong>exit code</strong> (readable by a calling shell/script). <code>SYSTEM LOGOFF [ALL]</code> exits and also
+process <strong>exit code</strong> (readable by a calling shell/script: <code>ERRORLEVEL</code> in a DOS batch file, <code>$?</code> in a Linux shell). <code>SYSTEM LOGOFF [ALL]</code> exits and also
 logs the client off — see <a href="#system-logoff">logoff</a>.</li>
 <li><strong>Shell call</strong> — <code>SYSTEM &quot;&lt;os-command&gt;&quot;</code> runs an operating-system command (launch another program,
 run a script), then returns to BR — <strong>the program's main way to invoke other applications through the
@@ -111,7 +111,7 @@ commands with the caller's privileges).</li>
 </tr>
 <tr>
 <td><code>-C</code> / <code>-c</code></td>
-<td><strong>continue asynchronously</strong> — don't wait for the command to finish (conflicts with <code>-R</code>)</td>
+<td><strong>continue asynchronously</strong> — don't wait for the command to finish (conflicts with <code>-R</code>). Windows launches the task and BR carries on; on Unix the command is framed with <code>NOHUP</code> and <code>&amp;</code>. Without it the call waits for the process, up to the <code>SHELL LIMIT</code> seconds</td>
 </tr>
 <tr>
 <td><code>-M</code> / <code>-m</code></td>
@@ -259,10 +259,24 @@ into memory. With no <code>first</code>/<code>ADD</code>, merged lines keep thei
 lines that share them. <code>ADD</code> appends all lines after the current program's last line; <code>&lt;first&gt;</code>
 renumbers the first merged line (others follow the source increments). A single line number merges
 only that line.</p>
+<ul>
+<li><strong>Defaults:</strong> the whole program is merged; a <code>-&lt;from&gt;</code> alone merges from that line to the end of the program;
+the merged lines keep their numbers. <strong>Caution:</strong> a merged line replaces any line in memory that has
+the same number.</li>
+<li><code>f</code> is the name of the program (a <code>.br</code> file) to merge.</li>
+<li><code>&lt;first&gt;</code> is the number given to the first merged line; the others follow the increments the source file had.</li>
+<li><code>ADD</code> puts every merged line after the end of the program in memory: the first is numbered <strong>ten greater than
+the current last line</strong>, and the rest keep the source's increments.</li>
+<li>Examples: <code>MERGE MERGETST -100 -300</code> merges lines 100 to 300 of MERGETST.BR, keeping their numbers (and
+replacing any lines of those numbers in memory); <code>MERGE MERGETST ADD</code> adds all of MERGETST.BR to the end.</li>
+<li><strong>Behaviour change:</strong> <code>MERGE f &lt;line&gt;</code> with a line number alone merges only that line. Before it merged from that
+line to the end of the program, which may matter to an old application.</li>
+<li>To <em>look at</em> lines of another program without merging them, use <code>LIST &lt;name</code> (see <a href="../editing/spec.html#list">LIST</a>).</li>
+</ul>
 <a id="replace"></a>
 <h3 id="save--replace--source-vs-object">SAVE / REPLACE — source vs object</h3>
 <p><code>SAVE</code> writes a <strong>new</strong> file (error 4150 if it exists); <code>REPLACE</code> overwrites an <strong>existing</strong> one and
-leaves the lines in memory. Both save <strong>source</strong> only when the name ends <code>.BRS</code> or the <strong><code>SOURCE</code></strong>
+leaves the lines in memory. Saving as source stores the <strong>current <code>STYLE</code></strong> formatting with the file, permanently. Both save <strong>source</strong> only when the name ends <code>.BRS</code> or the <strong><code>SOURCE</code></strong>
 keyword is given; otherwise they save <strong>object</strong> (<code>.BR</code>/<code>.BRO</code>). With no filename, <code>REPLACE</code> reuses the
 file's full original name (a trailing period suppresses the default extension). <strong><code>OBJECT</code></strong> (<code>.BRO</code>)
 omits source — <em>unrecoverable</em>, used to ship protected code. Before overwriting, BR copies the original
@@ -296,6 +310,17 @@ before line 5280 clause 2; a bare <code>GO .</code> reuses the last temp breakpo
 it). After an error, <code>GO</code> retries the failing statement. In STEP mode, Shift+F1–F5 step with
 widening scope (into-clause / over-clause / into-line / over-line / to <code>RETURN</code>|<code>FNEND</code>).
 <strong><code>GO END</code></strong> terminates the interrupted program and closes all files.</p>
+<ul>
+<li>A line can be given as a <strong>line label</strong> as well as a number, for both <code>GO &lt;line&gt;</code> and <code>GO .&lt;line&gt;</code>.</li>
+<li>The <code>TRACE</code> output goes to the screen unless <code>PRINT</code> is given; <code>PRINT</code> works only with <code>TRACE</code>. For example
+<code>GO TRACE PRINT 1350</code> resumes at line 1350 and traces to the printer. <code>NOSTEP</code> and <code>NOTRACE</code> turn the two off.</li>
+<li><code>STEP</code> shows the number of the line about to run in the status line; <strong>Enter</strong> runs it and shows the next.
+In STEP mode a typed <code>GO</code> means <code>GO RUN</code> and Enter means <code>GO STEP</code>. <code>RUN STEP NORESTORE</code> stops BR putting the
+application screen back after the first time; <code>RUN STEP RESTORE</code> puts it back before every step (and <code>GO RUN</code>
+does not reset <code>NORESTORE</code>). <code>GO PROC</code> takes the program's input from the active procedure.</li>
+<li><code>TRACE SOURCE</code> shows each line's source text as it runs, in place of only its number.</li>
+<li>Shift+F1 to Shift+F4 step by a wider scope each time: the F-key number rises as the scope does.</li>
+</ul>
 <a id="ai"></a>
 <h2 id="ai-br-50">AI (BR 5.0)</h2>
 <pre><code class="language-bnf">AI NEW
@@ -319,8 +344,10 @@ stops and asks. The assistant itself may not use <code>AI</code> (error 4171).</
 <pre><code class="language-bnf">EXECUTE &quot;[*]&lt;command-string&gt;&quot;
 </code></pre>
 <p>Runs any command/statement string at runtime — the bridge that makes commands part of the
-coding surface (build index files, run a SORT, start a PROC, …). A leading <code>*</code> suppresses screen
-restoration (the default does <strong>not</strong> restore the screen). Inspect
+coding surface (build index files, run a SORT, start a PROC, …). A leading <code>*</code> makes BR <strong>save the screen
+and put it back</strong> when the command finishes; without it the screen is <strong>not</strong> restored (<code>EXECUTE &quot;DIR&quot;</code> leaves
+what the command wrote, <code>EXECUTE &quot;*COPY OLDFILE NEWFILE&quot;</code> restores the screen). In GUI mode the screen is
+never saved, so the <code>*</code> has no effect there. Inspect
 <a href="../../10-language/data-manipulation/system-functions/spec.html#system-info"><code>CODE</code></a> afterward for a
 procedure's return value. <strong>Restrictions:</strong> because it is illegal to <em>terminate</em> a program from
 <code>EXECUTE</code>, the program-ending commands <code>LOAD</code>, <code>SAVE</code>, <code>REPLACE</code> and the <code>CHAIN</code> statement may not
@@ -356,7 +383,7 @@ makes it <strong>self-deleting</strong> after execution.</p>
 <p><a id="proc"></a><strong>Starting</strong>: <code>PROC {name|*name|ECHO|NOECHO}</code> (runs it; <code>*</code> suppresses F2 logging;
 NOECHO hides lines). <a id="subproc"></a><code>SUBPROC file</code> runs a <strong>nested</strong> procedure (up to 9 deep) then resumes.
 From code: <code>CHAIN &quot;PROC=…&quot;</code> / <code>CHAIN &quot;SUBPROC=…&quot;</code> (ends program) or <code>EXECUTE &quot;PROC …&quot;</code> (keeps
-program running). <code>RUN PROC</code> feeds procedure lines to a program's <code>INPUT</code>/<code>LINPUT</code>.</p>
+program running). <code>RUN PROC</code> feeds procedure lines to a program's <code>INPUT</code>/<code>LINPUT</code>/<code>RINPUT</code>; it has <strong>no effect</strong> on <code>INPUT FIELDS</code> or <code>RINPUT FIELDS</code>.</p>
 <p><a id="run-proc"></a><strong><code>RUN … PROC</code></strong> — <code>PROC</code> is an <strong>option of <code>RUN</code></strong>, not a command. It is not
 followed by a file name: the lines fed to the program are the ones that follow the <code>RUN</code> line in
 the procedure that is <em>already running</em>. Two forms work, both only as lines <strong>inside a procedure</strong>:</p>

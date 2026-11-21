@@ -34,6 +34,14 @@ arity rather than by symbol table and catches most newcomers out. The control st
 <li><strong>Required on every program line</strong>; range <strong>1–99999</strong>; conventionally incremented by 10
 (<code>100, 110, 120 …</code>) to leave room for insertions.</li>
 </ul>
+<a id="line-length"></a>
+<h3>Line length</h3>
+<ul>
+<li>A source line may be up to <strong>2000 characters</strong> in BR 4.2 and later, and <strong>800</strong> before
+(<a href="../../90-reference/error-codes/1050.html">error 1050</a>).</li>
+<li>BR must also be able to compile the line into 255 characters or less (also error 1050).</li>
+<li>Whether the limit applies to each <code>!:</code> sub-line or to the logical line is not documented.</li>
+</ul>
 <h3 id="language-wide-lexical-rules">Language-wide lexical rules</h3>
 <ul>
 <li><strong>Case-insensitive</strong> keywords and identifiers (<code>PRINT</code> = <code>pr</code> = <code>Print</code>; <code>NAME$</code> = <code>name$</code>).</li>
@@ -208,7 +216,7 @@ related code together; one consistent error handler (<code>ON ERROR</code>); pla
 <li><a href="../data-manipulation/system-functions/spec.html">system-functions</a> — the intrinsics whose arity
 drives <a href="#name-resolution">name resolution</a>; which names are reserved</li>
 <li><a href="../data-manipulation/expressions/spec.html">expressions</a> — where call-vs-subscript is parsed</li>
-<li><a href="../../00-configuration/installation-tooling/spec.html#lexi">installation-tooling — Lexi preprocessor</a> —
+<li><a href="../../00-configuration/installation-tooling/spec.html#lexi-preprocessor">installation-tooling — Lexi preprocessor</a> —
 <code>/* ... */</code> comments, <code>X$&amp;=</code> compound append, and <code>#Select#</code>/<code>#Case#</code>/<code>#Define#</code>/<code>#AutoNumber#</code>
 directives are not base-BR syntax at all; they're rewritten to plain BR <em>before</em> this spec's
 grammar ever sees them. Encountering one of these in real source is a sign the app preprocesses

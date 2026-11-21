@@ -26,7 +26,10 @@ corrections:
     only Lexi's own informal name for the feature. Also added: Lexi is itself a BR **library
     program** (`fnApplyLexi`/`fnUndoLexi` in `lexi.br`/`lexi.brs`), and a second confirmed
     distribution — the \"BR Language Server\" VS Code extension (`crs-dev.vslang-br`) bundles the
-    identical engine and runs it on save. Full detail moved to [Lexi](Lexi.md#mechanism)."
+    identical engine and runs it on save. Full detail moved to [Legacy Lexi](legacy_lexi.md#mechanism)."
+  - "Lexi links redirected (owner, 2026-11-19): Lexi.md was renamed legacy_lexi.md, and LEXI.md
+    added for the Lexi built into brls. The Lexi summary below now points to LEXI.md, and to
+    legacy_lexi.md where it describes the original lexi.brs program."
 ---
 
 # Installation & tooling
@@ -59,7 +62,7 @@ on close.
   command* that searches the BR Wiki for the word at the cursor
   (`http://brwiki.ads.net/index.php?title=Special:Search&search=$(CURRENT_WORD)`). Also hosts Lexi.
 
-<a id="lexi"></a>
+<a id="lexi-preprocessor"></a>
 ## Lexi preprocessor
 
 **Lexi** lets you edit `.BRS` source **without line numbers**, managing numbering automatically on
@@ -72,6 +75,8 @@ append, and preprocessor directives:
   branch, translated to an `IF`/`ELSE IF` chain. **The `#` signs are required** — a bare `SELECT
   CASE ... END SELECT` is not valid syntax in Lexi *or* in base BR (confirmed live: Lexi passes it
   through untouched, and it then fails to `LOAD`).
+
+Full reference: [LEXI](LEXI.md).
 
 Before stripping numbers Lexi runs **`RENUM LABELS_ONLY`** so hard-coded `GOTO`/`GOSUB` line targets
 become `L#####` labels (safe to edit number-free; re-added numbers reuse them as hints). It runs the
@@ -86,7 +91,8 @@ Compile/Extract-Source/Add-or-Strip-Line-Numbers/Run/Debug tools — `DebugBR` n
 `brnative.exe`); and the "BR Language Server" VS Code extension (`crs-dev.vslang-br`), which bundles
 the identical engine and runs it automatically on save. Lexi also integrates with Notepad++, and
 supports [ScreenIO](../../50-libraries/screenio/spec.md) development. Full mechanism, both
-distributions, headless/scripted invocation, and directive examples: [Lexi](Lexi.md).
+distributions, headless/scripted invocation, and directive examples of the original program:
+[Legacy Lexi](legacy_lexi.md).
 
 <a id="catalog"></a>
 ## Tool & DLL catalog
@@ -194,8 +200,9 @@ Its bundled Window Info utility shows what AutoIt "sees" on screen.
 - [50-libraries/screenio](../../50-libraries/screenio/spec.md) — Lexi also supports ScreenIO development
 - Backing keyword pages (deep detail retained): [MyEdit_(BR_Edition)](MyEdit_(BR_Edition).md),
   [ODBC](ODBC.md), [Profiler](Profiler.md), [Profiler_File_Layout](Profiler_File_Layout.md),
-  [Debugger](Debugger.md), [Lexi](Lexi.md) (preprocessor tool tables + directive examples —
-  relocated here from 50-libraries/screenio)
+  [Debugger](Debugger.md), [LEXI](LEXI.md) (the Lexi built into brls), [Legacy Lexi](legacy_lexi.md)
+  (the original program's tool tables + directive examples — relocated here from
+  50-libraries/screenio)
 
 *(3 redirect-collision pages re-fetched in 2b — `AutoIt`, `BRListenerInstaller.exe`, `BRSerial.dat` —
 were folded into this spec and pruned; verbatim wikitext remains on the BR wiki.)*

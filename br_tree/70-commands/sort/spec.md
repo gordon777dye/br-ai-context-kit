@@ -168,6 +168,18 @@ ignores what follows its last value.
 ([above](#index-out)). Form codes: `B`/`BL`/`BH`, `C`, `D`, `L`, `N`, `PD`, `S`, `ZD`. Max total
 key length 32,767 bytes. Append **`Y`** to `A`/`D` for BASEYEAR Y2K date handling.
 
+<a id="sizing"></a>
+**Space and limits.**
+- **Temporary work space** (address-out and record-out sorts alike): *records selected* x 2 x (*sort key length* + 4), rounded
+  up to a multiple of **1024** bytes.
+- **Address-out output file, `A` (PD3 format):** *records selected* x 4 + 15, rounded up to a multiple of **512**; the
+  record limit is **99,999** records.
+- **Address-out output file, `B` (B4 format):** *records selected* x 5 + 16, rounded up to a multiple of **512**; the
+  limit is 2,147,483,647 (2**31-1) records.
+- **Record-out output file, `R`:** *records selected* x (*record length* + 1), rounded up to a multiple of **512**.
+- BR **clears the controls, collating sequence included, that one sort group set** before it runs the next group in the
+  same control file. All commas of the `FILE` specification must be present even when some parameters are omitted.
+
 <a id="examples"></a>
 ## Examples
 

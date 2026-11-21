@@ -437,7 +437,7 @@ text before real BR ever compiles it.
 - **Lexi's syntax** (what each construct does): [`essentials.md`](essentials.md#1-core-language-rules).
 - **The full reference** — what Lexi is, both known distributions, how the VS Code extension
   invokes it, and every directive in detail:
-  [`br_tree` — Lexi](../br_tree/00-configuration/installation-tooling/Lexi.md).
+  [`br_tree` — Legacy Lexi](../br_tree/00-configuration/installation-tooling/legacy_lexi.md).
 - **How this fits into the actual coding loop**:
   [`APP-DEV-GUIDE.md`](APP-DEV-GUIDE.md#lexi-aware-coding-loop).
 

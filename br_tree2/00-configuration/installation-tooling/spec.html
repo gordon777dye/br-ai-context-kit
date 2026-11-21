@@ -36,8 +36,8 @@ copy these to migrate setups. Deep detail in <a href="MyEdit_(BR_Edition).html">
 command</em> that searches the BR Wiki for the word at the cursor
 (<code>http://brwiki.ads.net/index.php?title=Special:Search&amp;search=$(CURRENT_WORD)</code>). Also hosts Lexi.</li>
 </ul>
-<a id="lexi"></a>
-<h2 id="lexi-preprocessor">Lexi preprocessor</h2>
+<a id="lexi-preprocessor"></a>
+<h2>Lexi preprocessor</h2>
 <p><strong>Lexi</strong> lets you edit <code>.BRS</code> source <strong>without line numbers</strong>, managing numbering automatically on
 compile, and adds a handful of extra constructs: <code>/* ... */</code> comments, <code>X$&amp;=&quot;...&quot;</code> compound
 append, and preprocessor directives:</p>
@@ -49,6 +49,7 @@ ascending, with room for the lines between directives).</li>
 branch, translated to an <code>IF</code>/<code>ELSE IF</code> chain. <strong>The <code>#</code> signs are required</strong> — a bare <code>SELECT CASE ... END SELECT</code> is not valid syntax in Lexi <em>or</em> in base BR (confirmed live: Lexi passes it
 through untouched, and it then fails to <code>LOAD</code>).</li>
 </ul>
+<p>Full reference: <a href="LEXI.html">LEXI</a>.</p>
 <p>Before stripping numbers Lexi runs <strong><code>RENUM LABELS_ONLY</code></strong> so hard-coded <code>GOTO</code>/<code>GOSUB</code> line targets
 become <code>L#####</code> labels (safe to edit number-free; re-added numbers reuse them as hints). It runs the
 compile under <code>PROC NOECHO</code> for speed (press <strong>F2</strong> to see a compile-error line), and <strong>you must save
@@ -61,7 +62,8 @@ Compile/Extract-Source/Add-or-Strip-Line-Numbers/Run/Debug tools — <code>Debug
 <code>brnative.exe</code>); and the &quot;BR Language Server&quot; VS Code extension (<code>crs-dev.vslang-br</code>), which bundles
 the identical engine and runs it automatically on save. Lexi also integrates with Notepad++, and
 supports <a href="../../50-libraries/screenio/spec.html">ScreenIO</a> development. Full mechanism, both
-distributions, headless/scripted invocation, and directive examples: <a href="Lexi.html">Lexi</a>.</p>
+distributions, headless/scripted invocation, and directive examples of the original program:
+<a href="legacy_lexi.html">Legacy Lexi</a>.</p>
 <a id="catalog"></a>
 <h2 id="tool--dll-catalog">Tool &amp; DLL catalog</h2>
 <table>
@@ -228,8 +230,9 @@ Its bundled Window Info utility shows what AutoIt &quot;sees&quot; on screen.</p
 <li><a href="../../50-libraries/screenio/spec.html">50-libraries/screenio</a> — Lexi also supports ScreenIO development</li>
 <li>Backing keyword pages (deep detail retained): <a href="MyEdit_(BR_Edition).html">MyEdit_(BR_Edition)</a>,
 <a href="ODBC.html">ODBC</a>, <a href="Profiler.html">Profiler</a>, <a href="Profiler_File_Layout.html">Profiler_File_Layout</a>,
-<a href="Debugger.html">Debugger</a>, <a href="Lexi.html">Lexi</a> (preprocessor tool tables + directive examples —
-relocated here from 50-libraries/screenio)</li>
+<a href="Debugger.html">Debugger</a>, <a href="LEXI.html">LEXI</a> (the Lexi built into brls), <a href="legacy_lexi.html">Legacy Lexi</a>
+(the original program's tool tables + directive examples — relocated here from
+50-libraries/screenio)</li>
 </ul>
 <p><em>(3 redirect-collision pages re-fetched in 2b — <code>AutoIt</code>, <code>BRListenerInstaller.exe</code>, <code>BRSerial.dat</code> —
 were folded into this spec and pruned; verbatim wikitext remains on the BR wiki.)</em></p>

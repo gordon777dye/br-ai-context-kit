@@ -20,7 +20,7 @@ opens are cross-referenced below.</p>
 <h2>Syntax</h2>
 <a id="open"></a>
 <h3 id="open-internal--external">OPEN (internal &amp; external)</h3>
-<pre><code class="language-bnf">&lt;share-spec&gt; ::= 'NOSHR' | 'SHR' | 'SHRI'
+<pre><code class="language-bnf">&lt;share-spec&gt; ::= 'NOSHR' | 'SHR' | 'SHRI' | 'SHRU'      -- SHRU is SHR, kept for System/23 compatibility
 &lt;key-spec&gt;   ::= 'KPS=' &lt;start&gt; ['/' &lt;start&gt;]* ',' 'KLN=' &lt;len&gt; ['/' &lt;len&gt;]*   -- ≤6 sections, ≤128 bytes
 
 &lt;file-open-string&gt; ::= '&quot;' 'NAME=' &lt;file-pathname&gt;
@@ -254,6 +254,23 @@ are the statement parameters; the same-named
 end (unless <code>NOCLOSE</code>). <strong>The trailing <code>:</code> terminates the statement</strong> — to code another statement
 after <code>CLOSE</code> on the same physical line, add a <em>second</em> colon as the separator: <code>CLOSE #n: : STOP</code>
 (a single <code>CLOSE #n: STOP</code> folds the following statement into the CLOSE and misfires).</p>
+<ul>
+<li><strong><code>CLOSE #&lt;file&gt;[,FREE|,DROP][,RELEASE]: [&lt;condition&gt; &lt;line&gt;]…</code></strong> closes a data file or a window; <code>#n</code> is required.
+Without <code>FREE</code> or <code>DROP</code> the file and its data stay intact, and a name reserved with <code>PROTECT RESERVE</code> stays
+reserved. Error conditions that apply are <code>EOF</code>, <code>ERROR</code>, <code>EXIT</code> and <code>IOERR</code>
+(<code>6000 CLOSE #2,FREE:  IOERR 9300</code> frees the file and goes to 9300 on an I/O error); with none active, an error
+interrupts the program. The statement works the same on display, internal and external files.</li>
+<li><strong>Closing a window</strong> ends access to it and <strong>redisplays what was behind it</strong>. Text a <code>PRINT FIELDS</code> put on the
+screen before the window was opened, and that the window covered, comes back when <code>CLOSE #1:</code> runs. To close the
+window <em>without</em> restoring that, put <code>DROP</code> or <code>FREE</code> in the <code>CLOSE</code>; the display stays as it is.</li>
+<li><strong><code>RELEASE</code></strong> releases a file locked by the <code>RESERVE</code> parameter of <code>OPEN</code>. The other ways to release it are
+<code>PROTECT ... RELEASE</code> and leaving BR.</li>
+<li><strong>What it does for the data:</strong> <code>CLOSE</code> (written, or done for you) writes the last records in the buffers and
+updates an internal file's header record, so the data is protected if a diskette is removed before the program
+ends. With no <code>CLOSE</code>, every file is closed at the end of the program, in the reverse of the order they were
+opened. <code>END</code>, <code>STOP</code> and <code>CHAIN</code> do the same, except that a <code>CHAIN</code> with its <code>FILES</code> parameter leaves the
+files open.</li>
+</ul>
 </li>
 </ul>
 <a id="rec"></a>

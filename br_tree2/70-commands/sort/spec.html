@@ -275,6 +275,19 @@ ignores what follows its last value.</p>
 (ascending/descending); a 21st is error 7807. Index-out (<code>I</code>) takes at most six
 (<a href="#index-out">above</a>). Form codes: <code>B</code>/<code>BL</code>/<code>BH</code>, <code>C</code>, <code>D</code>, <code>L</code>, <code>N</code>, <code>PD</code>, <code>S</code>, <code>ZD</code>. Max total
 key length 32,767 bytes. Append <strong><code>Y</code></strong> to <code>A</code>/<code>D</code> for BASEYEAR Y2K date handling.</p>
+<p><a id="sizing"></a>
+<strong>Space and limits.</strong></p>
+<ul>
+<li><strong>Temporary work space</strong> (address-out and record-out sorts alike): <em>records selected</em> x 2 x (<em>sort key length</em> + 4), rounded
+up to a multiple of <strong>1024</strong> bytes.</li>
+<li><strong>Address-out output file, <code>A</code> (PD3 format):</strong> <em>records selected</em> x 4 + 15, rounded up to a multiple of <strong>512</strong>; the
+record limit is <strong>99,999</strong> records.</li>
+<li><strong>Address-out output file, <code>B</code> (B4 format):</strong> <em>records selected</em> x 5 + 16, rounded up to a multiple of <strong>512</strong>; the
+limit is 2,147,483,647 (2**31-1) records.</li>
+<li><strong>Record-out output file, <code>R</code>:</strong> <em>records selected</em> x (<em>record length</em> + 1), rounded up to a multiple of <strong>512</strong>.</li>
+<li>BR <strong>clears the controls, collating sequence included, that one sort group set</strong> before it runs the next group in the
+same control file. All commas of the <code>FILE</code> specification must be present even when some parameters are omitted.</li>
+</ul>
 <a id="examples"></a>
 <h2>Examples</h2>
 <p>The specifications in a procedure, after a <code>SORT</code> with no file name:</p>

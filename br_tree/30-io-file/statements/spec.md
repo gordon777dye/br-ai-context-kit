@@ -44,7 +44,7 @@ opens are cross-referenced below.
 <a id="open"></a>
 ### OPEN (internal & external)
 ```bnf
-<share-spec> ::= 'NOSHR' | 'SHR' | 'SHRI'
+<share-spec> ::= 'NOSHR' | 'SHR' | 'SHRI' | 'SHRU'      -- SHRU is SHR, kept for System/23 compatibility
 <key-spec>   ::= 'KPS=' <start> ['/' <start>]* ',' 'KLN=' <len> ['/' <len>]*   -- ≤6 sections, ≤128 bytes
 
 <file-open-string> ::= '"' 'NAME=' <file-pathname>
@@ -237,6 +237,21 @@ that matter on a `READ`, `NOKEY` and `NOREC` on a `REWRITE`.
   end (unless `NOCLOSE`). **The trailing `:` terminates the statement** — to code another statement
   after `CLOSE` on the same physical line, add a *second* colon as the separator: `CLOSE #n: : STOP`
   (a single `CLOSE #n: STOP` folds the following statement into the CLOSE and misfires).
+  - **`CLOSE #<file>[,FREE|,DROP][,RELEASE]: [<condition> <line>]…`** closes a data file or a window; `#n` is required.
+    Without `FREE` or `DROP` the file and its data stay intact, and a name reserved with `PROTECT RESERVE` stays
+    reserved. Error conditions that apply are `EOF`, `ERROR`, `EXIT` and `IOERR`
+    (`6000 CLOSE #2,FREE:  IOERR 9300` frees the file and goes to 9300 on an I/O error); with none active, an error
+    interrupts the program. The statement works the same on display, internal and external files.
+  - **Closing a window** ends access to it and **redisplays what was behind it**. Text a `PRINT FIELDS` put on the
+    screen before the window was opened, and that the window covered, comes back when `CLOSE #1:` runs. To close the
+    window *without* restoring that, put `DROP` or `FREE` in the `CLOSE`; the display stays as it is.
+  - **`RELEASE`** releases a file locked by the `RESERVE` parameter of `OPEN`. The other ways to release it are
+    `PROTECT ... RELEASE` and leaving BR.
+  - **What it does for the data:** `CLOSE` (written, or done for you) writes the last records in the buffers and
+    updates an internal file's header record, so the data is protected if a diskette is removed before the program
+    ends. With no `CLOSE`, every file is closed at the end of the program, in the reverse of the order they were
+    opened. `END`, `STOP` and `CHAIN` do the same, except that a `CHAIN` with its `FILES` parameter leaves the
+    files open.
 
 <a id="rec"></a>
 ### Relative access — `REC=`

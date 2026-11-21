@@ -1,6 +1,6 @@
 ---
-title: Lexi
-file: Lexi.md
+title: Legacy Lexi
+file: legacy_lexi.md
 category: 00-configuration
 subcategory: 00-configuration/installation-tooling
 kind: reference
@@ -29,6 +29,31 @@ corrections:
     called \"Select Case\" (matching this library's own header comment), but that is not its
     spelling. A downstream doc (this kit's `dev/essentials.md`) briefly repeated the bare-spelling
     reading before this was caught; see that file's `context/ERRORS.md` entry, 2026-09-11."
+  - "§#Define# corrected (2026-11-19). The section wrote references as `` `name` `` and its example
+    put the whole directive in quotes (`!. \"#Define# `ScreenControls` = …`). Neither works in
+    `fnApplyLexi`: names are bracketed, `[[name]]` (lexi.brs, the directive's `[[`/`]]` search),
+    and the directive is searched for outside string literals only, so a quoted one defines
+    nothing. Confirmed by running real Lexi on brls's fixture `internal/lexi/testdata/fixtures-src/
+    define.brs` (output frozen in `fixtures/define.lexi`): the quoted form left its reference
+    unexpanded. The same run confirmed the rules added under the section — first reference per
+    line only, references inside strings replaced, quotes around the value dropped, names matched
+    regardless of case. Found while cataloguing the original's defects for brls."
+  - "Added, from reading lexi.brs (not yet run in real Lexi): an #Autonumber# with no comma is
+    ignored, and one with anything after the increment keeps the old increment (§#Autonumber#); a
+    `/*` and `*/` on one line open a comment that does not close there (§/* ... */). Added from
+    running it: an L##### label whose number has been passed is numbered on with the increment
+    halved, never below 2 (§L##### labels)."
+  - "Renamed from Lexi.md to legacy_lexi.md (owner, 2026-11-19). It describes the original Lexi,
+    lexi.brs and its fnApplyLexi/fnUndoLexi, and its distributions. The Lexi brls runs has its own
+    page, LEXI.md, beside this one; references to Lexi in general now point there, and references
+    to the original program here."
+  - "§/* ... */ confirmed by running real Lexi (2026-11-19) on brls's lsp/lexi-err.brs (output in
+    lsp/legacy-out.brs): the one-line /* */ behaviour, previously from reading lexi.brs only, is
+    as described. Added what the reading missed: a line ending in */ ends in /, a continuation
+    operator, so the next line is joined onto it before the comment is handled. After a one-line
+    comment that line is lost into the comment; after a multi-line comment it is kept as code."
+  - "References to brls's LEXI_OLD.md removed (owner, 2026-11-20): that file was deleted. The
+    original Lexi's defects are listed at Dialect.Legacy in brls's internal/lexi/dialect.go."
 ---
 **Lexi**, the **BR! Lexical Preprocessor**, rewrites a handful of extra constructs — plus, in its
 best-known feature, an entire program's **line numbers** — into plain, correctly line-numbered BR
@@ -37,6 +62,9 @@ party editor` (`MyEdit` first, then `Notepad++`, and it will work with any edito
 customizable user tools), and that editor-integration story is still how most people meet it — but
 Lexi itself is not an editor plugin. It's a **BR program**, runnable headlessly with no editor
 involved at all (see [Headless / scripted invocation](#headless)).
+
+*This page is the original Lexi: the `lexi.brs` library and the tools built on it. The Lexi
+built into brls is described in [LEXI](LEXI.md).*
 
 If you use Lexi, you can edit your `BR Programs` **without line numbers**. This frees you up to
 copy and paste code, rearrange code, and add and edit code without having to worry about or
@@ -287,6 +315,24 @@ lines collapses on translation — the closing fragment attaches to the *next* l
 `!` comment rather than getting its own numbered line, so don't expect a strict
 1:1 source-line-to-output-line mapping.
 
+**Open and close it on different lines.** On the line where `/*` is found, Lexi does not look for
+`*/`. A one-line `/* note */` therefore starts a comment that runs on, every following line
+commented out with ` ! `, until a later line contains `*/`.
+
+**A line ending in `*/` is joined to the next line.** It ends in `/`, and Lexi joins a line ending
+in an operator (`/` among them) to the next line before it handles block comments. After a one-line
+`/* note */`, the next line is joined into the comment and lost:
+
+```
+/* one-line block comment */      00031 ! one-line block comment */ let A=1
+let A=1                    →      00032  ! print A
+print A
+```
+
+At the end of a multi-line comment the join does no harm: the joined line follows the `*/`, and
+Lexi moves it in front as code, so `over two lines */` followed by `let B=2` becomes
+`00026  let B=2 ! over two lines`.
+
 ### `X$&="..."` — compound append
 
 Shorthand for appending to a string variable. Lexi does **not** rewrite this to naive
@@ -351,20 +397,42 @@ error and stops; `clear` then `system` returns to the editor to fix the directiv
 and recompiling again. Placing `#Autonumber#` comments before stripping line numbers preserves the
 original numbering structure as closely as possible when numbers are re-added.
 
-### `#Define# `name` = text`
+**Write both numbers, and nothing after them.** From `lexi.brs` (read, not yet run): the line
+number is read up to the comma, and the increment from after it to the end of the line.
 
-A precompiler text-substitution constant. Wherever `` `name` `` appears afterward in the program,
-Lexi substitutes the defined text at preprocess time; a leading `.` on the `#Define#` comment line
+- **No comma** — no number is read, and the whole directive is ignored without a message.
+- **Anything after the increment** (`#Autonumber# 3000,5 resume here`) — the increment does not
+  convert. Lexi still moves to the new number but keeps the increment already in force, and the
+  directive's own line takes 3000 plus that increment, not 3000.
+
+### `#Define# [[name]] = text`
+
+A precompiler text-substitution constant. Wherever `[[name]]` appears on a later line, Lexi
+substitutes the defined text at preprocess time; a leading `.` on the `#Define#` comment line
 stops BR from re-casing it:
 
 ```
-!. "#Define# `ScreenControls` = "mat ControlName$, mat FieldName$, mat Description$, mat VPosition, mat HPosition, mat FieldType$"
+!. #Define# [[ScreenControls]] = mat ControlName$, mat FieldName$, mat Description$, mat VPosition, mat HPosition, mat FieldType$
 ```
 
-lets a function signature reference `` `ScreenControls` `` and have Lexi expand it to the full
+lets a function signature reference `[[ScreenControls]]` and have Lexi expand it to the full
 argument list every time the program is compiled. When line numbers are stripped back out, the
-substitution reverts to `` `name` `` — the expansion is a preprocess-time artifact, not a
+substitution reverts to `[[name]]` — the expansion is a preprocess-time artifact, not a
 permanent rewrite of the source.
+
+How `fnApplyLexi` reads it (`lexi.brs`, confirmed by running it):
+
+- **The directive must not be inside quotes.** Lexi looks for `#Define#` outside string
+  literals only, so `!. "#Define# [[Name]] = …"` defines nothing and `[[Name]]` is left in the
+  program as written.
+- **The name is everything from `[[` to `]]`**, brackets included, matched without regard to case.
+- **The text is the rest of the line**, trimmed. A leading `=` is dropped, and so are quotes
+  around the whole text: `! #Define# [[Q]]="quoted"` substitutes `quoted`, not `"quoted"`.
+- **Only the first `[[name]]` on each line is replaced**, once per name: `let X=[[Max]]+[[Max]]`
+  becomes `let X=10+[[Max]]`.
+- **A reference inside a string literal is replaced too**: `print "[[Max]] items"` becomes
+  `print "10 items"`.
+- A name never defined is left as written, and BR then reports it.
 
 <a id="select-case"></a>
 ### `#Select# expr #Case# value ... #End Select#` (informally "Select Case")
@@ -433,6 +501,11 @@ because they read as clutter), that's a separate cleanup step, not something Lex
 automatically. When line numbers are re-added, any `L#####` labels present are used as hints to
 match the new numbers back to the original numbering as closely as possible.
 
+A hint is taken only when its number is still ahead. A label `Lnnnn:` whose number numbering has
+already reached or passed is numbered on, and Lexi halves the increment (never below 2) to catch
+up with the labels after it. In a test fixture, `L2003:` came out as line `02017`. A label that is
+taken, and whose number is a multiple of 10, also sets the increment to 10 from there on.
+
 ### Save source code before running a tool
 
 Any Lexi user tool operates on the on-disk copy of the file, not what's currently in the editor
@@ -455,8 +528,9 @@ data as a result of using this or any other tool they create.
 <a id="see-also"></a>
 ## See also
 
-- [Installation & tooling — Lexi preprocessor](spec.md#lexi) — the folded category summary this
+- [Installation & tooling — Lexi preprocessor](spec.md#lexi-preprocessor) — the folded category summary this
   page backs.
+- [LEXI](LEXI.md) — the Lexi built into brls.
 - [`dev/BR_launch.md` — The Lexi preprocessor](../../../dev/BR_launch.md#the-lexi-preprocessor) —
   invoking `lexi-compile.ps1` headlessly, with its full parameter list.
 - [`dev/APP-DEV-GUIDE.md` — Lexi-aware coding loop](../../../dev/APP-DEV-GUIDE.md#lexi-aware-coding-loop) —

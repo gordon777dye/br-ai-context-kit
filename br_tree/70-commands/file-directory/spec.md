@@ -231,6 +231,17 @@ from 2 to 9 shows the next that many lines before pausing again (BR 5.0), and an
 screenful. **MKDIR** subdirectory names follow file-name rules, and the same
 name may exist under different parent directories.
 
+- **`TYPE <name> [-P] [>file|>>file|PRINT]`**: `name` may hold wildcards, and then every file it names is typed, one
+  after the other, into the **one** redirect, so `TYPE *.txt > all.txt` joins them (`>>` appends to an existing file).
+  Written to a file the bytes are copied as they are, so a file that holds a blob comes through whole; only on the
+  screen are trailing nulls and Ctrl-Z trimmed.
+- **Printer escape sequences (4.2+).** `TYPE` translates the printer escape sequences in a print file for the
+  *destination*, matched as the destination's printer name is at `OPEN` time (as `NAME=PRN:/printer`). To a display
+  file the printer type can be named with `PRINTER_TYPE=<type>`, matched against the second parameter of the
+  configuration's `PRINTER` statements: `TYPE PRTeport >PREVIEW:/HP4` translates the HP4 sequences in `report` for the
+  preview, and `TYPE PRTeport-file1 >report-file2 PRINTER_TYPE=HP4` copies file1 to file2 interpreting them. In contrast
+  `COPY PRT\EDITLIST.255 DIRECT:/HP4` sends a print file to a printer unaltered.
+
 <a id="drop-free"></a><a id="drop"></a><a id="free"></a>**DROP** empties a file's contents — freeing all allocated space and leaving
 only the header record for internal files — but keeps the name (size→0). **FREE** deletes the
 file(s) outright (unrecoverable). Both take `-N`/`-P`/`-V` and accept wildcards (use `-V` to
@@ -242,11 +253,49 @@ kept. A procedure can `FREE` itself as its last line; a `.$$$`-named procedure s
 after running. *(The same-named `DROP`/`FREE` **CLOSE parameters** inside a program are a separate
 file operation — [30-io-file/statements](../../30-io-file/statements/spec.md#close).)*
 
-<a id="protect"></a>**PROTECT … RESERVE/RELEASE** reserves a full path name for one workstation's
-exclusive use (and releases it) — the multi-user purge idiom; see
-[30-io-file/file-model](../../30-io-file/file-model/spec.md). **`PROTECT … READ`** makes the file
-read-only (it is refused while the file is open for output) and **`PROTECT … WRITE`** makes it
-writable again. A name containing `*` is accepted and ignored.
+<a id="protect"></a>**`PROTECT <file> {RESERVE|RELEASE|READ|WRITE}`** (`PROT`) turns on or off one of two kinds of file
+protection; exactly one of the four words is required. The file name ends at the first blank or comma, so
+`PROTECT CUSTOMER.FIL RESERVE` and `PROTECT CUSTOMER.FIL, RESERVE` are the same. A name containing `*` is
+accepted and ignored.
+
+**Multi-user protection: `RESERVE` and `RELEASE`.**
+- `RESERVE` reserves the file's full path name for **this workstation's exclusive use**: before every
+  `OPEN` BR consults a table of reservations, and an `OPEN` by another workstation fails with error **4148**
+  (file sharing rules violated) without touching the disk. The reservation holds even when the file is not
+  open, and it reserves the *name*, so it can be made for a file that does not exist, or kept after `FREE` has
+  deleted the file, which lets you reserve a name, delete the file, and rename the contents of another file
+  to it. Reserving a file this workstation has already reserved is not an error.
+- `RELEASE` removes a reservation, and only the workstation that made it can. All of a workstation's
+  reservations are released when it leaves BR. `STATUS ALL` lists the ones issued from this workstation.
+- Alternatives when the file is open: `CLOSE` with `RELEASE` (to release) and `OPEN` with `RESERVE` (to reserve).
+- It differs from locking with `NOSHR` in two ways: `PROTECT` keeps the file locked while it is not open, and
+  it does **not** stop other opens by the same workstation.
+- The multi-user purge idiom (remove deleted records and rebuild the index while nobody else can open the file),
+  as a procedure:
+
+  ```text
+  PROCERR RETURN
+  PROTECT CUSTMAST,RESERVE
+  PROCERR STOP
+  SKIP DONE IF ERR <> 0
+  COPY CUSTMAST WORK[WSID] -D
+  FREE CUSTMAST
+  RENAME WORK[WSID] CUSTMAST
+  INDEX CUSTMAST,CUSTMAST.KEY,1,4,REPLACE
+  PROTECT CUSTMAST,RELEASE
+  :DONE
+  CHAIN "MENU"
+  ```
+
+  Without the `RESERVE`, another workstation could open the file during the `COPY` and the `FREE` and `RENAME`
+  would fail. `SKIP` tests `ERR` only for zero or not because `PROCERR RETURN` forces it to zero. See also
+  [30-io-file/file-model](../../30-io-file/file-model/spec.md).
+
+**Read protection: `READ` and `WRITE`.** `READ` makes the file read-only (the file must exist, and it is refused
+while the file is open for output): every workstation, **including the one that issued it**, can read the data
+but not change it. `WRITE` removes that and allows reading and writing again. The operating system's permissions
+decide whether either succeeds. Unlike a reservation, read protection stays on the file after the workstation
+leaves BR, and it works on single-user systems too.
 
 <a id="examples"></a>
 ## Examples

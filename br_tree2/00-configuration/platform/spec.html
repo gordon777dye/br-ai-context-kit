@@ -64,7 +64,7 @@ mappings; a Windows client can drive a Linux/Mac server and vice-versa
 <a id="wbserver-exit"></a>
 <h2 id="workstation-tracking--exit">Workstation tracking &amp; exit</h2>
 <ul>
-<li><strong><code>WBSERVER.DAT</code></strong> (located via the <code>BRSERVER</code>/<code>WBSERVER</code> BRConfig.sys statement, else the first
+<li><strong><code>WBSERVER.DAT</code></strong> (located via the <code>BRSERVER</code> BRConfig.sys statement, else the first
 <code>DRIVE</code>) tracks workstation IDs and <strong>must be the <em>same</em> file for every workstation</strong> sharing data —
 two stations using <em>different</em> <code>WBSERVER.DAT</code>s and opening the same file raise <strong>error 4175</strong>.
 The first session to sign on when no other is using it empties it and writes it out afresh;

@@ -60,15 +60,20 @@ TRACE {ON|OFF|PRINT}      -- line-number tracing, under program control
 ### FOR / NEXT
 Counts the loop variable from start to end by `STEP` (default `1`; negative steps count down).
 The test happens **before** each pass; the variable **retains its final value** after the loop.
-`NEXT` must name the same variable as `FOR`. Loops **nest up to 20 levels** and must be fully
-contained (no partial overlap — the inner `NEXT` comes before the outer `NEXT`). Leave early with
-`GOTO`.
+`NEXT` must name the same variable as `FOR`. Loops must be fully contained (no partial overlap: the inner
+`NEXT` comes before the outer `NEXT`). Leave early with `GOTO`. **How many loops can be active** is set by
+the [`FORSTACK`](../../../00-configuration/config-directives/spec.md#flowstack) setting in BRConfig.sys, which
+counts distinct loop *variables*, not loops: the default is **100** here (the original wiki says 20, which was the
+old default), and a variable reused by many loops uses one slot. The number of times each variable is used is not
+limited.
 
 <a id="do-loop"></a>
 ### DO / LOOP
 Flexible condition loop; the `WHILE`/`UNTIL` test may sit on `DO` (tested first — may run zero
 times) or on `LOOP` (tested last — runs **at least once**). No labels needed for the structure;
-leave early with `EXIT DO`. `WHILE` continues while true; `UNTIL` continues until true.
+leave early with `EXIT DO`. `WHILE` continues while true; `UNTIL` continues until true. `LOOP` must be the last
+statement on its line, and the `LOOP` keyword is always required. With `CONFIG STYLE INDENT` (see
+[`STYLE`](../../../00-configuration/config-directives/spec.md#style)), `LIST` indents the lines between `DO` and `LOOP`.
 
 <a id="goto"></a>
 ### GOTO

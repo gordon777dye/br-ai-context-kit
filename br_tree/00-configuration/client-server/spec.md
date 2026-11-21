@@ -62,8 +62,8 @@ BRclient 192.168.1.100 BR          # client connects to server + label
 BRclient myserver.com:7543 BR      # custom port
 ```
 `BR_Parms.txt` (must sit beside `BRClient.exe`) supplies the connection: `host=<ip|dns|localhost>`,
-`label=<BRLISTENER.CONF label>`. The **`BRSERVER`** (a.k.a. legacy **`WBSERVER`**) BRConfig.sys
-statement names the server data file (`BRServer.dat`/`WBServer.dat`) and needs **no drive letter**.
+`label=<BRLISTENER.CONF label>`. The **`BRSERVER`** BRConfig.sys
+statement names the server data file (`BRServer.dat`) and needs **no drive letter**.
 
 <a id="reconnect"></a>
 ## Reconnect & keepalive

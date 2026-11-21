@@ -331,7 +331,7 @@ only against its translated output:
    -Compile`), or save the file in VS Code with the "BR Language Server" extension installed —
    both run the identical underlying Lexi engine, so either is a legitimate way to produce the
    final `.br` (mechanism:
-   [`br_tree` — Lexi](../br_tree/00-configuration/installation-tooling/Lexi.md#mechanism)).
+   [`br_tree` — Legacy Lexi](../br_tree/00-configuration/installation-tooling/legacy_lexi.md#mechanism)).
 5. Close with real BR's own gate regardless: `LOAD <the-compiled-or-translated-file> source` (or
    trust step 4's `-Compile`, which already does this) — same discipline as any other BR program,
    per §7.

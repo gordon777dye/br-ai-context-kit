@@ -300,7 +300,7 @@ parameter is the more damaging error.</p>
 </tr>
 <tr>
 <td><a id="br_date$"></a><a id="sql_date$"></a><code>SQL_DATE$(d$[,fmt$])</code> / <code>BR_DATE$(s$[,fmt$])</code></td>
-<td>pack/unpack SQL dates (4.30+); the format is optional</td>
+<td>convert between a date string and the SQL timestamp value. <code>SQL_DATE$</code> reads <code>d$</code> using the format <code>fmt$</code> (default: the current date format, as for <code>DAYS</code>) and returns a fixed-length SQL timestamp string; <code>BR_DATE$</code> takes such a timestamp string and returns the date formatted by <code>fmt$</code>. A <code>*</code> in front of <code>fmt$</code> also makes that format the session default, as in <code>DATE$</code>/<code>DAYS</code>. <code>BR_DATE$</code> of a string that is not a timestamp (wrong length or prefix) raises a timestamp-conversion error; a bad <code>fmt$</code> raises the date-format error. Used to move dates to and from ODBC/SQL columns</td>
 </tr>
 </tbody>
 </table>
@@ -423,15 +423,15 @@ added in <strong>4.3</strong>.</li>
 </tr>
 <tr>
 <td><a id="linestatus$"></a><code>LINESTATUS$(n)</code></td>
-<td>serial-line/modem status of communications channel <code>n</code> — see <a href="../../../30-io-file/serial-comm/spec.html">30-io-file/serial-comm</a></td>
+<td>⚠️ <strong>reserved but not implemented</strong> — parses (one numeric argument) but returns a runtime <em>bad-function</em> error; there is no serial-line status read in the current source</td>
 </tr>
 <tr>
 <td><a id="lines"></a><code>LINES(n)</code></td>
 <td>lines printed since last new-page (= <code>KREC</code> for display files)</td>
 </tr>
 <tr>
-<td><a id="linespp"></a><code>LINESPP(n)</code></td>
-<td>current lines per page (PRINTER <code>LPP</code>, else 66)</td>
+<td><a id="linespp"></a><code>LINESPP(&lt;file number&gt;)</code></td>
+<td>current lines per page of that print file: the <code>LPP</code> value of a BRConfig.sys <code>PRINTER</code> specification, else <strong>66</strong>. It lets a report adapt to dot-matrix and laser printers on one system. A <em>bracketed</em> PRINTER substitution that carries an <code>LPP</code> changes it when it is printed: with <code>PRINTER LPP 48 [SET48],&quot;\Ep48&quot;</code>, <code>PRINT LINESPP(255)</code> shows 66, then <code>PRINT #255:&quot;[SET48]&quot;</code> and <code>PRINT LINESPP(255)</code> shows 48</td>
 </tr>
 <tr>
 <td><a id="kln"></a><a id="krec"></a><code>KLN(n[,seg])</code> / <code>KREC(n)</code></td>
@@ -495,7 +495,7 @@ added in <strong>4.3</strong>.</li>
 </tr>
 <tr>
 <td><a id="menu"></a><a id="menu$"></a><code>MENU[(n)]</code> / <code>MENU$[(n)]</code></td>
-<td>subscript / data string of the selected native-menu item; <code>MENU$(n)</code> gives the <em>n</em>-th item's (see <a href="../../../20-io-screen/controls/spec.html#menus">controls</a>)</td>
+<td><code>MENU</code> is the subscript, <code>MENU$</code> the data string, of a native-menu item. With no argument they refer to the item most recently selected; <code>MENU$(n)</code> gives the data of item <em>n</em> (1-based) of the terminal window's menu, and an index that is not a live item returns the empty string. <code>MENU(n)</code> as a statement-style call sets which item counts as last selected (item <em>n</em>). See <a href="../../../20-io-screen/controls/spec.html#menus">controls</a></td>
 </tr>
 </tbody>
 </table>
@@ -511,15 +511,15 @@ added in <strong>4.3</strong>.</li>
 <tbody>
 <tr>
 <td><a id="err"></a><code>ERR</code></td>
-<td>last error number</td>
+<td>the number of the most recent error. Used in an error routine (<code>ON ERROR GOTO 99900</code> then <code>PRINT &quot;Unexpected error&quot;;ERR;&quot;at line&quot;;LINE</code>) and in procedures to see whether a command worked (<code>PROCERR RETURN</code>, the command, <code>PROCERR STOP</code>, <code>SKIP DONE IF ERR&lt;&gt;0</code>). It is set to <strong>zero</strong> by <code>RUN</code>, <code>PROCERR RETURN</code>, <code>CLEAR</code>, <code>CLEAR ALL</code> and any command that clears memory. It is <strong>not set</strong> (a) when <code>ON error … IGNORE</code> (or the default) ignores that condition, (b) for error <strong>4273</strong> (topic not found in the help file), so that a failed <code>HELP$</code> inside an error routine cannot spoil <code>RETRY</code> or <code>CONTINUE</code>, and (c) by an error in an immediate statement keyed at the keyboard. With <code>PROCERR RETURN</code> in a procedure the error is skipped but <code>ERR</code> is still set. An error produced by a string run with a line-numbered <code>EXECUTE</code> sets it too</td>
 </tr>
 <tr>
 <td><a id="line"></a><code>LINE</code></td>
-<td>current line number</td>
+<td>the <strong>line number of the most recent error</strong> (not the line now running); <code>-1</code> when there has been none, after <code>RUN</code>, <code>PROCERR RETURN</code>, <code>CLEAR</code> or <code>CLEAR ALL</code>, and for an error in a procedure while <code>PROCERR RETURN</code> is in effect. It is unchanged in the same cases as <code>ERR</code>, including 4273. With <code>PROCERR RETURN</code>, a syntax error during <code>LOAD … SOURCE</code> gives the number of the previous line (the current one was not accepted) and control returns to the procedure</td>
 </tr>
 <tr>
 <td><a id="cnt"></a><code>CNT</code></td>
-<td>data items successfully processed by the last I/O (<code>MAT A(CNT)</code> to size to what was read)</td>
+<td>the number of data items successfully processed by the last I/O statement (<code>MAT A(CNT)</code> sizes an array to what was read). After an I/O error it localises the fault: with <code>READ #2,USING 520: MAT PAYTYPE$,FLAG$,MAT AMT</code> and 52-element arrays, a conversion error (0726) with <code>CNT</code> = 52 means the first 52 items read and the 53rd is the bad one. For an error in a field-definition array of <code>INPUT FIELDS</code>, <code>PRINT FIELDS</code> or <code>RINPUT FIELDS</code>, it is the number of the last element processed. If the current error was not an I/O error, <code>CNT</code> describes an earlier one</td>
 </tr>
 <tr>
 <td><a id="brerr$"></a><code>BRERR$([code])</code></td>
@@ -555,7 +555,7 @@ added in <strong>4.3</strong>.</li>
 </tr>
 <tr>
 <td><a id="proclvl"></a><code>PROCLVL</code></td>
-<td>current procedure nesting level (<code>0</code> = keyboard / not in a procedure)</td>
+<td>current procedure nesting level: <code>0</code> at the keyboard or when no procedure is running, <code>1</code> inside a procedure started from the keyboard, and one more for each procedure nested inside it. The deepest level is 9; a tenth raises the too-many-active-procedures error</td>
 </tr>
 <tr>
 <td><a id="timer"></a><code>TIMER</code></td>

@@ -25,6 +25,13 @@ codes are canonically in [30-io-file/form-spec](../../30-io-file/form-spec/spec.
 *configuration* (spooling, PRINTER.SYS) is in
 [00-configuration](../../00-configuration/config-directives/spec.md).
 
+**File #253 is where a plain `PRINT` goes when it is open.** A `PRINT` with no file number and no `FIELDS` (the
+console `PRINT` of a program or the command line) writes to channel 253 if the program has opened it
+(`OPEN #253: ...`), and to the screen otherwise. In an **unattended** session this is how a program captures what
+would have been printed on the console. `PRINT #253:` itself is refused (error for a bad file use): the channel is
+only opened, not printed to by number. (`#254` is the alternate printer and `#255` the main printer.)
+Printing `NEWPAGE` to `#255` resets the `PAGEOFLOW` counter and the `KREC(255)` function to zero.
+
 <a id="syntax"></a>
 ## Syntax
 

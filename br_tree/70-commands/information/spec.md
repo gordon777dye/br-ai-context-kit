@@ -99,7 +99,13 @@ Each of these commands lists its forms and options when given
   **single** quotes match case-insensitively, **double** quotes require an exact-case match, `~`
   negates a term, and up to three terms combine (all must match). Edit-while-running tip: change a
   line, then `LIST … >file` to record it; `LOAD` that source later. (Plain `LIST <range>` for
-  display/editing is in [editing](../editing/spec.md#list).)
+  display/editing is in [editing](../editing/spec.md#list).) Syntax:
+  `LIST [<from> [<to>]] [~]{"<str>"|'<str>'}[…3x] [REPLACE "<str>"] [CLAUSES] [{>[>]<file>|PRINT}]`.
+  A term with `~` must be **absent** from a line and one without it **present**, in any mix, up to three; the
+  search runs over `<from>` to `<to>` (line numbers or labels) or the whole program. With `REPLACE` the lines are
+  shown **with the replacement made**, but nothing is stored until you scroll back to each line and press Enter on it;
+  to keep them all, redirect the output to a file and run it with `PROC`. `-P` shows one line at a time during a search
+  or replace.
 - **LOGGING** writes a level-filtered log (0 major-error … 5 minor-event … 9 debugging).
   <a id="debug-str"></a>**`DEBUG_STR(level, str$)`** (function, BR 4.3+) emits `str$` to the log
   (when `level` ≤ the active log level) and to the debugger, or to the command console if no
@@ -110,7 +116,7 @@ Each of these commands lists its forms and options when given
   entries or errors. See [LOGGING in a restricted session](../../00-configuration/config-directives/LOGGING.md#restricted-session).
 - <a id="status-verify"></a><a id="status"></a>**STATUS** (`ST`) reports system state by topic; with none, the
   general status (program, active procedures, …). Topics, any of which may be abbreviated:
-  `ALL`, `ATTRIBUTES`, `BREAKPOINTS`, `BTREE_VERIFY`, `COLORS`, `CONFIG`, `DATABASE`,
+  `ALL`, `ATTRIBUTES`, `BREAKPOINTS`, `COLORS`, `CONFIG`, `DATABASE`,
   `DIMS [LENGTHS [n]]`, `ENCRYPTION`, `ENV [name]`, `FILES [name]`, `FONTS`, `KEYBOARD`, `LIBRARY`,
   `LOCKS [name]`, `MEMORY`, `PRINTER`, `STACKS [RESET]`, `SUBSTITUTE` and `USERS`; a name after
   `ENV`, `FILES` or `LOCKS` narrows the report to it. `-P` pauses after each screenful and

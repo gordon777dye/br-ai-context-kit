@@ -40,6 +40,25 @@ PRINT '#'&lt;window&gt; ',' BORDER [&lt;border-spec&gt;] [ ':' &lt;caption&gt; ]
 corners. <strong>#0</strong> is always the main console (GUI console if GUI mode is on, else character-mode).</li>
 <li><strong>Border types</strong>: <code>S</code> single, <code>D</code> double, <code>B</code> blank, <code>NONE</code>; or supply two custom corner
 characters (BR derives the rest). <code>PRINT BORDER</code> (re)draws the border / sets a caption.</li>
+<li><a id="print-border"></a><strong><code>PRINT [#&lt;window&gt;,] BORDER {&quot;&lt;border&gt;[:&lt;attributes&gt;]&quot;|&lt;string-expr&gt;} : {&quot;[&lt;|&gt;]&lt;title&gt;&quot;|&lt;string-expr&gt;}</code></strong>
+(<code>PR B</code>) changes the border and the caption of a window that is already open; in the main window it sets the
+caption at the top of the BR window. Early versions used it to give an <code>OUTIN</code> window its border and caption: now both are
+given on the <code>OPEN</code> of the window. <code>#&lt;window&gt;</code> names a window file opened by an <code>OPEN</code> window statement.
+<ul>
+<li><strong>The border part</strong> is either a string expression or a quoted string that starts with the type: <code>S</code> a single
+sunken line, <code>B</code> blank, or the <strong>corners</strong> or <strong>8-character</strong> custom forms (<code>D</code> double and <code>H</code> shadowed, and the
+eight-character form, are only available with <code>OPTION 62</code>, which accepts <code>S</code>, <code>D</code>, <code>B</code>, <code>H</code> or an eight-character
+string followed by a colon and the attributes). The colon before the attributes is optional but recommended.
+The attributes after it colour the border itself (<a href="../fields-attributes/spec.html">attributes</a>). <code>S</code> (drop shadow) is
+accepted as an attribute only if the window was <strong>opened with the <code>S</code> attribute</strong>: otherwise error
+<a href="../../90-reference/error-codes/0868.html">0868</a>.</li>
+<li><strong>The caption</strong> follows a required colon: a quoted string or a string expression. In the quoted string an
+optional <code>&lt;</code> makes the title flush left, <code>&gt;</code> flush right, and with neither it is centred; the rest is the title.
+The defaults are the normal (<code>N</code>) attribute, no caption and a centred caption.</li>
+<li><code>PRINT BORDER</code> with no specification is no longer allowed (4.18a).</li>
+<li>On Unix and Linux terminals see the terminal considerations for windows.</li>
+</ul>
+</li>
 <li><strong>Positioning</strong>: <code>RELATIVE</code> (default) — coordinates from the parent window <code>#0</code>'s top-left
 (negatives allowed, placing the window above/left of the parent); <code>ABSOLUTE</code> — from the
 screen's top-left. When a <code>BORDER</code> is specified, <code>EROW</code>/<code>ECOL</code> must be <strong>one short</strong> of the desired

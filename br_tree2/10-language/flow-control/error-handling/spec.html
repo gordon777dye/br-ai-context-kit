@@ -67,6 +67,58 @@ places. A name in one is not necessarily in the other.</p>
 <code>OFLOW</code> <code>PAGEOFLOW</code> <code>SOFLOW</code> <code>TIMEOUT</code> <code>ZDIV</code></p>
 <p>† <strong><code>EVENT</code> compiles and can never fire</strong> — nothing in BR raises the condition. It is admissible
 everywhere the others are and traps nothing, in either roster.</p>
+<p><a id="conditions-by-statement"></a><strong>Which conditions a statement can actually raise</strong> (from the statement pages; a clause for another
+condition is accepted but never fires):</p>
+<table>
+<thead>
+<tr>
+<th>Statement</th>
+<th>Conditions that apply</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CLOSE</code></td>
+<td><code>EOF</code> <code>ERROR</code> <code>EXIT</code> <code>IOERR</code></td>
+</tr>
+<tr>
+<td><code>EXECUTE</code></td>
+<td><code>ERROR</code> <code>EXIT</code> <code>IOERR</code> (every error, syntax errors included, is passed back to the <code>EXECUTE</code>)</td>
+</tr>
+<tr>
+<td><code>INPUT</code></td>
+<td><code>CONV</code> <code>EOF</code> <code>ERROR</code> <code>EXIT</code> <code>HELP</code> <code>IOERR</code> <code>SOFLOW</code> (and <code>TIMEOUT</code> with <code>WAIT=</code>)</td>
+</tr>
+<tr>
+<td><code>LINPUT</code></td>
+<td><code>EOF</code> <code>ERROR</code> <code>EXIT</code> <code>HELP</code> <code>IOERR</code> <code>SOFLOW</code></td>
+</tr>
+<tr>
+<td><code>RINPUT</code></td>
+<td><code>ERROR</code> <code>EXIT</code></td>
+</tr>
+<tr>
+<td><code>LET</code></td>
+<td><code>CONV</code> <code>ERROR</code> <code>EXIT</code> <code>OFLOW</code> <code>SOFLOW</code> <code>ZDIV</code></td>
+</tr>
+<tr>
+<td><code>PRINT</code></td>
+<td><code>CONV</code> <code>EOF</code> <code>ERROR</code> <code>EXIT</code> <code>IOERR</code> <code>PAGEOFLOW</code> <code>SOFLOW</code></td>
+</tr>
+<tr>
+<td><code>REREAD</code></td>
+<td><code>CONV</code> <code>ERROR</code> <code>EXIT</code> <code>IOERR</code> <code>SOFLOW</code></td>
+</tr>
+<tr>
+<td><code>REWRITE</code></td>
+<td><code>CONV</code> <code>ERROR</code> <code>EXIT</code> <code>IOERR</code> <code>LOCKED</code> <code>NOKEY</code> <code>NOREC</code> <code>SOFLOW</code></td>
+</tr>
+<tr>
+<td><code>WRITE</code></td>
+<td><code>CONV</code> <code>DUPREC</code> <code>EOF</code> (disk full) <code>ERROR</code> <code>EXIT</code> <code>IOERR</code> <code>LOCKED</code> <code>NOREC</code> <code>SOFLOW</code></td>
+</tr>
+</tbody>
+</table>
 <p>The clauses <strong>repeat with no delimiter between them</strong> — <code>… NOKEY 910 EOF 900</code> is two clauses, not
 one clause and a syntax error. <a id="ignore"></a>A <code>line-ref</code> may also be <code>IGNORE</code> or <a id="system"></a><code>SYSTEM</code>, which are actions
 rather than branch targets (<code>… ERROR IGNORE</code>). <code>ON SOFLOW</code> has a third such action, <code>GROW</code>, which takes no line

@@ -118,6 +118,43 @@ line shows "INPUT" and the program waits for Enter. `INPUT`/`LINPUT`/`RINPUT` al
 timeout: a `WAIT=<sec>` in effect arms a `TIMEOUT` trap (**error 4145**) when no input arrives in time
 (`WAIT=0` = no wait, `WAIT=-1` = wait forever, reset on each keypress).
 
+<a id="input-details"></a>
+**Plain `INPUT`, in more detail.** The full form is
+`INPUT [#<file>:] {<variable>|MAT <array>}[, …] [<condition> <line>]…`.
+- **Where the data comes from.** The keyboard by default (no file number, or `#0`); the next records of a procedure
+  file when the program was started with `RUN PROC`; or a file or window already opened, named by `#<number>:`: a
+  display file, a communications file or a window file. From a display file the record is read as if it were typed,
+  so it must hold the right number of items, separated by commas; extra values left in the record after the last
+  variable has been given its value are ignored.
+- **Error conditions** that can be trapped: `CONV`, `EOF`, `ERROR`, `EXIT`, `HELP`, `IOERR` and `SOFLOW`.
+  With none active an error interrupts the program.
+- **Typing.** A numeric item may be entered with an exponent (`5.2E3` is 5200, `-5.2e+3` is -520, `+5e-4` is .0005).
+  A forward slash `/` as the last character typed ends a multi-variable `INPUT` without an error: the slash is not
+  read, and the variables not yet read are **not changed**, so they can keep default values (this also holds for
+  `RUN PROC` and display files). With `OPTION INVP` a comma, not a period, is the decimal point. Control characters
+  are not accepted as input.
+- **Choosing the right statement.** To take a whole record, `LINPUT` is preferred unless the fields are separated by
+  commas; `INPUT` must not be used with `EOL=NONE` for a display or communications file (`LINPUT` reads up to the
+  string's maximum length instead). To wait for any response, use `LINPUT A$`: `INPUT A$` gives error **0501**
+  (no data was entered) if only Enter is pressed.
+- **Type-ahead.** BR buffers keystrokes (up to 128) so none are lost between `INPUT` statements, and passes them to
+  `INPUT` or `KSTAT$`. Ctrl-A clears everything typed ahead of it and is seen at once. Function keys and the Help key
+  are also recognised unless `ON FNKEY IGNORE` or `ON HELP IGNORE` is in effect. The BRConfig.sys
+  [`TYPEAHEAD`](../../00-configuration/config-directives/spec.md#typeahead) setting turns the buffering off.
+- **`WAIT=`.** `WAIT=<seconds>` before the variables makes BR wait that long for input and then raise the `TIMEOUT`
+  condition (error **4145**). `WAIT=0` waits zero seconds (it does not ignore the clause), and `WAIT=-1` waits as long
+  as it takes, the clock restarting at each key. It is accepted by `INPUT`, `RINPUT`, `LINPUT` and the `FIELDS`/`SELECT`
+  forms:
+
+  ```text
+  00100 INPUT WAIT=10:X$ TIMEOUT 100
+  00130 INPUT FIELDS "10,10,C 10", WAIT=10:X$ TIMEOUT 100
+  00160 INPUT SELECT "10,10,C 10",WAIT=10:X$ TIMEOUT 100
+  ```
+
+  The `TIMEOUT` routine is the place to `RELEASE` records the operator was holding, after a warning and an
+  invitation to carry on, in multi-user programs. See also `KSTAT$`, which takes a `WAIT` too.
+
 <a id="navigation"></a>
 ### Navigation keys
 `Tab`/`Shift+Tab` next/prev field · `Enter` next field (unless NOWAIT) / submit group · `F1` field

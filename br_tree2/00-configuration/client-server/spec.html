@@ -52,8 +52,8 @@ subsequent sequential sessions (omit it if your app can't run multiple sessions)
 BRclient myserver.com:7543 BR      # custom port
 </code></pre>
 <p><code>BR_Parms.txt</code> (must sit beside <code>BRClient.exe</code>) supplies the connection: <code>host=&lt;ip|dns|localhost&gt;</code>,
-<code>label=&lt;BRLISTENER.CONF label&gt;</code>. The <strong><code>BRSERVER</code></strong> (a.k.a. legacy <strong><code>WBSERVER</code></strong>) BRConfig.sys
-statement names the server data file (<code>BRServer.dat</code>/<code>WBServer.dat</code>) and needs <strong>no drive letter</strong>.</p>
+<code>label=&lt;BRLISTENER.CONF label&gt;</code>. The <strong><code>BRSERVER</code></strong> BRConfig.sys
+statement names the server data file (<code>BRServer.dat</code>) and needs <strong>no drive letter</strong>.</p>
 <a id="reconnect"></a>
 <h2 id="reconnect--keepalive">Reconnect &amp; keepalive</h2>
 <p><code>BRClient</code> sends a keepalive every <strong>10 s</strong>; <code>BRServer</code> self-terminates if none arrives for <strong>100 s</strong>

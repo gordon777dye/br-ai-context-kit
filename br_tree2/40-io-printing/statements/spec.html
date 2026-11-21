@@ -17,6 +17,12 @@ cursor positioning, page control, and opening printer files. On-screen <code>PRI
 codes are canonically in <a href="../../30-io-file/form-spec/spec.html">30-io-file/form-spec</a>; printer
 <em>configuration</em> (spooling, PRINTER.SYS) is in
 <a href="../../00-configuration/config-directives/spec.html">00-configuration</a>.</p>
+<p><strong>File #253 is where a plain <code>PRINT</code> goes when it is open.</strong> A <code>PRINT</code> with no file number and no <code>FIELDS</code> (the
+console <code>PRINT</code> of a program or the command line) writes to channel 253 if the program has opened it
+(<code>OPEN #253: ...</code>), and to the screen otherwise. In an <strong>unattended</strong> session this is how a program captures what
+would have been printed on the console. <code>PRINT #253:</code> itself is refused (error for a bad file use): the channel is
+only opened, not printed to by number. (<code>#254</code> is the alternate printer and <code>#255</code> the main printer.)
+Printing <code>NEWPAGE</code> to <code>#255</code> resets the <code>PAGEOFLOW</code> counter and the <code>KREC(255)</code> function to zero.</p>
 <a id="syntax"></a>
 <h2>Syntax</h2>
 <pre><code class="language-bnf">-- unformatted --

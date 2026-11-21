@@ -55,7 +55,9 @@ is: <code>fnCloseDisplayWindow</code> and <code>STR2MAT(&quot;300,400,700&quot;,
 their return values discarded.</p>
 <p>Either form — assigned or called, <code>LET</code> written or implied — may close with a trailing
 <a href="../../flow-control/error-handling/spec.html#conditions">error-condition clause</a>, the same one any
-statement takes: <code>LET VAL(F$(N)) CONV skipval</code> and, with <code>LET</code> dropped, <code>X = 5 CONV 900</code>.</p>
+statement takes: <code>LET VAL(F$(N)) CONV skipval</code> and, with <code>LET</code> dropped, <code>X = 5 CONV 900</code>. The conditions that can be trapped on a <code>LET</code> are <code>CONV</code>, <code>ERROR</code>, <code>EXIT</code>, <code>OFLOW</code>, <code>SOFLOW</code> and
+<code>ZDIV</code>. BR types the word <code>LET</code> for you: in the console it is added as you press Enter, and with an external editor
+it is added when the program is compiled, so programs are normally written without it.</p>
 <ul>
 <li><strong>Multiple assignment</strong> — assign one value to several variables at once:
 <code>LET SUMA = SUMB = SUMC = SUMD = 0</code>.</li>

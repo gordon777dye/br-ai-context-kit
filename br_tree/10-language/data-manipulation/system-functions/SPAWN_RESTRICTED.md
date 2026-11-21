@@ -51,7 +51,7 @@ The new session is latched **before it reads its configuration file**, and the o
 point: `config$` is the *caller's* choice, so the configuration operations a restricted session
 refuses are refused **in that file**, not applied and then locked.
 
-Since `LOGGING` and `WBSERVER` are among them, the new session is handed the **current session's**
+Since `LOGGING` and `BRSERVER` are among them, the new session is handed the **current session's**
 `wbserver.dat`, and the **folder** of the current session's log. It writes its own audit log there,
 `restricted-<SESSION$>.log` (for example `restricted-012.log` for WSID 01, session 2), at level 8;
 when the current session is not logging, it goes in `%LOCALAPPDATA%\ADS`. The log's first entry

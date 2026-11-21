@@ -158,6 +158,7 @@ too, except multiple indexes). Use it for batch updates, record purges and temp 
 <li><strong>SHRI</strong> — others may open <strong>INPUT only</strong> (good during batch update / SORT).</li>
 <li><strong>SHR</strong> — full sharing; records lock individually during OUTIN update. Conflicts raise
 <strong>error 4148</strong>.</li>
+<li><strong>SHRU</strong> — the same as <code>SHR</code>; kept for System/23 compatibility.</li>
 <li><strong>Releases before 5.01</strong> — never have a file open while BR 5.01 has it, whatever the share-spec:
 whichever opens it second gets <strong>error 4149</strong> (an earlier release on Windows with <code>OPTION 33 31</code>
 or <code>32</code> gets <strong>4175</strong>). 5.01 adds a record past the end of the file and writes it after letting go

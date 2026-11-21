@@ -58,6 +58,22 @@ PRINT '#'<window> ',' BORDER [<border-spec>] [ ':' <caption> ]
   corners. **#0** is always the main console (GUI console if GUI mode is on, else character-mode).
 - **Border types**: `S` single, `D` double, `B` blank, `NONE`; or supply two custom corner
   characters (BR derives the rest). `PRINT BORDER` (re)draws the border / sets a caption.
+- <a id="print-border"></a>**`PRINT [#<window>,] BORDER {"<border>[:<attributes>]"|<string-expr>} : {"[<|>]<title>"|<string-expr>}`**
+  (`PR B`) changes the border and the caption of a window that is already open; in the main window it sets the
+  caption at the top of the BR window. Early versions used it to give an `OUTIN` window its border and caption: now both are
+  given on the `OPEN` of the window. `#<window>` names a window file opened by an `OPEN` window statement.
+  - **The border part** is either a string expression or a quoted string that starts with the type: `S` a single
+    sunken line, `B` blank, or the **corners** or **8-character** custom forms (`D` double and `H` shadowed, and the
+    eight-character form, are only available with `OPTION 62`, which accepts `S`, `D`, `B`, `H` or an eight-character
+    string followed by a colon and the attributes). The colon before the attributes is optional but recommended.
+    The attributes after it colour the border itself ([attributes](../fields-attributes/spec.md)). `S` (drop shadow) is
+    accepted as an attribute only if the window was **opened with the `S` attribute**: otherwise error
+    [0868](../../90-reference/error-codes/0868.md).
+  - **The caption** follows a required colon: a quoted string or a string expression. In the quoted string an
+    optional `<` makes the title flush left, `>` flush right, and with neither it is centred; the rest is the title.
+    The defaults are the normal (`N`) attribute, no caption and a centred caption.
+  - `PRINT BORDER` with no specification is no longer allowed (4.18a).
+  - On Unix and Linux terminals see the terminal considerations for windows.
 - **Positioning**: `RELATIVE` (default) — coordinates from the parent window `#0`'s top-left
   (negatives allowed, placing the window above/left of the parent); `ABSOLUTE` — from the
   screen's top-left. When a `BORDER` is specified, `EROW`/`ECOL` must be **one short** of the desired

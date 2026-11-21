@@ -120,7 +120,7 @@ SYSTEM [<flags>] "<os-command>"                      -- run an OS shell command,
 [`EXECUTE`](#execute) or a `PROC`. Three forms:
 
 - **Exit** — bare `SYSTEM` (`SY`) closes files and returns to the OS; `SYSTEM <n>` returns `<n>` as the
-  process **exit code** (readable by a calling shell/script). `SYSTEM LOGOFF [ALL]` exits and also
+  process **exit code** (readable by a calling shell/script: `ERRORLEVEL` in a DOS batch file, `$?` in a Linux shell). `SYSTEM LOGOFF [ALL]` exits and also
   logs the client off — see [logoff](#system-logoff).
 - **Shell call** — `SYSTEM "<os-command>"` runs an operating-system command (launch another program,
   run a script), then returns to BR — **the program's main way to invoke other applications through the
@@ -135,7 +135,7 @@ SYSTEM [<flags>] "<os-command>"                      -- run an OS shell command,
 | `-@` | run the command on the BR **client** side |
 | `-S` / `-s` | run on the BR **server** side (default follows the `SHELL DEFAULT CLIENT`/`SERVER` config) |
 | `-R` / `-r` (or leading `*`) | **restore** the BR screen after the call |
-| `-C` / `-c` | **continue asynchronously** — don't wait for the command to finish (conflicts with `-R`) |
+| `-C` / `-c` | **continue asynchronously** — don't wait for the command to finish (conflicts with `-R`). Windows launches the task and BR carries on; on Unix the command is framed with `NOHUP` and `&`. Without it the call waits for the process, up to the `SHELL LIMIT` seconds |
 | `-M` / `-m` | **hide** / **minimize** the launched program's window |
 | `-H` / `-h` | **hide** / **minimize** BR's own window during the call |
 | `-W` / `-w` | accepted and **ignored** in BR 5.0 (it marked a Windows program in 4.x, and no longer conflicts with `-R`) |
@@ -214,10 +214,23 @@ lines that share them. `ADD` appends all lines after the current program's last 
 renumbers the first merged line (others follow the source increments). A single line number merges
 only that line.
 
+- **Defaults:** the whole program is merged; a `-<from>` alone merges from that line to the end of the program;
+  the merged lines keep their numbers. **Caution:** a merged line replaces any line in memory that has
+  the same number.
+- `f` is the name of the program (a `.br` file) to merge.
+- `<first>` is the number given to the first merged line; the others follow the increments the source file had.
+- `ADD` puts every merged line after the end of the program in memory: the first is numbered **ten greater than
+  the current last line**, and the rest keep the source's increments.
+- Examples: `MERGE MERGETST -100 -300` merges lines 100 to 300 of MERGETST.BR, keeping their numbers (and
+  replacing any lines of those numbers in memory); `MERGE MERGETST ADD` adds all of MERGETST.BR to the end.
+- **Behaviour change:** `MERGE f <line>` with a line number alone merges only that line. Before it merged from that
+  line to the end of the program, which may matter to an old application.
+- To *look at* lines of another program without merging them, use `LIST <name` (see [LIST](../editing/spec.md#list)).
+
 <a id="replace"></a>
 ### SAVE / REPLACE — source vs object
 `SAVE` writes a **new** file (error 4150 if it exists); `REPLACE` overwrites an **existing** one and
-leaves the lines in memory. Both save **source** only when the name ends `.BRS` or the **`SOURCE`**
+leaves the lines in memory. Saving as source stores the **current `STYLE`** formatting with the file, permanently. Both save **source** only when the name ends `.BRS` or the **`SOURCE`**
 keyword is given; otherwise they save **object** (`.BR`/`.BRO`). With no filename, `REPLACE` reuses the
 file's full original name (a trailing period suppresses the default extension). **`OBJECT`** (`.BRO`)
 omits source — *unrecoverable*, used to ship protected code. Before overwriting, BR copies the original
@@ -256,6 +269,16 @@ it). After an error, `GO` retries the failing statement. In STEP mode, Shift+F1�
 widening scope (into-clause / over-clause / into-line / over-line / to `RETURN`|`FNEND`).
 **`GO END`** terminates the interrupted program and closes all files.
 
+- A line can be given as a **line label** as well as a number, for both `GO <line>` and `GO .<line>`.
+- The `TRACE` output goes to the screen unless `PRINT` is given; `PRINT` works only with `TRACE`. For example
+  `GO TRACE PRINT 1350` resumes at line 1350 and traces to the printer. `NOSTEP` and `NOTRACE` turn the two off.
+- `STEP` shows the number of the line about to run in the status line; **Enter** runs it and shows the next.
+  In STEP mode a typed `GO` means `GO RUN` and Enter means `GO STEP`. `RUN STEP NORESTORE` stops BR putting the
+  application screen back after the first time; `RUN STEP RESTORE` puts it back before every step (and `GO RUN`
+  does not reset `NORESTORE`). `GO PROC` takes the program's input from the active procedure.
+- `TRACE SOURCE` shows each line's source text as it runs, in place of only its number.
+- Shift+F1 to Shift+F4 step by a wider scope each time: the F-key number rises as the scope does.
+
 <a id="ai"></a>
 ## AI (BR 5.0)
 
@@ -283,8 +306,10 @@ once with error 4158.
 EXECUTE "[*]<command-string>"
 ```
 Runs any command/statement string at runtime — the bridge that makes commands part of the
-coding surface (build index files, run a SORT, start a PROC, …). A leading `*` suppresses screen
-restoration (the default does **not** restore the screen). Inspect
+coding surface (build index files, run a SORT, start a PROC, …). A leading `*` makes BR **save the screen
+and put it back** when the command finishes; without it the screen is **not** restored (`EXECUTE "DIR"` leaves
+what the command wrote, `EXECUTE "*COPY OLDFILE NEWFILE"` restores the screen). In GUI mode the screen is
+never saved, so the `*` has no effect there. Inspect
 [`CODE`](../../10-language/data-manipulation/system-functions/spec.md#system-info) afterward for a
 procedure's return value. **Restrictions:** because it is illegal to *terminate* a program from
 `EXECUTE`, the program-ending commands `LOAD`, `SAVE`, `REPLACE` and the `CHAIN` statement may not
@@ -324,7 +349,7 @@ makes it **self-deleting** after execution.
 <a id="proc"></a>**Starting**: `PROC {name|*name|ECHO|NOECHO}` (runs it; `*` suppresses F2 logging;
 NOECHO hides lines). <a id="subproc"></a>`SUBPROC file` runs a **nested** procedure (up to 9 deep) then resumes.
 From code: `CHAIN "PROC=…"` / `CHAIN "SUBPROC=…"` (ends program) or `EXECUTE "PROC …"` (keeps
-program running). `RUN PROC` feeds procedure lines to a program's `INPUT`/`LINPUT`.
+program running). `RUN PROC` feeds procedure lines to a program's `INPUT`/`LINPUT`/`RINPUT`; it has **no effect** on `INPUT FIELDS` or `RINPUT FIELDS`.
 
 <a id="run-proc"></a>**`RUN … PROC`** — `PROC` is an **option of `RUN`**, not a command. It is not
 followed by a file name: the lines fed to the program are the ones that follow the `RUN` line in

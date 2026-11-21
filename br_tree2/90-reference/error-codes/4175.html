@@ -17,7 +17,7 @@
 <li>A release before 5.01, on Windows with <code>OPTION 33 31</code> or <code>32</code>, also gets it when opening a file
 that BR 5.01 has open, and logs that a user with WSID 0 is on the other <code>wbserver.dat</code>. There is
 no other <code>wbserver.dat</code>: the two versions cannot have one file open together (see <a href="4149.html">4149</a>).</li>
-<li>If the WBServer.dat location has been set to a separate mapped drive (in <code>BRConfig.sys</code>, by the use of a <code>WBServer</code> <code>config</code> statement), and that drive got rebooted,than workstations that were in BR! will continue to function properly, but other sessions that newly launch will receive 4175 errors. # Delete all the WBServer.dat files.  (del \wbserver.dat /s)</li>
+<li>If the WBServer.dat location has been set to a separate mapped drive (in <code>BRConfig.sys</code>, by the use of a <code>BRSERVER</code> <code>config</code> statement), and that drive got rebooted,than workstations that were in BR! will continue to function properly, but other sessions that newly launch will receive 4175 errors. # Delete all the WBServer.dat files.  (del \wbserver.dat /s)</li>
 <li>Exit BR! on all workstations.  Once every workstation has completely exited BR!, they may all re-enter.</li>
 </ul>
 </main>

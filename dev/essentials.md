@@ -177,13 +177,13 @@ Two kinds of content, both load-bearing:
     a growing list, not exhaustive, the same as the rest of this file. Full directive reference,
     both known Lexi distributions (classic SageAX zip vs. the VS Code extension bundle), and the
     headless invocation mechanism:
-    [`br_tree/00-configuration/installation-tooling/Lexi.md`](../br_tree/00-configuration/installation-tooling/Lexi.md).
+    [`br_tree/00-configuration/installation-tooling/legacy_lexi.md`](../br_tree/00-configuration/installation-tooling/legacy_lexi.md).
 
   **If a program won't compile in base BR (or `brls` rejects it) and it uses any of the above
   `#`-prefixed or `&=`/`/* */` syntax, the fix is not to remove the construct — check whether the
   app is meant to be run through Lexi first.** A common, real deployment of Lexi is bundled inside
   the "BR Language Server" VS Code extension (`crs-dev.vslang-br`), which runs Lexi automatically
-  on save; see [`br_tree` — Lexi](../br_tree/00-configuration/installation-tooling/Lexi.md) for a
+  on save; see [`br_tree` — Legacy Lexi](../br_tree/00-configuration/installation-tooling/legacy_lexi.md) for a
   verified (not guessed) description of how that pipeline actually invokes Lexi and compiles the
   result, and [`BR_launch.md`](BR_launch.md#the-lexi-preprocessor) for running the same thing
   headlessly. If a program has none of this syntax, it's likely plain BR and none of this

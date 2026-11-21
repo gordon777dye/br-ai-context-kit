@@ -41,14 +41,19 @@ TRACE {ON|OFF|PRINT}      -- line-number tracing, under program control
 <h3 id="for--next">FOR / NEXT</h3>
 <p>Counts the loop variable from start to end by <code>STEP</code> (default <code>1</code>; negative steps count down).
 The test happens <strong>before</strong> each pass; the variable <strong>retains its final value</strong> after the loop.
-<code>NEXT</code> must name the same variable as <code>FOR</code>. Loops <strong>nest up to 20 levels</strong> and must be fully
-contained (no partial overlap — the inner <code>NEXT</code> comes before the outer <code>NEXT</code>). Leave early with
-<code>GOTO</code>.</p>
+<code>NEXT</code> must name the same variable as <code>FOR</code>. Loops must be fully contained (no partial overlap: the inner
+<code>NEXT</code> comes before the outer <code>NEXT</code>). Leave early with <code>GOTO</code>. <strong>How many loops can be active</strong> is set by
+the <a href="../../../00-configuration/config-directives/spec.html#flowstack"><code>FORSTACK</code></a> setting in BRConfig.sys, which
+counts distinct loop <em>variables</em>, not loops: the default is <strong>100</strong> here (the original wiki says 20, which was the
+old default), and a variable reused by many loops uses one slot. The number of times each variable is used is not
+limited.</p>
 <a id="do-loop"></a>
 <h3 id="do--loop">DO / LOOP</h3>
 <p>Flexible condition loop; the <code>WHILE</code>/<code>UNTIL</code> test may sit on <code>DO</code> (tested first — may run zero
 times) or on <code>LOOP</code> (tested last — runs <strong>at least once</strong>). No labels needed for the structure;
-leave early with <code>EXIT DO</code>. <code>WHILE</code> continues while true; <code>UNTIL</code> continues until true.</p>
+leave early with <code>EXIT DO</code>. <code>WHILE</code> continues while true; <code>UNTIL</code> continues until true. <code>LOOP</code> must be the last
+statement on its line, and the <code>LOOP</code> keyword is always required. With <code>CONFIG STYLE INDENT</code> (see
+<a href="../../../00-configuration/config-directives/spec.html#style"><code>STYLE</code></a>), <code>LIST</code> indents the lines between <code>DO</code> and <code>LOOP</code>.</p>
 <a id="goto"></a>
 <h3>GOTO</h3>
 <p>Unconditional transfer to a <code>&lt;line-ref&gt;</code>. Backward jumps form loops; forward jumps skip code.

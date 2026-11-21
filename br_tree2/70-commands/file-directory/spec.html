@@ -322,6 +322,18 @@ screen, a printer, or another file. <strong><code>-P</code></strong> pauses afte
 from 2 to 9 shows the next that many lines before pausing again (BR 5.0), and any other key the next
 screenful. <strong>MKDIR</strong> subdirectory names follow file-name rules, and the same
 name may exist under different parent directories.</p>
+<ul>
+<li><strong><code>TYPE &lt;name&gt; [-P] [&gt;file|&gt;&gt;file|PRINT]</code></strong>: <code>name</code> may hold wildcards, and then every file it names is typed, one
+after the other, into the <strong>one</strong> redirect, so <code>TYPE *.txt &gt; all.txt</code> joins them (<code>&gt;&gt;</code> appends to an existing file).
+Written to a file the bytes are copied as they are, so a file that holds a blob comes through whole; only on the
+screen are trailing nulls and Ctrl-Z trimmed.</li>
+<li><strong>Printer escape sequences (4.2+).</strong> <code>TYPE</code> translates the printer escape sequences in a print file for the
+<em>destination</em>, matched as the destination's printer name is at <code>OPEN</code> time (as <code>NAME=PRN:/printer</code>). To a display
+file the printer type can be named with <code>PRINTER_TYPE=&lt;type&gt;</code>, matched against the second parameter of the
+configuration's <code>PRINTER</code> statements: <code>TYPE PRTeport &gt;PREVIEW:/HP4</code> translates the HP4 sequences in <code>report</code> for the
+preview, and <code>TYPE PRTeport-file1 &gt;report-file2 PRINTER_TYPE=HP4</code> copies file1 to file2 interpreting them. In contrast
+<code>COPY PRT\EDITLIST.255 DIRECT:/HP4</code> sends a print file to a printer unaltered.</li>
+</ul>
 <p><a id="drop-free"></a><a id="drop"></a><a id="free"></a><strong>DROP</strong> empties a file's contents — freeing all allocated space and leaving
 only the header record for internal files — but keeps the name (size→0). <strong>FREE</strong> deletes the
 file(s) outright (unrecoverable). Both take <code>-N</code>/<code>-P</code>/<code>-V</code> and accept wildcards (use <code>-V</code> to
@@ -332,11 +344,56 @@ everything in it. Under <code>-V</code> each file is asked about, and a folder t
 kept. A procedure can <code>FREE</code> itself as its last line; a <code>.$$$</code>-named procedure self-deletes
 after running. <em>(The same-named <code>DROP</code>/<code>FREE</code> <strong>CLOSE parameters</strong> inside a program are a separate
 file operation — <a href="../../30-io-file/statements/spec.html#close">30-io-file/statements</a>.)</em></p>
-<p><a id="protect"></a><strong>PROTECT … RESERVE/RELEASE</strong> reserves a full path name for one workstation's
-exclusive use (and releases it) — the multi-user purge idiom; see
-<a href="../../30-io-file/file-model/spec.html">30-io-file/file-model</a>. <strong><code>PROTECT … READ</code></strong> makes the file
-read-only (it is refused while the file is open for output) and <strong><code>PROTECT … WRITE</code></strong> makes it
-writable again. A name containing <code>*</code> is accepted and ignored.</p>
+<p><a id="protect"></a><strong><code>PROTECT &lt;file&gt; {RESERVE|RELEASE|READ|WRITE}</code></strong> (<code>PROT</code>) turns on or off one of two kinds of file
+protection; exactly one of the four words is required. The file name ends at the first blank or comma, so
+<code>PROTECT CUSTOMER.FIL RESERVE</code> and <code>PROTECT CUSTOMER.FIL, RESERVE</code> are the same. A name containing <code>*</code> is
+accepted and ignored.</p>
+<p><strong>Multi-user protection: <code>RESERVE</code> and <code>RELEASE</code>.</strong></p>
+<ul>
+<li>
+<p><code>RESERVE</code> reserves the file's full path name for <strong>this workstation's exclusive use</strong>: before every
+<code>OPEN</code> BR consults a table of reservations, and an <code>OPEN</code> by another workstation fails with error <strong>4148</strong>
+(file sharing rules violated) without touching the disk. The reservation holds even when the file is not
+open, and it reserves the <em>name</em>, so it can be made for a file that does not exist, or kept after <code>FREE</code> has
+deleted the file, which lets you reserve a name, delete the file, and rename the contents of another file
+to it. Reserving a file this workstation has already reserved is not an error.</p>
+</li>
+<li>
+<p><code>RELEASE</code> removes a reservation, and only the workstation that made it can. All of a workstation's
+reservations are released when it leaves BR. <code>STATUS ALL</code> lists the ones issued from this workstation.</p>
+</li>
+<li>
+<p>Alternatives when the file is open: <code>CLOSE</code> with <code>RELEASE</code> (to release) and <code>OPEN</code> with <code>RESERVE</code> (to reserve).</p>
+</li>
+<li>
+<p>It differs from locking with <code>NOSHR</code> in two ways: <code>PROTECT</code> keeps the file locked while it is not open, and
+it does <strong>not</strong> stop other opens by the same workstation.</p>
+</li>
+<li>
+<p>The multi-user purge idiom (remove deleted records and rebuild the index while nobody else can open the file),
+as a procedure:</p>
+<pre><code class="language-text">PROCERR RETURN
+PROTECT CUSTMAST,RESERVE
+PROCERR STOP
+SKIP DONE IF ERR &lt;&gt; 0
+COPY CUSTMAST WORK[WSID] -D
+FREE CUSTMAST
+RENAME WORK[WSID] CUSTMAST
+INDEX CUSTMAST,CUSTMAST.KEY,1,4,REPLACE
+PROTECT CUSTMAST,RELEASE
+:DONE
+CHAIN &quot;MENU&quot;
+</code></pre>
+<p>Without the <code>RESERVE</code>, another workstation could open the file during the <code>COPY</code> and the <code>FREE</code> and <code>RENAME</code>
+would fail. <code>SKIP</code> tests <code>ERR</code> only for zero or not because <code>PROCERR RETURN</code> forces it to zero. See also
+<a href="../../30-io-file/file-model/spec.html">30-io-file/file-model</a>.</p>
+</li>
+</ul>
+<p><strong>Read protection: <code>READ</code> and <code>WRITE</code>.</strong> <code>READ</code> makes the file read-only (the file must exist, and it is refused
+while the file is open for output): every workstation, <strong>including the one that issued it</strong>, can read the data
+but not change it. <code>WRITE</code> removes that and allows reading and writing again. The operating system's permissions
+decide whether either succeeds. Unlike a reservation, read protection stays on the file after the workstation
+leaves BR, and it works on single-user systems too.</p>
 <a id="examples"></a>
 <h2>Examples</h2>
 <pre><code class="language-text">CHDIR \DATA\REPORTS

@@ -84,7 +84,7 @@ disposable session nobody is waiting for has no reason to keep holding a session
 <p>The new session is latched <strong>before it reads its configuration file</strong>, and the ordering is the whole
 point: <code>config$</code> is the <em>caller's</em> choice, so the configuration operations a restricted session
 refuses are refused <strong>in that file</strong>, not applied and then locked.</p>
-<p>Since <code>LOGGING</code> and <code>WBSERVER</code> are among them, the new session is handed the <strong>current session's</strong>
+<p>Since <code>LOGGING</code> and <code>BRSERVER</code> are among them, the new session is handed the <strong>current session's</strong>
 <code>wbserver.dat</code>, and the <strong>folder</strong> of the current session's log. It writes its own audit log there,
 <code>restricted-&lt;SESSION$&gt;.log</code> (for example <code>restricted-012.log</code> for WSID 01, session 2), at level 8;
 when the current session is not logging, it goes in <code>%LOCALAPPDATA%\ADS</code>. The log's first entry

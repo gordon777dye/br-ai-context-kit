@@ -78,7 +78,13 @@ its current value.</li>
 <strong>single</strong> quotes match case-insensitively, <strong>double</strong> quotes require an exact-case match, <code>~</code>
 negates a term, and up to three terms combine (all must match). Edit-while-running tip: change a
 line, then <code>LIST … &gt;file</code> to record it; <code>LOAD</code> that source later. (Plain <code>LIST &lt;range&gt;</code> for
-display/editing is in <a href="../editing/spec.html#list">editing</a>.)</li>
+display/editing is in <a href="../editing/spec.html#list">editing</a>.) Syntax:
+<code>LIST [&lt;from&gt; [&lt;to&gt;]] [~]{&quot;&lt;str&gt;&quot;|'&lt;str&gt;'}[…3x] [REPLACE &quot;&lt;str&gt;&quot;] [CLAUSES] [{&gt;[&gt;]&lt;file&gt;|PRINT}]</code>.
+A term with <code>~</code> must be <strong>absent</strong> from a line and one without it <strong>present</strong>, in any mix, up to three; the
+search runs over <code>&lt;from&gt;</code> to <code>&lt;to&gt;</code> (line numbers or labels) or the whole program. With <code>REPLACE</code> the lines are
+shown <strong>with the replacement made</strong>, but nothing is stored until you scroll back to each line and press Enter on it;
+to keep them all, redirect the output to a file and run it with <code>PROC</code>. <code>-P</code> shows one line at a time during a search
+or replace.</li>
 <li><strong>LOGGING</strong> writes a level-filtered log (0 major-error … 5 minor-event … 9 debugging).
 <a id="debug-str"></a><strong><code>DEBUG_STR(level, str$)</code></strong> (function, BR 4.3+) emits <code>str$</code> to the log
 (when <code>level</code> ≤ the active log level) and to the debugger, or to the command console if no
@@ -89,7 +95,7 @@ how a program says what it is in its audit log, and the line is marked as the pr
 entries or errors. See <a href="../../00-configuration/config-directives/LOGGING.html#restricted-session">LOGGING in a restricted session</a>.</li>
 <li><a id="status-verify"></a><a id="status"></a><strong>STATUS</strong> (<code>ST</code>) reports system state by topic; with none, the
 general status (program, active procedures, …). Topics, any of which may be abbreviated:
-<code>ALL</code>, <code>ATTRIBUTES</code>, <code>BREAKPOINTS</code>, <code>BTREE_VERIFY</code>, <code>COLORS</code>, <code>CONFIG</code>, <code>DATABASE</code>,
+<code>ALL</code>, <code>ATTRIBUTES</code>, <code>BREAKPOINTS</code>, <code>COLORS</code>, <code>CONFIG</code>, <code>DATABASE</code>,
 <code>DIMS [LENGTHS [n]]</code>, <code>ENCRYPTION</code>, <code>ENV [name]</code>, <code>FILES [name]</code>, <code>FONTS</code>, <code>KEYBOARD</code>, <code>LIBRARY</code>,
 <code>LOCKS [name]</code>, <code>MEMORY</code>, <code>PRINTER</code>, <code>STACKS [RESET]</code>, <code>SUBSTITUTE</code> and <code>USERS</code>; a name after
 <code>ENV</code>, <code>FILES</code> or <code>LOCKS</code> narrows the report to it. <code>-P</code> pauses after each screenful and
