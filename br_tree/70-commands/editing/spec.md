@@ -25,6 +25,7 @@ below).
 ## Syntax
 
 ```bnf
+<line-range> ::= <starting-line> <ending-line>
 AUTO  [<start-line>] [{','|' '} <increment>]      -- AU; default 10, 10
 RENUM [-<from>] [-<to>] [<first>] [<incr>] [LABELS_ONLY]   -- RENU; updates GOTO/GOSUB references
 DEL   { <line> | <start-line> <end-line> } [SOURCE]   -- DE; delete line(s)
@@ -55,20 +56,23 @@ Each of these commands lists its forms and options when given
 - <a id="del"></a>**DEL** removes a line or inclusive range (in memory only until `SAVE`/`REPLACE`;
   gaps are fine). **`DEL … SOURCE`** deletes only the *source* text, keeping the compiled object —
   used to hide source for security; the program then **cannot be reloaded from source** (keep a
-  separate full copy). Deleted lines leave reclaimable space: save to source and reload to recover
+  separate full copy). Deleted whole lines leave reclaimable space: save to source and reload to recover
   ~100 bytes of object per 7 deleted lines.
-- <a id="list"></a>**LIST** shows lines with BR's canonical formatting (5-digit numbers, upper-cased
-  keywords); edit directly on a listed line and press Enter on that line to store it. After a `RUN`
-  you must `LIST` again before editing. (`LIST "string"` instead *searches/replaces* — see
-  [information](../information/spec.md#list-search).)
-- <a id="list-options"></a>**LIST options.** **`-P`** pauses after **each line**; at the pause a
-  digit from 2 to 9 lists the next that many lines before pausing again, any other key lists one
-  more, and Ctrl-A stops. **`-<line>`** and **`<line>-`** list the screenful ending, or starting, at
-  that line — what PgUp, PgDn and F6 type for you. **`CLAUSES`** marks where each clause begins, for
+- <a id="list"></a>**LIST** shows lines with BR's canonical formatting (5-digit numbers, keywords 
+  formatted per STYLE configuration statement); edit directly on a listed line and press Enter on 
+  that line to store it. After a `RUN` and another ATTN, up and down arrows and PgUp/PgDn resume 
+  listing. `LIST "string"` *searches* for matching lines — see
+  [information](../information/spec.md#list-search). Several variants are available.
+- <a id="list-options"></a>**LIST options.** **`-P`** pauses after **each line**. Any key lists one
+  more, PgUp/PgDn work, and Ctrl-A stops. **`-<line>`** and **`<line>-`** list the screenful 
+  ending, or starting, at
+  that line — what F5 and F6 type for you. **`CLAUSES`** marks where each clause begins, for
   `line:clause` references in `BREAK` and `GO`. **`PRINT`** lists to the printer, ending with a
-  page eject unless **`NOEJECT`** is given (the old wiki called this `SKIP`); `>printer-name` lists to a named
+  page eject unless **`NOEJECT`** is given (the old wiki called this `SKIP`); `>printer-name` lists 
+  to a named
   printer. `LIST PRINT` uses the printer's initialization escape sequences.
-- <a id="list-output"></a>**Where `LIST` writes.** The screen by default. **`>file`** writes the listing to a file
+- <a id="list-output"></a>**Where `LIST` writes.** The screen by default. **`>file`** writes the 
+  listing to a file
   (created, as source: `LIST 500 1350 >B:\OUTPUT.BRS`) and **`>>file`** appends to one; **`PRINT`** goes to the
   printer. A single line number with `>file` redirects **only that line** (before, it redirected from that line to the
   end of the program: this can affect an old application). `PRINT` is different on the screen's one-line rule:
