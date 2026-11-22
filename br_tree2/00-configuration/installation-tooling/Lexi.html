@@ -231,7 +231,7 @@ On a <code>#DEFINE#</code> line the name being defined is never replaced.</li>
 <code>#CASE ELSE#</code> and <code>#END SELECT#</code> belongs to the innermost <code>#SELECT#</code> open, and once that one is
 closed the outer one goes on. The result is nested <code>if</code> blocks:</p>
 <pre><code>#SELECT# Mode #CASE# 1               if Mode = 1 then  ! #SELECT# Mode #CASE# 1
-   #SELECT# Sub #CASE# &quot;a&quot;              if Sub = &quot;a&quot; then  ! #SELECT# Sub #CASE# &quot;a&quot;
+   #SELECT# Sub$ #CASE# &quot;a&quot;             if Sub$ = &quot;a&quot; then  ! #SELECT# Sub$ #CASE# &quot;a&quot;
       print &quot;1a&quot;                           print &quot;1a&quot;
    #CASE ELSE#                   →      else  ! #CASE ELSE#
       print &quot;1 other&quot;                      print &quot;1 other&quot;

@@ -12,7 +12,7 @@ kept separate from coding specifications.** Each folder has its own `_index.md`.
 - **[40-io-printing/](40-io-printing/_index.md)** (7 docs) — Printing authoring (coding side only; spool/printer config lives under 00-configuration).
 - **[50-libraries/](50-libraries/_index.md)** (27 docs) — Reusable library facility and the shipped function packs.
 - **[60-integration/](60-integration/_index.md)** (7 docs) — Web & data-exchange integration — JSON/data store and BR as a web server.
-- **[70-commands/](70-commands/_index.md)** (12 docs) — Executive/console commands. Integral to coding because they are runnable from program code via `EXECUTE "<cmd>"`.
+- **[70-commands/](70-commands/_index.md)** (14 docs) — Executive/console commands. Integral to coding because they are runnable from program code via `EXECUTE "<cmd>"`.
 - **[90-reference/](90-reference/_index.md)** (868 docs) — Lookup-only reference material — not authoring specifications.
 
 ## Where do I look for…
@@ -29,6 +29,7 @@ kept separate from coding specifications.** Each folder has its own `_index.md`.
 | Lay out a screen / field | `20-io-screen/*` |
 | Print a report | `40-io-printing/*` |
 | Run a program from code (EXECUTE) | `70-commands` |
+| Write a regular expression (SEARCH /.../) | `70-commands/file-directory/ECMA_REGEX.md` |
 | Look up an error code | `90-reference/error-codes/_index.md` |
 | Configure BR / deploy | `00-configuration/*` |
 

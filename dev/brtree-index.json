@@ -1,8 +1,8 @@
 {
-  "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; section_index maps each statement, READY command and system function to the spec section(s) (anchor) that cover it, each with a kind - command, function, statement or reference - saying what that section documents the word as; config_index maps each configuration statement (BRConfig.sys, CONFIG) to where it is defined: a page of its own (file) or a section (anchor); each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-11-20",
+  "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; section_index maps each statement, READY command and system function to the spec section(s) (anchor) that cover it, each with a kind - command, function, statement, clause, deprecated, config, format, or reference for a section that documents it as none of these - saying what that section documents the word as; config_index maps each configuration statement (BRConfig.sys, CONFIG) to where it is defined: a page of its own (file) or a section (anchor); each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
+  "generated": "2026-11-22",
   "source": "br_tree/",
-  "source_sha256": "fb5ee215deefcc295edb644b2d383b798e0766bd4fe1ba06bc5d3289baa3d569",
+  "source_sha256": "b8c3d6323b59a951afd956d67f2390bb2b462c3b03b45b4b7042aed4e504d35d",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -279,7 +279,8 @@
       "00-configuration/config-directives",
       "10-language/data-manipulation/system-functions",
       "20-io-screen/fields-attributes",
-      "30-io-file/form-spec"
+      "30-io-file/form-spec",
+      "70-commands/information"
     ],
     "DATE$": [
       "10-language/data-manipulation/system-functions"
@@ -541,7 +542,8 @@
     "HELP": [
       "10-language/flow-control/error-handling",
       "20-io-screen/input-output",
-      "20-io-screen/windows-cursor"
+      "20-io-screen/windows-cursor",
+      "70-commands/information"
     ],
     "HELP$": [
       "10-language/data-manipulation/system-functions"
@@ -949,6 +951,9 @@
       "10-language/data-manipulation/system-functions",
       "30-io-file/form-spec"
     ],
+    "POS=": [
+      "30-io-file/statements"
+    ],
     "PRINT": [
       "10-language/flow-control/other-flow",
       "40-io-printing/statements"
@@ -1123,7 +1128,8 @@
       "10-language/data-manipulation/system-functions"
     ],
     "SEARCH": [
-      "30-io-file/keys-indexes"
+      "30-io-file/keys-indexes",
+      "70-commands/file-directory"
     ],
     "SEARCH_CHAR": [
       "00-configuration/config-directives"
@@ -1170,7 +1176,8 @@
       "10-language/data-manipulation/system-functions"
     ],
     "SKIP": [
-      "30-io-file/form-spec"
+      "30-io-file/form-spec",
+      "70-commands/program-management"
     ],
     "SLEEP": [
       "10-language/data-manipulation/system-functions"
@@ -1664,7 +1671,7 @@
       {
         "spec": "00-configuration/client-server",
         "anchor": "config",
-        "kind": "reference"
+        "kind": "config"
       },
       {
         "spec": "00-configuration/config-directives",
@@ -1746,7 +1753,7 @@
       {
         "spec": "00-configuration/config-directives",
         "anchor": "date",
-        "kind": "reference"
+        "kind": "config"
       },
       {
         "spec": "10-language/data-manipulation/system-functions",
@@ -1756,12 +1763,17 @@
       {
         "spec": "20-io-screen/fields-attributes",
         "anchor": "format-codes",
-        "kind": "reference"
+        "kind": "format"
       },
       {
         "spec": "30-io-file/form-spec",
         "anchor": "format-codes",
-        "kind": "reference"
+        "kind": "format"
+      },
+      {
+        "spec": "70-commands/information",
+        "anchor": "date",
+        "kind": "command"
       }
     ],
     "DATE$": [
@@ -1782,7 +1794,7 @@
       {
         "spec": "00-configuration/installation-tooling",
         "anchor": "debug",
-        "kind": "reference"
+        "kind": "command"
       }
     ],
     "DEBUG_STR": [
@@ -2020,7 +2032,7 @@
       {
         "spec": "30-io-file/form-spec",
         "anchor": "when-a-form-is-compiled",
-        "kind": "reference"
+        "kind": "statement"
       }
     ],
     "FP": [
@@ -2089,6 +2101,11 @@
         "spec": "10-language/flow-control/error-handling",
         "anchor": "ignore",
         "kind": "clause"
+      },
+      {
+        "spec": "70-commands/information",
+        "anchor": "help",
+        "kind": "command"
       }
     ],
     "HELP$": [
@@ -2123,7 +2140,7 @@
       {
         "spec": "30-io-file/keys-indexes",
         "anchor": "index",
-        "kind": "reference"
+        "kind": "command"
       }
     ],
     "INF": [
@@ -2355,7 +2372,7 @@
       {
         "spec": "20-io-screen/controls",
         "anchor": "menu",
-        "kind": "reference"
+        "kind": "clause"
       }
     ],
     "MENU$": [
@@ -2367,7 +2384,7 @@
       {
         "spec": "20-io-screen/controls",
         "anchor": "menus",
-        "kind": "reference"
+        "kind": "function"
       }
     ],
     "MERGE": [
@@ -2484,12 +2501,12 @@
       {
         "spec": "30-io-file/database",
         "anchor": "open",
-        "kind": "reference"
+        "kind": "statement"
       },
       {
         "spec": "30-io-file/file-model",
         "anchor": "file-ref",
-        "kind": "reference"
+        "kind": "statement"
       },
       {
         "spec": "30-io-file/statements",
@@ -2548,7 +2565,7 @@
       {
         "spec": "30-io-file/form-spec",
         "anchor": "format-codes",
-        "kind": "reference"
+        "kind": "format"
       }
     ],
     "PRINT": [
@@ -2696,7 +2713,7 @@
       {
         "spec": "30-io-file/file-model",
         "anchor": "reserve",
-        "kind": "reference"
+        "kind": "clause"
       }
     ],
     "RESTORE": [
@@ -2816,6 +2833,18 @@
         "kind": "function"
       }
     ],
+    "SEARCH": [
+      {
+        "spec": "30-io-file/keys-indexes",
+        "anchor": "key-clause",
+        "kind": "clause"
+      },
+      {
+        "spec": "70-commands/file-directory",
+        "anchor": "search",
+        "kind": "command"
+      }
+    ],
     "SELECT": [
       {
         "spec": "20-io-screen/input-output",
@@ -2848,12 +2877,12 @@
       {
         "spec": "00-configuration/config-directives",
         "anchor": "setenv",
-        "kind": "reference"
+        "kind": "config"
       },
       {
         "spec": "00-configuration/environment",
         "anchor": "setenv",
-        "kind": "reference"
+        "kind": "function"
       },
       {
         "spec": "10-language/data-manipulation/system-functions",
@@ -2886,7 +2915,12 @@
       {
         "spec": "30-io-file/form-spec",
         "anchor": "skip",
-        "kind": "reference"
+        "kind": "format"
+      },
+      {
+        "spec": "70-commands/program-management",
+        "anchor": "skip",
+        "kind": "command"
       }
     ],
     "SLEEP": [
@@ -3108,7 +3142,7 @@
       {
         "spec": "30-io-file/keys-indexes",
         "anchor": "verify",
-        "kind": "reference"
+        "kind": "command"
       }
     ],
     "VERSION": [
@@ -4247,6 +4281,7 @@
         "architecture",
         "config",
         "reconnect",
+        "restart",
         "cs-operations",
         "examples",
         "service-install",
@@ -5581,6 +5616,7 @@
         "REC",
         "KEY",
         "LINK=",
+        "POS=",
         "KEYONLY",
         "FIRST",
         "LAST",
@@ -5701,6 +5737,7 @@
         "positioning",
         "pageoflow",
         "print-files",
+        "print-redirect",
         "examples",
         "see-also"
       ],
@@ -5936,13 +5973,15 @@
         "FREE",
         "PROTECT",
         "DROP",
-        "TYPE"
+        "TYPE",
+        "SEARCH"
       ],
       "related": [
         "program-management",
         "information"
       ],
       "anchors": [
+        "paging",
         "syntax",
         "semantics",
         "chdir",
@@ -5959,6 +5998,7 @@
         "rename-filesystem",
         "overwrite",
         "type",
+        "search",
         "drop-free",
         "drop",
         "free",
@@ -5976,6 +6016,7 @@
       "category": "70-commands",
       "status": "2b",
       "keywords": [
+        "HELP",
         "STATUS",
         "LIST",
         "TRACE",
@@ -5983,6 +6024,7 @@
         "LOGGING",
         "STEP",
         "BREAK",
+        "DATE",
         "TIME",
         "ALL",
         "FONTS",
@@ -6006,6 +6048,7 @@
         "syntax",
         "semantics",
         "date-time",
+        "date",
         "time",
         "break",
         "display",
@@ -6017,10 +6060,11 @@
         "msg",
         "printer-list",
         "procin-program",
+        "help",
         "examples",
         "see-also"
       ],
-      "summary": "Inspecting state and debugging a running program: date/time, the command console, single-stepping, breakpoints, variable display, and logging."
+      "summary": "Inspecting state and debugging a running program: date/time, the command console, single-stepping, breakpoints, variable display, and logging. The HELP command, which shows br_tree topics in the browser or on the console, has its own page: HELP."
     },
     {
       "path": "70-commands/program-management",
@@ -6046,6 +6090,7 @@
         "ALL",
         "SUBPROC",
         "PROCERR",
+        "SKIP",
         "ALERT",
         "FILES",
         "ECHO",
@@ -6081,6 +6126,7 @@
         "proc",
         "subproc",
         "run-proc",
+        "skip",
         "procerr",
         "alert",
         "look-ahead",

@@ -17,7 +17,8 @@ listing lines. Loading/saving the program is in
 below).</p>
 <a id="syntax"></a>
 <h2>Syntax</h2>
-<pre><code class="language-bnf">AUTO  [&lt;start-line&gt;] [{','|' '} &lt;increment&gt;]      -- AU; default 10, 10
+<pre><code class="language-bnf">&lt;line-range&gt; ::= &lt;starting-line&gt; &lt;ending-line&gt;
+AUTO  [&lt;start-line&gt;] [{','|' '} &lt;increment&gt;]      -- AU; default 10, 10
 RENUM [-&lt;from&gt;] [-&lt;to&gt;] [&lt;first&gt;] [&lt;incr&gt;] [LABELS_ONLY]   -- RENU; updates GOTO/GOSUB references
 DEL   { &lt;line&gt; | &lt;start-line&gt; &lt;end-line&gt; } [SOURCE]   -- DE; delete line(s)
 LIST  [&lt;line-range&gt;]                              -- LIS; display/edit; edit a listed line + Enter
@@ -45,20 +46,23 @@ renumbered yet keep that label) — the basis of Lexi's number-free editing.</li
 <li><a id="del"></a><strong>DEL</strong> removes a line or inclusive range (in memory only until <code>SAVE</code>/<code>REPLACE</code>;
 gaps are fine). <strong><code>DEL … SOURCE</code></strong> deletes only the <em>source</em> text, keeping the compiled object —
 used to hide source for security; the program then <strong>cannot be reloaded from source</strong> (keep a
-separate full copy). Deleted lines leave reclaimable space: save to source and reload to recover
+separate full copy). Deleted whole lines leave reclaimable space: save to source and reload to recover
 ~100 bytes of object per 7 deleted lines.</li>
-<li><a id="list"></a><strong>LIST</strong> shows lines with BR's canonical formatting (5-digit numbers, upper-cased
-keywords); edit directly on a listed line and press Enter on that line to store it. After a <code>RUN</code>
-you must <code>LIST</code> again before editing. (<code>LIST &quot;string&quot;</code> instead <em>searches/replaces</em> — see
-<a href="../information/spec.html#list-search">information</a>.)</li>
-<li><a id="list-options"></a><strong>LIST options.</strong> <strong><code>-P</code></strong> pauses after <strong>each line</strong>; at the pause a
-digit from 2 to 9 lists the next that many lines before pausing again, any other key lists one
-more, and Ctrl-A stops. <strong><code>-&lt;line&gt;</code></strong> and <strong><code>&lt;line&gt;-</code></strong> list the screenful ending, or starting, at
-that line — what PgUp, PgDn and F6 type for you. <strong><code>CLAUSES</code></strong> marks where each clause begins, for
+<li><a id="list"></a><strong>LIST</strong> shows lines with BR's canonical formatting (5-digit numbers, keywords
+formatted per STYLE configuration statement); edit directly on a listed line and press Enter on
+that line to store it. After a <code>RUN</code> and another ATTN, up and down arrows and PgUp/PgDn resume
+listing. <code>LIST &quot;string&quot;</code> <em>searches</em> for matching lines — see
+<a href="../information/spec.html#list-search">information</a>. Several variants are available.</li>
+<li><a id="list-options"></a><strong>LIST options.</strong> <strong><code>-P</code></strong> pauses after <strong>each line</strong>. Any key lists one
+more, PgUp/PgDn work, and Ctrl-A stops. <strong><code>-&lt;line&gt;</code></strong> and <strong><code>&lt;line&gt;-</code></strong> list the screenful
+ending, or starting, at
+that line — what F5 and F6 type for you. <strong><code>CLAUSES</code></strong> marks where each clause begins, for
 <code>line:clause</code> references in <code>BREAK</code> and <code>GO</code>. <strong><code>PRINT</code></strong> lists to the printer, ending with a
-page eject unless <strong><code>NOEJECT</code></strong> is given (the old wiki called this <code>SKIP</code>); <code>&gt;printer-name</code> lists to a named
+page eject unless <strong><code>NOEJECT</code></strong> is given (the old wiki called this <code>SKIP</code>); <code>&gt;printer-name</code> lists
+to a named
 printer. <code>LIST PRINT</code> uses the printer's initialization escape sequences.</li>
-<li><a id="list-output"></a><strong>Where <code>LIST</code> writes.</strong> The screen by default. <strong><code>&gt;file</code></strong> writes the listing to a file
+<li><a id="list-output"></a><strong>Where <code>LIST</code> writes.</strong> The screen by default. <strong><code>&gt;file</code></strong> writes the
+listing to a file
 (created, as source: <code>LIST 500 1350 &gt;B:\OUTPUT.BRS</code>) and <strong><code>&gt;&gt;file</code></strong> appends to one; <strong><code>PRINT</code></strong> goes to the
 printer. A single line number with <code>&gt;file</code> redirects <strong>only that line</strong> (before, it redirected from that line to the
 end of the program: this can affect an old application). <code>PRINT</code> is different on the screen's one-line rule:

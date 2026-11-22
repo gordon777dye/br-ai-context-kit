@@ -591,9 +591,21 @@ WSID=UNIQUE
   priority is: a session already running on the machine, then the command line, then BRConfig.sys, then the default of
   1 with an increment of 1; of several `WSID` lines the last one wins. `WSID` 0 is not allowed (4.17). A `WSID` on the
   command line makes this statement do nothing. If the id is taken the client is told so (the "WSID in use" message).
-  `WSID=UNIQUE` gives every session its own id instead of sharing one across a machine's sessions, and `WSID=SESSION`
-  changes how `WSID$` is formed; `STATUS CONFIG` reports both on lines of their own. A restricted session may not
-  change any of these, because they set the identity its actions are logged under.
+  A restricted session may not change any of these, because they set the identity its actions are logged under.
+  - **The session number.** By default the sessions one machine starts share one WSID and are told apart by a
+    session number (1 to 9) after it: with WSID 01, `SESSION$` is `011` in the first session and `012` in the second,
+    while `WSID$` is `01` in both (two digits, three above 99). The `[SESSION]` file-name substitution is `SESSION$`
+    and `[WSID]` is `WSID$`.
+  - **`WSID=SESSION`** (no value) makes `WSID$` return what `SESSION$` does, the WSID followed by the session
+    number (`012`), and gives `[WSID]` the same value. Files named with `[WSID]` then get a name of their own in
+    each session, where otherwise the sessions of one machine would all use the same file.
+  - **`WSID=UNIQUE`** (no value) turns off the sharing. BR does not look for sessions already running on the machine
+    (so a second session does not join the first's WSID as an additional session), the session number is 1, and a
+    WSID that is already in use is refused as in use, not shared, nor replaced by the WSID an earlier session of the
+    same machine had. The server counts each session as its own user.
+  - `STATUS CONFIG` reports both on lines of their own, `WSID=SESSION is ON` or `OFF` and `WSID=UNIQUE is ON` or
+    `OFF`. Like `WSID <n>`, both are read from a configuration file when BR starts: the `CONFIG` command refuses
+    them as a syntax error, and a restricted session refuses them.
 - <a id="style"></a>**`STYLE`** sets how `LIST` formats source. Words, any number of them on a line, shortenable to a unique prefix:
   - `INDENT <n>[,<column>]` — `n` (0-8) is how far a nested statement is indented; `column` (20-60, 0 or left off for none) is
     where comments are lined up.

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>File &amp; directory commands — BR reference</title>
-<meta name="keywords" content="DIR, COPY, MOVE, RENAME, MKDIR, RMDIR, CHDIR, FREE, PROTECT, DROP, TYPE">
+<meta name="keywords" content="DIR, COPY, MOVE, RENAME, MKDIR, RMDIR, CHDIR, FREE, PROTECT, DROP, TYPE, SEARCH">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -18,18 +18,31 @@ For opening files inside a program see
 length, when combined into one word, must come <strong>last</strong> in it (<code>-D124</code>, not <code>-124D</code>) — as a word of
 its own it may stand anywhere (<code>-124 -D</code>). In BR 5.0 each command lists its own options when given
 <a href="../program-management/spec.html#command-help"><code>-?</code></a> alone (<code>COPY -?</code>).</p>
+<p><a id="paging"></a><strong><code>-P</code> pauses after each screenful</strong> of <code>DIR</code>, <code>COPY</code>, <code>MOVE</code>, <code>RENAME</code>, <code>DROP</code>, <code>FREE</code>,
+<code>TYPE</code> and <code>SEARCH</code>. At the pause, the break key ends the command, PgDn (BR 5.03) shows the next screen
+starting with the last line shown, a digit 2 to 9 (BR 5.03; <code>TYPE</code> since 5.0) the next that many lines
+before pausing again, and any other key the next screenful.</p>
+<p><strong>Patterns in file names (BR 5.0).</strong> The name parameter of <code>DIR</code> (<code>&lt;filename&gt; | &lt;glob&gt;</code>), <code>COPY</code>, <code>MOVE</code> and
+<code>RENAME</code> (<code>&lt;from&gt;</code>), and <code>TYPE</code>, <code>DROP</code> and <code>FREE</code> (<code>&lt;file&gt;</code>) may be a glob pattern (<code>*</code>, <code>?</code>, <code>[ ]</code>, <code>{a,b}</code>,
+<code>**</code>) that names several files. The other parameters take none: <code>&lt;to&gt;</code> is a name or a folder (for <code>COPY</code>,
+<code>MOVE</code> and <code>RENAME</code> a <code>*</code> in it is applied to each file's own name), the <code>&lt;file&gt;</code> after <code>PRINT</code> or <code>&gt;</code> is the
+redirect target, and <code>CHDIR</code>, <code>MKDIR</code>, <code>RMDIR</code> and <code>PROTECT</code> take no pattern. The pattern syntax, when a name
+counts as a glob and how matches are handled are in <a href="filename-patterns.html#globs">filename-patterns.md</a>.
+<code>COPY</code>, <code>MOVE</code>, <code>RENAME</code>, <code>TYPE</code> and <code>SEARCH</code> also take <strong>several</strong> <code>&lt;from&gt;</code> (<code>&lt;file&gt;</code>) separated by commas or blanks,
+the last name of the first three being <code>&lt;to&gt;</code>; see <a href="filename-patterns.html#glob-several">filename-patterns.md</a>.</p>
 <a id="syntax"></a>
 <h2>Syntax</h2>
 <pre><code class="language-bnf">CHDIR [&lt;drive&gt;':'] ['\']&lt;path&gt; [-N]     -- CD / CH; no arg = show current dir
 MKDIR [&lt;drive&gt;':']&lt;path&gt;                -- MK
 RMDIR [&lt;drive&gt;':']&lt;path&gt;                -- RM; directory must be empty
 DIR  [&lt;drive&gt;':'][&lt;path&gt;][&lt;filename&gt; | &lt;glob&gt;] [-AOLPWUCB] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]   -- DI
-COPY   &lt;from&gt; { &lt;to&gt; | PRN: | AUX: } [-DFNPRSV] [-&lt;new_recl&gt;] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]  -- COP; -R the folders below
-MOVE   &lt;from&gt; &lt;to&gt; [-FNPRV] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]  -- MO; renames when it can, else copies and frees
-RENAME &lt;from&gt; &lt;to&gt; [-DNPVF] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]  -- REN; renames or moves (wildcards ok); -D a folder
-TYPE   &lt;file&gt; [-P] [PRINT | '&gt;'['&gt;'] &lt;file&gt;] -- TY; dump a file to screen/printer/file
-DROP &lt;file-ref&gt; [-NPV] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]   -- DR; empties contents, keeps the name (size→0)
-FREE &lt;file-ref&gt; [-NPRV] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]  -- no abbreviation; deletes the file (unrecoverable); -R the folders below
+COPY   &lt;from&gt; [[','] &lt;from&gt;]... { &lt;to&gt; | PRN: | AUX: } [-DFNPRSV] [-&lt;new_recl&gt;] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]  -- COP; -R the folders below
+MOVE   &lt;from&gt; [[','] &lt;from&gt;]... &lt;to&gt; [-FNPRV] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]  -- MO; renames when it can, else copies and frees
+RENAME &lt;from&gt; [[','] &lt;from&gt;]... &lt;to&gt; [-DNPVF] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]  -- REN; renames or moves (wildcards ok); -D a folder
+TYPE &lt;file&gt; [[','] &lt;file&gt;]... [-P] [PRINT | '&gt;'['&gt;'] &lt;file&gt;] -- TY; dump 1 or more files to screen/printer/file - concatenate
+SEARCH [-I~WBR] &lt;pattern&gt; &lt;file&gt; [[','] &lt;file&gt;]... [-PCLN] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]  -- SE; lines that match: name:line: text
+DROP &lt;file&gt; [-NPV] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]   -- DR; empties contents, keeps the name (size→0)
+FREE &lt;file&gt; [-NPRV] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]  -- no abbreviation; deletes the file (unrecoverable); -R the folders below
 PROTECT &lt;file-ref&gt; ',' { RESERVE | RELEASE | READ | WRITE }   -- PROT; reserve a path / set read-only
 </code></pre>
 <a id="semantics"></a>
@@ -319,8 +332,8 @@ restores the earlier behaviour: <code>COPY</code> replaces the file silently and
 unless <code>-F</code>.</p>
 <p><a id="type"></a><strong>TYPE</strong> sends a file's contents to the
 screen, a printer, or another file. <strong><code>-P</code></strong> pauses after each screenful; at the pause a digit
-from 2 to 9 shows the next that many lines before pausing again (BR 5.0), and any other key the next
-screenful. <strong>MKDIR</strong> subdirectory names follow file-name rules, and the same
+from 2 to 9 shows the next that many lines before pausing again (BR 5.0), PgDn the next screen starting
+with the last line shown (BR 5.03), and any other key the next screenful. <strong>MKDIR</strong> subdirectory names follow file-name rules, and the same
 name may exist under different parent directories.</p>
 <ul>
 <li><strong><code>TYPE &lt;name&gt; [-P] [&gt;file|&gt;&gt;file|PRINT]</code></strong>: <code>name</code> may hold wildcards, and then every file it names is typed, one
@@ -330,9 +343,75 @@ screen are trailing nulls and Ctrl-Z trimmed.</li>
 <li><strong>Printer escape sequences (4.2+).</strong> <code>TYPE</code> translates the printer escape sequences in a print file for the
 <em>destination</em>, matched as the destination's printer name is at <code>OPEN</code> time (as <code>NAME=PRN:/printer</code>). To a display
 file the printer type can be named with <code>PRINTER_TYPE=&lt;type&gt;</code>, matched against the second parameter of the
-configuration's <code>PRINTER</code> statements: <code>TYPE PRTeport &gt;PREVIEW:/HP4</code> translates the HP4 sequences in <code>report</code> for the
-preview, and <code>TYPE PRTeport-file1 &gt;report-file2 PRINTER_TYPE=HP4</code> copies file1 to file2 interpreting them. In contrast
+configuration's <code>PRINTER</code> statements: <code>TYPE PRT\report &gt;PREVIEW:/HP4</code> translates the HP4 sequences in <code>report</code> for the
+preview, and <code>TYPE PRT\report-file1 &gt;report-file2 PRINTER_TYPE=HP4</code> copies file1 to file2 interpreting them. In contrast
 <code>COPY PRT\EDITLIST.255 DIRECT:/HP4</code> sends a print file to a printer unaltered.</li>
+</ul>
+<p><a id="search"></a><strong><code>SEARCH</code> (BR 5.03)</strong> (<code>SE</code>) shows the lines of text files that contain a pattern, each as
+<code>name:line: text</code>, a small BR form of <code>grep</code>:</p>
+<pre><code>SEARCH apple notes.txt
+SEARCH -I &quot;apple pie&quot; data\*.txt,old\*.txt &gt;hits.txt
+SEARCH /^ *PRINT/ src\**\*.brs &gt;lines$
+SEARCH -IWR print src\ -L
+SEARCH -~ todo notes.txt -C
+</code></pre>
+<ul>
+<li><strong>The pattern</strong> comes first, after any attributes: a word (<code>apple</code>), a quoted literal (<code>&quot;apple pie&quot;</code>,
+<code>'say &quot;hi&quot;'</code>; two of the quote that opened it stand for one, <code>&quot;say &quot;&quot;hi&quot;&quot;&quot;</code>), or a regular expression
+between slashes (<code>/^apple/</code>, ECMAScript syntax: see <a href="ECMA_REGEX.html">Regular expressions</a>, or
+<code>HELP COMMANDS REGEX</code>). A pattern may hold blanks, commas and quotes, and a regex may hold a <code>!</code>,
+which elsewhere on the line starts a remark; inside <code>/.../</code>, <code>\/</code> is a <code>/</code>. An unterminated quote or regex is error 1003, and a regex that does not compile
+is <a href="../../90-reference/error-codes/1009.html">error 1009</a>.</li>
+<li><strong>Attributes</strong>, before the pattern, decide what matches; they may be combined (<code>-I~WB</code>):
+<ul>
+<li><strong><code>-I</code></strong> ignores the case of ASCII letters, for both forms.</li>
+<li><strong><code>-~</code></strong> selects the lines that do <strong>not</strong> match.</li>
+<li><strong><code>-W</code></strong> whole word: a match may not touch a word character (a letter, a digit, <code>_</code> or <code>$</code>) on either
+side, so <code>-W PRINT</code> finds <code>PRINT X</code> and <code>(PRINT)</code> but not <code>PRINTER</code> or <code>PRINT$</code>. A match that fails
+is passed over and the search goes on in the same line, so <code>PRINTER PRINT</code> is found.</li>
+<li><strong><code>-B</code></strong> blank-tolerant: in each line a run of blanks and tabs counts as one blank, and blanks at
+either end are ignored; a literal pattern is treated the same way, so <code>-B &quot;IF X&quot;</code> finds <code>IF   X</code>
+and <code>IF&lt;tab&gt;X</code>. A regex sees the normalised line. The line shown is the line as it is.</li>
+<li><strong><code>-R</code></strong> a folder that a name matches is searched whole, with the folders below it, as <code>COPY -R</code>
+takes it; without <code>-R</code> a name ending in <code>\</code> names folders only and finds nothing (4152).</li>
+</ul>
+</li>
+<li><strong>Options</strong>, after the names, decide how the result is shown:
+<ul>
+<li><strong><code>-C</code></strong> only a count of matching lines per file, <code>name:count</code>, a file with none included.</li>
+<li><strong><code>-L</code></strong> only the name of each file with a match.</li>
+<li><strong><code>-N</code></strong> no <code>name:line:</code> prefix: the lines alone (with <code>-C</code>, the counts alone).</li>
+<li><strong><code>-P</code></strong> pauses; see Output below.
+An attribute after the names, an option before the pattern, <code>-L</code> with <code>-C</code> or <code>-N</code>, or any other letter
+(<code>-V</code>, <code>-F</code>, a record length) is error 1006.</li>
+</ul>
+</li>
+<li><strong>The files</strong> are named as for <code>TYPE</code>: one or more names, separated by commas or blanks, each of which
+may be a pattern, with the rules of <a href="filename-patterns.html#glob-several">filename-patterns.md</a>: a name
+that matches nothing is skipped unless none match (4152), and a file that two names match is searched
+once. The file the output is redirected to is never searched, so <code>SEARCH x *.txt &gt;hits.txt</code> does not
+read its own results.</li>
+<li><strong>Each line is cleaned before it is compared</strong>: only displayable ASCII (32 to 126) and the tab are
+kept, and every other byte is removed, bytes above 127 among them, so a pattern holding an accented
+letter never matches. The line shown is the cleaned line, so a binary file sends no stray bytes to the
+screen or a redirect. Line numbers count the file's own lines. A UTF-8 byte-order mark at the start of
+a file is ignored.</li>
+<li><strong>An internal file</strong> is searched record by record: the header is skipped (the record length is read
+from it), each record is a line, numbered by its record number, a deleted record is not searched, and
+trailing blanks are removed. Numeric fields (<code>PD</code>, <code>B</code> and the like) clean away to nothing or to stray
+characters, so search the character fields.</li>
+<li><strong>No match</strong> is no output and no error.</li>
+<li><strong>Output</strong> goes to the screen, wrapped as <code>TYPE</code> wraps, or to <code>&gt;file</code> or <code>&gt;&gt;file</code>, which get each line
+whole however long, or to <code>PRINT</code> or
+<code>&gt;name$</code>, which fills a string array a line to an element, growing it as
+<a href="filename-patterns.html#glob-matches">filename-patterns.md</a> describes. With <code>&gt;name$</code> the array's size
+is the number of lines found. <strong><code>-P</code></strong>, after the names, pauses after each screenful: a digit 2 to 9
+shows the next that many lines, PgDn the next screen starting with the last line shown, and any other
+key the next screenful.</li>
+<li>A regular expression is not tried on a line longer than 4,096 characters, nor on a line the regex
+engine gives up on (a pattern such as <code>(a*)*b</code> can be too complex for it); the first such line in
+each file is reported on the screen, and the search goes on.</li>
+<li>A restricted session may run it.</li>
 </ul>
 <p><a id="drop-free"></a><a id="drop"></a><a id="free"></a><strong>DROP</strong> empties a file's contents — freeing all allocated space and leaving
 only the header record for internal files — but keeps the name (size→0). <strong>FREE</strong> deletes the
@@ -394,6 +473,19 @@ while the file is open for output): every workstation, <strong>including the one
 but not change it. <code>WRITE</code> removes that and allows reading and writing again. The operating system's permissions
 decide whether either succeeds. Unlike a reservation, read protection stays on the file after the workstation
 leaves BR, and it works on single-user systems too.</p>
+<p>Unlike <code>RESERVE</code> and <code>RELEASE</code>, which touch only BR's own table, <code>READ</code> and <code>WRITE</code> <strong>change the file's real
+operating-system permissions</strong>, so they take effect for every program, not just BR, and they are not reversed
+by anything but <code>WRITE</code> (or a change made outside BR). Exactly what is set, from the source:</p>
+<ul>
+<li><strong>Windows:</strong> <code>READ</code> sets the file's attributes to <em>archive + read-only</em>; <code>WRITE</code> sets them to <em>archive</em> only.
+The whole attribute set is <strong>replaced</strong>, not edited, so any other attribute the file had (hidden, system)
+is cleared by either word.</li>
+<li><strong>Unix:</strong> <code>READ</code> does <code>chmod 0444</code> (read-only for owner, group and everyone); <code>WRITE</code> does <code>chmod 0666</code>
+(read and write for all three). The file's previous mode is not remembered, so <code>WRITE</code> on a file that
+was <code>0640</code> leaves it <code>0666</code>, <strong>widening access to group and public</strong>, and execute bits are dropped by both.</li>
+<li><code>READ</code> first opens the file once to check that it exists and is not open for output; a failure comes back as
+an ordinary file error. <code>PROTECT</code> is refused in a restricted session.</li>
+</ul>
 <a id="examples"></a>
 <h2>Examples</h2>
 <pre><code class="language-text">CHDIR \DATA\REPORTS

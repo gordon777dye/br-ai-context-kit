@@ -288,6 +288,7 @@ _783 entries._
 | [1005](1005.md) | Duplicate label or function |
 | [1006](1006.md) | Syntax error |
 | [1008](1008.md) | Invalid keyword in shell interpreter |
+| [1009](1009.md) | Invalid regular expression |
 | [1011](1011.md) | Illegal immediate statement |
 | [1012](1012.md) | Illegal line number |
 | [1020](1020.md) | Missing parenthesis |

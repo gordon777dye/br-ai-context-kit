@@ -26,6 +26,7 @@ commands (<code>LOAD</code>, <code>RUN</code>, <code>SAVE</code>, <code>LIST &lt
 <li><a href="#glob-when">When a name is a glob</a></li>
 <li><a href="#glob-command-line">The command line</a></li>
 <li><a href="#glob-matches">What the commands do with the matches</a></li>
+<li><a href="#glob-several">Several names in one command</a></li>
 </ol>
 </li>
 <li><a href="#slash"><code>/</code> in a file name</a></li>
@@ -72,6 +73,10 @@ commands (<code>LOAD</code>, <code>RUN</code>, <code>SAVE</code>, <code>LIST &lt
 <tr>
 <td><code>TYPE</code></td>
 <td>the files to show, one after the other</td>
+</tr>
+<tr>
+<td><code>SEARCH</code></td>
+<td>the files to search, one after the other (BR 5.03)</td>
 </tr>
 </tbody>
 </table>
@@ -234,11 +239,44 @@ sub-directories</strong>, so two files with the same name from different
 directories overwrite each other; with <code>-R</code> each file keeps its place below the
 folders before the first pattern. <code>RENAME</code> and <code>COPY</code> to a name with <code>*</code> apply
 the <code>*</code> to each file's own name (<code>RENAME a{1,2}.txt *.bak</code>).</li>
-<li>A pattern that matches nothing is error <strong>4152</strong>, file not found, as before.</li>
+<li>A pattern that matches nothing is error <strong>4152</strong>, file not found, as before. With several names
+in one command it is not an error unless none of them match; see <a href="#glob-several">1.7</a>.</li>
 <li>Redirection (<code>&gt; file</code>, <code>&gt;&gt; file</code>, <code>&gt; A$</code>) works for the commands that had it. Into an array,
-<code>&gt;</code> and <code>&gt;&gt;</code> alike add elements for more lines. A longer line makes the elements longer when
-the command is given at the console; under <code>EXECUTE</code> the program's <code>SOFLOW</code> setting decides
-(grow, cut under <code>ON SOFLOW IGNORE</code>, else error 58).</li>
+<code>&gt;</code> and <code>&gt;&gt;</code> alike add elements for more lines. A longer line makes the elements longer, at the
+console and under <code>EXECUTE</code> alike, without <code>ON SOFLOW GROW</code> or <code>SOFLOW-GROW</code> being needed; the
+one exception is an <code>EXECUTE</code> run under <code>ON SOFLOW IGNORE</code>, which cuts the line to the element
+length instead. Growing stops at <code>SOFLOW-GROW MAX=</code>, past which the line is error 58.</li>
+</ul>
+<a id="glob-several"></a>
+<h3 id="17-several-names-in-one-command">1.7 Several names in one command</h3>
+<p><code>COPY</code>, <code>MOVE</code>, <code>RENAME</code>, <code>TYPE</code> and <code>SEARCH</code> take more than one <code>&lt;from&gt;</code> (<code>TYPE</code>, <code>SEARCH</code>: <code>&lt;file&gt;</code>), separated by commas or blanks, as
+any parameters are. Each name may be a pattern. A name with a blank in it is quoted.</p>
+<pre><code>COPY a.txt,data\*.dat,notes\ bak
+COPY a.txt data\*.dat notes\ bak
+MOVE old1,old2 archive\
+RENAME a,b *.bak
+TYPE head.txt,body.txt &gt;all.txt
+</code></pre>
+<ul>
+<li><strong>The last name is where they go.</strong> <code>COPY a,b,c</code> and <code>COPY a b c</code> both copy <code>a</code> and <code>b</code> to <code>c</code>, as in <code>cp</code>
+and <code>mv</code>; <code>COPY a b</code> is as it always was. A blank is a separator, so a missing or extra name changes what
+the command means: the rule below about the target is what catches most such slips. <code>TYPE</code> has no target: every name is a file to show, in the order
+written, into one redirect.</li>
+<li><strong>A folder, unless the target has a wildcard.</strong> With several <code>&lt;from&gt;</code> the target must be an
+existing folder, or error <strong>4203</strong> (path does not exist or is not a directory). A target with <code>*</code> or <code>?</code>
+is not required to be one: it makes each file's own name, as for one <code>&lt;from&gt;</code>. <code>-R</code> makes the folder as
+it does for one.</li>
+<li><strong>Names are taken in the order written</strong>, each one's matches in the order of 1.6. <strong>A file that
+more than one name matches is handled once, at the first</strong>: the later matches are ignored, by the
+file's whole name and, on Windows, without regard to case. So <code>COPY a.txt,*.txt dir</code> copies <code>a.txt</code> once,
+and <code>TYPE</code> shows it once. The overwrite question, or error 4150 where none can be asked, still shows when
+<em>different</em> files would be given one name (a wildcard <code>&lt;to&gt;</code>); <code>-F</code> and an answer of <code>all</code> replace
+without a word.</li>
+<li><strong>A name that matches nothing is skipped</strong>, because another may match. If none match, the
+command is error <strong>4152</strong>, file not found. A single name that matches nothing is error 4152 as before.
+A name that is skipped for being misspelt is not reported.</li>
+<li><strong><code>RENAME -D</code></strong> (one folder, renamed whole) takes one name; several are a syntax error.</li>
+<li>An error, or Esc or Ctrl-A at a question, stops the whole command, not only the name it came in.</li>
 </ul>
 <a id="slash"></a>
 <h2 id="2--in-a-file-name">2. <code>/</code> in a file name</h2>

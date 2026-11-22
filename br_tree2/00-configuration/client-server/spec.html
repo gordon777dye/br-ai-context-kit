@@ -66,6 +66,69 @@ offers a session-number box so you can <strong>reconnect from another workstatio
 disconnect the session does the normal <code>Exit_After</code> exit — a BR error then unattended mode (no client
 I/O; exits at the next keyboard wait; default 240 s). Raising the values (e.g. <code>999</code>) helps long/slow
 commands, but the workstation appears to &quot;lock up&quot; while waiting.</p>
+<p>That is a client that is still running and has lost its link. A client that has <em>died</em> is a different
+case: see <a href="#restart">Restarting a client whose session is still running</a>.</p>
+<a id="restart"></a>
+<h3 id="restarting-a-client-whose-session-is-still-running">Restarting a client whose session is still running</h3>
+<p>When a remote client's process dies (a crash, a kill, a power cut at the desk), its server does not end:
+it notices the client has gone and waits for it to reconnect until the reconnect time runs out. A client
+started afresh cannot reconnect to it, because a reconnect resumes a client that kept its screens, windows
+and files, and a new process has none of them. So the new client <strong>ends the old session first</strong> and then
+logs in as usual.</p>
+<p><strong>What the client keeps.</strong> While a remote session runs, the client keeps its reconnect id in the session's
+registry slot (the registry on Windows, a file elsewhere), beside the WSID and the owning process the slot
+already holds:</p>
+<table>
+<thead>
+<tr>
+<th>Entry</th>
+<th>Holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reconnectKey/IDn</code></td>
+<td>the reconnect id, in hex</td>
+</tr>
+<tr>
+<td><code>reconnectTarget/IDn</code></td>
+<td>the listener's address and port and the label, <code>127.0.0.1:8565/QSMRP</code></td>
+</tr>
+<tr>
+<td><code>reconnectSeen/IDn</code></td>
+<td>when the client was last known to be alive, written at most every 30 seconds</td>
+</tr>
+<tr>
+<td><code>reconnectLimit/IDn</code></td>
+<td>the keep-alive timeout plus the reconnect timeout, in seconds: by then the server has given up</td>
+</tr>
+</tbody>
+</table>
+<p>It is stored once the client has both its reconnect id and its slot. It is cleared when the session ends in
+order: the server says it is exiting, or the user closes the client and the server is told. <code>SYSTEM LOGOFF</code>
+clears it with the rest of the slot. A client that dies, or exits while the link is down, leaves it.</p>
+<p><strong>What a new client does.</strong> Before it logs in, the client looks for slots for the same listener and label
+whose client process is no longer running and that still hold a reconnect id. A slot whose client was last
+alive longer ago than its limit is cleared without asking: its server has ended by itself. For each of the
+others:</p>
+<ol>
+<li>The client connects to the listener and asks it to end that session, giving the reconnect id, the
+session's <code>SESSION$</code> and how long to hold the request. <strong>There is no login</strong>: the reconnect id is the
+session's own secret.</li>
+<li>The listener holds the request. A listener that does not know the request does not answer, and the client
+goes on after five seconds.</li>
+<li>The old server asks to reconnect as soon as it notices its client has gone. The listener matches it to the
+held request on the reconnect id and, when both are known, on <code>SESSION$</code>.</li>
+<li>The listener tells the server to abort. The server gives back its WSID and file reservations,
+acknowledges and ends.</li>
+<li>The listener tells the client, and the client logs in. Because the old session gave back its WSID before
+acknowledging, the new session can have the same WSID and <code>SESSION$</code>.</li>
+</ol>
+<p>The client holds the request for at most 35 seconds, or less when the slot shows the server will have given
+up sooner. If the server does not come in that time, the client withdraws the request and logs in anyway. A
+server that ends without acknowledging, as one built before the acknowledgement does, is taken as ended when
+its connection to the listener closes. Either way the slot is cleared: <strong>each orphaned session is tried
+once</strong>. An end-session request is never matched as a reconnect, and a reconnect is never handed to it.</p>
 <a id="cs-operations"></a>
 <h2 id="client-side-operations">Client-side operations</h2>
 <ul>

@@ -8,7 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree fold (LOAD modes, CHAIN passing, CLEAR variants, GO form, MERGE, express procs); CHAIN/Procedure_files retained; no conflicts
 recovered-fold: REPLACE (folded+pruned — source-vs-object/.BRS/.BRO rules, .BAK + OPTION 26, default-extension; verbatim retained on the BR wiki)
 related: [file-directory, information, editing]
-keywords: [AI, RUN, LOAD, SAVE, REPLACE, MERGE, CLEAR, GO, EXECUTE, CHAIN, PROC, SYSTEM, LOGOFF, ALL, SUBPROC, PROCERR, ALERT, FILES, ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP, NOTRACE]
+keywords: [AI, RUN, LOAD, SAVE, REPLACE, MERGE, CLEAR, GO, EXECUTE, CHAIN, PROC, SYSTEM, LOGOFF, ALL, SUBPROC, PROCERR, SKIP, ALERT, FILES, ECHO, NOECHO, SOURCE, OBJECT, ONLY, NOSTEP, NOTRACE]
 corrections:
   - "PROCERR REM removed: BR no longer supports it (2026-10-31). In the refreshed BR source, command0.cpp's PROCERR accepts STOP_TYPE and RETURN_TYPE only and answers any other qualifier with BREMISSINGKEYWORD; wbos.cpp's PROCERR help lists STOP and RETURN. REM is still in table2k (REM_TYPE), but no command reads it."
   - "AI added to the frontmatter keywords, with the AI section (BR 5.0: BR50 Release_Notes.md 2.19, 2.13). The command had no page in this tree."
@@ -35,6 +35,8 @@ corrections:
     the parse got a variable that does not exist. Whether BR accepts `FILES` more than
     once in one CHAIN was not tested, so the alternation neither permits nor forbids it
     deliberately. Found and fixed in brls (internal/parse/walk.go, matchUnit)."
+  - "SKIP added to keywords:, and a `skip` anchor on the procedure-flow paragraph: the SKIP command is
+    documented here and was not declared (2026-11-22). Found when brls stopped linking a sense to another sense's section: the DATE command, the procedure SKIP and the POS= clause had been linked only to the DATE function, FORM's SKIP n and the POS format code."
 ---
 
 # Program management & procedures
@@ -53,44 +55,8 @@ Any statement can be run immediately as a command; a bare expression is an impli
 (`6+4`→`10`). Commands can't appear in a program **except** via `EXECUTE` or inside a `PROC`.
 
 <a id="print-redirect"></a>
-## `PRINT ... | > file` — console output to a file or array (BR 5.0)
-
-A `PRINT` given at the command line — typed at `READY`, in a procedure, or run by
-[`EXECUTE`](#execute) — can send what it would show on the console to a file or a string array:
-
-```bnf
-PRINT [<print-list>] | > { <file> | <array$> }     -- create or replace the file; empty the array
-PRINT [<print-list>] | >> { <file> | <array$> }    -- add to the end of the file or array
-```
-
-```
-PRINT MAT CUST$ | > cust.txt
-PRINT USING "form pos 3,c 10": NAME$ | >> names.txt
-PRINT MAT A | > LINES$
-```
-
-- **It is the console output that is redirected.** The lines are exactly what the console would
-  have shown, wrapped and zoned at the console's width as they would be there, and nothing goes to
-  the screen. `PRINT USING` is redirected the same way. A `PRINT #n:` writes to its file as usual;
-  it produces no console output, so its target is created or emptied and receives nothing.
-- **`|` comes after the whole print list**, and the target is the last thing on the line (a `!`
-  comment may follow it). Blanks between `|`, `>` and the name are optional: `|>out.txt` and
-  `| > out.txt` are the same.
-- **`<array$>`** is a one-dimensional string array of the program the command is given in, one
-  line to an element, as with `LIST > A$` and `DISPLAY ... > A$`. A name ending in `$` is always
-  an array: if the program has none by that name it is made, as `A$(1)` would make it, and starts
-  empty even with `>>`. A file whose name ends in `$` is written in quotes: `| > "A$"`.
-  It is redimensioned to the lines it holds. A line longer than its elements makes them that long
-  when the `PRINT` is given at the console; under `EXECUTE` the program's `SOFLOW` setting decides
-  (grow, cut under `ON SOFLOW IGNORE`, else error 58). Growing stops at `SOFLOW-GROW MAX=`. It is written when the `PRINT` is done, so a `PRINT`
-  may print the array it fills: `PRINT MAT A$ | >> A$` adds a copy of `A$` to its end.
-- **A line a `PRINT` leaves unfinished** (ending in `;` or `,`) is written without a line end.
-- The file is opened before the statement runs and closed when it ends, whether it ends normally
-  or with an error. An error opening it stops the statement before anything runs.
-- **Only on a command line.** In a numbered program line `|` is not an operator, and the line is a
-  syntax error. A single `|` is never an operator (`||` is OR), so nothing else is read
-  differently.
-- A missing name, or anything other than a comment after it, is error **1006**.
+A `PRINT` typed at the command line can send its console output to a file or string array with `| >` and `| >>`:
+see [`PRINT ... | > file`](../../40-io-printing/statements/spec.md#print-redirect) in the printing statements.
 
 <a id="command-help"></a>
 ## `-?` — what a command takes (BR 5.0)
@@ -374,7 +340,7 @@ RUN PROC                     ! ... then run what is in memory with proc-fed inpu
   ends, the following proc lines are commands again. Confirmed on 4.33c.
 - **The `RUN … PROC` line must not be the proc's last line.** See [look-ahead](#look-ahead).
 
-**Flow & errors**: `SKIP n|label [IF <cond>]` branches — the label is written **without** its
+<a id="skip"></a>**Flow & errors**: `SKIP n|label [IF <cond>]` branches — the label is written **without** its
 colon (`SKIP BUSY` goes to the line `:BUSY`; `SKIP :BUSY` never matches), and a label search that
 reaches the end of the procedure carries on from the top, so a skip may go backward;
 <a id="procerr"></a>`PROCERR STOP` (default) halts on error and `PROCERR RETURN` continues (sets `ERR`); <a id="alert"></a>`ALERT msg` pauses for the operator (`GO` resumes; under

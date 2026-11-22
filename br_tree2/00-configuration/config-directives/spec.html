@@ -786,9 +786,23 @@ non-number is an error); <code>n+</code> or <code>n+incr</code> also lets BR mov
 priority is: a session already running on the machine, then the command line, then BRConfig.sys, then the default of
 1 with an increment of 1; of several <code>WSID</code> lines the last one wins. <code>WSID</code> 0 is not allowed (4.17). A <code>WSID</code> on the
 command line makes this statement do nothing. If the id is taken the client is told so (the &quot;WSID in use&quot; message).
-<code>WSID=UNIQUE</code> gives every session its own id instead of sharing one across a machine's sessions, and <code>WSID=SESSION</code>
-changes how <code>WSID$</code> is formed; <code>STATUS CONFIG</code> reports both on lines of their own. A restricted session may not
-change any of these, because they set the identity its actions are logged under.</p>
+A restricted session may not change any of these, because they set the identity its actions are logged under.</p>
+<ul>
+<li><strong>The session number.</strong> By default the sessions one machine starts share one WSID and are told apart by a
+session number (1 to 9) after it: with WSID 01, <code>SESSION$</code> is <code>011</code> in the first session and <code>012</code> in the second,
+while <code>WSID$</code> is <code>01</code> in both (two digits, three above 99). The <code>[SESSION]</code> file-name substitution is <code>SESSION$</code>
+and <code>[WSID]</code> is <code>WSID$</code>.</li>
+<li><strong><code>WSID=SESSION</code></strong> (no value) makes <code>WSID$</code> return what <code>SESSION$</code> does, the WSID followed by the session
+number (<code>012</code>), and gives <code>[WSID]</code> the same value. Files named with <code>[WSID]</code> then get a name of their own in
+each session, where otherwise the sessions of one machine would all use the same file.</li>
+<li><strong><code>WSID=UNIQUE</code></strong> (no value) turns off the sharing. BR does not look for sessions already running on the machine
+(so a second session does not join the first's WSID as an additional session), the session number is 1, and a
+WSID that is already in use is refused as in use, not shared, nor replaced by the WSID an earlier session of the
+same machine had. The server counts each session as its own user.</li>
+<li><code>STATUS CONFIG</code> reports both on lines of their own, <code>WSID=SESSION is ON</code> or <code>OFF</code> and <code>WSID=UNIQUE is ON</code> or
+<code>OFF</code>. Like <code>WSID &lt;n&gt;</code>, both are read from a configuration file when BR starts: the <code>CONFIG</code> command refuses
+them as a syntax error, and a restricted session refuses them.</li>
+</ul>
 </li>
 <li>
 <p><a id="style"></a><strong><code>STYLE</code></strong> sets how <code>LIST</code> formats source. Words, any number of them on a line, shortenable to a unique prefix:</p>

@@ -8,7 +8,7 @@ kind: spec
 status: 2b           # reference base + br_tree fold (BREAK detail, DISPLAY -p/MAT, STATUS/VERIFY, DEBUG_STR, LIST search); PROCIN/PROGRAM$ home resolved; no conflicts
 recovered-fold: NOSTEP (redirect-collision page re-fetched; NOSTEP/NOTRACE already covered by the GO bnf in program-management — pruned; verbatim retained on the BR wiki)
 related: [program-management, editing]
-keywords: [STATUS, LIST, TRACE, DISPLAY, LOGGING, STEP, BREAK, TIME, ALL, FONTS, NORESTORE, DEBUG_STR, PROGRAM$, ATTRIBUTES, BREAKPOINTS, COLORS, DIMS, ENCRYPTION, LOCKS, MEMORY, USERS]
+keywords: [HELP, STATUS, LIST, TRACE, DISPLAY, LOGGING, STEP, BREAK, DATE, TIME, ALL, FONTS, NORESTORE, DEBUG_STR, PROGRAM$, ATTRIBUTES, BREAKPOINTS, COLORS, DIMS, ENCRYPTION, LOCKS, MEMORY, USERS]
 corrections:
   - "From the BR 5.0 parsers (see br50 br/docs/FLAGS.md), 2026-10-21, source reading not yet confirmed by a run: the BREAK paragraph said conditional breakpoints aren't set with BREAK - BR 5.0 has `IF <cond>` on a target, `BREAK IF <cond>` and `BREAK IF OFF`, plus `BREAK FILE` (commandc.cpp breakDisplay(); release notes 3.10, 3.11); DISPLAY gains IF and FILE likewise; STATUS's topics are listed in full from table8k with -P and redirection (statcmd.cpp); VERIFY described as it is, a message and no check (wbos.cpp VERIFY_CMD); pointer to the new `-?` command help added."
   - "MSG(\"sleeptime\",n) unit corrected to milliseconds (was given as seconds here; see MSG.md corrections for the brmsg.cpp evidence). Reported in context/ERRORS.md 2026-09-28."
@@ -22,12 +22,15 @@ corrections:
     and were routing nowhere despite the status line above already noting their 'home resolved'.
     Found 2026-09-11 auditing `go run ./cmd/gendata`'s unrouted-function list against actual
     br_tree content."
+  - "DATE added to keywords:, and a `date` anchor beside `time`: the DATE command is documented here and
+    was not declared, so it routed nowhere of its own (2026-11-22). Found when brls stopped linking a sense to another sense's section: the DATE command, the procedure SKIP and the POS= clause had been linked only to the DATE function, FORM's SKIP n and the POS format code."
 ---
 
 # Information & debugging commands
 
 Inspecting state and debugging a running program: date/time, the command console,
-single-stepping, breakpoints, variable display, and logging.
+single-stepping, breakpoints, variable display, and logging. The `HELP` command, which shows
+br_tree topics in the browser or on the console, has its own page: [HELP](HELP.md).
 
 <a id="syntax"></a>
 ## Syntax
@@ -42,6 +45,7 @@ BREAK ALL OFF                                       -- clear every breakpoint
 DISPLAY [-p <prog>] { <var> | MAT <array> | ALL } [OFF | PRINT | '>'['>'] { <file> | <array$> }] [IF <cond>]
                                                     -- IF <cond> is last on BREAK and DISPLAY: it takes the rest of the line
 DISPLAY FILE <name> [OPEN|CLOSE] [OFF] [PRINT]      -- report the file's OPENs and CLOSEs (5.0)
+HELP <category> <topic>                             -- display documentation in the user's browser
 LIST [<range>] [~]{ "<str>" | '<str>' }[…3x] [REPLACE "<new>"] [PRINT | '>'['>'] <file>]   -- search/replace
 LOGGING <level> ',' <logfile> [',' UNATTENDED] [',' +CONSOLE]
 STATUS [<topic>…] [-P] ['>'['>'] <file>]          -- ST; topics below
@@ -54,7 +58,7 @@ Each of these commands lists its forms and options when given
 <a id="semantics"></a>
 ## Semantics
 
-- <a id="date-time"></a><a id="time"></a>**DATE/TIME** (commands, `DA`/`TI`) set or show the clock for this terminal,
+- <a id="date-time"></a><a id="date"></a><a id="time"></a>**DATE/TIME** (commands, `DA`/`TI`) set or show the clock for this terminal,
   **session only** (per-workstation, lost on exit, no effect on the OS clock) — distinct from the
   [`DATE$`/`TIME$`](../../10-language/data-manipulation/system-functions/spec.md#date-functions)
   *functions* that only read it. Quirk: `DATE` is *set* as `mm-dd-yy` (or `mm/dd/yy`) but *reported*
@@ -87,9 +91,9 @@ Each of these commands lists its forms and options when given
   `PRINT` sends the lines to the printer and `> file` to a file (`>>` adds to it). `> A$` sends
   them into a one-dimensional string array of the program the command is given in, one line to
   an element: `>` empties it first, `>>` keeps what it holds, and it is redimensioned as each
-  line is written. A line longer than the elements makes them all that long when the command was
-  given at the console; when an `EXECUTE` gave it, the program's `SOFLOW` setting at that time
-  decides (grow, cut under `ON SOFLOW IGNORE`, else error 58). Growing stops at
+  line is written. A line longer than the elements makes them all that long, at the console and
+  under `EXECUTE` alike; the one exception is an `EXECUTE` run under `ON SOFLOW IGNORE`, which
+  cuts the line to the element length. Growing stops at
   `SOFLOW-GROW MAX=`. A display does not watch the array it fills: `DISPLAY ALL > A$` leaves `A$`
   out, and `DISPLAY MAT A$ > A$` (or an element of it) is refused (1006). If the program or the
   array is gone when a line is written, the line goes to the screen. `DISPLAY FILE
@@ -141,6 +145,12 @@ Each of these commands lists its forms and options when given
   path (`br_filename$`) of the loaded `.br`/`.wb` program — handy in shared error routines. *(Both
   are value-returning functions; they live here as console/debugging aids and are cross-linked from
   the [function index](../../10-language/data-manipulation/system-functions/spec.md#system-info).)*
+- <a id="help"></a>**`HELP <category> <topic>`** shows the br_tree topic for those words (`HELP COMMANDS LIST`,
+  `HELP LIBRARIES FILEIO`), in the person's own web browser when br_tree2 is found and as pages on the
+  console otherwise. `HELP` alone lists what it covers; Tab, Enter and the arrow keys then work together on
+  that list, and Backspace at the end of a word takes the whole word and offers the words that fit there.
+  F1 and Ctrl-Y show the topic for the word at the cursor. The browser tab, where the trees are found
+  (`CONFIG HELPTREE`, `HELPTREE2`) and what the browser connects to: [HELP](HELP.md).
 
 <a id="examples"></a>
 ## Examples
@@ -161,6 +171,7 @@ LOGGING 9, trace.log
 - [editing](../editing/spec.md#list) — `LIST` for display/editing (vs `LIST "search"` here)
 - [filename-patterns](../file-directory/filename-patterns.md#tab-completion) — Tab completes the file after `>`/`>>` of `STATUS`, `DISPLAY`, `LIST` and `RUN` at `READY`
 - [system-functions](../../10-language/data-manipulation/system-functions/spec.md#system-info) — `ERR`/`LINE`/`CODE`, and the `PROCIN`/`PROGRAM$` cross-links
+- [HELP](HELP.md) — the `HELP` command: Tab, Enter and arrow keys on the command line, the browser help tab, where the trees are found
 - Backing keyword pages retained (deep reference): [MSG](MSG.md) (keystroke table),
   [PRINTER_LIST](PRINTER_LIST.md) (printer-select idiom), [PROCIN](PROCIN.md), [PROGRAM$](PROGRAM$.md)
 

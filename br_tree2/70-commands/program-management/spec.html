@@ -21,41 +21,9 @@ commands in <a href="../file-directory/spec.html">file-directory</a>.</p>
 (<code>LOAD</code>, <code>SAVE</code>, <code>RUN</code>, <code>LIST</code>, <code>DIR</code>). A <strong>statement</strong> has a line number and runs at <code>RUN</code>.
 Any statement can be run immediately as a command; a bare expression is an implied <code>PRINT</code>
 (<code>6+4</code>→<code>10</code>). Commands can't appear in a program <strong>except</strong> via <code>EXECUTE</code> or inside a <code>PROC</code>.</p>
-<a id="print-redirect"></a>
-<h2 id="print----file--console-output-to-a-file-or-array-br-50"><code>PRINT ... | &gt; file</code> — console output to a file or array (BR 5.0)</h2>
-<p>A <code>PRINT</code> given at the command line — typed at <code>READY</code>, in a procedure, or run by
-<a href="#execute"><code>EXECUTE</code></a> — can send what it would show on the console to a file or a string array:</p>
-<pre><code class="language-bnf">PRINT [&lt;print-list&gt;] | &gt; { &lt;file&gt; | &lt;array$&gt; }     -- create or replace the file; empty the array
-PRINT [&lt;print-list&gt;] | &gt;&gt; { &lt;file&gt; | &lt;array$&gt; }    -- add to the end of the file or array
-</code></pre>
-<pre><code>PRINT MAT CUST$ | &gt; cust.txt
-PRINT USING &quot;form pos 3,c 10&quot;: NAME$ | &gt;&gt; names.txt
-PRINT MAT A | &gt; LINES$
-</code></pre>
-<ul>
-<li><strong>It is the console output that is redirected.</strong> The lines are exactly what the console would
-have shown, wrapped and zoned at the console's width as they would be there, and nothing goes to
-the screen. <code>PRINT USING</code> is redirected the same way. A <code>PRINT #n:</code> writes to its file as usual;
-it produces no console output, so its target is created or emptied and receives nothing.</li>
-<li><strong><code>|</code> comes after the whole print list</strong>, and the target is the last thing on the line (a <code>!</code>
-comment may follow it). Blanks between <code>|</code>, <code>&gt;</code> and the name are optional: <code>|&gt;out.txt</code> and
-<code>| &gt; out.txt</code> are the same.</li>
-<li><strong><code>&lt;array$&gt;</code></strong> is a one-dimensional string array of the program the command is given in, one
-line to an element, as with <code>LIST &gt; A$</code> and <code>DISPLAY ... &gt; A$</code>. A name ending in <code>$</code> is always
-an array: if the program has none by that name it is made, as <code>A$(1)</code> would make it, and starts
-empty even with <code>&gt;&gt;</code>. A file whose name ends in <code>$</code> is written in quotes: <code>| &gt; &quot;A$&quot;</code>.
-It is redimensioned to the lines it holds. A line longer than its elements makes them that long
-when the <code>PRINT</code> is given at the console; under <code>EXECUTE</code> the program's <code>SOFLOW</code> setting decides
-(grow, cut under <code>ON SOFLOW IGNORE</code>, else error 58). Growing stops at <code>SOFLOW-GROW MAX=</code>. It is written when the <code>PRINT</code> is done, so a <code>PRINT</code>
-may print the array it fills: <code>PRINT MAT A$ | &gt;&gt; A$</code> adds a copy of <code>A$</code> to its end.</li>
-<li><strong>A line a <code>PRINT</code> leaves unfinished</strong> (ending in <code>;</code> or <code>,</code>) is written without a line end.</li>
-<li>The file is opened before the statement runs and closed when it ends, whether it ends normally
-or with an error. An error opening it stops the statement before anything runs.</li>
-<li><strong>Only on a command line.</strong> In a numbered program line <code>|</code> is not an operator, and the line is a
-syntax error. A single <code>|</code> is never an operator (<code>||</code> is OR), so nothing else is read
-differently.</li>
-<li>A missing name, or anything other than a comment after it, is error <strong>1006</strong>.</li>
-</ul>
+<p><a id="print-redirect"></a>
+A <code>PRINT</code> typed at the command line can send its console output to a file or string array with <code>| &gt;</code> and <code>| &gt;&gt;</code>:
+see <a href="../../40-io-printing/statements/spec.html#print-redirect"><code>PRINT ... | &gt; file</code></a> in the printing statements.</p>
 <a id="command-help"></a>
 <h2 id="---what-a-command-takes-br-50"><code>-?</code> — what a command takes (BR 5.0)</h2>
 <p>Any command given <code>-?</code> as the <strong>whole</strong> of its arguments lists the forms and options it accepts and

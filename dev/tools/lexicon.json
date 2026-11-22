@@ -313,6 +313,7 @@
       "RMDIR",
       "RUN",
       "SAVE",
+      "SEARCH",
       "SKIP",
       "SORT",
       "STATUS",

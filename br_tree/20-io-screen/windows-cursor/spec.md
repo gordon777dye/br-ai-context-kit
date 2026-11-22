@@ -228,9 +228,12 @@ line show the br_tree topic for the word at the cursor:
 
 - **In the person's own web browser** when br_tree2, the HTML edition, is found
   ([`HELPTREE2`](../../00-configuration/config-directives/spec.md#helptree2)). The client opens
-  one help tab and moves it to each new topic; a tab that is behind other windows changes page
-  without coming forward, and the status line says *Help is open in your browser*. The pages come
-  from the BR server through the client, so a client on another machine works the same.
+  one help tab and moves it to each new topic, and a tab left open by the last session is found
+  again when BR restarts. On Windows the browser's window is brought to the front when the tab
+  moves (BR cannot choose the tab: if another tab is the active one in that window, that is what
+  shows); elsewhere only the status line, *Help is open in your browser*, says it moved. The pages
+  come from the BR server through the client, so a client on another machine works the same. See
+  [HELP](../../70-commands/information/HELP.md).
 - **On the console** otherwise: the page in 23 rows, with the arrow keys, Page Up/Down and
   Home/End to move and F2 or Esc to leave.
 

@@ -9,6 +9,16 @@ corrections:
   - "PROCERR REM removed: BR no longer supports it (2026-10-31). In the refreshed BR source, command0.cpp's PROCERR accepts STOP_TYPE and RETURN_TYPE only and answers any other qualifier with BREMISSINGKEYWORD; wbos.cpp's PROCERR help lists STOP and RETURN. REM is still in table2k (REM_TYPE), but no command reads it."
   - "Brought into line with the 2026-10-21 corrections to the four command specs (from the BR 5.0 parsers; see br50 br/docs/FLAGS.md): a fifth reading rule for the `-?` command help; COPY/DROP/FREE lose -A, which BR accepts and ignores, and COPY gains -F; the record-length rule narrowed; TYPE gains -P; PROTECT gains READ and WRITE; EDIT gains its operands; BREAK and DISPLAY gain IF and FILE; PROCERR gains REM. brls reads these signatures through its generator, so it follows only once regenerated."
   - "Brought into line with BR50 Release_Notes.md (dev/tools): AI and DEBUG gain signatures (1.30, 2.19, 2.1, 2.2, 3.1, 3.2, 3.7); DIR gains the 5.0 options -T -S -R -M -N -B and +ddd (1.29), with the old letters kept for -O and OPTION 8; LIST gains CLAUSES and NOEJECT (1.30). New operand kind <plusint>."
+  - "SEARCH added (BR 5.03; file-directory/spec.md#search, and BR's searchParse and searchOptionsValid in
+    wbos.cpp), with a new operand kind, <pattern>, for its pattern: BR reads the attributes and the
+    pattern from the line as typed, not through the shared tokenizer, so a /regex/ may hold blanks, commas
+    and quotes. The options-stand-anywhere rule is narrowed to say it does not hold before a pattern. The
+    attribute -~ is a letter of <flags:IWBR~>. Not expressed: -L with -C or -N (1006). (2026-11-22)"
+  - "TYPE and COPY take several names, as file-directory/spec.md#syntax gives them (`TYPE <file> [[','] <file>]...`,
+    `COPY <from> [[','] <from>]... <to>`): `{ <path> }*` after the first. MOVE and RENAME likewise, from the same
+    BNF (`<from> [[','] <from>]... <to>`). The lines had one name (COPY: one source
+    and the destination), so `TYPE a.txt,b.txt` and `COPY a.txt,b.txt dest` were refused. A comma between names
+    is a blank, as for every command. (2026-11-22)"
 ---
 
 # Command signatures
@@ -56,7 +66,9 @@ the tree speaks:
   [INDEX](../30-io-file/keys-indexes/INDEX.md) gives `-N`), but QSMRP also writes `-N` after `SORT`,
   `TYPE`, `DIR`, `MKDIR`, `PROTECT` and `PROC`, and `COPY a b -124 -d -n` with the record length
   *before* other options, which BR accepts: it must be last only within one combined option word. The
-  letters are not checked.
+  letters are not checked. **Except before a `<pattern>`:** `SEARCH` reads every word ahead of its pattern
+  that begins with a dash as an attribute, and refuses one with any letter but its own (1006), so there
+  the letters are checked and nothing is passed over.
 - **A comma is a blank.** [INDEX.md](../30-io-file/keys-indexes/INDEX.md) says parameters are
   separated by spaces or commas, and QSMRP writes `PROTECT f Release` and `PROTECT f, Release` alike.
   A `','` in a signature is therefore never required.
@@ -81,6 +93,7 @@ the tree speaks:
 | `<redirect>` | `PRINT`, or `>file` / `>>file`, the file attached or in the next word |
 | `<fromfile>` | `<name`: the `<` written against the name, as `LIST <menu` |
 | `<search>` | a quoted string, optionally preceded by `~` |
+| `<pattern>` | `SEARCH`'s pattern, read from the line as typed and not split into words: a `/regex/` to the first `/` with no `\` before it, a string in either quote (two of that quote stand for one), or a word. It may hold blanks, commas and quotes, and must end at a blank, a comma or the end of the line. An unclosed regex or string is refused ([search](file-directory/spec.md#search)) |
 | `<flags:XYZ>` | `-` followed by one or more of the letters shown, as `-AOLPWUCB` |
 | `<status-topic>` | any one word; the topics BR knows are `STATUS`'s table |
 
@@ -100,10 +113,11 @@ CHDIR    [<path>] [<flags:N>]
 MKDIR    <path>
 RMDIR    <path>
 DIR      [<path>] { <flags:ABCLMNOPRSTUW> | <plusint> | <redirect> }*
-COPY     <path> <path> [<flags:DFNPRSV>] [<dashint>] [<redirect>]
-RENAME   <path> <path> [<flags:DNPVF>] [<redirect>]
-MOVE     <path> <path> [<flags:FNPRV>] [<redirect>]
-TYPE     <path> [<flags:P>] [<redirect>]
+COPY     <path> <path> { <path> }* [<flags:DFNPRSV>] [<dashint>] [<redirect>]
+RENAME   <path> <path> { <path> }* [<flags:DNPVF>] [<redirect>]
+MOVE     <path> <path> { <path> }* [<flags:FNPRV>] [<redirect>]
+TYPE     <path> { <path> }* [<flags:P>] [<redirect>]
+SEARCH   { <flags:IWBR~> }* <pattern> <path> { <path> | <flags:CLNP> | <redirect> }*
 DROP     <path> [<flags:NPV>] [<redirect>]
 FREE     <path> [<flags:NPRV>] [<redirect>]
 PROTECT  <path> ',' { RESERVE | RELEASE | READ | WRITE }

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Information &amp; debugging commands — BR reference</title>
-<meta name="keywords" content="STATUS, LIST, TRACE, DISPLAY, LOGGING, STEP, BREAK, TIME, ALL, FONTS, NORESTORE, DEBUG_STR, PROGRAM$, ATTRIBUTES, BREAKPOINTS, COLORS, DIMS, ENCRYPTION, LOCKS, MEMORY, USERS">
+<meta name="keywords" content="HELP, STATUS, LIST, TRACE, DISPLAY, LOGGING, STEP, BREAK, TIME, ALL, FONTS, NORESTORE, DEBUG_STR, PROGRAM$, ATTRIBUTES, BREAKPOINTS, COLORS, DIMS, ENCRYPTION, LOCKS, MEMORY, USERS">
 <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -12,7 +12,8 @@
 <main>
 <h1 id="information--debugging-commands">Information &amp; debugging commands</h1>
 <p>Inspecting state and debugging a running program: date/time, the command console,
-single-stepping, breakpoints, variable display, and logging.</p>
+single-stepping, breakpoints, variable display, and logging. The <code>HELP</code> command, which shows
+br_tree topics in the browser or on the console, has its own page: <a href="HELP.html">HELP</a>.</p>
 <a id="syntax"></a>
 <h2>Syntax</h2>
 <pre><code class="language-bnf">DATE [&lt;mm-dd-yy&gt;|&lt;mm/dd/yy&gt;]   TIME [&lt;hh:mm:ss&gt;]   -- DA/TI; show/set session date &amp; time (this terminal)
@@ -24,6 +25,7 @@ BREAK ALL OFF                                       -- clear every breakpoint
 DISPLAY [-p &lt;prog&gt;] { &lt;var&gt; | MAT &lt;array&gt; | ALL } [OFF | PRINT | '&gt;'['&gt;'] { &lt;file&gt; | &lt;array$&gt; }] [IF &lt;cond&gt;]
                                                     -- IF &lt;cond&gt; is last on BREAK and DISPLAY: it takes the rest of the line
 DISPLAY FILE &lt;name&gt; [OPEN|CLOSE] [OFF] [PRINT]      -- report the file's OPENs and CLOSEs (5.0)
+HELP &lt;category&gt; &lt;topic&gt;                             -- display documentation in the user's browser
 LIST [&lt;range&gt;] [~]{ &quot;&lt;str&gt;&quot; | '&lt;str&gt;' }[…3x] [REPLACE &quot;&lt;new&gt;&quot;] [PRINT | '&gt;'['&gt;'] &lt;file&gt;]   -- search/replace
 LOGGING &lt;level&gt; ',' &lt;logfile&gt; [',' UNATTENDED] [',' +CONSOLE]
 STATUS [&lt;topic&gt;…] [-P] ['&gt;'['&gt;'] &lt;file&gt;]          -- ST; topics below
@@ -67,9 +69,9 @@ redirection must come before <code>IF</code></strong>, which takes the rest of t
 <code>PRINT</code> sends the lines to the printer and <code>&gt; file</code> to a file (<code>&gt;&gt;</code> adds to it). <code>&gt; A$</code> sends
 them into a one-dimensional string array of the program the command is given in, one line to
 an element: <code>&gt;</code> empties it first, <code>&gt;&gt;</code> keeps what it holds, and it is redimensioned as each
-line is written. A line longer than the elements makes them all that long when the command was
-given at the console; when an <code>EXECUTE</code> gave it, the program's <code>SOFLOW</code> setting at that time
-decides (grow, cut under <code>ON SOFLOW IGNORE</code>, else error 58). Growing stops at
+line is written. A line longer than the elements makes them all that long, at the console and
+under <code>EXECUTE</code> alike; the one exception is an <code>EXECUTE</code> run under <code>ON SOFLOW IGNORE</code>, which
+cuts the line to the element length. Growing stops at
 <code>SOFLOW-GROW MAX=</code>. A display does not watch the array it fills: <code>DISPLAY ALL &gt; A$</code> leaves <code>A$</code>
 out, and <code>DISPLAY MAT A$ &gt; A$</code> (or an element of it) is refused (1006). If the program or the
 array is gone when a line is written, the line goes to the screen. <code>DISPLAY FILE &lt;name&gt;</code> reports the file's OPENs and CLOSEs. In STEP/error mode, just typing a variable name prints
@@ -120,6 +122,12 @@ printers (default first) and returns the count; the names double as <code>OPEN &
 path (<code>br_filename$</code>) of the loaded <code>.br</code>/<code>.wb</code> program — handy in shared error routines. <em>(Both
 are value-returning functions; they live here as console/debugging aids and are cross-linked from
 the <a href="../../10-language/data-manipulation/system-functions/spec.html#system-info">function index</a>.)</em></li>
+<li><a id="help"></a><strong><code>HELP &lt;category&gt; &lt;topic&gt;</code></strong> shows the br_tree topic for those words (<code>HELP COMMANDS LIST</code>,
+<code>HELP LIBRARIES FILEIO</code>), in the person's own web browser when br_tree2 is found and as pages on the
+console otherwise. <code>HELP</code> alone lists what it covers; Tab, Enter and the arrow keys then work together on
+that list, and Backspace at the end of a word takes the whole word and offers the words that fit there.
+F1 and Ctrl-Y show the topic for the word at the cursor. The browser tab, where the trees are found
+(<code>CONFIG HELPTREE</code>, <code>HELPTREE2</code>) and what the browser connects to: <a href="HELP.html">HELP</a>.</li>
 </ul>
 <a id="examples"></a>
 <h2>Examples</h2>
@@ -137,6 +145,7 @@ LOGGING 9, trace.log
 <li><a href="../editing/spec.html#list">editing</a> — <code>LIST</code> for display/editing (vs <code>LIST &quot;search&quot;</code> here)</li>
 <li><a href="../file-directory/filename-patterns.html#tab-completion">filename-patterns</a> — Tab completes the file after <code>&gt;</code>/<code>&gt;&gt;</code> of <code>STATUS</code>, <code>DISPLAY</code>, <code>LIST</code> and <code>RUN</code> at <code>READY</code></li>
 <li><a href="../../10-language/data-manipulation/system-functions/spec.html#system-info">system-functions</a> — <code>ERR</code>/<code>LINE</code>/<code>CODE</code>, and the <code>PROCIN</code>/<code>PROGRAM$</code> cross-links</li>
+<li><a href="HELP.html">HELP</a> — the <code>HELP</code> command: Tab, Enter and arrow keys on the command line, the browser help tab, where the trees are found</li>
 <li>Backing keyword pages retained (deep reference): <a href="MSG.html">MSG</a> (keystroke table),
 <a href="PRINTER_LIST.html">PRINTER_LIST</a> (printer-select idiom), <a href="PROCIN.html">PROCIN</a>, <a href="PROGRAM$.html">PROGRAM$</a></li>
 </ul>
