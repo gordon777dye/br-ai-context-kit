@@ -216,8 +216,9 @@ That is the signature in this kit's copy of FileIO ([`tools/fileio.brs`](tools/f
 | `DialogType` | What it opens |
 |---|---|
 | `1` | Nothing: uses `Filename$`, or generates a name when it is blank. No completion message. |
-| `3` | No file dialog, but a column-picker screen (`fnSelectDataCrawlerCols`, line 1868) |
-| `0`, `2`, other | The `fnCsvExportDlg` file dialog (line 1764), then an `"Export complete!"` `MsgBox` |
+| `3` | No file dialog, but a column-picker screen (`fnSelectDataCrawlerCols`, line 1868). No completion message. |
+| `2` | The `fnCsvExportDlg` file dialog (line 1764), then the column picker (line 1865 tests for 2 or 3), then an `"Export complete!"` `MsgBox` |
+| `0`, other | The `fnCsvExportDlg` file dialog (line 1764), then an `"Export complete!"` `MsgBox` |
 
 Anything that opens a screen or a `MsgBox` stops an `UNATTENDED` run with "Input attempted in
 unattended mode". Two more things to know:

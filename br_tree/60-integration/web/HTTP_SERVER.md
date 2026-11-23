@@ -78,7 +78,7 @@ Rules:
 
 | Statement | Effect |
 |---|---|
-| `OPEN #n: "NAME=<any>, HTTP=SERVER [, AUTH] [, RECL=<n>] [, EOL=NONE] [, WAIT=<sec>] [, CHUNK=<bytes>]", DISPLAY, OUTIN` | Starts the server the first time it is opened, then attaches channel `#n` to the request queue. `NAME=` names nothing; both programs use `name=http_file`. `HTTP=` is `SERVER` or `CLIENT`. The file must be `DISPLAY`, opened `OUTIN`: it reads requests and writes their responses. |
+| `OPEN #n: "[NAME=<any>,] HTTP=SERVER [, AUTH] [, RECL=<n>] [, EOL=NONE] [, WAIT=<sec>] [, CHUNK=<bytes>]", DISPLAY, OUTIN` | Starts the server the first time it is opened, then attaches channel `#n` to the request queue. `NAME=` is optional and names nothing (`OPEN #1: "http=server", display, outin` opens); both programs use `name=http_file`. `HTTP=` is `SERVER` or `CLIENT`. The file must be `DISPLAY`, opened `OUTIN`: it reads requests and writes their responses. |
 | `LINPUT #n: POST$` (also `INPUT #n:`) | First sends the **previous** request's response, if one is pending. Then it waits for the next queued request, makes it the channel's current request, and returns its body. |
 | `PRINT #n: X$` | Appends to the current request's response. Nothing is sent until the next read, a `PAGE-FLUSH`, or `CLOSE` - or, with `CHUNK=`, until a chunk's worth has been printed. |
 | `FILE$(n, "<keyword>")` | Reads facts about the current request, or acts on it. See §2.3. |

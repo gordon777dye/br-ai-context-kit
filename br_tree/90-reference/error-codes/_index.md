@@ -429,7 +429,7 @@ _783 entries._
 | [4153](4153.md) | Restricted session: may not change a file this session did not create |
 | [4154](4154.md) | Restricted session: this operation is not permitted |
 | [4155](4155.md) | No session is free on this WSID for a restricted session |
-| [4156](4156.md) | A restricted session can be started only from a local Windows session |
+| [4156](4156.md) | A restricted session cannot be started from this session |
 | [4157](4157.md) | The restricted session did not finish in time and was ended |
 | [4158](4158.md) | No assistant is listening on this session's channel |
 | [4159](4159.md) | DEPRECATED ERROR, as of 4.30: Volume not on line |
@@ -451,6 +451,7 @@ _783 entries._
 | [4175](4175.md) | Multiple WBServer.dat files |
 | [4176](4176.md) | Another session's debug channel is waiting for its debugger; a debug channel can open once that one is attached or closes |
 | [4177](4177.md) | DEPRECATED ERROR, as of 4.30: No command provided. Windows shell call without command |
+| [4178](4178.md) | The restricted session did not start: its client did not log in and claim it in time |
 | [4179](4179.md) | Failed to lock in progress byte in WBServer.dat (formerly Share.exe not loaded) |
 | [4180](4180.md) | Drive start. Bad drive statement |
 | [4184](4184.md) | Drive is already mapped |

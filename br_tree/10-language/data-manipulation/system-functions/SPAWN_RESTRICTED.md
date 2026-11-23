@@ -5,7 +5,7 @@ category: 10-language
 subcategory: 10-language/data-manipulation/system-functions
 kind: function
 since: BR 5.0
-related: [internal function, restricted session, PROC, SLEEP, WSID$, SESSION$, DEBUG_STR, LOGGING, audit log, 4154, 4155, 4156, 4157]
+related: [internal function, restricted session, PROC, SLEEP, WSID$, SESSION$, DEBUG_STR, LOGGING, audit log, client/server, 4154, 4155, 4156, 4157, 4178]
 ---
 `SPAWN_RESTRICTED(command$ [, config$ [, wait [, label$]]])`
 
@@ -40,8 +40,9 @@ session is restricted and disposable; the one that called it is neither.
 |---|---|
 | `4154` | a **restricted** session called it. Nothing in the child could be less restricted than its parent; the refusal is because a program generated for a user has no business spending the WSID's sessions |
 | `4155` | no session is free. **One session per workstation ID is always kept back**, so a spawn can never take the last one a person might need — with eight of nine in use, this is raised |
-| `4156` | not local Windows. It is available in local mode on Windows and raises this elsewhere for now |
+| `4156` | the session cannot start one here: a **console client**, which has no second window to open, or local mode on a platform with no local spawn (a Mac) |
 | `4157` | the session did not finish within `wait` and was ended |
+| `4178` | the new session **did not start** (client/server only): nothing logged in and started it within 60 seconds, or within `wait` if that is shorter. For example a login box was cancelled, or the listener could not be reached |
 
 Every refusal is logged as a security event.
 
@@ -65,6 +66,19 @@ The new session can add notes of its own with [`DEBUG_STR`](spec.md#debug_str). 
 session they are written as `Program note: <text>`, on one line, at level 5 or above, so they cannot
 pass for BR's own entries.
 
+## In client/server (BR 5.03)
+
+In a client/server session the new session is **started by the BR client**, on the person's own
+computer, so its window opens in front of them: a second client, connected through the same
+brlistener and label. It logs in with the person's own login and does not ask for a password, on any
+label, and brlistener starts it restricted whatever else happens. It runs on the server under the
+same workstation ID, writes its audit log in the same folder, and returns its exit code, its process
+id (with no `wait`) or 4157, exactly as above.
+
+**The `wait` includes the start.** The new session has to start its client, connect and log in
+before it can run, which takes a few seconds, so allow for that in a short `wait`. If it has not
+started within 60 seconds, or within `wait` if that is shorter, the call raises **4178**.
+
 ## Example
 
 ```text
@@ -78,5 +92,5 @@ pass for BR's own entries.
 
 - [system-functions](spec.md#system-info) — `WSID$`, `SESSION$`, `SLEEP`
 - [LOGGING in a restricted session](../../../00-configuration/config-directives/LOGGING.md#restricted-session) — the audit log, its name, its level and the program's notes
-- [90-reference/error-codes](../../../90-reference/error-codes/_index.md) — 4154 to 4157
+- [90-reference/error-codes](../../../90-reference/error-codes/_index.md) — 4154 to 4157, and 4178
 - [BRRESTRICT.SYS](../../../00-configuration/config-directives/BRRESTRICT.SYS.md) — the file list, which bounds the new session as it bounds every session
