@@ -8,8 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (PAGEOFLOW); misfiled command/config pages relocated; no conflicts
 recovered-fold: 'PRINT_USING, PRN, REMOTE_PRINTING (3 redirect-collision pages folded from re-fetched source — RUN >/>>/>CON: redirect, string-FORM recompile, PRN:/10 pass-through, DIRECT:/ vs SPOOLCMD, PRINTER_LIST(), CS OPTION 30/@ routing; verbatim retained on the BR wiki)'
 related: [pcl-pdf, sort]
-keywords: [PRINT, OPEN, PAGEOFLOW, NEWPAGE, BELL, TAB, HEADING, USING, PIC, COPIES, PRINTER_LIST]
+keywords: [PRINT, OPEN, PAGEOFLOW, NEWPAGE, BELL, TAB, HEADING, USING, PIC, COPIES, PRINTER_LIST, "WAIT="]
 corrections:
+  - "2026-11-23, from BR 5.03's source (primop1.cpp: PRINT_PRI calls print() without the statement's wait) and run headless: WAIT= added to both PRINT forms, where BR's syntax tree puts it, as accepted with no effect. `PRINT #3, WAIT=1: \"printed\"` ran clean and wrote the line. Also the formatted form's separator: it read `['#'<file-num> ':'] USING`, and the channel is followed by a comma there (`PRINT #255, USING 100: X`), as the tree has it and as QSMRP writes it 4,672 times, with 0 colons. WAIT= added to the keywords."
   - "PRINTER_LIST added to the frontmatter keywords. `PRINTER_LIST(MAT a$)` is documented on this
     page (populates an array with local printer names/ports) and was routing nowhere. Found
     2026-09-11 auditing `go run ./cmd/gendata`'s unrouted-function list against actual br_tree
@@ -41,12 +42,13 @@ Printing `NEWPAGE` to `#255` resets the `PAGEOFLOW` counter and the `KREC(255)` 
 
 ```bnf
 -- unformatted --
-PRINT ['#'<file-num> ':'] [<print-options>] [<print-list>]
+PRINT ['#'<file-num> [',' 'WAIT=' <numeric-expr>] ':'] [<print-options>] [<print-list>]
 <print-options> ::= BELL | NEWPAGE | TAB(<column>)
 <print-list>    ::= <expression> [ { ';' | ',' } <expression> ]*
 
 -- formatted --
-PRINT ['#'<file-num> ':'] USING { <form-ref> | <string-expr> } ':' <expression-list>
+PRINT ['#'<file-num> ','] USING { <form-ref> | <string-expr> } [',' 'WAIT=' <numeric-expr>] ':' <expression-list>
+-- WAIT= is accepted on both and has no effect: PRINT does not read it
 <form-ref> ::= FORM <format-spec> [',' <format-spec>]*
 <format-spec> ::= POS <column> | X <spaces> | SKIP <lines>            -- cursor
                | C <length> | N <length>[.<dec>] | PIC(<picture>)     -- conversion

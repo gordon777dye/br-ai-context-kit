@@ -8,8 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree enrichment (INPUT SELECT, MAT grouping); no conflicts
 recovered-fold: Field_Help, Full_Screen_Processing_Statements, INPUT_FIELDS, PRINT_FIELDS (4 redirect-collision pages folded from re-fetched source — multi-window input, 4.17 field-windowing syntax, hot-field fkey ranges + 10000=Enter, ATTR MAT, field-help spec; verbatim retained on the BR wiki)
 related: [fields-attributes, controls, windows-cursor]
-keywords: [PRINT FIELDS, INPUT FIELDS, RINPUT FIELDS, INPUT SELECT, RINPUT SELECT, INPUT, LINPUT, RINPUT, SELECT, ATTR, HELP]
+keywords: [PRINT FIELDS, INPUT FIELDS, RINPUT FIELDS, INPUT SELECT, RINPUT SELECT, INPUT, LINPUT, RINPUT, SELECT, ATTR, HELP, "WAIT="]
 corrections:
+  - "2026-11-23: WAIT= added to the BNF of plain INPUT, LINPUT and RINPUT (a `<source>` of `#channel[, WAIT=n]:` or `WAIT=n:`) and of INPUT/RINPUT FIELDS (between ATTR and HELP), where BR's syntax trees put it. The WAIT= bullet already said all of these accept it; the BNF did not show it. `INPUT #6, WAIT=1: I$` and `LINPUT #6, WAIT=1: L$` were run headless against a display file and read the line. WAIT= added to the keywords."
   - "ATTR and HELP added to the frontmatter keywords. Both appear in this page's BNF for INPUT/RINPUT FIELDS — `[',' ATTR <attrs>] [',' HELP <help>]` — and in its semantics, and neither was declared. Found in brls phase 13."
 ---
 
@@ -25,8 +26,8 @@ Full-screen data entry: positioning text and input at any row/column with `PRINT
 
 ```bnf
 PRINT  ['#'<window>,] FIELDS <field-specs> ':' <expression-list>
-INPUT  ['#'<window>,] FIELDS <field-specs> [',' ATTR <attrs>] [',' HELP <help>] ':' <io-list> [<error-cond>]
-RINPUT ['#'<window>,] FIELDS <field-specs> [',' ATTR <attrs>] [',' HELP <help>] ':' <io-list> [<error-cond>]
+INPUT  ['#'<window>,] FIELDS <field-specs> [',' ATTR <attrs>] [',' 'WAIT=' <seconds>] [',' HELP <help>] ':' <io-list> [<error-cond>]
+RINPUT ['#'<window>,] FIELDS <field-specs> [',' ATTR <attrs>] [',' 'WAIT=' <seconds>] [',' HELP <help>] ':' <io-list> [<error-cond>]
 
 <field-specs> ::= '"' <field-def> [ ';' <field-def> ]* '"'   -- one or more fields
                 | MAT <string-array>                          -- array of field definitions
@@ -102,9 +103,11 @@ be a non-alphanumeric character absent from the text. Border/attributes come fro
 ### Plain (non-FIELDS) keyboard input
 Bottom-line input without positioning:
 ```bnf
-INPUT  <variable-list> [ CONV <ref> ] [ SOFLOW <ref> ] [ EOF <ref> ] [ TIMEOUT <ref> ]
-LINPUT <string-variable> [ TIMEOUT <ref> ]            -- whole line, including commas/punctuation
-RINPUT <variable> [ TIMEOUT <ref> ]                   -- single variable: prints its current value, then prompts for a replacement
+INPUT  [<source>] <variable-list> [ CONV <ref> ] [ SOFLOW <ref> ] [ EOF <ref> ] [ TIMEOUT <ref> ]
+LINPUT [<source>] <string-variable> [ TIMEOUT <ref> ]            -- whole line, including commas/punctuation
+RINPUT [<source>] <variable> [ TIMEOUT <ref> ]                   -- single variable: prints its current value, then prompts for a replacement
+<source> ::= '#'<channel> [ ',' 'WAIT=' <seconds> ] ':'
+           | 'WAIT=' <seconds> ':'                                -- the keyboard, with a timeout (see WAIT= below)
 ```
 `INPUT` reads comma-separated values into the list (type-checked for numerics; `CONV`/`SOFLOW`
 handle bad data) — it takes **no prompt argument** (`INPUT "X", A$` does not compile; emit the

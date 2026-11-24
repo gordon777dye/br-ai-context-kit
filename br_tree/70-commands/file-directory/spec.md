@@ -8,8 +8,10 @@ kind: spec
 status: 2b           # reference base + br_tree fold (full -options, TYPE/PROTECT, CHDIR nav, client-server @:, abbreviations); no conflicts
 recovered-fold: MkDir, RENAME (2 redirect-collision pages folded from re-fetched source — RENAME full -NPVF options + PRINT/redirect, MKDIR naming rules; verbatim retained on the BR wiki)
 related: [program-management, information]
-keywords: [DIR, COPY, MOVE, RENAME, MKDIR, RMDIR, CHDIR, FREE, PROTECT, DROP, TYPE, SEARCH]
+keywords: [DIR, COPY, MOVE, RENAME, MKDIR, RMDIR, CHDIR, FREE, FRE, PROTECT, DROP, TYPE, SEARCH, RESERVE, RELEASE]
 corrections:
+  - "2026-11-24, from BR 5.03's source (tblcmd.cpp table1k FRE -> FRE_FORCE_CMD; commandc.cpp cmdproc, whose only action for it is error 1000; wbos.cpp s_commandHelp, which has no FRE entry) and a headless run of `FRE -?` (error 1000): the `fre` paragraph after DROP/FREE, and FRE added to the keywords. It had been named only in the FREE-abbreviation correction."
+  - "2026-11-22: RESERVE and RELEASE added to the keywords, with `reserve` and `release` anchors on PROTECT's two bullets, so PROTECT's qualifiers (table2k) link to them. The RESERVE qualifier had no link, and the RELEASE qualifier linked to the top of the file-model page."
   - "BR 5.03, 2026-11-22: the regex syntax now has a page of its own, ECMA_REGEX.md (HELP COMMANDS REGEX), linked from the search section. A /regex/ may hold a ! (command.cpp no longer takes it for the start of a remark, which had made /(?!x)/ error 1003)."
   - "BR 5.03, 2026-11-22, from the source change (wbos.cpp, tested headless): SEARCH phase 2 - attributes -~ -W -B -R before the pattern and options -C -L -N after the names (-L with -C or -N is 1006); a line written to a disk file is no longer wrapped at the record length; a line the regex engine gives up on is skipped and noted, not error 1009. The search section and the BNF line are updated."
   - "BR 5.03, 2026-11-22, from the source change (wbos.cpp output(); built, the pause not yet run on a screen): a digit 2 to 9 at the `-P` pause of DIR, COPY, MOVE, RENAME, DROP and FREE shows the next that many lines, as TYPE's and SEARCH's already did. The paging paragraph says so."
@@ -151,9 +153,10 @@ a new name), and can copy to a device. Options: `-D` omit deleted records (inter
 no action log, `-P` pause per screen, `-S` copy an **open** file (must be opened `SHR`/`SHRI` else
 error **4148**), `-V` verify each action, `-F` overwrite without asking (see
 [overwrite](#overwrite)), `-<n>` set the new internal-file record length (space-padded; last within
-a combined option word). **`-A` is accepted and has no effect**: it was documented as copying only
-archive-bit files and then clearing the bit, but BR 5.0 collects the files without looking at the
-bit and clears nothing. **`-C`** (ask for another diskette when the disk fills) **was removed in BR
+a combined option word). **`-A` is a syntax error (1006)** from BR 5.03: it was documented as
+copying only archive-bit files and then clearing the bit, but BR never applied it - it collected
+the files without looking at the bit and cleared nothing - so it was accepted and ignored until it
+was made an error like any other flag `COPY` does not have. Only `DIR` takes `-A`. **`-C`** (ask for another diskette when the disk fills) **was removed in BR
 5.0**; the letter is still accepted, and does nothing for `COPY`. Device targets `PRN:`/`AUX:`/`COM1:`/`LPT1:`… send to a
 printer (on Linux these need a `SUBSTITUTE` mapping in [BRConfig.sys](../../00-configuration/config-directives/spec.md));
 copying *to* `PRN:`/`WIN:` is illegal — use `TYPE` with redirection. As of 4.2 a print file copies
@@ -328,7 +331,7 @@ SEARCH -~ todo notes.txt -C
 <a id="drop-free"></a><a id="drop"></a><a id="free"></a>**DROP** empties a file's contents — freeing all allocated space and leaving
 only the header record for internal files — but keeps the name (size→0). **FREE** deletes the
 file(s) outright (unrecoverable). Both take `-N`/`-P`/`-V` and accept wildcards (use `-V` to
-verify); `-A` is accepted and has no effect, as on `COPY`. **`FREE <name> -R`** (BR 5.0) deletes
+verify); `-A` is a syntax error (1006) from BR 5.03, as on `COPY`. **`FREE <name> -R`** (BR 5.0) deletes
 what *name* matches, as [`COPY -R`](#copy-recursive) reads *from*, and frees a folder that matches
 whole: its files, then its folders, deepest first. `FREE old -R` removes the folder `old` and
 everything in it. Under `-V` each file is asked about, and a folder that still has a file in it is
@@ -336,19 +339,23 @@ kept. A procedure can `FREE` itself as its last line; a `.$$$`-named procedure s
 after running. *(The same-named `DROP`/`FREE` **CLOSE parameters** inside a program are a separate
 file operation — [30-io-file/statements](../../30-io-file/statements/spec.md#close).)*
 
+<a id="fre"></a>**`FRE`** is in BR's command table only so that a short spelling of `FREE` is refused
+rather than deleting anything: `FRE`, with or without operands, is error **1000** (unidentified
+source remaining), and so is `FRE -?`, which has no command help. Type `FREE` in full.
+
 <a id="protect"></a>**`PROTECT <file> {RESERVE|RELEASE|READ|WRITE}`** (`PROT`) turns on or off one of two kinds of file
 protection; exactly one of the four words is required. The file name ends at the first blank or comma, so
 `PROTECT CUSTOMER.FIL RESERVE` and `PROTECT CUSTOMER.FIL, RESERVE` are the same. A name containing `*` is
 accepted and ignored.
 
 **Multi-user protection: `RESERVE` and `RELEASE`.**
-- `RESERVE` reserves the file's full path name for **this workstation's exclusive use**: before every
+- <a id="reserve"></a>`RESERVE` reserves the file's full path name for **this workstation's exclusive use**: before every
   `OPEN` BR consults a table of reservations, and an `OPEN` by another workstation fails with error **4148**
   (file sharing rules violated) without touching the disk. The reservation holds even when the file is not
   open, and it reserves the *name*, so it can be made for a file that does not exist, or kept after `FREE` has
   deleted the file, which lets you reserve a name, delete the file, and rename the contents of another file
   to it. Reserving a file this workstation has already reserved is not an error.
-- `RELEASE` removes a reservation, and only the workstation that made it can. All of a workstation's
+- <a id="release"></a>`RELEASE` removes a reservation, and only the workstation that made it can. All of a workstation's
   reservations are released when it leaves BR. `STATUS ALL` lists the ones issued from this workstation.
 - Alternatives when the file is open: `CLOSE` with `RELEASE` (to release) and `OPEN` with `RESERVE` (to reserve).
 - It differs from locking with `NOSHR` in two ways: `PROTECT` keeps the file locked while it is not open, and

@@ -8,8 +8,9 @@ kind: spec
 status: 2b           # reference base + br_tree fold (EDIT, AUTO proc-restriction/restart, DEL SOURCE, abbreviations); no conflicts
 recovered-fold: RENUM (folded+pruned — LABELS_ONLY 4.18a, segment reorder, collision/99999 errors; verbatim retained on the BR wiki)
 related: [program-management, information]
-keywords: [EDIT, LIST, AUTO, RENUM, DEL, SOURCE, CLAUSES, NOEJECT]
+keywords: [EDIT, LIST, AUTO, RENUM, DEL, SOURCE, CLAUSES, NOEJECT, XREF]
 corrections:
+  - "2026-11-24, from BR 5.03's source (tblcmd.cpp table2k XREF -> XREF, a token value no command's qualifier switch tests) and a headless `LIST XREF` (error 1006): the `xref` note under LIST options, and XREF added to the keywords."
   - "From the BR 5.0 parsers (see br50 br/docs/FLAGS.md), 2026-10-21, source reading not yet confirmed by a run: LIST's -P (a pause after each line, and a digit there lists that many), -n / n- paging, CLAUSES and NOEJECT documented (command9.cpp LIST); EDIT's program, - and ~ forms documented (commandc.cpp editCommand()); pointer to the new `-?` command help added."
   - "SOURCE added to the frontmatter keywords. `DEL … SOURCE` is in this page's BNF and semantics, and was not declared. Found in brls phase 13."
 ---
@@ -71,6 +72,8 @@ Each of these commands lists its forms and options when given
   page eject unless **`NOEJECT`** is given (the old wiki called this `SKIP`); `>printer-name` lists 
   to a named
   printer. `LIST PRINT` uses the printer's initialization escape sequences.
+  <a id="xref"></a>**`XREF` is not an option.** It is still in BR's qualifier table (`table2k`), but
+  no command reads it, so `LIST XREF` is error **1006** (syntax error). *Measured, 5.03 headless.*
 - <a id="list-output"></a>**Where `LIST` writes.** The screen by default. **`>file`** writes the 
   listing to a file
   (created, as source: `LIST 500 1350 >B:\OUTPUT.BRS`) and **`>>file`** appends to one; **`PRINT`** goes to the

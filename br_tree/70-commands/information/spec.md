@@ -24,6 +24,16 @@ corrections:
     br_tree content."
   - "DATE added to keywords:, and a `date` anchor beside `time`: the DATE command is documented here and
     was not declared, so it routed nowhere of its own (2026-11-22). Found when brls stopped linking a sense to another sense's section: the DATE command, the procedure SKIP and the POS= clause had been linked only to the DATE function, FORM's SKIP n and the POS format code."
+  - "TRACE documented in full beside BREAK (2026-11-24, BR 5.03; br50 br/docs/BR503 Release_Notes.md 2.8):
+    the three modes LINES, LABELS and PRINT, the console options and the statement side by side, OFF
+    remembering the modes, and how tracing meets STEP, SOURCE, BREAK IF and STATUS BREAK. The RUN and
+    GO lines of the syntax gain the trace options and NOTRACE, and the TRACE line gives the modes in
+    any order. From primop0.cpp (traceOn, traceOff), command9.cpp and run.cpp, and tested by br50's
+    br/aiaccess/tracetest.py and tracescreen.py."
+  - "BREAK <system function> documented (BR 5.03, 2026-11-24): stops before a clause that calls it;
+    BREAK FNname on a library function now stops from the caller's prompt; consecutive breakpoints
+    each stop. From run.cpp (checkbreakpoints, clauseBreakFunction, functionBreakPointMatch) and
+    commandc.cpp, tested by br50's br/aiaccess/fnbreak.py."
 ---
 
 # Information & debugging commands
@@ -37,14 +47,19 @@ br_tree topics in the browser or on the console, has its own page: [HELP](HELP.m
 
 ```bnf
 DATE [<mm-dd-yy>|<mm/dd/yy>]   TIME [<hh:mm:ss>]   -- DA/TI; show/set session date & time (this terminal)
-RUN [STEP] [TRACE] [NORESTORE|RESTORE]             -- step / trace execution (resume with GO → program-management)
-BREAK [-p <prog>] { <line>[:<clause>] | <label>: | <var> | FN<name> | BEGIN } [OFF | '>'['>'] { <file> | <array$> }] [IF <cond>]   -- ST mode triggers
+RUN [<program>] ['>'['>']<file>] [STEP] [TRACE [LINES|LABELS|PRINT|'>'['>']<file>]… [ON|OFF] | NOTRACE] [NORESTORE|RESTORE]
+                                                    -- run, stepping and/or tracing; options in any order
+GO [<line>] [STEP] [TRACE [LINES|LABELS|PRINT|'>'['>']<file>]… [ON|OFF] | NOTRACE] [NORESTORE|RESTORE]
+                                                    -- resume a halted program, the same options
+BREAK [-p <prog>] { <line>[:<clause>] | <label>: | <var> | FN<name> | <system-function> | BEGIN } [OFF | '>'['>'] { <file> | <array$> }] [IF <cond>]   -- ST mode triggers
 BREAK IF <cond> | BREAK IF OFF                      -- test <cond> after every line (5.0)
 BREAK FILE <name> [OPEN|CLOSE] [OFF]                -- stop when the file is opened or closed (5.0)
 BREAK ALL OFF                                       -- clear every breakpoint
 DISPLAY [-p <prog>] { <var> | MAT <array> | ALL } [OFF | PRINT | '>'['>'] { <file> | <array$> }] [IF <cond>]
                                                     -- IF <cond> is last on BREAK and DISPLAY: it takes the rest of the line
 DISPLAY FILE <name> [OPEN|CLOSE] [OFF] [PRINT]      -- report the file's OPENs and CLOSEs (5.0)
+TRACE [LINES|LABELS|PRINT]… { OFF | [ON] ['>'['>']<file>] }  -- the statement: set the trace modes, in a program
+                                                    -- or typed at READY (BR 5.03 for LINES, LABELS, PRINT OFF)
 HELP <category> <topic>                             -- display documentation in the user's browser
 LIST [<range>] [~]{ "<str>" | '<str>' }[…3x] [REPLACE "<new>"] [PRINT | '>'['>'] <file>]   -- search/replace
 LOGGING <level> ',' <logfile> [',' UNATTENDED] [',' +CONSOLE]
@@ -63,14 +78,100 @@ Each of these commands lists its forms and options when given
   [`DATE$`/`TIME$`](../../10-language/data-manipulation/system-functions/spec.md#date-functions)
   *functions* that only read it. Quirk: `DATE` is *set* as `mm-dd-yy` (or `mm/dd/yy`) but *reported*
   as `yy/mm/dd` (legacy — programs normally use the function, not the command).
-- **RUN STEP** pauses after each action statement (Enter = next, `GO` = resume); **TRACE** prints
-  line numbers as they execute; combine `STEP TRACE`. The fuller `GO [STEP|TRACE] [.line]` resume /
-  temporary-breakpoint forms and Shift+F1–F5 stepping are in
+- **RUN STEP** pauses after each action statement (Enter = next, `GO` = resume); **TRACE** shows
+  the program's flow as it runs ([below](#trace)); combine `STEP TRACE`. The fuller
+  `GO [STEP|TRACE] [.line]` resume / temporary-breakpoint forms and Shift+F1–F5 stepping are in
   [program-management](../program-management/spec.md#go).
+- <a id="trace"></a>**TRACE** shows where a program goes while it runs, without stopping it, where
+  `BREAK` stops it at a chosen point. It has three **modes** (BR 5.03; before, line numbers were the
+  only kind):
+  - **LINES**: each line's number as the line starts, five digits (`00120`). The line a `GO <line>`
+    resumes at is not shown; the lines after it are.
+  - **LABELS**: each line label the run reaches, by `GOTO`, `GOSUB` or falling into it,
+    with its colon (`POST_LEDGER:`). With both on, a line's label comes before its number.
+    Labels are kept with the source, so a program saved without its source shows none.
+  - **PRINT**: where it goes. Without it, each item and a space are added to the main window's bottom
+    line, which wraps onto a new line when full; with it, to the system printer (BR opens `PRN:` if
+    the program has not). While the program waits at a `PAUSE`, the bottom line
+    being built is covered by the prompt; it shows once the run goes on.
+  - <a id="trace-file"></a>**`>file`** or **`>>file`** (BR 5.03): to a file, which `>` replaces and
+    `>>` adds to. The trace is laid out for reading: each label is a line of its own, and the line
+    numbers between labels follow one another on a line, blank-separated, starting a new line before
+    one would pass column 80:
+    ```
+    POST_LEDGER:
+    00800 00810 00820 00830 00840 00850 00860 00870 00880 00890 00900 00910 00920
+    00930 00940
+    ```
+    Each item is written as it happens, so the file can be read while the program is paused. It
+    stays open while the run continues, through `PAUSE`s and stops, and closes at a bare `TRACE OFF`
+    (or `NOTRACE`) and when the program ends and BR returns to READY. A `TRACE ON` that resumes
+    tracing to it reopens it and **adds** to it, whether it was named with `>` or `>>`. `RUN`
+    forgets it. The name is a file, never an array: `>A$` naming an array of the program is refused
+    with error 315. The file is opened by the same code as `DISPLAY`'s and `BREAK`'s redirection, so
+    names, drives and sessions work as they do there.
+
+  `PRINT` and a file are exclusive, and **the last one named wins**: `RUN TRACE >t.txt PRINT` traces
+  to the printer, `RUN TRACE PRINT >t.txt` to the file, and naming the printer closes the file.
+
+  BR also logs each item at logging level 12, as `Trace line 00120 in <program>` or
+  `Trace label POST_LEDGER: in <program>`, so `LOGGING 12, <file>` gives a permanent record of the
+  flow that survives the screen.
+
+  **Turning it on and off.** The console options and the statement set the same modes:
+
+  | Console, on `RUN` or `GO` | Statement, in a program or at READY | Effect |
+  |---|---|---|
+  | `TRACE` | `TRACE ON`, `TRACE` | resume the modes the last `OFF` stopped; with none remembered, line numbers |
+  | `TRACE LINES` | `TRACE LINES ON` | line numbers |
+  | `TRACE LABELS` | `TRACE LABELS ON` | labels |
+  | `TRACE LINES LABELS` | `TRACE LABELS LINES ON` | both, named in any order |
+  | `TRACE PRINT` | `TRACE PRINT`, `TRACE PRINT ON` | to the printer |
+  | `TRACE PRINT OFF` | `TRACE PRINT OFF` | back to the window, the other modes left on |
+  | `TRACE >t.txt`, `TRACE LABELS >>t.txt` | `TRACE LABELS ON >t.txt`, `TRACE >>"t.txt"` | to a file, replacing or adding to it |
+  | `TRACE LABELS OFF` | `TRACE LINES OFF`, `TRACE LABELS OFF` | that mode off, the others left on |
+  | `NOTRACE`, `TRACE OFF` | `TRACE OFF` | every mode off, remembering which were on |
+
+  - **The statement turns on or off only the modes it names.** `TRACE LABELS ON` adds labels to any
+    line tracing already on, and `TRACE PRINT` or `TRACE >t.txt` only selects where tracing goes; it
+    does not start it, so write `TRACE LINES PRINT ON` or `TRACE LINES ON >t.txt` (or a `TRACE ON` as
+    well).
+  - **In the statement, `>file` comes last**, after `ON` if there is one, and needs no quotes: an
+    unquoted name runs to the next blank and is the file's name as written, so `>F$` is a file named
+    `F$`, not the variable. A name with blanks in it goes in quotes, and a quoted name may be a string
+    expression (`>"t"&STR$(N)&".txt"`). `LIST` shows an unquoted name in quotes. A file that cannot be
+    opened is an error of the `TRACE` statement, which `ON ERROR` traps.
+  - **On the console, the word `TRACE` starts tracing.** `RUN TRACE PRINT` traces line numbers to the
+    printer, and `RUN TRACE LABELS` traces exactly the labels, turning line numbers off. Every trace
+    option follows `TRACE`: before it, `LINES`, `LABELS`, `ON` and `OFF` are a program name to `RUN`
+    and a line label to `GO`, and `PRINT` does nothing. Those four must be spelled out; `PRINT` may
+    be abbreviated. Options may come in any order with `STEP`, `NORESTORE` and the rest, and are
+    acted on once the whole command is read, so `GO TRACE PRINT OFF` never switches anything on.
+  - **`>file` on the console belongs to `TRACE` only when it follows `TRACE`.** `RUN TRACE LABELS
+    >t.txt` sends just the trace to `t.txt`. A `>file` before `TRACE` (or with no `TRACE`) is `RUN`'s
+    own printer redirection, as before, and the two are independent: `RUN >p.txt TRACE >t.txt` puts
+    the program's printer output in `p.txt` and the trace in `t.txt`. `GO` accepts `>file` only after
+    `TRACE`.
+  - **`OFF` remembers.** A `TRACE OFF` that names no mode, `GO TRACE OFF` and `NOTRACE` stop every mode,
+    the printer or file included, and remember which were on; a later `TRACE ON`, bare `TRACE` or `GO TRACE`
+    resumes exactly those. So a program can bracket the region it wants traced, and a halted run can
+    be resumed with tracing off and back on, without naming the modes again. An `OFF` with nothing on
+    leaves the memory alone. `RUN` starts afresh: it clears the modes and forgets the memory. `GO`
+    keeps both.
+  - **With other debugging.** `STEP TRACE` shows each line number and then stops before the line.
+    `SOURCE` after `TRACE` (`RUN TRACE SOURCE`) shows each line's source in place of its number.
+    A `BREAK … IF` or `BREAK IF` condition is evaluated with tracing and stepping suspended, so it
+    adds nothing to the trace. `STATUS BREAK` lists breakpoints and displays, not the trace modes.
+  - **Compatibility.** A program that uses `TRACE LINES`, `TRACE LABELS`, `TRACE PRINT OFF` or `>file` needs
+    BR 5.03: an older BR cannot compile them and misreads them in a saved program. `TRACE ON`,
+    `TRACE OFF` and `TRACE PRINT` behave as they always did, except that a bare `TRACE` now means
+    `TRACE ON` (it was undefined). The statement's grammar is in
+    [other-flow](../../10-language/flow-control/other-flow/spec.md#trace), the console forms in
+    [command-signatures](../command-signatures.md#trace-options).
 - <a id="break"></a>**BREAK** drops a program into STEP mode when its target is hit: a `line`
   (must be an executable line — flow/assignment/I-O; not comments, `DATA`, or `DIM`), a `label:`,
-  a changed `variable`/array/array-element (e.g. `BREAK CUSTOMER$(6)`, as of 4.16), a `FNname`, or
-  `BEGIN` (on entry). `BREAK var` also implies `DISPLAY var`. A redirection (`> file`,
+  a changed `variable`/array/array-element (e.g. `BREAK CUSTOMER$(6)`, as of 4.16), a `FNname`, a
+  system function (BR 5.03), or `BEGIN` (on entry). `BREAK var` also implies `DISPLAY var`. A redirection (`> file`,
   `>> file`, `> A$`, as for [DISPLAY](#display)) does not change the break itself, but the line
   that implied display shows for a changed variable goes there instead of the screen
   (`BREAK TOTAL >> TRACE$`); with `OFF` it is refused (1006). **The redirection must come before
@@ -82,6 +183,20 @@ Each of these commands lists its forms and options when given
   with no target tests it after every line (`BREAK IF OFF` ends that). Before 5.0 the way was a
   stored `IF A>B THEN EXECUTE "go step"`. **`BREAK FILE <name>`** stops when the file is opened or
   closed (`OPEN` or `CLOSE` for one of the two).
+  - <a id="break-function"></a>**`BREAK FNname`** stops inside the function, at its first line, once
+    the call has been made and its arguments evaluated. A library function stops too, whether the
+    break was set at the calling program's prompt or with `-p <library>` (before BR 5.03 only the
+    second worked).
+  - **`BREAK <system function>`** (BR 5.03), such as `BREAK LEN`, `BREAK STR$` or `BREAK VAL`, stops
+    **before any clause** that calls the function, since a system function has no lines of its own
+    to stop in: `BREAK LEN` stops before `LET B=LEN(A$)`, and again before every later clause that
+    calls `LEN`. `GO` (or Enter) runs the clause and goes on. Any of BR's string or numeric functions
+    can be named, spelled out in full; `OFF` clears it, `-p` chooses the program as for any
+    breakpoint, and `STATUS BREAK` lists it as `BREAK FUNCTION LEN`. `IF` and a redirection are
+    refused (1006), and `DISPLAY` does not take a function (1070). A clause is stopped before if its
+    compiled code calls the function, even where the call would not be reached.
+  - With several breakpoints, each stops in turn: before BR 5.03, a stop passed over the next
+    check, wherever it was, so `BREAK 60` and `BREAK 70` stopped at 60 only.
 - <a id="display"></a>**DISPLAY** monitors variables as they change, printing
   `line  var  new-value`. It takes whole arrays (`DISPLAY MAT CUSTOMER$`) and single elements
   (`DISPLAY CUSTOMER$(5)`); `-p <prog>` masks programs; `OFF` stops it. `IF <cond>` (BR 5.0)

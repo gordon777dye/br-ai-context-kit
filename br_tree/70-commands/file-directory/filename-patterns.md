@@ -8,6 +8,8 @@ kind: concept
 status: 2b
 related: [spec, ../editing/spec, ../program-management/spec, ../../30-io-file/file-model/spec, ../../00-configuration/config-directives/OPTION_(Config)]
 keywords: [DIR, COPY, MOVE, RENAME, FREE, DROP, TYPE, LOAD, RUN, SAVE, REPLACE, MERGE, PROC, SUBPROC, CD, LIST, STATUS, DISPLAY, INDEX, MKDIR, RMDIR, CHDIR, glob, OPTION 84, Tab completion]
+corrections:
+  - "2026-11-24 (owner): `L` and `LI` also `LINK` removed from the abbreviation examples. The kit documents LINK only as linked files."
 ---
 
 # File name patterns and Tab completion
@@ -318,8 +320,7 @@ the screen less three rows and ends `... and n more`.
   3.1 or anything longer, which is exactly what BR itself accepts. `FREE`,
   `DIR` and `PROC` have no abbreviation: BR refuses `FR` and `FRE`, `DI`
   is also `DISPLAY`, and `PRO` is also `PROCERR` and `PROTECT`. A shorter word
-  is ambiguous to BR (`CO` is also `CONFIG`, `T` also `TIME`, `L` and `LI` also
-  `LINK`, `M` also `MKDIR`, `RE` also `RENUM`, `S` also `SAVE` …), and Tab
+  is ambiguous to BR (`CO` is also `CONFIG`, `T` also `TIME`, `M` also `MKDIR`, `RE` also `RENUM`, `S` also `SAVE` …), and Tab
   after it moves to the next tab stop. `INDEX` is the only command beginning
   with `I`, so `I` alone is enough.
 - **Everywhere else Tab is what it was**: on any other command, and in the

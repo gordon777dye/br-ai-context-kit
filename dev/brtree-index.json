@@ -1,8 +1,8 @@
 {
   "$comment": "Concept -> spec router over br_tree/. keyword_index maps a BR keyword to the spec path(s) that document it; section_index maps each statement, READY command and system function to the spec section(s) (anchor) that cover it, each with a kind - command, function, statement, clause, deprecated, config, format, or reference for a section that documents it as none of these - saying what that section documents the word as; config_index maps each configuration statement (BRConfig.sys, CONFIG) to where it is defined: a page of its own (file) or a section (anchor); each spec record carries title, status, anchors, and lead summary. Regenerate with tools/gen_brtree_index.exe.",
-  "generated": "2026-11-22",
+  "generated": "2026-11-24",
   "source": "br_tree/",
-  "source_sha256": "b8c3d6323b59a951afd956d67f2390bb2b462c3b03b45b4b7042aed4e504d35d",
+  "source_sha256": "348af9cda598fcba4267417061636a4003dba0a50f48ea29b7de50e6d4cbd34e",
   "count": 38,
   "keyword_index": {
     "!:": [
@@ -14,6 +14,12 @@
     ":=": [
       "10-language/data-manipulation/assignment",
       "10-language/data-manipulation/expressions"
+    ],
+    ">": [
+      "10-language/flow-control/other-flow"
+    ],
+    ">>": [
+      "10-language/flow-control/other-flow"
     ],
     "ABS": [
       "10-language/data-manipulation/system-functions"
@@ -332,6 +338,9 @@
     "DIR": [
       "70-commands/file-directory"
     ],
+    "DISCONNECT": [
+      "00-configuration/installation-tooling"
+    ],
     "DISPLAY": [
       "20-io-screen/controls",
       "30-io-file/file-model",
@@ -480,6 +489,9 @@
     "FP": [
       "10-language/data-manipulation/system-functions"
     ],
+    "FRE": [
+      "70-commands/file-directory"
+    ],
     "FREE": [
       "30-io-file/statements",
       "70-commands/file-directory"
@@ -608,7 +620,11 @@
     "JSON": [
       "60-integration/json-datastore"
     ],
-    "KEY": [
+    "KEY=": [
+      "30-io-file/keys-indexes",
+      "30-io-file/statements"
+    ],
+    "KEY>=": [
       "30-io-file/keys-indexes",
       "30-io-file/statements"
     ],
@@ -640,6 +656,10 @@
     "L": [
       "30-io-file/form-spec"
     ],
+    "LABELS": [
+      "10-language/flow-control/other-flow",
+      "70-commands/program-management"
+    ],
     "LAST": [
       "30-io-file/statements"
     ],
@@ -661,7 +681,9 @@
       "10-language/flow-control/error-handling"
     ],
     "LINES": [
-      "10-language/data-manipulation/system-functions"
+      "10-language/data-manipulation/system-functions",
+      "10-language/flow-control/other-flow",
+      "70-commands/program-management"
     ],
     "LINESPP": [
       "10-language/data-manipulation/system-functions"
@@ -697,6 +719,7 @@
       "70-commands/information"
     ],
     "LOG": [
+      "00-configuration/installation-tooling",
       "10-language/data-manipulation/system-functions"
     ],
     "LOGGING": [
@@ -1019,7 +1042,9 @@
       "30-io-file/statements"
     ],
     "REC": [
-      "10-language/data-manipulation/system-functions",
+      "10-language/data-manipulation/system-functions"
+    ],
+    "REC=": [
       "30-io-file/statements"
     ],
     "RELATIVE": [
@@ -1027,7 +1052,9 @@
     ],
     "RELEASE": [
       "30-io-file/file-model",
-      "50-libraries/library-facility"
+      "30-io-file/statements",
+      "50-libraries/library-facility",
+      "70-commands/file-directory"
     ],
     "REM": [
       "10-language/data-manipulation/system-functions",
@@ -1049,7 +1076,9 @@
       "30-io-file/statements"
     ],
     "RESERVE": [
-      "30-io-file/file-model"
+      "30-io-file/file-model",
+      "30-io-file/statements",
+      "70-commands/file-directory"
     ],
     "RESIDENT": [
       "50-libraries/library-facility"
@@ -1128,8 +1157,15 @@
       "10-language/data-manipulation/system-functions"
     ],
     "SEARCH": [
-      "30-io-file/keys-indexes",
       "70-commands/file-directory"
+    ],
+    "SEARCH=": [
+      "30-io-file/keys-indexes",
+      "30-io-file/statements"
+    ],
+    "SEARCH>=": [
+      "30-io-file/keys-indexes",
+      "30-io-file/statements"
     ],
     "SEARCH_CHAR": [
       "00-configuration/config-directives"
@@ -1359,8 +1395,10 @@
     "VU": [
       "20-io-screen/fields-attributes"
     ],
-    "WAIT": [
-      "30-io-file/statements"
+    "WAIT=": [
+      "20-io-screen/input-output",
+      "30-io-file/statements",
+      "40-io-printing/statements"
     ],
     "WBPLATFORM$": [
       "10-language/data-manipulation/system-functions"
@@ -1406,6 +1444,9 @@
     ],
     "XLATE$": [
       "10-language/data-manipulation/system-functions"
+    ],
+    "XREF": [
+      "70-commands/editing"
     ],
     "ZD": [
       "30-io-file/form-spec"
@@ -2042,6 +2083,13 @@
         "kind": "function"
       }
     ],
+    "FRE": [
+      {
+        "spec": "70-commands/file-directory",
+        "anchor": "fre",
+        "kind": "command"
+      }
+    ],
     "FREE": [
       {
         "spec": "30-io-file/statements",
@@ -2282,6 +2330,11 @@
       }
     ],
     "LOG": [
+      {
+        "spec": "00-configuration/installation-tooling",
+        "anchor": "log",
+        "kind": "command"
+      },
       {
         "spec": "10-language/data-manipulation/system-functions",
         "anchor": "log",
@@ -2655,18 +2708,28 @@
         "spec": "10-language/data-manipulation/system-functions",
         "anchor": "rec",
         "kind": "function"
-      },
-      {
-        "spec": "30-io-file/statements",
-        "anchor": "rec",
-        "kind": "clause"
       }
     ],
     "RELEASE": [
       {
+        "spec": "30-io-file/file-model",
+        "anchor": "release",
+        "kind": "clause"
+      },
+      {
+        "spec": "30-io-file/statements",
+        "anchor": "release",
+        "kind": "statement"
+      },
+      {
         "spec": "50-libraries/library-facility",
         "anchor": "clearing",
-        "kind": "statement"
+        "kind": "clause"
+      },
+      {
+        "spec": "70-commands/file-directory",
+        "anchor": "release",
+        "kind": "command"
       }
     ],
     "REM": [
@@ -2714,6 +2777,16 @@
         "spec": "30-io-file/file-model",
         "anchor": "reserve",
         "kind": "clause"
+      },
+      {
+        "spec": "30-io-file/statements",
+        "anchor": "reserve",
+        "kind": "statement"
+      },
+      {
+        "spec": "70-commands/file-directory",
+        "anchor": "reserve",
+        "kind": "command"
       }
     ],
     "RESTORE": [
@@ -2834,11 +2907,6 @@
       }
     ],
     "SEARCH": [
-      {
-        "spec": "30-io-file/keys-indexes",
-        "anchor": "key-clause",
-        "kind": "clause"
-      },
       {
         "spec": "70-commands/file-directory",
         "anchor": "search",
@@ -3073,6 +3141,11 @@
         "spec": "10-language/flow-control/other-flow",
         "anchor": "trace",
         "kind": "statement"
+      },
+      {
+        "spec": "70-commands/information",
+        "anchor": "trace",
+        "kind": "command"
       }
     ],
     "TRIM$": [
@@ -3194,7 +3267,7 @@
       "FILES"
     ],
     "CLOSE": [
-      "WAITEQ",
+      "WAIT=",
       "FREE",
       "DROP",
       "RELEASE"
@@ -3249,7 +3322,7 @@
       "THEN"
     ],
     "INPUT": [
-      "WAITEQ",
+      "WAIT=",
       "FIELDS",
       "ATTR",
       "HELP",
@@ -3265,7 +3338,7 @@
       "RELEASE"
     ],
     "LINPUT": [
-      "WAITEQ"
+      "WAIT="
     ],
     "LOOP": [
       "WHILE",
@@ -3306,14 +3379,14 @@
       "FIELDS",
       "HELP",
       "USING",
-      "WAITEQ",
+      "WAIT=",
       "BORDER"
     ],
     "RANDOMIZE": [],
     "READ": [
       "USING",
       "POS=",
-      "WAITEQ",
+      "WAIT=",
       "RESERVE",
       "RELEASE",
       "KEY=",
@@ -3371,7 +3444,7 @@
       "RELEASE"
     ],
     "RINPUT": [
-      "WAITEQ",
+      "WAIT=",
       "FIELDS",
       "ATTR",
       "HELP",
@@ -3380,16 +3453,20 @@
     "SELECT": [],
     "STOP": [],
     "TRACE": [
+      "LINES",
+      "LABELS",
       "PRINT",
       "OFF",
-      "ON"
+      "ON",
+      ">>",
+      ">"
     ],
     "USE": [],
     "WRITE": [
       "USING",
       "REC=",
       "POS=",
-      "WAITEQ",
+      "WAIT=",
       "RESERVE",
       "RELEASE"
     ]
@@ -4487,7 +4564,9 @@
         "AUTH",
         "LISTEN",
         "OBSERVE",
-        "SCREENLOG"
+        "SCREENLOG",
+        "LOG",
+        "DISCONNECT"
       ],
       "related": [
         "config-directives",
@@ -4502,6 +4581,8 @@
         "dotnet",
         "diagnostics",
         "debug",
+        "log",
+        "disconnect",
         "automation",
         "see-also"
       ],
@@ -5140,7 +5221,11 @@
         "TO",
         "ON",
         "OFF",
-        "PRINT"
+        "PRINT",
+        "LINES",
+        "LABELS",
+        ">",
+        ">>"
       ],
       "related": [
         "conditionals",
@@ -5317,7 +5402,8 @@
         "RINPUT",
         "SELECT",
         "ATTR",
-        "HELP"
+        "HELP",
+        "WAIT="
       ],
       "related": [
         "fields-attributes",
@@ -5468,6 +5554,7 @@
         "sharing",
         "locking",
         "reserve",
+        "release",
         "linked",
         "wsid",
         "slash",
@@ -5539,8 +5626,10 @@
       "status": "2b",
       "keywords": [
         "INDEX",
-        "KEY",
-        "SEARCH",
+        "KEY=",
+        "KEY>=",
+        "SEARCH=",
+        "SEARCH>=",
         "KEYED",
         "KEYONLY",
         "REORG",
@@ -5613,8 +5702,11 @@
         "DELETE",
         "RESTORE",
         "REREAD",
-        "REC",
-        "KEY",
+        "REC=",
+        "KEY=",
+        "KEY>=",
+        "SEARCH=",
+        "SEARCH>=",
         "LINK=",
         "POS=",
         "KEYONLY",
@@ -5629,9 +5721,11 @@
         "OUTIN",
         "SEQUENTIAL",
         "OUTPUT",
-        "WAIT",
+        "WAIT=",
         "DROP",
-        "FREE"
+        "FREE",
+        "RELEASE",
+        "RESERVE"
       ],
       "related": [
         "file-model",
@@ -5649,10 +5743,13 @@
         "display",
         "read",
         "rewrite",
+        "io-wait",
         "linput",
         "write",
         "delete",
         "restore",
+        "release",
+        "reserve",
         "link",
         "keyonly",
         "no-abbreviation",
@@ -5717,7 +5814,8 @@
         "USING",
         "PIC",
         "COPIES",
-        "PRINTER_LIST"
+        "PRINTER_LIST",
+        "WAIT="
       ],
       "related": [
         "pcl-pdf",
@@ -5930,7 +6028,8 @@
         "DEL",
         "SOURCE",
         "CLAUSES",
-        "NOEJECT"
+        "NOEJECT",
+        "XREF"
       ],
       "related": [
         "program-management",
@@ -5944,6 +6043,7 @@
         "del",
         "list",
         "list-options",
+        "xref",
         "list-output",
         "list-scroll",
         "list-forms",
@@ -5971,10 +6071,13 @@
         "RMDIR",
         "CHDIR",
         "FREE",
+        "FRE",
         "PROTECT",
         "DROP",
         "TYPE",
-        "SEARCH"
+        "SEARCH",
+        "RESERVE",
+        "RELEASE"
       ],
       "related": [
         "program-management",
@@ -6002,7 +6105,10 @@
         "drop-free",
         "drop",
         "free",
+        "fre",
         "protect",
+        "reserve",
+        "release",
         "examples",
         "see-also"
       ],
@@ -6050,7 +6156,10 @@
         "date-time",
         "date",
         "time",
+        "trace",
+        "trace-file",
         "break",
+        "break-function",
         "display",
         "list-search",
         "debug-str",
@@ -6099,7 +6208,9 @@
         "OBJECT",
         "ONLY",
         "NOSTEP",
-        "NOTRACE"
+        "NOTRACE",
+        "LINES",
+        "LABELS"
       ],
       "related": [
         "file-directory",

@@ -8,8 +8,11 @@ kind: spec
 status: 2b           # reference base verified comprehensive; misfiled command pages relocated; added 2026-07-03: CLOSE trailing-colon terminates the statement (second colon needed before a following statement); no conflicts
 recovered-fold: LINPUT, OPEN_DISPLAY, OPEN_external, READ(disambig), REREAD, RESTORE(disambig), RESTORE_file (7 redirect-collision pages folded from re-fetched source — external short-record 4271, DELETE-invalid-on-external, TRANSLATE/0608/4146, RESTORE modes+linked anchors, LINPUT/WAIT/TIMEOUT, REREAD dup-key idiom; verbatim retained on the BR wiki)
 related: [file-model, form-spec, keys-indexes, serial-comm]
-keywords: [OPEN, CLOSE, READ, WRITE, REWRITE, DELETE, RESTORE, REREAD, REC, KEY, "LINK=", "POS=", KEYONLY, FIRST, LAST, PRIOR, NEXT, SAME, EOF, NOKEY, NOREC, OUTIN, SEQUENTIAL, OUTPUT, WAIT, DROP, FREE]
+keywords: [OPEN, CLOSE, READ, WRITE, REWRITE, DELETE, RESTORE, REREAD, "REC=", "KEY=", "KEY>=", "SEARCH=", "SEARCH>=", "LINK=", "POS=", KEYONLY, FIRST, LAST, PRIOR, NEXT, SAME, EOF, NOKEY, NOREC, OUTIN, SEQUENTIAL, OUTPUT, "WAIT=", DROP, FREE, RELEASE, RESERVE]
 corrections:
+  - "2026-11-23: REC, KEY and WAIT in the keywords replaced by BR's spellings REC=, KEY=, KEY>= and WAIT=, and SEARCH= and SEARCH>= added (the BNF's <position> names them). The bare words routed the clauses only because brls's router retried a keyword without its relational suffix. REC alone is the REC(n) function, documented in system-functions, and KEY and WAIT are no BR token. The owner's rule (2026-11-23): a spelling without the = does not stand for the one with it, and the router no longer retries."
+  - "2026-11-23, from BR 5.03's source (primop1.cpp: WAIT_SEC sets pri_struct.wait, which only binput and fields() read; file2.cpp locks a record with the OPEN's ufwait; bopen.cpp bcloseWork) and run headless: WAIT= added to READ's and WRITE's BNF and as a second CLOSE form (CLOSE #n, WAIT=n [, FREE]:), as BR's syntax trees have it. On all three it is accepted and does nothing: READ, WRITE and CLOSE with WAIT=1 ran clean, and CLOSE WAIT=1, FREE still deleted the file. That it has no effect on a locked record is from the source, not from a run, which would need two workstations. The `io-wait` bullet says so. The REWRITE bullet said a repositioning REWRITE's WAIT= bounds the wait for a locked record; REWRITE has no WAIT= (BR answers error 1026), and the wait is the OPEN's. Found when syn.txt was regenerated with WAIT= in place of WAITEQ, which brls's BNF check had been unable to see."
+  - "2026-11-22, from BR 5.03's source (primop1.cpp RELEASE_PRI and RESERVE_PRI; syn.txt's RELEASE and RESERVE trees): the RELEASE and RESERVE statements, which no page documented, added to the BNF and as the `release` and `reserve` bullets beside RESTORE. RELEASE #n releases the locks RESERVE kept and is otherwise a no-op; RESERVE #n compiles and is always error 2300. RELEASE and RESERVE added to the keywords, so the two statements link here and not to the clause sections in file-model or LIBRARY RELEASE."
   - "The eight positioning keywords matched through command5.cpp's sec_kw[] array - PRIOR, LAST,
     KEYONLY, FIRST, NEXT, END, SAME and LINK= - take no abbreviation, and nothing here said so.
     The page documented two of syntaxfn's rules for KEYONLY (READ only; the colon must follow) and
@@ -69,14 +72,19 @@ OPEN '#'<channel> ':' <file-open-string> ',' 'EXTERNAL' ','
 <a id="io"></a>
 ### Record I/O
 ```bnf
-READ    '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' <position> ] [ ',' { 'RESERVE' | 'RELEASE' } ] [ ',' 'KEYONLY' ] ':' <variable-list> <exits>
+READ    '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' <position> ] [ ',' 'WAIT=' <numeric-expr> ] [ ',' { 'RESERVE' | 'RELEASE' } ] [ ',' 'KEYONLY' ] ':' <variable-list> <exits>
                                                                                           -- KEYONLY: READ only, and the ':' must follow it
+                                                                                          -- WAIT=: accepted, no effect (see below)
 REREAD  '#'<channel> [ ',' 'USING' <form-ref> ] ':' <variable-list> <exits>      -- re-reads buffered record; no EOF
-WRITE   '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' 'REC=' <numeric-expr> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <expression-list> <exits>
+WRITE   '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' 'REC=' <numeric-expr> ] [ ',' 'WAIT=' <numeric-expr> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <expression-list> <exits>
+                                                                                          -- WAIT=: accepted, no effect
 REWRITE '#'<channel> [ ',' 'USING' <form-ref> ] [ ',' <update-position> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <expression-list> <exits>
 DELETE  '#'<channel> [ ',' <update-position> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <exits>
 RESTORE '#'<channel> [ ',' <position> ] [ ',' { 'RESERVE' | 'RELEASE' } ] ':' <exits>
 CLOSE   '#'<channel> [ ',' { 'DROP' | 'FREE' } ] [ ',' 'RELEASE' ] ':'
+CLOSE   '#'<channel> ',' 'WAIT=' <numeric-expr> [ ',' 'FREE' ] ':'                -- WAIT=: accepted, no effect; FREE still deletes
+RELEASE '#'<channel> ':' <exits>                                                -- drops the locks RESERVE kept
+RESERVE '#'<channel> ':' <exits>                                                -- compiles; always error 2300
 
 <position> ::= 'REC=' <numeric-expr> | 'KEY[>]=' <string-expr> | 'SEARCH[>]=' <string-expr>
              | 'LINK=' <string-expr>                     -- LINKED files only; see below
@@ -149,9 +157,13 @@ that matter on a `READ`, `NOKEY` and `NOREC` on a `REWRITE`.
   `REC=`/`POS=`/`KEY=` clause; a common idiom reads a *key-only* FORM, tests the key, then `REREAD`s the
   *full* FORM (e.g. to walk duplicate keys). **REWRITE** updates the last record read (file must be
   `OUTIN`); it changes only the fields the FORM names, leaving the rest intact. When REWRITE
-  **repositions** via `REC=`/`KEY=`, `WAIT=<sec>` bounds how long to wait for a record another
-  workstation has locked before **error 0061** (default 15s); `WAIT=` is meaningless on a plain
-  REWRITE of the already-locked current record.
+  **repositions** via `REC=`/`KEY=`, BR waits the OPEN's `WAIT=` (15s by default) for a record
+  another workstation has locked, then raises **error 0061**. REWRITE takes no `WAIT=` clause of its
+  own: `REWRITE #1, USING 30, WAIT=5: X$` is error **1026**.
+- <a id="io-wait"></a>**`WAIT=` on `READ`, `WRITE` and `CLOSE`** is accepted and does nothing. BR
+  evaluates the expression, but only the keyboard and file reads of `INPUT`/`LINPUT`/`RINPUT` and the
+  `FIELDS` forms use it (`primop1.cpp`). A record lock waits for the OPEN's `WAIT=` (`ufwait`,
+  `file2.cpp`). `CLOSE #n, WAIT=n, FREE:` still deletes the file. The OPEN's `WAIT=` is the one to set.
 - <a id="linput"></a>**LINPUT** reads an entire line/record into **one** string variable, keeping
   commas, quotes and leading blanks (unlike `INPUT`, which splits on commas) — from the keyboard
   (`#0`/none), a display/communications file, or a procedure file under `RUN PROC`. `WAIT=<sec>` arms
@@ -178,6 +190,12 @@ that matter on a `READ`, `NOKEY` and `NOREC` on a `REWRITE`.
   file-channel number (`1–199` or `300–999`). By default RESTORE **releases all record locks** held on
   the channel; **`,RESERVE`** keeps them and **`,RELEASE`** releases them explicitly. (To *merely*
   release record locks, `REREAD #n: RELEASE` is faster than `RESTORE #n:`.)
+- <a id="release"></a>**`RELEASE #n:`** is a statement of its own, as well as the `,RELEASE` clause. On an
+  internal or external file opened `OUTIN` with `SHR` that holds record locks kept by `,RESERVE`, it
+  releases them all. In every other case it does nothing, and is not an error.
+- <a id="reserve"></a>**`RESERVE #n:`** compiles, but always fails at run time with **error 2300**
+  (a feature no longer supported). To keep locks, use the `,RESERVE` clause on the I/O statement; to
+  reserve a file's name, see [file-model](../file-model/spec.md#locking).
 - <a id="link"></a>**`LINK=<string-expr>`** verifies that a linked record belongs to the master you
   think it does. Admitted on `READ`, `RESTORE`, `REWRITE` and `DELETE`, and it is a **positioning
   parameter** in BR's own grouping — `command5.cpp` lists it beside `FIRST`/`LAST`/`PRIOR`/`SAME`, and
