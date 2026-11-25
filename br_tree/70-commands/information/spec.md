@@ -10,6 +10,16 @@ recovered-fold: NOSTEP (redirect-collision page re-fetched; NOSTEP/NOTRACE alrea
 related: [program-management, editing]
 keywords: [HELP, STATUS, LIST, TRACE, DISPLAY, LOGGING, STEP, BREAK, DATE, TIME, ALL, FONTS, NORESTORE, DEBUG_STR, PROGRAM$, ATTRIBUTES, BREAKPOINTS, COLORS, DIMS, ENCRYPTION, LOCKS, MEMORY, USERS]
 corrections:
+  - "DISPLAY FNname documented (BR 5.03, 2026-11-24; br50 br/docs/BR503 Release_Notes.md 2.12): the value
+    a function returns, at each return, and implied by BREAK FNname. From run.cpp (functionReturnDisplay,
+    called by popFlowStack) and commandc.cpp; tested by br50's br/aiaccess/fnreturn.py."
+  - "BREAK -p is set again at every LOAD of the program, now from source too (BR 5.03, 2026-11-24; release
+    notes 3.9): command7.cpp's programLoaded(), called by command.cpp at the end of a source load; tested by
+    br50's br/aiaccess/aftertest.py."
+  - "BREAK ... AFTER n documented (BR 5.03, 2026-11-24; br50 br/docs/BR503 Release_Notes.md 2.11): passes
+    over the first n stops of a line, variable, FNname, system function or BREAK IF; before IF; counted
+    afresh at RUN; shown by STATUS BREAK. From commandc.cpp (breakDisplay), run.cpp (checkbreakpoints)
+    and command1.cpp (conditionalBreakCommand), tested by br50's br/aiaccess/aftertest.py."
   - "From the BR 5.0 parsers (see br50 br/docs/FLAGS.md), 2026-10-21, source reading not yet confirmed by a run: the BREAK paragraph said conditional breakpoints aren't set with BREAK - BR 5.0 has `IF <cond>` on a target, `BREAK IF <cond>` and `BREAK IF OFF`, plus `BREAK FILE` (commandc.cpp breakDisplay(); release notes 3.10, 3.11); DISPLAY gains IF and FILE likewise; STATUS's topics are listed in full from table8k with -P and redirection (statcmd.cpp); VERIFY described as it is, a message and no check (wbos.cpp VERIFY_CMD); pointer to the new `-?` command help added."
   - "MSG(\"sleeptime\",n) unit corrected to milliseconds (was given as seconds here; see MSG.md corrections for the brmsg.cpp evidence). Reported in context/ERRORS.md 2026-09-28."
   - "BREAK, TIME, ALL, FONTS and NORESTORE added to the frontmatter keywords. All five are in this page's BNF — BREAK has an anchor of its own — and none was declared. Found in brls phase 13."
@@ -51,11 +61,11 @@ RUN [<program>] ['>'['>']<file>] [STEP] [TRACE [LINES|LABELS|PRINT|'>'['>']<file
                                                     -- run, stepping and/or tracing; options in any order
 GO [<line>] [STEP] [TRACE [LINES|LABELS|PRINT|'>'['>']<file>]… [ON|OFF] | NOTRACE] [NORESTORE|RESTORE]
                                                     -- resume a halted program, the same options
-BREAK [-p <prog>] { <line>[:<clause>] | <label>: | <var> | FN<name> | <system-function> | BEGIN } [OFF | '>'['>'] { <file> | <array$> }] [IF <cond>]   -- ST mode triggers
-BREAK IF <cond> | BREAK IF OFF                      -- test <cond> after every line (5.0)
+BREAK [-p <prog>] { <line>[:<clause>] | <label>: | <var> | FN<name> | <system-function> | BEGIN } [OFF | '>'['>'] { <file> | <array$> }] [AFTER <n>] [IF <cond>]   -- ST mode triggers
+BREAK [AFTER <n>] IF <cond> | BREAK IF OFF          -- test <cond> after every line (5.0)
 BREAK FILE <name> [OPEN|CLOSE] [OFF]                -- stop when the file is opened or closed (5.0)
 BREAK ALL OFF                                       -- clear every breakpoint
-DISPLAY [-p <prog>] { <var> | MAT <array> | ALL } [OFF | PRINT | '>'['>'] { <file> | <array$> }] [IF <cond>]
+DISPLAY [-p <prog>] { <var> | MAT <array> | FN<name> | ALL } [OFF | PRINT | '>'['>'] { <file> | <array$> }] [IF <cond>]
                                                     -- IF <cond> is last on BREAK and DISPLAY: it takes the rest of the line
 DISPLAY FILE <name> [OPEN|CLOSE] [OFF] [PRINT]      -- report the file's OPENs and CLOSEs (5.0)
 TRACE [LINES|LABELS|PRINT]… { OFF | [ON] ['>'['>']<file>] }  -- the statement: set the trace modes, in a program
@@ -178,7 +188,9 @@ Each of these commands lists its forms and options when given
   `IF`**: `IF` takes the rest of the command as its condition, so `BREAK TOTAL > T$ IF TOTAL>100`
   works, while in `BREAK TOTAL IF TOTAL>100 > T$` the condition is `TOTAL>100 > T$`, which is not
   a valid expression (error 1026 when the break is reached). `OFF` clears one setting, `ALL OFF`
-  clears all; `-p <prog>` masks which program/libraries it applies to. **Conditional** breakpoints
+  clears all; `-p <prog>` masks which program/libraries it applies to, and is remembered: the
+  breakpoint is set again whenever a program of that name is loaded, compiled or from source (from
+  source only since BR 5.03, and only once every line has compiled). **Conditional** breakpoints
   (BR 5.0): `IF <cond>` after a target stops only when the condition is true, and `BREAK IF <cond>`
   with no target tests it after every line (`BREAK IF OFF` ends that). Before 5.0 the way was a
   stored `IF A>B THEN EXECUTE "go step"`. **`BREAK FILE <name>`** stops when the file is opened or
@@ -186,15 +198,35 @@ Each of these commands lists its forms and options when given
   - <a id="break-function"></a>**`BREAK FNname`** stops inside the function, at its first line, once
     the call has been made and its arguments evaluated. A library function stops too, whether the
     break was set at the calling program's prompt or with `-p <library>` (before BR 5.03 only the
-    second worked).
+    second worked). When the function returns, the value it returned is shown, as
+    [`DISPLAY FNname`](#display-function) shows it (BR 5.03): where the break's redirection sends
+    it, or to the screen or an attached debugger.
   - **`BREAK <system function>`** (BR 5.03), such as `BREAK LEN`, `BREAK STR$` or `BREAK VAL`, stops
     **before any clause** that calls the function, since a system function has no lines of its own
     to stop in: `BREAK LEN` stops before `LET B=LEN(A$)`, and again before every later clause that
     calls `LEN`. `GO` (or Enter) runs the clause and goes on. Any of BR's string or numeric functions
     can be named, spelled out in full; `OFF` clears it, `-p` chooses the program as for any
-    breakpoint, and `STATUS BREAK` lists it as `BREAK FUNCTION LEN`. `IF` and a redirection are
-    refused (1006), and `DISPLAY` does not take a function (1070). A clause is stopped before if its
+    breakpoint, and `STATUS BREAK` lists it as `BREAK FUNCTION LEN`. `AFTER <n>` is taken (see
+    below); `IF` and a redirection are refused (1006), and `DISPLAY` does not take a function (1070). A clause is stopped before if its
     compiled code calls the function, even where the call would not be reached.
+  - **When a watch is checked** (BR 5.03). `BREAK var` and `DISPLAY var` compare the variable
+    only after a statement that wrote a watched variable (an assignment, `INPUT`, `LINPUT`,
+    `READ`, `MAT`, `NEXT`, a function that fills an argument such as `STR2MAT`, or output
+    redirected into an array), so a watch costs nothing while nothing writes it. A variable a
+    function changes through a parameter passed by reference is caught right after that line,
+    inside the function, even when the function is in a library.
+  - <a id="break-after"></a>**`AFTER <n>`** (BR 5.03) passes over a breakpoint's first *n* stops and
+    stops from the next one on: `BREAK TOTAL AFTER 5` stops the 6th time `TOTAL` changes and every
+    time after, `BREAK 1200 AFTER 99` the 100th time line 1200 is reached, `BREAK FNCALC AFTER 2`
+    at the third call, `BREAK LEN AFTER 10` before the 11th clause that calls `LEN`. It goes after
+    the target and **before `IF`**, which takes the rest of the command; with `IF` only the times
+    the condition holds are counted (`BREAK TOTAL AFTER 3 IF X>0`, and with no target
+    `BREAK AFTER 2 IF X>100`, the third line after which `X>100`). The count starts again at each
+    `RUN`, and entering the `BREAK` again sets it afresh. `STATUS BREAK` shows it
+    (`BREAK LINE 01200:01 AFTER 99`) and, part way through a run, how many are left
+    (`AFTER 99 (40 to go)`); a `-p` breakpoint keeps its `AFTER` when the program is loaded again.
+    `AFTER` is a keyword only when a number follows, so a variable named `AFTER` can still be
+    watched. It is refused (1006) with `OFF`, `ALL`, `BEGIN` or `FILE`, by `DISPLAY`, and twice.
   - With several breakpoints, each stops in turn: before BR 5.03, a stop passed over the next
     check, wherever it was, so `BREAK 60` and `BREAK 70` stopped at 60 only.
 - <a id="display"></a>**DISPLAY** monitors variables as they change, printing
@@ -203,7 +235,9 @@ Each of these commands lists its forms and options when given
   reports a change only when the condition is true, and takes a variable of its own. **The
   redirection must come before `IF`**, which takes the rest of the command as its condition:
   `DISPLAY TOTAL > T$ IF TOTAL>100`, not `DISPLAY TOTAL IF TOTAL>100 > T$`.
-  `PRINT` sends the lines to the printer and `> file` to a file (`>>` adds to it). `> A$` sends
+  `PRINT` sends the lines to the printer and `> file` to a file (`>>` adds to it). Any number of
+  `DISPLAY`s may name the same file; they share one handle on it (BR 5.03; before, a fifth to
+  one file failed with error 4147 or lost its lines to the screen). `> A$` sends
   them into a one-dimensional string array of the program the command is given in, one line to
   an element: `>` empties it first, `>>` keeps what it holds, and it is redimensioned as each
   line is written. A line longer than the elements makes them all that long, at the console and
@@ -214,6 +248,14 @@ Each of these commands lists its forms and options when given
   array is gone when a line is written, the line goes to the screen. `DISPLAY FILE
   <name>` reports the file's OPENs and CLOSEs. In STEP/error mode, just typing a variable name prints
   its current value.
+  - <a id="display-function"></a>**`DISPLAY FNname`** (BR 5.03) says what the function returns, each
+    time it returns, with the line and clause that called it, and the run goes on:
+    `line 00080:01, FNSQ returned, value = 4`. The line goes where the display sends it (the
+    screen, `PRINT`, a file or an array). It works for a single-line or multi-line `DEF`, numeric or
+    string, and a library function, whether set from the calling program or with `-p <library>`.
+    `IF` is refused with a function (1006): a function returns in the middle of a statement, where
+    the run cannot halt to test a condition. `DISPLAY ALL` leaves functions out, and a system
+    function (`DISPLAY LEN`) is refused (1070). [`BREAK FNname`](#break-function) implies it.
 - <a id="list-search"></a>**LIST "str"** searches the program (and `REPLACE "new"` replaces):
   **single** quotes match case-insensitively, **double** quotes require an exact-case match, `~`
   negates a term, and up to three terms combine (all must match). Edit-while-running tip: change a
